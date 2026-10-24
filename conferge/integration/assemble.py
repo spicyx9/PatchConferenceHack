@@ -167,7 +167,7 @@ def assemble(slices: list[SourceSlice],
         domains[name], picked[name] = _travel_domain(name, window, travel.get(name), api_fixture)
     demo = DemoData(
         conference=conference,
-        user=dict(api_fixture.user),
+        user={**api_fixture.user, "source_mode": "fixture"},
         demo_goal_text=api_fixture.demo_goal_text,
         events=events,
         people=people,

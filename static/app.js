@@ -332,13 +332,13 @@
     $("proposals").innerHTML = props.length ? props.map(function (p) {
       return '<div class="event-item"><span class="title">' + esc(p.text) +
         '<br><span class="muted small-text">' + esc(p.reason || "") + "</span></span>" +
-        (p.accepted ? '<span class="badge ok">Accepted</span>'
-          : '<button class="small primary" data-action="accept" data-id="' + esc(p.id) + '">Accept</button>') + "</div>";
+        (p.accepted ? '<span class="badge ok">Noted</span>'
+          : '<button class="small primary" data-action="accept" data-id="' + esc(p.id) + '">Note</button>') + "</div>";
     }).join("") : '<p class="muted">No proposal.</p>';
 
     var b = t.budget || {};
     $("budget").innerHTML = "<table><tbody>" +
-      "<tr><th>Budget</th><td>" + esc(fmtUsd(b.budget_usd)) + "</td></tr>" +
+      "<tr><th>Budget</th><td>" + esc(fmtUsd(b.budget_usd)) + " " + sourceBadge(b.source_mode) + "</td></tr>" +
       "<tr><th>Flights</th><td>" + esc(fmtUsd(b.flights_usd)) + "</td></tr>" +
       "<tr><th>Lodging</th><td>" + esc(fmtUsd(b.lodging_usd)) + "</td></tr>" +
       "<tr><th>Remaining</th><td>" + esc(fmtUsd(b.remaining_usd)) + "</td></tr>" +
@@ -371,9 +371,22 @@
     return planned ? "#f0b429" : "#6e7681";
   }
 
+  function routeKindLabel(polylines) {
+    var kinds = {};
+    (polylines || []).forEach(function (p) { if (p && p.kind) kinds[p.kind] = true; });
+    if (kinds.straight_line_order_of_visits) return "straight lines, not routes";
+    return Object.keys(kinds).join(", ");
+  }
+
   function renderMap(m) {
     lastMapData = m;
     var el = $("map");
+    var kindEl = $("map-kind");
+    if (kindEl) {
+      var label = routeKindLabel(m && m.polylines);
+      kindEl.textContent = label;
+      kindEl.className = label ? "badge neutral" : "hidden";
+    }
     if (typeof L === "undefined") {
       el.innerHTML = '<p class="muted" style="padding:1rem">Leaflet not loaded. Points: ' +
         esc(((m && m.markers) || []).map(function (x) { return x.label; }).join(", ")) + "</p>";
@@ -392,7 +405,7 @@
     ((m && m.polylines) || []).forEach(function (p, idx) {
       if (!p.points || p.points.length < 2) return;
       L.polyline(p.points, { color: dayColors[idx % dayColors.length], weight: 4, opacity: 0.8, dashArray: "6 6" })
-        .bindTooltip("Day " + esc(p.day)).addTo(mapLayer);
+        .bindTooltip("Day " + esc(p.day) + (p.kind === "straight_line_order_of_visits" ? ", straight line" : "")).addTo(mapLayer);
     });
     ((m && m.markers) || []).forEach(function (mk) {
       if (typeof mk.lat !== "number" || typeof mk.lng !== "number") return;
