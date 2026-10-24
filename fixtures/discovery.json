@@ -1,0 +1,146 @@
+{
+  "source_mode": "fixture",
+  "provider": "brightdata_serp",
+  "captured_at": "2026-10-24T07:28:00+00:00",
+  "note": "SYNTHETIC SERP RESPONSES. No Bright Data key was available, so no Google result was observed. Each URL and title is real and copied from fixtures captured live by w01 (luma.json) and w02 (eventbrite-aggregators.json); the pairing query -> URL -> rank is constructed offline to exercise routing. Snippets are null (never invented). Not a live response.",
+  "plan": {
+    "city": "San Francisco",
+    "conference_name": "GitHub Universe",
+    "aliases": [
+      "Universe"
+    ],
+    "venue": "Fort Mason Center",
+    "start_date": "2026-10-28",
+    "end_date": "2026-10-29",
+    "sponsors": [
+      "Amplitude",
+      "Faros",
+      "Rubrik",
+      "Xebia",
+      "Cloudsmith",
+      "Chainguard"
+    ],
+    "hosts": [],
+    "topics": [
+      "AI agents",
+      "developer tools",
+      "MCP"
+    ],
+    "max_sponsors": 8,
+    "max_platform_days": 4
+  },
+  "serp_responses": {
+    "\"GitHub Universe\" San Francisco afterparty": {
+      "organic": [
+        {
+          "link": "https://amplitude.com/2026-10-github-universe#afterparty",
+          "title": "Ship It Afterparty",
+          "description": null,
+          "rank": 1
+        },
+        {
+          "link": "https://conferenceparties.com/github26/",
+          "title": "GitHub Universe 2026 parties",
+          "description": null,
+          "rank": 2
+        },
+        {
+          "link": "https://luma.com/git-together",
+          "title": "DevOps on Draft: A Universe Git-Together",
+          "description": null,
+          "rank": 3
+        }
+      ]
+    },
+    "\"GitHub Universe\" San Francisco happy hour": {
+      "organic": [
+        {
+          "link": "https://pages.faros.ai/connect-with-faros-at-github-universe?utm_source=google",
+          "title": "AI Engineering Happy Hour",
+          "description": null,
+          "rank": 1
+        },
+        {
+          "link": "https://go.slalom.com/GitHub-Universe-Happy-Hour",
+          "title": "AI in Motion: Charting the Next Frontier",
+          "description": null,
+          "rank": 2
+        },
+        {
+          "link": "https://lu.ma/git-together",
+          "title": "DevOps on Draft: A Universe Git-Together",
+          "description": null,
+          "rank": 3
+        }
+      ]
+    },
+    "Rubrik San Francisco October 2026 party": {
+      "organic": [
+        {
+          "link": "https://rubrik.registration.goldcast.io/events/e44f07c0-8a90-4556-bd73-9a61845fd1cf",
+          "title": "Recovery Hour with Rubrik",
+          "description": null,
+          "rank": 1
+        }
+      ]
+    },
+    "Xebia San Francisco October 2026 party": {
+      "organic": [
+        {
+          "link": "https://events.xebia.com/microsoft/github-universe-broad-street-oyster-bash2026",
+          "title": "Xebia’s Broad Street Oyster Bash",
+          "description": null,
+          "rank": 1
+        }
+      ]
+    },
+    "San Francisco tech event October 29 2026": {
+      "organic": [
+        {
+          "link": "https://luma.com/0m8oub77",
+          "title": "Entire Espresso with Gergely Orosz and Thomas Dohmke",
+          "description": null,
+          "rank": 1
+        },
+        {
+          "link": "https://luma.com/xueo91fw",
+          "title": "Agent Builders Breakfast - Founders & Builders in SOMA, SF",
+          "description": null,
+          "rank": 2
+        }
+      ]
+    },
+    "site:luma.com San Francisco October 28 2026": {
+      "organic": [
+        {
+          "link": "https://luma.com/69r7rj77",
+          "title": "Agentic Infrastructure Stack Summit",
+          "description": null,
+          "rank": 1
+        },
+        {
+          "link": "https://luma.com/you-halloween",
+          "title": "Hack With YOU @AWS Builder Loft - Halloween Edition",
+          "description": null,
+          "rank": 2
+        },
+        {
+          "link": "https://luma.com/discover",
+          "title": "Discover events",
+          "description": null,
+          "rank": 3
+        }
+      ]
+    },
+    "site:eventbrite.com San Francisco October 2026 developer OR AI": {
+      "organic": [
+        {
+          "link": "https://www.eventbrite.com/e/ai-startup-pitch-investor-networking-i-san-francisco-tickets-2003686507281",
+          "title": "AI Startup Pitch & Investor Networking I San Francisco",
+          "description": null,
+          "rank": 1
+        }
+      ]
+    }
+  }
+}

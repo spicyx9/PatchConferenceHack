@@ -1,0 +1,374 @@
+{
+ "_comment": "Real Eventbrite destination/search response captured 2026-10-23, reduced to 2 results; pagination is rewritten per test.",
+ "events": {
+  "pagination": {
+   "page_size": 50,
+   "object_count": 2,
+   "continuation": null,
+   "page_number": 1,
+   "page_count": 1
+  },
+  "results": [
+   {
+    "id": "1984404755041",
+    "eid": "1984404755041",
+    "eventbrite_event_id": "1984404755041",
+    "name": "TRIVIA with Oakland's Finest Trivia",
+    "summary": "Join us at the OP taproom for a fun night of TRIVIA ! Compete, have some fun and enjoy your favorite Original Pattern draft beers.",
+    "full_description": null,
+    "start_time": "19:00",
+    "end_time": "21:00",
+    "start_date": "2026-10-28",
+    "end_date": "2026-10-28",
+    "published": "2026-03-03T18:56:21Z",
+    "hide_start_date": false,
+    "hide_end_date": false,
+    "language": "en-us",
+    "timezone": "America/Los_Angeles",
+    "url": "https://www.eventbrite.com/e/trivia-with-oaklands-finest-trivia-tickets-1984404755041",
+    "parent_url": "https://www.eventbrite.com/e/trivia-with-oaklands-finest-trivia-tickets-1984404521342",
+    "tickets_url": "https://www.eventbrite.com/checkout-external?eid=1984404755041",
+    "tickets_by": "Eventbrite",
+    "is_cancelled": null,
+    "is_online_event": false,
+    "is_protected_event": false,
+    "primary_venue_id": "296692669",
+    "primary_organizer_id": "16482971751",
+    "series_id": "1984404521342",
+    "tags": [
+     {
+      "display_name": "Beer",
+      "prefix": "EventbriteSubCategory",
+      "tag": "EventbriteSubCategory/10001"
+     },
+     {
+      "display_name": "Food & Drink",
+      "prefix": "EventbriteCategory",
+      "tag": "EventbriteCategory/110",
+      "localized": {
+       "display_name": "Food & Drink"
+      }
+     },
+     {
+      "display_name": "Party or Social Gathering",
+      "prefix": "EventbriteFormat",
+      "tag": "EventbriteFormat/11"
+     },
+     {
+      "_type": "tag",
+      "display_name": "Free",
+      "prefix": "OrganizerTag",
+      "tag": "OrganizerTag/Free"
+     }
+    ],
+    "image_id": "938661853",
+    "checkout_flow": "widget",
+    "num_children": 1,
+    "dedup": {
+     "count": 1,
+     "hash": ""
+    },
+    "urgency_signals": {
+     "messages": [
+      "salesEndSoon"
+     ],
+     "categories": []
+    },
+    "locations": [
+     {
+      "id": "102191575",
+      "type": "continent",
+      "name": "North America"
+     },
+     {
+      "id": "85633793",
+      "type": "country",
+      "name": "United States"
+     },
+     {
+      "id": "85688637",
+      "type": "region",
+      "name": "California"
+     },
+     {
+      "id": "102086959",
+      "type": "county",
+      "name": "Alameda"
+     },
+     {
+      "id": "85921881",
+      "type": "locality",
+      "name": "Oakland"
+     },
+     {
+      "id": "1108794093",
+      "type": "macrohood",
+      "name": "Central Oakland"
+     },
+     {
+      "id": "85872423",
+      "type": "neighbourhood",
+      "name": "Produce and Waterfront"
+     }
+    ],
+    "_type": "destination_event",
+    "ticket_availability": {
+     "minimum_ticket_price": {
+      "currency": "USD",
+      "value": 0,
+      "major_value": "0.00",
+      "display": "0.00 USD"
+     },
+     "maximum_ticket_price": {
+      "currency": "USD",
+      "value": 0,
+      "major_value": "0.00",
+      "display": "0.00 USD"
+     },
+     "is_sold_out": false,
+     "has_available_tickets": true,
+     "is_free": true,
+     "has_bogo_tickets": false
+    },
+    "primary_organizer": {
+     "_type": "destination_profile",
+     "id": "16482971751",
+     "profile_type": "organizer",
+     "name": "Original Pattern Brewing",
+     "url": "https://www.eventbrite.com/o/original-pattern-brewing-16482971751",
+     "image_id": "920044643",
+     "twitter": null,
+     "facebook": "originalpattern",
+     "website_url": "http://originalpatternbeer.com",
+     "followed_by_you": false,
+     "num_followers": 1201,
+     "num_following": null,
+     "num_saves": null,
+     "num_collections": null,
+     "num_upcoming_events": null
+    },
+    "primary_venue": {
+     "_type": "destination_venue",
+     "id": "296692669",
+     "name": "Original Pattern Brewing",
+     "address": {
+      "address_1": "292 4th St",
+      "address_2": "",
+      "city": "Oakland",
+      "region": "CA",
+      "postal_code": "94607",
+      "country": "US",
+      "latitude": "37.7961351",
+      "longitude": "-122.27145889999997",
+      "localized_address_display": "292 4th St, Oakland, CA 94607",
+      "localized_area_display": "Oakland, CA",
+      "localized_multi_line_address_display": [
+       "292 4th St",
+       "Oakland, CA 94607"
+      ]
+     },
+     "venue_profile_id": null,
+     "venue_profile_url": ""
+    },
+    "event_sales_status": {
+     "sales_status": "on_sale",
+     "start_sales_date": {
+      "timezone": "America/Los_Angeles",
+      "utc": "1970-01-01T08:00:00Z",
+      "local": "1970-01-01T00:00:00"
+     },
+     "currency": "USD",
+     "end_sales_date": {
+      "timezone": "America/Los_Angeles",
+      "utc": "2026-10-29T01:00:00Z",
+      "local": "2026-10-28T18:00:00"
+     },
+     "message": null,
+     "default_message": null,
+     "message_code": null,
+     "message_type": null
+    }
+   },
+   {
+    "id": "1991757091076",
+    "eid": "1991757091076",
+    "eventbrite_event_id": "1991757091076",
+    "name": "Karaoke & Happy Hour",
+    "summary": "Karaoke Every Wednesday. $2 off all whiskeys. Happy Hour All Nite.",
+    "full_description": null,
+    "start_time": "19:00",
+    "end_time": "23:59",
+    "start_date": "2026-10-28",
+    "end_date": "2026-10-28",
+    "published": "2026-06-12T08:00:19Z",
+    "hide_start_date": false,
+    "hide_end_date": false,
+    "language": "en-us",
+    "timezone": "America/Los_Angeles",
+    "url": "https://www.eventbrite.com/e/karaoke-happy-hour-tickets-1991757091076",
+    "parent_url": "https://www.eventbrite.com/e/karaoke-happy-hour-tickets-1991756934608",
+    "tickets_url": "https://www.eventbrite.com/checkout-external?eid=1991757091076",
+    "tickets_by": "Eventbrite",
+    "is_cancelled": null,
+    "is_online_event": false,
+    "is_protected_event": false,
+    "primary_venue_id": "296609567",
+    "primary_organizer_id": "118898869541",
+    "series_id": "1991756934608",
+    "tags": [
+     {
+      "display_name": "Other",
+      "prefix": "EventbriteSubCategory",
+      "tag": "EventbriteSubCategory/3999"
+     },
+     {
+      "display_name": "Music",
+      "prefix": "EventbriteCategory",
+      "tag": "EventbriteCategory/103",
+      "localized": {
+       "display_name": "Music"
+      }
+     },
+     {
+      "display_name": "Party or Social Gathering",
+      "prefix": "EventbriteFormat",
+      "tag": "EventbriteFormat/11"
+     },
+     {
+      "_type": "tag",
+      "display_name": "Singing",
+      "prefix": "OrganizerTag",
+      "tag": "OrganizerTag/Singing"
+     }
+    ],
+    "image_id": "1186743311",
+    "checkout_flow": "widget",
+    "num_children": 1,
+    "dedup": {
+     "count": 1,
+     "hash": ""
+    },
+    "urgency_signals": {
+     "messages": [
+      "salesEndSoon"
+     ],
+     "categories": []
+    },
+    "locations": [
+     {
+      "id": "102191575",
+      "type": "continent",
+      "name": "North America"
+     },
+     {
+      "id": "85633793",
+      "type": "country",
+      "name": "United States"
+     },
+     {
+      "id": "85688637",
+      "type": "region",
+      "name": "California"
+     },
+     {
+      "id": "102086959",
+      "type": "county",
+      "name": "Alameda"
+     },
+     {
+      "id": "85921881",
+      "type": "locality",
+      "name": "Oakland"
+     },
+     {
+      "id": "1108794093",
+      "type": "macrohood",
+      "name": "Central Oakland"
+     },
+     {
+      "id": "85872277",
+      "type": "neighbourhood",
+      "name": "Downtown"
+     }
+    ],
+    "_type": "destination_event",
+    "ticket_availability": {
+     "minimum_ticket_price": {
+      "currency": "USD",
+      "value": 0,
+      "major_value": "0.00",
+      "display": "0.00 USD"
+     },
+     "maximum_ticket_price": {
+      "currency": "USD",
+      "value": 0,
+      "major_value": "0.00",
+      "display": "0.00 USD"
+     },
+     "is_sold_out": false,
+     "has_available_tickets": true,
+     "is_free": true,
+     "has_bogo_tickets": false
+    },
+    "primary_organizer": {
+     "_type": "destination_profile",
+     "id": "118898869541",
+     "profile_type": "organizer",
+     "name": null,
+     "url": "https://www.eventbrite.com/o/118898869541",
+     "image_id": null,
+     "twitter": null,
+     "facebook": null,
+     "website_url": null,
+     "followed_by_you": false,
+     "num_followers": 12,
+     "num_following": null,
+     "num_saves": null,
+     "num_collections": null,
+     "num_upcoming_events": null
+    },
+    "primary_venue": {
+     "_type": "destination_venue",
+     "id": "296609567",
+     "name": "Golden Ratio",
+     "address": {
+      "address_1": "1517 Franklin Street",
+      "address_2": "",
+      "city": "Oakland",
+      "region": "CA",
+      "postal_code": "94612",
+      "country": "US",
+      "latitude": "37.8052081",
+      "longitude": "-122.2694506",
+      "localized_address_display": "1517 Franklin Street, Oakland, CA 94612",
+      "localized_area_display": "Oakland, CA",
+      "localized_multi_line_address_display": [
+       "1517 Franklin Street",
+       "Oakland, CA 94612"
+      ]
+     },
+     "venue_profile_id": null,
+     "venue_profile_url": ""
+    },
+    "event_sales_status": {
+     "sales_status": "on_sale",
+     "start_sales_date": {
+      "timezone": "America/Los_Angeles",
+      "utc": "1970-01-01T08:00:00Z",
+      "local": "1970-01-01T00:00:00"
+     },
+     "currency": "USD",
+     "end_sales_date": {
+      "timezone": "America/Los_Angeles",
+      "utc": "2026-10-29T01:00:00Z",
+      "local": "2026-10-28T18:00:00"
+     },
+     "message": null,
+     "default_message": null,
+     "message_code": null,
+     "message_type": null
+    }
+   }
+  ]
+ }
+}
