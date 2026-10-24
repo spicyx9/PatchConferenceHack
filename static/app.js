@@ -1671,7 +1671,12 @@
               esc(airline) +
               "</b> · " +
               esc(date) +
-              ' · Local airport times</div><div class="flight-fare"><strong>' +
+              ' · Local airport times</div><div class="flight-fare">' +
+              sourceBadge(
+                recordMode(leg),
+                leg.collected_at || (leg.source && leg.source.collected_at),
+              ) +
+              '<strong>' +
               esc(travelMoney(leg.total_price, leg.currency)) +
               "</strong><span>" +
               esc(
@@ -1687,7 +1692,6 @@
               "</div><details><summary>Flight details</summary><p>" +
               esc(flightPriceText(leg)) +
               "</p>" +
-              sourceBadge(recordMode(leg), leg.collected_at || (leg.source && leg.source.collected_at)) +
               sourceApiBadge(leg.source) +
               "<p>Price status: " +
               esc(leg.price_status || "unknown") +

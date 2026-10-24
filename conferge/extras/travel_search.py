@@ -114,7 +114,7 @@ def search_cached(query: TravelSearch, directory: Path | None = None) -> dict:
                             or first.departure_at is None
                             or first.departure_at.date() != query.depart):
                         continue
-                    if offer.trip_type == "round_trip":
+                    if offer.trip_type == "round_trip" and len(offer.slices) > 1:
                         back = offer.slices[1].segments[0]
                         if back.departure_at is None or back.departure_at.date() != query.return_date:
                             continue
@@ -217,6 +217,10 @@ def _flight_matches(offer: FlightOffer, query: TravelSearch) -> bool:
     last = offer.slices[0].segments[-1]
     if first.departure_at is None:
         return False
+    if offer.trip_type == "round_trip" and len(offer.slices) == 1:
+        return (offer.return_slice_collected is False
+                and first.origin_iata in origins and last.destination_iata in destinations
+                and first.departure_at.date() == query.depart)
     if offer.trip_type == "round_trip":
         back_first = offer.slices[1].segments[0]
         back_last = offer.slices[1].segments[-1]
