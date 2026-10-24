@@ -26,6 +26,21 @@ BrightDataApi = Literal["datasets", "web_unlocker", "serp"]
 _USAGE: dict[str, int] = {"datasets": 0, "web_unlocker": 0, "serp": 0}
 
 
+def parse_body(response: httpx.Response) -> Any:
+    """JSON body, or a list of rows when Bright Data answers JSON Lines (application/jsonl)."""
+    ctype = response.headers.get("content-type", "")
+    text = response.text
+    if "jsonl" in ctype or "ndjson" in ctype:
+        return [json.loads(line) for line in text.splitlines() if line.strip()]
+    try:
+        return json.loads(text) if text.strip() else None
+    except json.JSONDecodeError:
+        try:
+            return [json.loads(line) for line in text.splitlines() if line.strip()]
+        except json.JSONDecodeError as exc:
+            raise BrightDataError("Bright Data response is neither JSON nor JSON Lines") from exc
+
+
 def record_usage(api: BrightDataApi, count: int = 1) -> None:
     _USAGE[api] = _USAGE.get(api, 0) + max(count, 0)
 
@@ -154,7 +169,7 @@ class BrightDataClient:
             params=self._dataset_params(dataset_id, method, limit_per_input),
             payload={"input": inputs},
         )
-        payload = response.json()
+        payload = parse_body(response)
         if response.status_code == 202:
             snapshot_id = payload.get("snapshot_id") if isinstance(payload, dict) else None
             if not snapshot_id:
@@ -174,14 +189,14 @@ class BrightDataClient:
             params=self._dataset_params(dataset_id, method, limit_per_input),
             payload=inputs,
         )
-        payload = response.json()
+        payload = parse_body(response)
         if not isinstance(payload, dict) or not payload.get("snapshot_id"):
             raise BrightDataError("Bright Data trigger did not return snapshot_id")
         return str(payload["snapshot_id"])
 
     async def snapshot_progress(self, snapshot_id: str) -> dict[str, Any]:
         response = await self._request("GET", f"/datasets/v3/progress/{snapshot_id}")
-        data = response.json()
+        data = parse_body(response)
         if not isinstance(data, dict):
             raise BrightDataError("Bright Data progress response is not an object")
         return data
@@ -190,7 +205,7 @@ class BrightDataClient:
         response = await self._request(
             "GET", f"/datasets/v3/snapshot/{snapshot_id}", params={"format": "json"}
         )
-        data = response.json()
+        data = parse_body(response)
         if response.status_code == 202 or (
             isinstance(data, dict) and data.get("status") in {"starting", "running", "building"}
         ):

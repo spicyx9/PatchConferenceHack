@@ -73,3 +73,17 @@ def test_fixtures_opt_in_only(tmp_path):
 def test_collection_output_timestamp_aware():
     from conferge.core.brightdata import CollectionOutput
     assert CollectionOutput(status="ready", source_mode="live").collected_at.tzinfo == timezone.utc
+
+
+def test_parse_body_reads_json_lines_and_plain_json() -> None:
+    import httpx
+
+    from conferge.core.brightdata import parse_body
+
+    jsonl = httpx.Response(200, headers={"content-type": "application/jsonl; charset=utf-8"},
+                           text='{"id": "1"}\n{"id": "2"}\n')
+    assert parse_body(jsonl) == [{"id": "1"}, {"id": "2"}]
+    unlabelled = httpx.Response(200, headers={"content-type": "application/json"},
+                                text='{"id": "1"}\n{"id": "2"}')
+    assert parse_body(unlabelled) == [{"id": "1"}, {"id": "2"}]
+    assert parse_body(httpx.Response(200, json={"snapshot_id": "s"})) == {"snapshot_id": "s"}
