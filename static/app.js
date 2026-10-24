@@ -53,6 +53,37 @@
     return '<span class="badge ' + cls + '">' + esc(m.toUpperCase()) + "</span>";
   }
 
+  // Collection channel of a travel item (API `source` object). Absent on older payloads: returns "".
+  var PROVIDER_LABELS = { brightdata: "Bright Data", pyairbnb: "pyairbnb", "fast-flights": "fast-flights", serpapi: "SerpApi" };
+  var BD_API_LABELS = { dataset: "dataset", unlocker: "Web Unlocker", serp: "SERP API" };
+
+  function sourceApiText(src) {
+    var prov = src.provider || "unknown";
+    if (prov === "fixture" || src.api === "fixture") return "Fixture";
+    if (prov === "brightdata") return "Bright Data \u00b7 " + (BD_API_LABELS[src.api] || src.api || "unknown");
+    if (src.api === "fallback") return "Repli " + (PROVIDER_LABELS[prov] || prov);
+    return (PROVIDER_LABELS[prov] || prov) + (src.api && src.api !== "unknown" ? " \u00b7 " + src.api : "");
+  }
+
+  function sourceApiBadge(src) {
+    if (!src || typeof src !== "object") return "";
+    var tier = Number(src.tier);
+    var cls = tier === 0 || tier === 1 ? "src-bd" : tier === 2 ? "src-fallback" : tier === 3 ? "src-fixture" : "neutral";
+    var tip = [];
+    if (src.label) tip.push(src.label);
+    if (src.id) tip.push("id: " + src.id);
+    if (src.site) tip.push("site: " + src.site);
+    if (src.snapshot_id) tip.push("snapshot: " + src.snapshot_id);
+    return '<span class="badge src ' + cls + '" title="' + esc(tip.join(" | ")) + '">' + esc(sourceApiText(src)) + "</span>";
+  }
+
+  // Observed price only: total_price as given, else the raw scraped text, else "unknown". Never computed.
+  function flightPriceText(f) {
+    if (f.total_price !== null && f.total_price !== undefined) return f.total_price + " " + (f.currency || "");
+    if (f.raw_price_text) return "prix observ\u00e9: " + f.raw_price_text;
+    return "unknown";
+  }
+
   function statusBadge(status) {
     var s = status || "unknown";
     var cls = STATUS_RANK.hasOwnProperty(s) ? s : "neutral";
@@ -290,11 +321,12 @@
         return "<li><b>Vol</b> " + esc(l.date) + ": " + esc(l.from) + " vers " + esc(l.to) +
           ' <span class="muted">depart ' + esc(orUnknown(l.departure_at)) + ", arrivee " + esc(orUnknown(l.arrival_at)) +
           ", compagnie " + esc(orUnknown(l.carrier)) + '</span> <span class="badge neutral">prix ' + esc(orUnknown(l.price_status)) +
-          "</span> " + sourceBadge(l.source_mode) + "</li>";
+          "</span> " + ("total_price" in l || "raw_price_text" in l ? '<span class="muted">' + esc(flightPriceText(l)) + "</span> " : "") +
+          sourceBadge(l.source_mode) + " " + sourceApiBadge(l.source) + "</li>";
       }
       return "<li><b>Hebergement</b> " + esc(l.name) + ' <span class="muted">' + esc(orUnknown(l.check_in)) + " au " +
         esc(orUnknown(l.check_out)) + '</span> <span class="badge neutral">prix ' + esc(orUnknown(l.price_status)) + "</span> " +
-        sourceBadge(l.source_mode) + "</li>";
+        sourceBadge(l.source_mode) + " " + sourceApiBadge(l.source) + "</li>";
     }).join("") : '<li class="muted">Aucun trajet.</li>';
 
     var props = t.proposals || [];
@@ -323,7 +355,7 @@
       var priceCls = st.price_status === "verified" ? "ok" : "neutral";
       return '<div class="card"><div class="row"><b>' + esc(st.name) + "</b></div>" +
         '<div class="row"><span class="badge ' + priceCls + '">prix ' + esc(orUnknown(st.price_status)) + "</span>" +
-        '<span class="badge neutral">dispo ' + esc(orUnknown(st.availability)) + "</span>" + sourceBadge(st.source_mode) + "</div>" +
+        '<span class="badge neutral">dispo ' + esc(orUnknown(st.availability)) + "</span>" + sourceBadge(st.source_mode) + sourceApiBadge(st.source) + "</div>" +
         '<div class="field"><b>Type:</b> ' + esc(orUnknown(st.lodging_type)) + "</div>" +
         '<div class="field"><b>Total:</b> ' + esc(st.total_price === null || st.total_price === undefined ? "unknown" :
           st.total_price + " " + (st.currency || "")) + "</div>" +
@@ -332,6 +364,23 @@
         (link ? '<div class="field"><a href="' + esc(link) + '" target="_blank" rel="noopener noreferrer">Reserver</a></div>' : "") +
         "</div>";
     }).join("") : '<p class="muted">Aucun hebergement.</p>';
+  }
+
+  function renderFlights(f) {
+    var items = (f && f.items) || [];
+    $("flights").innerHTML = items.length ? items.map(function (fl) {
+      var route = (fl.slices || []).map(function (sl) {
+        var segs = sl.segments || [];
+        if (!segs.length) return "";
+        return segs[0].origin_iata + " vers " + segs[segs.length - 1].destination_iata +
+          " (" + orUnknown(segs[0].marketing_carrier) + ", " + Math.max(segs.length - 1, 0) + " escale(s))";
+      }).join(" / ");
+      var link = safeUrl(fl.booking_url);
+      return "<li><b>Vol</b> " + esc(route) + ' <span class="muted">' + esc(flightPriceText(fl)) + "</span> " +
+        '<span class="badge neutral">prix ' + esc(orUnknown(fl.price_status)) + "</span> " +
+        sourceBadge(fl.source_mode || modeOfEvidence(fl.evidence)) + " " + sourceApiBadge(fl.source) +
+        (link ? ' <a href="' + esc(link) + '" target="_blank" rel="noopener noreferrer">Voir</a>' : "") + "</li>";
+    }).join("") : '<li class="muted">Aucun vol.</li>';
   }
 
   function markerColor(kind, planned) {
@@ -564,6 +613,7 @@
       settle(api("/events", null, "events"), "events", renderEvents, errors),
       settle(api("/travel", null, "travel"), "travel", renderTravel, errors),
       settle(api("/stays", null, "stays"), "stays", renderStays, errors),
+      settle(api("/flights", null, "flights"), "flights", renderFlights, errors),
       settle(api("/travel/map", null, "map"), "map", renderMap, errors),
       settle(api("/graph", null, "graph"), "graph", renderGraph, errors),
       settle(api("/people", null, "people"), "people", renderPeople, errors),
@@ -768,18 +818,36 @@
       esc(storyTop.name) + "</button>";
   }
 
-  function renderBrightData(res) {
+  // "X/Y" of items whose source.provider is brightdata; null when the list was not loaded.
+  function bdShare(res) {
+    if (!res || !Array.isArray(res.items)) return null;
+    var n = res.items.filter(function (it) { return it && it.source && it.source.provider === "brightdata"; }).length;
+    return n + "/" + res.items.length;
+  }
+
+  function renderBrightData(res, stays, flights) {
     var u = (res && res.usage) || {}, ready = (res && res.ready) || {};
     function part(api, label) {
       return esc(label) + " " + esc(u[api] || 0) + (ready[api] ? "" : ' <span class="muted">(not configured)</span>');
     }
+    var s = bdShare(stays), f = bdShare(flights);
+    var travel = s !== null || f !== null
+      ? '<div class="bd-travel">' + (s !== null ? "S\u00e9jours via Bright Data: " + esc(s) : "") +
+        (s !== null && f !== null ? " \u00b7 " : "") + (f !== null ? "Vols via Bright Data: " + esc(f) : "") + "</div>"
+      : "";
     $("bd-counter").innerHTML = "<b>Records collected via Bright Data: " + esc(u.total || 0) + "</b>" +
       ' <span class="bd-detail">' + part("datasets", "datasets") + " | " + part("web_unlocker", "Web Unlocker") +
-      " | " + part("serp", "SERP API") + "</span>";
+      " | " + part("serp", "SERP API") + "</span>" + travel;
   }
 
   function loadStory() {
-    api("/brightdata", null, "brightdata").then(renderBrightData).catch(function () {
+    function optional(path, key) { return api(path, null, key).catch(function () { return null; }); }
+    api("/brightdata", null, "brightdata").then(function (bd) {
+      renderBrightData(bd);
+      return Promise.all([optional("/stays", "stays"), optional("/flights", "flights")]).then(function (r) {
+        renderBrightData(bd, r[0], r[1]);
+      });
+    }).catch(function () {
       $("bd-counter").textContent = "Records collected via Bright Data: unavailable";
     });
     return Promise.all([api("/plan", null, "plan"), api("/travel/map", null, "map"), api("/people?limit=3", null, "people")])
