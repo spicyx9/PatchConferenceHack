@@ -126,6 +126,48 @@ class WhereSlot(LocalModel):
     source_url: HttpUrl | None = None
 
 
+Grade = Literal["A", "B", "C", "D"]
+GRADE_THRESHOLDS: tuple[tuple[Grade, float], ...] = (("A", 80.0), ("B", 65.0), ("C", 50.0))
+
+
+def grade_for(score: float) -> Grade:
+    """A >= 80, B >= 65, C >= 50, D otherwise."""
+    return next((g for g, floor in GRADE_THRESHOLDS if score >= floor), "D")
+
+
+class ScoreBreakdown(LocalModel):
+    """Additive parts of a 0..100 person score; ``total()`` equals the score they explain."""
+
+    goal_fit: float = 0.0
+    presence: float = 0.0
+    identity: float = 0.0
+    corroboration: float = 0.0
+    graph: float = 0.0
+
+    def total(self) -> float:
+        return round(self.goal_fit + self.presence + self.identity + self.corroboration
+                     + self.graph, 2)
+
+    @classmethod
+    def capped(cls, parts: dict[str, float], cap: float = 100.0, ndigits: int = 2
+               ) -> ScoreBreakdown:
+        """Parts in field order, each trimmed so the running sum stays within [0, cap],
+        then rounded; any rounding residue goes to the largest part."""
+        out: dict[str, float] = {}
+        running = 0.0
+        for name in cls.model_fields:
+            value = float(parts.get(name, 0.0))
+            value = min(max(value, -running), cap - running)
+            out[name] = value
+            running += value
+        rounded = {k: round(v, ndigits) for k, v in out.items()}
+        residue = round(round(running, ndigits) - sum(rounded.values()), ndigits)
+        if residue:
+            top = max(rounded, key=lambda k: abs(rounded[k]))
+            rounded[top] = round(rounded[top] + residue, ndigits)
+        return cls(**rounded)
+
+
 class PersonMatch(LocalModel):
     person: Person
     score: float = Field(ge=0, le=100)
@@ -137,3 +179,5 @@ class PersonMatch(LocalModel):
     confidence: float | None = Field(default=None, ge=0, le=1)
     scorer: Literal["deterministic", "llm"] = "deterministic"
     warnings: list[str] = Field(default_factory=list)
+    score_breakdown: ScoreBreakdown | None = None
+    grade: Grade | None = None

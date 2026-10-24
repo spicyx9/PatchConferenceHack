@@ -2781,7 +2781,11 @@
               (card.met
                 ? '<div class="followup" id="followup-' + esc(id) + '"></div>'
                 : "") +
+              '<div class="small-text" id="why-' + esc(id) + '"></div>' +
               '<div class="people-actions">' +
+              '<button class="secondary" data-action="why" data-id="' +
+              esc(id) +
+              '">Why?</button>' +
               (card.met
                 ? '<button class="primary" data-action="followup" data-id="' +
                   esc(id) +
@@ -3871,6 +3875,32 @@
           .catch(function () {
             toast("Copying is not available in this browser.");
           });
+    } else if (action === "why") {
+      var whyBox = $("why-" + id);
+      if (!whyBox) return;
+      whyBox.textContent = "Reading the graph…";
+      api("/graph/why/" + encodeURIComponent(id))
+        .then(function (why) {
+          var links = (why.evidence || [])
+            .map(function (ev) {
+              var link = safeUrl(ev.source_url);
+              return (
+                "<li>" +
+                (link
+                  ? '<a href="' + esc(link) + '" target="_blank" rel="noopener noreferrer">' +
+                    esc(ev.evidence_id) + "</a>"
+                  : esc(ev.evidence_id)) +
+                "</li>"
+              );
+            })
+            .join("");
+          whyBox.innerHTML = why.answer
+            ? "<p>" + esc(why.answer) + '</p><ul class="plain-list">' + links + "</ul>"
+            : '<p class="muted">No connection path in the graph for this person.</p>';
+        })
+        .catch(function (e) {
+          whyBox.textContent = e.message;
+        });
     } else if (action === "showpath" || action === "path") {
       if (action === "showpath") switchTab("graph");
       highlightPath(id);
