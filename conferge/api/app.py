@@ -66,6 +66,38 @@ class DemoState:
         self.providers = found
         self.graph_probe = graph_probe
         self.reset()
+        self.restore_memory()
+
+    def restore_memory(self) -> int:
+        """Meetings already recorded in FalkorDB survive an API restart (they live in the graph).
+
+        Reads the user's MET Meeting nodes (person, note, time); nothing is written. Returns how
+        many were restored; 0 without a graph. ``POST /reset`` deletes them on purpose.
+        """
+        store = self.store()
+        if store is None:
+            return 0
+        try:
+            from conferge.graph.queries import run_read
+
+            rows = run_read(store, "MATCH (m:Meeting {user_id: $user_id, kind: 'MET'})-[:MET]->(p:Person) "
+                                   "RETURN p.id, m.note, m.at ORDER BY m.at", {"user_id": USER_ID})
+        except Exception:  # noqa: BLE001 - no graph memory: the process starts empty, as before
+            return 0
+        for row in rows:
+            if not isinstance(row, (list, tuple)) or len(row) != 3:
+                continue  # not a Meeting row: nothing to restore
+            person_id, note, at = row
+            if not isinstance(person_id, str) or self.data.person(person_id) is None:
+                continue
+            self.met[person_id] = note or ""
+            if at:
+                try:
+                    self.met_at[person_id] = datetime.fromisoformat(str(at))
+                except ValueError:
+                    pass
+        self.invalidate()
+        return len(self.met)
 
     def reset(self) -> None:
         self.data = copy.deepcopy(self.pristine)
