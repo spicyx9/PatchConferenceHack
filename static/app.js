@@ -850,8 +850,25 @@
       }).join("; ") : "none");
   }
 
+  function renderReachability(r) {
+    var box = $("pipeline-reach");
+    if (!box) return;
+    if (!r) { box.innerHTML = '<h3>Reachability: plain fetch vs Bright Data</h3><p class="muted">Block matrix not run yet (scripts/probes/block_matrix.py).</p>'; return; }
+    var c = r.counts || {};
+    var cls = function (v) { return '<span class="reach-' + esc(v) + '">' + esc(v) + "</span>"; };
+    box.innerHTML = "<h3>Reachability: plain fetch vs Bright Data</h3>" +
+      "<p><b>" + esc(c.reachable_without_brightdata) + " of " + esc(c.n) + " sites reachable without Bright Data, " +
+      esc(c.reachable_with_brightdata) + " of " + esc(c.n) + " with</b> " +
+      '<span class="muted">(run ' + esc(fmtTime(r.run_at)) + ", Web Unlocker zone " + esc(r.zone) + ")</span></p>" +
+      '<table class="pipeline-table"><thead><tr><th>Site</th><th>httpx default UA</th><th>httpx browser UA</th>' +
+      "<th>Bright Data Unlocker</th></tr></thead><tbody>" + (r.sites || []).map(function (s) {
+        return "<tr><td>" + esc(s.site) + "</td><td>" + cls(s.plain_default_ua) + "</td><td>" + cls(s.plain_browser_ua) +
+          '</td><td title="' + esc(s.detail) + '">' + cls(s.brightdata_unlocker) + "</td></tr>";
+      }).join("") + "</tbody></table>";
+  }
+
   function loadStory() {
-    api("/pipeline", null, "pipeline").then(renderPipeline).catch(function () {
+    api("/pipeline", null, "pipeline").then(function (res) { renderPipeline(res); renderReachability(res && res.reachability); }).then(renderPipeline).catch(function () {
       $("pipeline-table").textContent = "pipeline unavailable";
     });
     function optional(path, key) { return api(path, null, key).catch(function () { return null; }); }
