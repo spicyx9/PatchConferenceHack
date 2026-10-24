@@ -154,6 +154,36 @@ Q_SEARCH_EVENTS = (
 )
 Q_EDGE_COUNTS = "MATCH ()-[r]->() RETURN type(r), count(r)"
 
+# -- gaps: what the graph has no recorded path for, for the user's goals (not proof of absence) --
+# Goals with none of the ranking paths (speaker, attendance, host, host company, company
+# topic, topic) to any Person. Role matches are not graph paths and are not counted.
+Q_GOALS_WITHOUT_PATH = (
+    "MATCH (g:Goal {user_id: $user_id}) "
+    "WHERE NOT (g)-[:ABOUT]->(:Topic)<-[:ABOUT]-(:Event)<-[:SPEAKS_AT|ATTENDS_CONFIRMED|HOSTS]-(:Person) "
+    "AND NOT (g)-[:ABOUT]->(:Topic)<-[:ABOUT]-(:Event)<-[:HOSTS]-(:Company)<-[:WORKS_AT]-(:Person) "
+    "AND NOT (g)-[:ABOUT]->(:Topic)<-[:ABOUT]-(:Company)<-[:WORKS_AT]-(:Person) "
+    "AND NOT (g)-[:ABOUT]->(:Topic)<-[:ABOUT]-(:Person) "
+    "RETURN g.id, g.description, g.topics ORDER BY g.id"
+)
+# Companies named in a goal (a goal topic equal to the name, or the name as a word of the
+# description) with no SPEAKS_AT / HOSTS / EXHIBITS_AT / ATTENDS_CONFIRMED tie to an Event,
+# directly or through a person who works there.
+Q_TARGET_COMPANIES_NOT_PRESENT = (
+    "MATCH (g:Goal {user_id: $user_id}), (c:Company) "
+    "WHERE size(c.name) >= 3 AND (any(t IN g.topics WHERE toLower(t) = toLower(c.name)) "
+    "OR (' ' + toLower(g.description) + ' ') CONTAINS (' ' + toLower(c.name) + ' ')) "
+    "AND NOT (c)-[:HOSTS|EXHIBITS_AT|SPEAKS_AT]->(:Event) "
+    "AND NOT (c)<-[:WORKS_AT]-(:Person)-[:SPEAKS_AT|HOSTS|ATTENDS_CONFIRMED]->(:Event) "
+    "RETURN DISTINCT g.id, c.id, c.name ORDER BY g.id, c.name"
+)
+# Goal topics no Event is ABOUT.
+Q_TOPICS_UNCOVERED = (
+    "MATCH (g:Goal {user_id: $user_id})-[:ABOUT]->(t:Topic) "
+    "WHERE NOT (t)<-[:ABOUT]-(:Event) "
+    "RETURN g.id, t.id, t.name ORDER BY g.id, t.name"
+)
+_SOURCE_MODES_QUERY = "MATCH (n) RETURN n.source_mode, count(n)"
+
 READ_QUERIES = {name: value for name, value in globals().items() if name.startswith("Q_")}
 
 # Path kind -> base weight; speaking is the strongest public signal, a shared
@@ -497,3 +527,21 @@ def graph_counts(target: GraphStore | GraphQuery) -> dict[str, dict[str, int]]:
         "nodes": {label: count for label, count in run_read(target, Q_NODE_COUNTS)},
         "edges": {rel: count for rel, count in run_read(target, Q_EDGE_COUNTS)},
     }
+
+
+GAP_QUERIES = {
+    "goals_without_path": (Q_GOALS_WITHOUT_PATH, ("goal_id", "description", "topics")),
+    "target_companies_not_present": (Q_TARGET_COMPANIES_NOT_PRESENT, ("goal_id", "company_id", "company")),
+    "topics_uncovered": (Q_TOPICS_UNCOVERED, ("goal_id", "topic_id", "topic")),
+}
+
+
+def graph_gaps(target: GraphStore | GraphQuery, user_id: str) -> dict[str, Any]:
+    """Absence queries for the user's goals: rows plus the literal Cypher of each query."""
+    params = {"user_id": user_id}
+    out: dict[str, Any] = {}
+    for name, (query, keys) in GAP_QUERIES.items():
+        rows = [dict(zip(keys, row, strict=True)) for row in run_read(target, query, params)]
+        out[name] = {"rows": rows, "count": len(rows), "cypher": literal_cypher(query, params)}
+    out["source_modes"] = {str(mode): int(n) for mode, n in run_read(target, _SOURCE_MODES_QUERY)}
+    return out

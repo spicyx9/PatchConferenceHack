@@ -2472,6 +2472,32 @@
     return positions;
   }
 
+  // What our graph has no recorded path for (not proof of absence); never an empty block.
+  function renderGraphGaps(res) {
+    var box = $("graph-gaps-body");
+    if (!box) return;
+    if (!res || !res.gaps) {
+      box.textContent = (res && res.warnings && res.warnings[0]) || "Graph not reachable: no graph to query.";
+      return;
+    }
+    var labels = { goals_without_path: "Goals with no path to anyone",
+      target_companies_not_present: "Companies in your goals with no presence at an event",
+      topics_uncovered: "Goal topics no event is about" };
+    var parts = Object.keys(labels).map(function (k) {
+      var g = res.gaps[k] || { rows: [], count: 0, cypher: "" };
+      var rows = g.rows.map(function (r) {
+        return "<li>" + esc(r.description || r.company || r.topic || r.goal_id) + ' <span class="muted">(' + esc(r.goal_id) + ")</span></li>";
+      }).join("");
+      return "<h3>" + esc(labels[k]) + " · " + esc(g.count) + "</h3>" +
+        (rows ? "<ul>" + rows + "</ul>" : '<p class="muted">None.</p>') +
+        '<pre class="cypher">' + esc(g.cypher) + "</pre>";
+    }).join("");
+    box.classList.remove("muted");
+    box.innerHTML = (res.empty ? "<p><b>No gaps for these goals</b></p>" : "") +
+      '<p class="small-text">Graph source mode: <b>' + esc(res.graph_source_mode) + "</b> " +
+      esc(JSON.stringify(res.graph_source_modes || {})) + "</p>" + parts;
+  }
+
   function renderGraph(g) {
     pathRequest++;
     loadConnectionChoices();
@@ -3315,6 +3341,7 @@
       ),
       settle(api("/travel/map", null, "map"), "map", renderMap, errors),
       settle(api("/graph", null, "graph"), "connections", renderGraph, errors),
+      settle(api("/graph/gaps", null, null), "graph gaps", renderGraphGaps, errors),
       settle(
         api("/people?limit=100", null, "people"),
         "people",
