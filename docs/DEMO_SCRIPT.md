@@ -40,37 +40,31 @@ non-zero exit. Then continue with step 3 below (browser, Reset session).
 4. **Reset session.** Header **Replan** → **Reset session** (under "Start fresh") → confirm
    **Reset session**. Reload the page.
 5. **Check the starting state** on **Discover**, "People to connect with", in this order:
-   **Ryan Hecht**, **Camila Maia**, **Nick Liffen** (scores 56, 47, 40 in `GET /api/v1/people`;
-   the screen shows the parts on the **People** tab: Ryan Hecht "goal fit 12 · presence 40 ·
-   corroboration 4", Camila Maia "goal fit 30 · presence 10 · corroboration 7", Nick Liffen
-   "presence 40"); right column shows **194** events to explore, **32** on your agenda,
+   **Ryan Hecht**, **Camila Maia**, **Nick Liffen** (scores 56, 47, 40 in `GET /api/v1/people`);
+   right column shows **194** events to explore and **25** agenda items (`GET /api/v1/plan`),
    **0** conversations saved. If the top 3 differs, repeat steps 1 and 4.
 6. After a rehearsal, repeat step 4: the rehearsal's "I met" is saved in FalkorDB.
 
 ## Script
 
+Values measured on `c6c4d7d` at 15:18 PDT (`STATUS.md`); labels as they read in `static/` on that commit.
+
 | Time | Say | Do (exact UI) | On screen |
 |---|---|---|---|
-| 0:00 | "Every conference, you miss the three people who mattered. Conferge finds them before you land." | Stay on **Discover**. | Hero "Your week in **San Francisco**", "GitHub Universe 2026 · Oct 28 — Oct 29". |
-| 0:10 | "I tell it why I'm going: I build AI developer tools and I want seed investors, agent founders and Copilot PMs." | Click the **V** avatar (top right). The goal is prefilled. Click **Update your agenda**. | Toast "Goal updated. Your agenda and suggested people have been recalculated." Chips **Meet seed investors (developer tools) · 45 %**, **Meet founders (ai agents) · 35 %**, **Meet product managers (copilot) · 20 %**. |
-| 0:20 | "That goal became an agenda." | Point at the right column. | **194** events to explore, **32** on your agenda, **50** suggested connections. |
-| 0:25 | "Where does the data come from? The official catalog, Luma, Partiful, and Bright Data for what is hard to reach." | Click **How are suggestions made?** (right column), then scroll to **Data pipeline**. | official **210**, luma **12**, partiful **6**, eventbrite **8**, aggregators **7** records; Sources overall **partial: Partiful not exhausted, 6 events kept**. |
-| 0:35 | "Bright Data collected the stays, the flights and the LinkedIn profiles. Here is what it took: no call at query time." | Stay in the dialog; point at the counter and the pipeline rows. | "Bright Data: **38** requests, **79** records", product table (Booking 1 / 15, Airbnb 1 / 6, Google Hotels 1 / 0, LinkedIn 6 / 15, Crunchbase 1 / 2, Google Flights Web Unlocker 1 / 34, SERP 17 / 5 and 10 / 2), "Estimated cost $**0.0570**, list price estimate, not billed", "Stays via Bright Data: **6/6** · Flights via Bright Data: **1/1**". Reachability: **10 of 21** sites without Bright Data, **14 of 21** with. Close the dialog. |
-| 0:45 | "My first match is Ryan Hecht. His LinkedIn profile, collected by Bright Data, confirms he works at GitHub." | Tab **People**. Hover the green **brightdata:linkedin** badge on Ryan Hecht's card. | Card **Ryan Hecht**, Product Manager · GitHub, "goal fit 12 · presence 40 · corroboration 4" (score 56), "LINKEDIN · Not provided · GitHub profile **brightdata:linkedin**". Tooltip: dataset gd_l1viktl72bvl7bjuj0, snapshot sd_mvms2ssrh1bjodbs9, identity_confidence 1. |
-| 0:55 | "And this is why he's on my list: a path in the graph, from my goal to the session where he speaks." | Tab **Discover** → **See why** under Ryan Hecht. | Tab **Connections**, "**FalkorDB connected**". Path: Meet founders (ai agents) → ai agents → GitHub Copilot and Windows: Bringing local models into the workflow → Ryan Hecht. |
-| 1:05 | "Conferge also tells me what to skip. Anti-FOMO." | Tab **Discover**, scroll to "You don't need to be everywhere." | **4** skips: Outside planning hours, Schedule conflict, Travel time, Lower relevance. |
-| 1:15 | "Skipping this oyster bash frees three hours for better meetings." | Point at the last skip. | "Skip: Xebia’s Broad Street Oyster Bash", "What you gain: **180 min** freed for higher-value meetings". |
-| 1:25 | "Now an event sells out." | Discover, "An event sold out?" → **Explore a sold-out scenario**. | Panel "Your agenda, adjusted." **Removed (1)**: Agentic engineering past the pilot. **Added (1)**: How one open source project turned funding into security at scale. |
-| 1:35 | "It replans on its own, and explains why: the best remaining session in the same time slot." | Point at "Reason" and "Path". | "Simulated change, not an update from the source." Agenda still **32**. |
-| 1:45 | "I met Ryan. One click, and the ranking is recomputed from FalkorDB." | Discover, "Keep the connection going." → **I met Ryan Hecht** → **Save conversation**. | Toast "Meeting with Ryan Hecht recorded. Suggestions updated." Top: **Camila Maia**, **Nick Liffen**, **Annamalai Chockalingam** (scores 47, 40, 38.5 in `GET /api/v1/people`). **1** conversations saved. |
-| 1:55 | "Bright Data collects, FalkorDB stores the relationships, our agents never touch the web at query time." | Stay on Discover. | — |
+| 0:00 | "Every conference, you miss the three people who mattered. Conferge finds them before you land." | Stay on **Discover**. | The city banner and **People to connect with**. |
+| 0:10 | "I tell it why I'm going: I build AI developer tools and I want seed investors, agent founders and Copilot PMs." | Right column, **Edit priorities**. The sentence is prefilled. Click **Update your agenda**. | Toast "Goal updated". Three chips under **Your priorities**. |
+| 0:20 | "That goal became an agenda." | Point at the right column. | **194** events to explore and **25** agenda items (`GET /api/v1/plan`); people ranked: top **50**. |
+| 0:25 | "Where does the data come from? The official catalogue, Luma, Partiful, Eventbrite, and Bright Data for what is hard to reach." | Click the round info button (**Sources and how it works**), scroll to **Data pipeline**. | The pipeline rows with their collection time; events: 161 catalogue slots (142 official sessions outside Social, 19 catalogue Social items classed confirmed_side_event) and 33 external side events (Luma 12, Eventbrite 8, conferenceparties 7, Partiful 6). |
+| 0:35 | "Bright Data collected the stays, the flights and the profiles earlier today. We replay the timestamped results." | Stay in the dialog; point at the Bright Data counter. Close the dialog. | **39** requests, **81** records from the cache; 0 requests by the running demo. |
+| 0:45 | "My first match is Ryan Hecht, and this is why: a path in the graph, from my goal to the session where he speaks." | Under **People to connect with**, click **View connection** on Ryan Hecht. | Tab **Connections**: **Why this person?** with the goal to person path and its evidence, "Engine: FalkorDB". |
+| 1:05 | "Conferge also tells me what to skip." | Click **Discover**, unfold **Outside your agenda**. | The skipped events, each with its reason. |
+| 1:25 | "Now an event sells out. This is a labelled simulation." | Open **My summary** (`http://127.0.0.1:8000/#dashboard`; no link to it in the header). Under **Adjust your agenda**, click **Explore a sold-out scenario**. | Removed: **Agentic engineering past the pilot: An enterprise playbook**. Added: **How one open source project turned funding into security at scale**. "Simulated change, not an update from the source." |
+| 1:45 | "I met Ryan. One click, and FalkorDB remembers it; the ranking is recomputed." | Still on **My summary**, under **Your latest meeting**, click "I met Ryan Hecht", then **Save conversation**. | Toast "Meeting with Ryan Hecht recorded. Suggestions updated." Top 3: Camila Maia 47, Nick Liffen 40, Annamalai Chockalingam 38.5. |
+| 1:55 | "Bright Data collects, FalkorDB ranks and remembers, our planner builds the plan; nothing is fetched while you watch." | Stay on **My summary**. | — |
 
 ## Notes
 
 - Not shown anywhere in the UI: node and edge counts of the graph. The startup log prints
   "node writes" / "edge writes" (MERGE writes, not counts); do not quote them as graph size.
-- The LinkedIn headline shows "Not provided": Bright Data returned no headline for these
-  profiles. Do not invent one.
-- People tab says **10 suggestions** while Discover says **50** suggested connections: both
-  are on screen; quote the one you are pointing at.
+- The People tab lists 10 cards while Discover counts the top 50: quote the one you are pointing at.
 - The counter reads the Bright Data cache collected earlier the same day: 0 requests are made by the running demo; times shown are each record's own `collected_at`.

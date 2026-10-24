@@ -15,12 +15,18 @@ Companion files: `slides.html` (7 slides, arrow keys), `CHECKLIST.md` (the 10 mi
 ## Two opening hooks, pick one
 
 **Hook A, the business card.**
-"Two days, 161 official sessions, 46 side events in our dataset, thousands of people. Most of us fly home with four business cards and the feeling we were in the wrong room. Conferge starts from your goal, not from the agenda."
+"Two days, 161 catalogue slots (142 official sessions outside Social, 19 catalogue Social items classed as confirmed side events), plus 33 external side events in our dataset, thousands of people. Most of us fly home with four business cards and the feeling we were in the wrong room. Conferge starts from your goal, not from the agenda."
 
 **Hook B, the question to the jury.**
-"Who in this room is going to GitHub Universe next week? If you want to meet seed investors, which of the 46 side events do you pick, and who do you talk to when you get there? Conferge answers that in one sentence, and shows you why."
+"Who in this room is going to GitHub Universe next week? If you want to meet seed investors, which of the 52 side events do you pick, and who do you talk to when you get there? Conferge answers that in one sentence, and shows you why."
 
 Hook A is safer and 5 seconds shorter. Hook B works if the room is awake and someone raises a hand.
+
+## Say this to judges
+
+"We collected our travel and profile data earlier today through Bright Data, and we replay the timestamped results on stage. FalkorDB computes the ranked connections and their evidence paths, and it persists who I have met. Our rule-based planner builds the itinerary, taking known scheduling and travel constraints into account. The sold-out event is a labelled simulation: the change of plan is real, but the source status is not live."
+
+On prices: "These are observed prices from a past collection, quoted for 2 adults. We do not guarantee booking availability, and the return flight segment was not fully collected."
 
 ## Rules that do not bend
 
@@ -49,10 +55,10 @@ The FalkorDB Browser (v2.6.2, started by `make up`) is a second browser tab on h
 | 0:45 | Speaker | "Who should you meet, and why. Each card is a person, and the why is a real path in the graph, not a score from a black box. Goal, topic, event, speaker: four hops, and every edge carries where it came from and when." | Scroll to **People to connect with**. Click **View connection** on the first card (Ryan Hecht). On **Connections**, open **Why this suggestion? View the sources**. | **Your next connection**: Ryan Hecht, Product Manager at GitHub, **The reason to connect**, **A place to start** (his session, Wed, Oct 28, 11:50 AM). Under the sources: **Why this person?** Meet founders (ai agents), ai agents, GitHub Copilot and Windows, Ryan Hecht, then three evidence lines (ABOUT, ABOUT, SPEAKS_AT) with source and observed-at timestamp, **Engine: FalkorDB**. | FalkorDB |
 | 1:05 | Speaker | "Same path, in FalkorDB itself. Same graph, same ids for the planner, the replanner and your memory. Four hops, and every edge carries where it came from." | Switch to the FalkorDB Browser tab, graph `conferge_demo`, the prepared query (below) already in the box: click the blue **Run** arrow. | The path lights up in the Browser: Goal, Topic, Event, Person, 4 nodes and 3 edges. Plan B if the Browser fails on stage: on **Connections**, open **Explore the relationship map** then **Planning details**, point at the Cypher line and the **Copy query** button. | FalkorDB |
 | 1:25 | Speaker | "From the people and the events, a day by day agenda for the days you are in town, with the venues on a map." | Click **Discover**. Scroll to **Your agenda**. Click the **Wed, Oct 28** day tab. | Oct 28: Opening Keynote 09:00, Agentic engineering past the pilot 10:30, and the map **Your meeting places** next to it. | both |
-| 1:40 | Speaker | "Anti-FOMO. Two sessions at 10:30 on the 28th. It picks one, says why, and tells you what you give up." | Scroll to **Outside your agenda**, click the line to unfold it, then **Why it's not in your agenda** under "Shut the context window!". | Four skipped events. Shut the context window! (Wed, Oct 28, 10:30 AM): overlaps 'How one open source project turned funding into security at scale' incl. 20 min travel; utility 36.5 vs 47.0. | FalkorDB |
-| 2:00 | Speaker | "Things change. We simulate that the top event of the plan sells out. It is a simulation, and the screen says so. Removed, replaced, and the reason." | Click **View your progress** in the footer (**My summary**). Under **Adjust your agenda**, click **Explore a sold-out scenario**. | **SIMULATION (not observed): the top event of your plan becomes sold out**. REMOVED Agentic engineering past the pilot. ADDED How one open source project turned funding into security at scale (Wed, Oct 28, 10:30 AM). The reason, the path to Gregg Cochran, and the line "Simulated change, not an update from the source." | FalkorDB |
+| 1:40 | Speaker | "Anti-FOMO. Two sessions at 10:30 on the 28th. It picks one, says why, and tells you what you give up." | Scroll to **Outside your agenda**, click the line to unfold it, then **Why it's not in your agenda** under "Shut the context window!". | Four skipped events. Shut the context window! (Wed, Oct 28, 10:30 AM): overlaps 'How one open source project turned funding into security at scale' incl. 20 min travel; utility 36.5 vs 47.0. | planner (Python) |
+| 2:00 | Speaker | "Things change. We simulate that the top event of the plan sells out. It is a simulation, and the screen says so. Removed, replaced, and the reason." | Click **View your progress** in the footer (**My summary**). Under **Adjust your agenda**, click **Explore a sold-out scenario**. | **SIMULATION (not observed): the top event of your plan becomes sold out**. REMOVED Agentic engineering past the pilot. ADDED How one open source project turned funding into security at scale (Wed, Oct 28, 10:30 AM). The reason, the path to Gregg Cochran, and the line "Simulated change, not an update from the source." | planner (Python) |
 | 2:20 | Speaker | "You met Ryan. One click writes it to the graph. He leaves the ranking, the next person moves up, and the meeting is still there at the next conference." | Under **Your latest meeting**, click **I met Ryan Hecht**. In the dialog **A conversation worth remembering**, click **Save conversation** (the note is optional). | Toast "Meeting with Ryan Hecht recorded. Suggestions updated." The button now reads **I met Camila Maia**. Tiles: Meetings recorded 0 to 1, Qualified contacts 0 to 1. On **Discover**, Ryan Hecht has left **People to connect with**. | FalkorDB |
-| 2:40 | Speaker | "704 nodes, 2,233 edges, every edge with a source. 1,216 tests. What stays after Universe is the graph itself: your memory of who you met, ready for the next conference." | Slides, slide 6 then 7. | Numbers, then what remains. | both |
+| 2:40 | Speaker | "691 nodes, 2213 edges, every edge with a source. 1457 tests. What stays after Universe is the graph itself: your memory of who you met, ready for the next conference." | Slides, slide 6 then 7. | Numbers, then what remains. | both |
 | 2:55 | Speaker | "Conferge. Be in the right place, with the right people, at the right time. Thank you." | Slide 7 stays up. | | |
 
 Spoken words in the table, Hook A included: 349. At 150 words per minute that is 2 min 20 s of speech; with the eleven clicks (about 5 s of machine time in total, measured), the scrolling and three tab switches, a full pass lands between 2:35 and 2:50. If you are past 2:30 when you reach the sold-out step, skip anti-FOMO (1:40) and go straight to the simulated change.
@@ -70,7 +76,7 @@ RETURN p ORDER BY length(p) LIMIT 3
 
 The Browser bundled in the FalkorDB 6.0.3 image (2.7.2) fails every query with "An unexpected error occurred"; `make up` now starts Browser v2.6.2 instead on the same port, and its header must read v2.6.2. Verified on October 24 on `e6c08e4`: the query above returns the path, 4 nodes and 3 edges (capture `rehearsal/falkordb-browser-path-v2.6.2.png`). The share link from **Show in FalkorDB Browser** pre-fills the query but does not run it: one click on **Run** is needed. Plan B if it fails on stage: the same path is under **Why this suggestion? View the sources** and the same query under **Planning details** on the **Connections** tab of the app.
 
-What the FalkorDB judge should have seen by 2:40: a multi-hop query, the path shown in their own Browser, the evidence on every edge in the app, shared state between the planner and the replanner (same graph, same ids, the agent table), and memory that survives the session (the Meeting node written at 2:20).
+What the FalkorDB judge should have seen by 2:40: a multi-hop query, the path shown in their own Browser, the evidence on every edge in the app, the ranking and the evidence paths come from FalkorDB, while the plan and the diff are built by the Python planner, and memory that survives the session (the Meeting node written at 2:20).
 
 ### What the Bright Data judge should have seen
 
@@ -85,7 +91,7 @@ What changes in the script:
 1. The Driver opens the video in full screen, paused on the first frame, before the Speaker starts. QuickTime, space to play, arrow keys to step.
 2. The Speaker says the same sentences. The Driver plays and pauses at each step so the Speaker's words match the frame. Six pauses, about 5 seconds of video per step.
 3. The Sources dialog (0:30) is not in the video: say the sentence over slide 4 (Bright Data).
-4. The FalkorDB Browser part at 1:05 becomes slide 3 (the graph that decides) with the path drawn on the slide. Say: "This is the same path the Browser shows live, our laptop dropped so here it is on the slide."
+4. The FalkorDB Browser part at 1:05 becomes slide 3 (the graph that ranks and explains) with the path drawn on the slide. Say: "This is the same path the Browser shows live, our laptop dropped so here it is on the slide."
 5. The timings move: the video covers 0:15 to 2:40 in 35 s of play time plus pauses. You gain about a minute. Spend it on slide 6 (numbers) and slide 7 (what stays).
 
 Localhost does not need wifi. If only the venue wifi drops, the demo still runs, since FalkorDB and the API are on the laptop. Use the video only if the laptop itself is in trouble.
@@ -94,21 +100,19 @@ Localhost does not need wifi. If only the venue wifi drops, the demo still runs,
 
 - "Is the data real?" The collection is real and public, captured on October 24 from the GitHub Universe catalog, Luma, Partiful and Eventbrite. The demo replays that snapshot so it works offline, and the Sources dialog says so. Stays, flights and LinkedIn cards were collected through Bright Data today and are served from that cache, labelled Cached.
 - "Where is the LLM?" There is none in the loop today. Goal parsing and ranking are deterministic, so nothing is invented: no price, no attendance, no guest list.
-- "Why a graph and not a table?" Because the answer to "why this person" is a path, and the same graph serves the planner, the replanner and your memory. Replanning after a sold-out event is one traversal: who else is at the event, where else do they appear.
+- "Why a graph and not a table?" Because the answer to "why this person" is a path, and the same graph serves the planner, the replanner and your memory. FalkorDB ranks people and events, remembers meetings and skips, and provides the evidence paths; the rule-based Python planner builds the plan and the diff.
 
 ## Where each number comes from
 
-Measured on October 24, 2026 on `main` at `e6c08e4`, local laptop, `make demo` on http://127.0.0.1:8030 (the stage uses 8000), FalkorDB 6.0.3 on port 6382, graph created fresh by that load (an instance shared with another server inflates the count: 711 was read on a graph another process had written to).
+All numbers: `STATUS.md`, section "Measured on c6c4d7d at 15:18 PDT", read by command after `make predemo` on that commit.
 
 | Number | Command | Result |
 |---|---|---|
-| 704 nodes | `redis-cli -p 6382 GRAPH.QUERY conferge_demo "MATCH (n) RETURN count(n)"` | 704 (the same after a meeting and a Reset) |
-| 2,233 edges | `redis-cli -p 6382 GRAPH.QUERY conferge_demo "MATCH ()-[r]->() RETURN count(r)"` | 2233 |
-| 1,216 tests | `make check` | 1216 passed, 26 skipped in 37.7 s |
-| 207 events, 32 on the agenda, 50 suggested connections | the counters in the right column of **Discover**; `GET /api/v1/people?limit=100` field `total` = 50 | |
-| 161 official sessions, 46 side events, Bright Data requests and records per product | `SUBMISSION.md`, read from `GET /api/v1/events` and `GET /api/v1/pipeline` | |
-| 349 spoken words | word count of the **Say** column, Hook A included | 2 min 20 s at 150 words per minute |
-| Startup | `make demo` to the first API answer | 3.3 s with cached travel; 14.6 s with `DEMO_ARGS="--travel live"` (rehearsal) |
-| Clicks | Playwright, click to rendered element (rehearsal) | Update your agenda 0.04 s, Explore a sold-out scenario 1.6 s, Save conversation 0.8 s |
+| Graph | `redis-cli -p 6380 GRAPH.RO_QUERY conferge_demo "MATCH (n) RETURN count(n)"` and `"MATCH ()-[r]->() RETURN count(r)"` | 691 nodes, 2213 edges |
+| Tests | `make check` | 1457 passed, 29 skipped |
+| Events | `GET /api/v1/events` | 194: 161 catalogue slots (142 official sessions outside Social, 19 catalogue Social items classed `confirmed_side_event`) and 33 external side events (Luma 12, Eventbrite 8, conferenceparties 7, Partiful 6) |
+| Agenda | `GET /api/v1/plan` | 25 items |
+| Sold-out scenario | `POST /api/v1/simulate-change` | Agentic engineering past the pilot: An enterprise playbook replaced by How one open source project turned funding into security at scale |
+| People | `GET /api/v1/people?limit=100` | top 50; top 3 Ryan Hecht 56, Camila Maia 47, Nick Liffen 40; after "I met Ryan Hecht": Camila Maia 47, Nick Liffen 40, Annamalai Chockalingam 38.5 |
 
-`GET /api/v1/graph` returns a capped sample (332 nodes, 400 edges), not the totals; use the Cypher counts above.
+`GET /api/v1/graph` returns a capped sample, not the totals; use the Cypher counts above.
