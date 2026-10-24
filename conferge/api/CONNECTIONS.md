@@ -20,5 +20,7 @@ neighbourhood and goal path. Vector relevance is not represented as factual conf
 
 Validation: unit tests cover scope, malformed embeddings and rejecting unknown model IDs.
 The vector adapter, index creation, cache and scoped nearest-neighbour query were also
-checked against local FalkorDB 6.0.3 using a separate disposable test graph. Live OpenAI
-quality and account access require a configured key and have not been verified.
+checked against local FalkorDB 6.0.3 using a separate disposable test graph. Live OpenAI search was verified locally with a configured key: 183 profile embeddings
+were cached in FalkorDB, and the Responses API returned six scoped matches with
+profile-based reasons. The browser search flow also passed. This is a functional
+smoke test, not a retrieval-quality evaluation; the account balance remains unverified.
