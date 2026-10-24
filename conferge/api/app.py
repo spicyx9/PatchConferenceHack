@@ -330,11 +330,15 @@ def create_app(
 
         client = bd.BrightDataClient.from_env()
         apis = ("datasets", "web_unlocker", "serp")
+        ready = {api: client.not_ready(api) is None for api in apis}
+        # "live" only when at least one Bright Data API can actually be called from this
+        # process; without a key nothing here is live, so the label says "unknown".
+        notes = [] if any(ready.values()) else ["Bright Data not configured: no API ready in this process"]
         return _envelope(state, [], {
             "usage": bd.usage(),
-            "ready": {api: client.not_ready(api) is None for api in apis},
+            "ready": ready,
             "not_ready_reason": {api: client.not_ready(api) for api in apis},
-        }, mode_override="live")
+        }, extra_warnings=notes, mode_override="live" if any(ready.values()) else "unknown")
 
     @api.get("/search")
     def search(q: str = Query(..., min_length=2, max_length=100),

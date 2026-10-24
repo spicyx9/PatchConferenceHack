@@ -805,7 +805,7 @@
   }
 
   function loadStory() {
-    api("/brightdata", null, "brightdata").then(renderBrightData).catch(function () {
+    api("/brightdata", null, null).then(renderBrightData).catch(function () {
       $("bd-counter").textContent = "Records collected via Bright Data: unavailable";
     });
     return Promise.all([api("/plan", null, "plan"), api("/travel/map", null, "map"), api("/people?limit=3", null, "people")])
