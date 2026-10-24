@@ -27,9 +27,7 @@ BROWSER_UA = (
 SLUG_CONTEXT: dict[str, dict[str, str]] = {
     "github26": {"city": "San Francisco", "timezone": "America/Los_Angeles"},
     "reinvent2026": {"city": "Las Vegas", "timezone": "America/Los_Angeles"},
-    "reinvent-2026": {"city": "Las Vegas", "timezone": "America/Los_Angeles"},
     "sema-2026": {"city": "Las Vegas", "timezone": "America/Los_Angeles"},
-    "reinventradar": {"city": "Las Vegas", "timezone": "America/Los_Angeles"},
 }
 
 _PLATFORM_HOSTS = {

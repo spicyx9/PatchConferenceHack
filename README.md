@@ -1,6 +1,6 @@
 # Conferge
 
-**Don't just attend conferences. Be in the right place, with the right people, at the right time.**
+**Plan a conference trip in minutes and maximize the professional opportunities you get out of it.**
 
 ![Conferge demo overview](docs/demo/screens/0-overview.png)
 
@@ -12,14 +12,11 @@ Most attendees go home with a few business cards and the feeling they were in th
 
 ## What it does
 
-1. **Goal first**: turns one sentence ("meet seed investors, AI agent founders, Copilot PMs") into weighted goals.
-2. **Event discovery**: collects official sessions and side events (Luma, Partiful, Eventbrite, party aggregators) and links them to the conference.
-3. **Who to meet, and why**: ranks people and shows the explainable FalkorDB path from your goal to each person, with sources.
-4. **Reverse planning**: builds a day-by-day plan for the days you are in town, with a map of the venues.
-5. **Anti-FOMO**: tells you which events to skip (time conflict, travel too long, low score) and what you gain by skipping them.
-6. **Live replanning**: when an event sells out, the plan is recomputed and the diff says what was removed, what replaces it and why.
-7. **Memory**: "I met this person" is written to the graph and the ranking changes immediately.
-
+1. **Opportunity Graph**: one sentence ("meet seed investors, AI agent founders, Copilot PMs") becomes weighted goals, and official sessions plus side events (Luma, Partiful, Eventbrite, conferenceparties) are linked in FalkorDB to people, companies and topics.
+2. **Reverse Planning**: starts from the goals to build a day-by-day plan for the days you are in town, with a map of the venues.
+3. **Smart Networking**: who to meet and why, ranked against your goals with the explainable FalkorDB path and its sources; "I met this person" is written to the graph and the ranking changes immediately.
+4. **Anti-FOMO**: tells you which events to skip (time conflict, travel too long, low score, outside hours) and what you gain by skipping them.
+5. **Live Replanning**: when an event sells out, the plan is recomputed and the diff says what was removed, what replaces it and why.
 ## Architecture
 
 ```

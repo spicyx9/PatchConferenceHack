@@ -5,7 +5,7 @@ Un worktree par branche dans `../conferge-wNN`, créé par `scripts/create_workt
 | # | Branche | Dossier(s) | Mission | Dépend de | Clé Bright Data |
 |---|---|---|---|---|---|
 | 01 | w01-events-luma-partiful | backend/app/providers/events/luma, partiful | endpoints JSON publics, pagination, RunReport, enrichissement page | core | non (Unlocker optionnel) |
-| 02 | w02-events-eventbrite-aggregators | providers/events/eventbrite, aggregators | découpage récursif, parseur conferenceparties + raidandev + reinventradar | core | non |
+| 02 | w02-events-eventbrite-aggregators | providers/events/eventbrite, aggregators | découpage récursif, parseur conferenceparties (raidandev, reinventradar retirés) | core | non |
 | 03 | w03-events-official | providers/events/official | sessions, speakers, sponsors Universe (JSON derrière la page sinon Browser API), Sessionize, Sched | core | Browser si besoin |
 | 04 | w04-events-discovery | providers/events/discovery | SERP batch, Facebook Events, routage des URLs, rattachement événement ↔ conférence (score) | core, 01, 02 pour le routage | oui |
 | 05 | w05-stays | providers/stays | Booking, Google Hotels, Airbnb (pyairbnb puis Bright Data), vérification, price_status, distances | core | oui |
