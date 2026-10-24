@@ -1,0 +1,211 @@
+{
+ "provider": "brightdata:google_maps",
+ "dataset_id": "gd_m8ebnr0q2qlklc02fz",
+ "run": {
+  "snapshot_id": "sd_mvmvwe7c2bqi2xcka6",
+  "status": "ready",
+  "inputs": 9,
+  "started_at": null,
+  "finished_at": "2026-10-24T21:11:07.432644+00:00",
+  "records": 15,
+  "note": "read after the 180 s polling window; same single collection"
+ },
+ "venues": [
+  {
+   "venue_id": "venue:fort-mason-center-san-francisco",
+   "query_name": "Fort Mason Center",
+   "city": "San Francisco",
+   "event_ids": [],
+   "found": false,
+   "match_reason": "dataset error for this input",
+   "name": null,
+   "address": null,
+   "lat": null,
+   "lng": null,
+   "rating": null,
+   "reviews_count": null,
+   "website": null,
+   "place_id": null,
+   "provider": "brightdata:google_maps",
+   "dataset_id": "gd_m8ebnr0q2qlklc02fz",
+   "snapshot_id": "sd_mvmvwe7c2bqi2xcka6",
+   "collected_at": "2026-10-24T21:11:07.432644+00:00"
+  },
+  {
+   "venue_id": "venue:sightglass-coffee-san-francisco",
+   "query_name": "Sightglass Coffee",
+   "city": "San Francisco",
+   "event_ids": [
+    "luma:evt-YyphB0zuBwmzJ5z"
+   ],
+   "found": true,
+   "match_reason": "nearest branch to the known point (0 m)",
+   "name": "Sightglass Coffee",
+   "address": "270 7th St, San Francisco, CA 94103, United States",
+   "lat": 37.7770356,
+   "lng": -122.4084543,
+   "rating": 4.4,
+   "reviews_count": 3442,
+   "website": "https://sightglasscoffee.com/",
+   "place_id": "ChIJf-V9OIKAhYARu8bBG2S6RME",
+   "provider": "brightdata:google_maps",
+   "dataset_id": "gd_m8ebnr0q2qlklc02fz",
+   "snapshot_id": "sd_mvmvwe7c2bqi2xcka6",
+   "collected_at": "2026-10-24T21:11:07.432644+00:00"
+  },
+  {
+   "venue_id": "venue:fairmont-san-francisco-san-francisco",
+   "query_name": "Fairmont San Francisco",
+   "city": "San Francisco",
+   "event_ids": [
+    "eventbrite:2000775243613"
+   ],
+   "found": true,
+   "match_reason": "nearest branch to the known point (0 m)",
+   "name": "Fairmont San Francisco",
+   "address": "950 Mason St, San Francisco, CA 94108, United States",
+   "lat": 37.7923897,
+   "lng": -122.4104443,
+   "rating": 4.5,
+   "reviews_count": 7652,
+   "website": "https://www.fairmont.com/san-francisco/?goto=fiche_hotel&code_hotel=A576&merchantid=seo-maps-US-A576&sourceid=aw-cen&utm_medium=seo%20maps&utm_source=google%20Maps&utm_campaign=seo%20maps",
+   "place_id": "ChIJN2S4EI2AhYAR9J4Qeh1U8Aw",
+   "provider": "brightdata:google_maps",
+   "dataset_id": "gd_m8ebnr0q2qlklc02fz",
+   "snapshot_id": "sd_mvmvwe7c2bqi2xcka6",
+   "collected_at": "2026-10-24T21:11:07.432644+00:00"
+  },
+  {
+   "venue_id": "venue:3117-16th-st-san-francisco",
+   "query_name": "3117 16th St",
+   "city": "San Francisco",
+   "event_ids": [
+    "partiful:h6YYc5rG42JsJ9zHCjMX"
+   ],
+   "found": false,
+   "match_reason": "dataset error for this input",
+   "name": null,
+   "address": null,
+   "lat": null,
+   "lng": null,
+   "rating": null,
+   "reviews_count": null,
+   "website": null,
+   "place_id": null,
+   "provider": "brightdata:google_maps",
+   "dataset_id": "gd_m8ebnr0q2qlklc02fz",
+   "snapshot_id": "sd_mvmvwe7c2bqi2xcka6",
+   "collected_at": "2026-10-24T21:11:07.432644+00:00"
+  },
+  {
+   "venue_id": "venue:culinary-artistas-san-francisco",
+   "query_name": "Culinary Artistas",
+   "city": "San Francisco",
+   "event_ids": [
+    "conferenceparties:github26:2f318a831ccbd284"
+   ],
+   "found": true,
+   "match_reason": "single result in the venue's city",
+   "name": "Culinary Artistas",
+   "address": "851 Beach St, San Francisco, CA 94109, United States",
+   "lat": 37.8062191,
+   "lng": -122.4227905,
+   "rating": 4.9,
+   "reviews_count": 42,
+   "website": "http://culinaryartistas.com/",
+   "place_id": "ChIJrWDxleCAhYARu1R0Se2ierg",
+   "provider": "brightdata:google_maps",
+   "dataset_id": "gd_m8ebnr0q2qlklc02fz",
+   "snapshot_id": "sd_mvmvwe7c2bqi2xcka6",
+   "collected_at": "2026-10-24T21:11:07.432644+00:00"
+  },
+  {
+   "venue_id": "venue:3223-mission-st-san-francisco",
+   "query_name": "3223 Mission St",
+   "city": "San Francisco",
+   "event_ids": [
+    "partiful:Gt3TRSXGjsyMBmL111cL"
+   ],
+   "found": false,
+   "match_reason": "dataset error for this input",
+   "name": null,
+   "address": null,
+   "lat": null,
+   "lng": null,
+   "rating": null,
+   "reviews_count": null,
+   "website": null,
+   "place_id": null,
+   "provider": "brightdata:google_maps",
+   "dataset_id": "gd_m8ebnr0q2qlklc02fz",
+   "snapshot_id": "sd_mvmvwe7c2bqi2xcka6",
+   "collected_at": "2026-10-24T21:11:07.432644+00:00"
+  },
+  {
+   "venue_id": "venue:equator-coffee-san-francisco",
+   "query_name": "Equator Coffee",
+   "city": "San Francisco",
+   "event_ids": [
+    "official:github-universe-2026:1791482173209001jHLv"
+   ],
+   "found": false,
+   "match_reason": "ambiguous: 3 results in the venue's city, no known point to choose",
+   "name": null,
+   "address": null,
+   "lat": null,
+   "lng": null,
+   "rating": null,
+   "reviews_count": null,
+   "website": null,
+   "place_id": null,
+   "provider": "brightdata:google_maps",
+   "dataset_id": "gd_m8ebnr0q2qlklc02fz",
+   "snapshot_id": "sd_mvmvwe7c2bqi2xcka6",
+   "collected_at": "2026-10-24T21:11:07.432644+00:00"
+  },
+  {
+   "venue_id": "venue:figma-hq-san-francisco",
+   "query_name": "Figma HQ",
+   "city": "San Francisco",
+   "event_ids": [
+    "official:github-universe-2026:1791439808268001QNVO"
+   ],
+   "found": true,
+   "match_reason": "single result in the venue's city",
+   "name": "Figma",
+   "address": "760 Market St Fl 10, San Francisco, CA 94102, United States",
+   "lat": 37.7864626,
+   "lng": -122.4054273,
+   "rating": 4.1,
+   "reviews_count": 9,
+   "website": "https://www.figma.com/",
+   "place_id": "ChIJGbRAYQCBhYARrWjZ-UVbE0k",
+   "provider": "brightdata:google_maps",
+   "dataset_id": "gd_m8ebnr0q2qlklc02fz",
+   "snapshot_id": "sd_mvmvwe7c2bqi2xcka6",
+   "collected_at": "2026-10-24T21:11:07.432644+00:00"
+  },
+  {
+   "venue_id": "venue:glen-park-san-francisco",
+   "query_name": "Glen Park",
+   "city": "San Francisco",
+   "event_ids": [
+    "luma:evt-ESzIcjB6CmeezPV"
+   ],
+   "found": false,
+   "match_reason": "dataset error for this input",
+   "name": null,
+   "address": null,
+   "lat": null,
+   "lng": null,
+   "rating": null,
+   "reviews_count": null,
+   "website": null,
+   "place_id": null,
+   "provider": "brightdata:google_maps",
+   "dataset_id": "gd_m8ebnr0q2qlklc02fz",
+   "snapshot_id": "sd_mvmvwe7c2bqi2xcka6",
+   "collected_at": "2026-10-24T21:11:07.432644+00:00"
+  }
+ ]
+}

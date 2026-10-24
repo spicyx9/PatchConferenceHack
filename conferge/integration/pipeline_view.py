@@ -23,7 +23,7 @@ HEADLINE = ("Agents never fetch the web at query time: all reasoning runs on the
 # applied to rows extracted from a Web Unlocker page (one request, many rows) or to SERP.
 USD_PER_1000_RECORDS = Decimal("1.5")
 _DATASET_PROVIDERS = {"booking", "google_hotels", "brightdata_google_flights", "brightdata",
-                      "facebook_events", "brightdata:linkedin"}
+                      "facebook_events", "brightdata:linkedin", "brightdata:google_maps"}
 _UNLOCKER_USE = re.compile(r"via Web Unlocker (\d+)x")
 
 
