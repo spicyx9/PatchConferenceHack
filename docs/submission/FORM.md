@@ -1,6 +1,6 @@
 # Patch the Conference: submission form
 
-Copy each field as is. Numbers filled from `STATUS.md` (measured on c6c4d7d at 15:18 PDT).
+Copy each field as is. Numbers filled from `STATUS.md` (measured on dfca2bf at 15:33 PDT).
 
 ## Project name
 
@@ -16,7 +16,7 @@ Big conferences bury the people who matter to you under hundreds of sessions and
 
 Bright Data is at the core of the data. Its datasets (Booking, Airbnb, LinkedIn, Crunchbase, Google Maps), Web Unlocker (Google Flights) and SERP API collected what a plain request cannot reach: 21 stays, 34 flight itineraries, 17 LinkedIn profiles. Every record keeps its source URL and collection time, and the demo replays that timestamped collection.
 
-FalkorDB is at the core of the reasoning. 194 events with their speakers, companies and topics form a graph of 691 nodes and 2213 edges. FalkorDB ranks the connections, returns the goal-to-person path behind each one as evidence, and remembers who you met. A rule-based planner builds the 25-item itinerary from them. No LLM in the loop: no invented price, attendance or guest list.
+FalkorDB is at the core of the reasoning. 194 events with their speakers, companies and topics form a graph of 690 nodes and 2184 edges. FalkorDB ranks the connections, returns the goal-to-person path behind each one as evidence, and remembers who you met. A rule-based planner builds the 25-item itinerary from them. No LLM decides a price, a ranking or an attendance: FalkorDB ranks, Python plans. The optional semantic search uses OpenAI embeddings on FalkorDB's vector index and labels its summary as generated.
 
 ## Tracks
 
@@ -25,7 +25,7 @@ FalkorDB is at the core of the reasoning. 194 events with their speakers, compan
 
 ## Tech stack
 
-Python, FastAPI, Pydantic, FalkorDB 6.0.3 (falkordb-py, Cypher), Bright Data (Datasets, Web Unlocker, SERP API), httpx, HTML/CSS/vanilla JavaScript with Cytoscape.js, Docker Compose, uv, pytest (1457 tests in `make check`).
+Python, FastAPI, Pydantic, FalkorDB 6.0.3 (falkordb-py, Cypher), Bright Data (Datasets, Web Unlocker, SERP API), httpx, HTML/CSS/vanilla JavaScript with Cytoscape.js, Docker Compose, uv, pytest (1470 tests in `make check`).
 
 ## Repository URL
 
