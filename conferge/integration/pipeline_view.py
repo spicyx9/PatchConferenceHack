@@ -2,7 +2,8 @@
 
 Rows say how each source was collected (``brightdata`` / ``direct`` / ``fallback``),
 which Bright Data API (``dataset`` / ``unlocker`` / ``serp``) when relevant, the record
-count, collected_at, the RunReport outcome and an estimated cost for Bright Data rows.
+count, collected_at and the RunReport outcome. No USD figure: no captured Bright Data
+response carried a cost.
 Nothing here is a constant: a source that did not run has no row.
 """
 
@@ -10,7 +11,6 @@ from __future__ import annotations
 
 import json
 import re
-from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
@@ -19,9 +19,6 @@ from conferge.core.schemas import RunReport
 
 HEADLINE = ("Agents never fetch the web at query time: all reasoning runs on the stored, "
             "deduplicated, provenance-tagged graph.")
-# List price estimate, not billed: Bright Data datasets, USD 1.50 per 1,000 records. Never
-# applied to rows extracted from a Web Unlocker page (one request, many rows) or to SERP.
-USD_PER_1000_RECORDS = Decimal("1.5")
 _DATASET_PROVIDERS = {"booking", "google_hotels", "brightdata_google_flights", "brightdata",
                       "facebook_events", "brightdata:linkedin", "brightdata:google_maps"}
 _UNLOCKER_USE = re.compile(r"via Web Unlocker (\d+)x")
@@ -44,9 +41,6 @@ def row(source: str, report: RunReport, *, fallback: bool = False,
     kind = "fallback" if fallback or report.source_mode == "fixture" else (
         "brightdata" if api else "direct")
     records = report.unique_count
-    estimate = None
-    if kind == "brightdata" and api == "dataset" and report.status != "failed":
-        estimate = str((Decimal(records) * USD_PER_1000_RECORDS / 1000).quantize(Decimal("0.0001")))
     return {
         "source": source, "provider": report.provider, "kind": kind, "brightdata_api": api,
         "records": records, "collected_at": collected_at or report.finished_at.isoformat(),
@@ -55,9 +49,6 @@ def row(source: str, report: RunReport, *, fallback: bool = False,
         # brightdata_no_peers is shown as is (Bright Data out of peers after 15/30/60 s retries).
         "reason": NO_PEERS if NO_PEERS in report.warnings else (
             report.errors[0] if report.errors else None),
-        "estimated_cost_usd": estimate,
-        "estimate_basis": ("dataset records x 1.5 / 1000, list price estimate, not billed"
-                           if estimate is not None else None),
     }
 
 
@@ -77,14 +68,12 @@ def build_rows(slices: list[Any], travel: dict[str, Any], travel_fallback: dict[
             if "skipped" in note and "Bright Data" in note:
                 rows.append({"source": name, "provider": "brightdata", "kind": "skipped",
                              "brightdata_api": "dataset", "records": None, "collected_at": None,
-                             "status": "skipped", "termination": None, "reason": note,
-                             "estimated_cost_usd": None, "estimate_basis": None})
+                             "status": "skipped", "termination": None, "reason": note})
         if travel_fallback.get(name):
             rows.append({"source": name, "provider": "api fixture", "kind": "fallback",
                          "brightdata_api": None, "records": None, "collected_at": None,
                          "status": "fixture", "termination": None,
-                         "reason": "live results unusable; labelled fixture shown",
-                         "estimated_cost_usd": None, "estimate_basis": None})
+                         "reason": "live results unusable; labelled fixture shown"})
     rows.extend(fli_rows())  # Google Flights secondary source, as of the last fli probe
     return rows
 
@@ -110,8 +99,7 @@ def fli_rows(path: Path = FLI_RUN) -> list[dict[str, Any]]:
              "brightdata_api": None, "records": run.get("records", 0),
              "collected_at": run.get("run_at"), "status": run["status"],
              "termination": "exhausted" if run["status"] == "ok" else "error",
-             "reason": f"{summary}" + (f" ({reason})" if reason else ""),
-             "estimated_cost_usd": None, "estimate_basis": None}]
+             "reason": f"{summary}" + (f" ({reason})" if reason else "")}]
 
 
 def reachability(path: Path | None = None) -> dict[str, Any] | None:
@@ -132,11 +120,10 @@ def reachability(path: Path | None = None) -> dict[str, Any] | None:
 
 
 def totals(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    """Records returned per Bright Data API. No USD: no captured response carried a cost."""
     by_api: dict[str, int] = {}
-    cost = Decimal(0)
     for r in rows:
         if r["kind"] == "brightdata" and r["status"] != "failed":
             by_api[r["brightdata_api"]] = by_api.get(r["brightdata_api"], 0) + (r["records"] or 0)
-            cost += Decimal(r["estimated_cost_usd"] or 0)
     return {"brightdata_records_by_api": by_api, "brightdata_records": sum(by_api.values()),
-            "estimated_cost_usd": str(cost), "estimate": True}
+            "cost_usd": None, "cost_note": "cost not read from any Bright Data response"}

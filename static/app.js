@@ -794,6 +794,15 @@
       conf.venue_name || "Venue to be confirmed";
     $("conference-city").textContent = conf.city || "City to be confirmed";
     $("hero-city").textContent = conf.city || "Your next conference";
+    $("travel-context").textContent = [
+      conf.name,
+      conf.city,
+      conf.start_date && shortDate(conf.start_date),
+    ]
+      .filter(Boolean)
+      .join(" · ");
+    if (!$("travel-research-form").dataset.initialized)
+      $("research-destination").value = conf.city || "";
     $("conference-dates").textContent =
       conf.start_date && conf.end_date
         ? shortDate(conf.start_date) + " — " + shortDate(conf.end_date)
@@ -1299,77 +1308,349 @@
           sourceModeBadge(b.source_mode);
   }
 
+  var travelSearchKind = "flights",
+    travelSearchResults = {},
+    travelSearchSequence = 0,
+    travelAutoSearch = false;
+  var travelGuests = { flights: "1", stays: "2" };
+  function travelQuery() {
+    return {
+      kind: travelSearchKind,
+      trip_type: $("flight-type").value,
+      origin: $("research-origin").value.trim(),
+      destination: $("research-destination").value.trim(),
+      depart: $("research-depart").value,
+      return_date: $("research-return").value,
+      adults: Number($("research-adults").value),
+      cabin: $("research-cabin").value,
+      rooms: Number($("research-rooms").value),
+      radius_km: Number($("travel-stay-radius").value),
+    };
+  }
   function updateResearchLinks() {
-    var origin = $("research-origin").value.trim(),
-      depart = $("research-depart").value,
-      back = $("research-return").value;
-    $("research-return").min = depart;
+    var q = travelQuery();
+    $("research-return").min = q.depart;
     $("research-return").setCustomValidity(
-      back < depart ? "Return must be after departure." : "",
+      (travelSearchKind === "stays" || q.trip_type !== "one_way") &&
+        q.return_date <= q.depart
+        ? "Return or check-out must be after departure."
+        : "",
     );
     $("research-flights-link").href =
       "https://www.google.com/travel/flights?q=" +
       encodeURIComponent(
         "Flights from " +
-          origin +
-          " to San Francisco on " +
-          depart +
-          " returning " +
-          back,
+          q.origin +
+          " to " +
+          q.destination +
+          " on " +
+          q.depart +
+          (q.trip_type === "one_way"
+            ? " one way"
+            : " returning " + q.return_date) +
+          ", " +
+          q.adults +
+          " adults, " +
+          q.cabin,
       );
     $("research-stays-link").href =
-      "https://www.booking.com/searchresults.html?ss=San+Francisco&checkin=" +
-      encodeURIComponent(depart) +
+      "https://www.booking.com/searchresults.html?ss=" +
+      encodeURIComponent(q.destination) +
+      "&checkin=" +
+      q.depart +
       "&checkout=" +
-      encodeURIComponent(back) +
-      "&group_adults=1&no_rooms=1";
-    var changed = $("travel-research-form").dataset.changed;
-    $("travel-offer-context").textContent = changed
-      ? "Search links use your dates. Collected offers below retain their original dates."
-      : "Collected offers for your conference trip. Check current prices with the provider.";
+      q.return_date +
+      "&group_adults=" +
+      q.adults +
+      "&no_rooms=" +
+      q.rooms;
   }
-
+  function travelEmpty(message, link) {
+    return (
+      '<div class="travel-search-empty"><h3>No matching offers yet.</h3><p>' +
+      esc(message) +
+      "</p>" +
+      (safeUrl(link)
+        ? '<a href="' +
+          esc(link) +
+          '" target="_blank" rel="noopener noreferrer">Continue with a travel provider</a>'
+        : "") +
+      "</div>"
+    );
+  }
+  function switchTravelKind(kind) {
+    travelGuests[travelSearchKind] = $("research-adults").value;
+    travelSearchKind = kind;
+    var flights = kind === "flights";
+    $("research-adults").value = travelGuests[kind];
+    $("travel-flights-tab").setAttribute("aria-selected", String(flights));
+    $("travel-stays-tab").setAttribute("aria-selected", String(!flights));
+    $("flight-results-panel").hidden = !flights;
+    $("stay-results-panel").hidden = flights;
+    $("travel-title").textContent = flights
+      ? "Find your flight."
+      : "Find a place to stay.";
+    $("research-origin-label").hidden = !flights;
+    $("research-origin").required = flights;
+    $("research-return").closest("label").hidden =
+      flights && $("flight-type").value === "one_way";
+    $("research-return").required = !(
+      flights && $("flight-type").value === "one_way"
+    );
+    $("research-cabin-label").hidden = !flights;
+    $("flight-type-label").hidden = !flights;
+    $("research-rooms-label").hidden = flights;
+    $("travel-stop-filters").hidden = !flights;
+    $("stay-radius-filter").hidden = flights;
+    $("research-destination-label").textContent = flights ? "To" : "Where";
+    $("research-depart-label").textContent = flights ? "Departure" : "Check-in";
+    $("research-return-label").textContent = flights ? "Return" : "Check-out";
+    document
+      .querySelector(".travel-search-fields")
+      .classList.toggle("is-stays", !flights);
+    $("travel-search-hint").textContent = flights
+      ? "Destination set from your conference."
+      : "Search near the conference. Quoted stays use the guest count above.";
+    updateResearchLinks();
+    searchTravel("cached");
+  }
+  function searchTravel(mode) {
+    if (!$("travel-research-form").reportValidity()) return Promise.resolve();
+    updateResearchLinks();
+    var q = travelQuery();
+    q.mode = mode || "live";
+    var sequence = ++travelSearchSequence,
+      kind = q.kind;
+    $("travel-search-button").disabled = true;
+    $("travel-refresh-prices").disabled = true;
+    $("travel-show-collected").disabled = true;
+    $("travel-search-button").querySelector("span").textContent = "Searching…";
+    $("travel-results-workspace").setAttribute("aria-busy", "true");
+    $("travel-search-feedback").textContent = "";
+    $("travel-offer-context").textContent = "Finding offers for your dates…";
+    function awaitCollection(res) {
+      if(sequence !== travelSearchSequence) return Promise.resolve(res);
+      if(res.status !== "running" || !res.job_id) return Promise.resolve(res);
+      $("travel-search-button").querySelector("span").textContent = "Collecting…";
+      $("travel-offer-context").textContent = "Checking Booking and Airbnb. Collection can take a few minutes.";
+      return new Promise(function(resolve){setTimeout(resolve,2500);}).then(function(){
+        if(sequence !== travelSearchSequence) return res;
+        return api("/travel/search/" + encodeURIComponent(res.job_id), null, null).then(awaitCollection);
+      });
+    }
+    return api("/travel/search", { method: "POST", body: q }, null)
+      .then(awaitCollection)
+      .then(function (res) {
+        if (sequence !== travelSearchSequence) return;
+        travelSearchResults[kind] = res;
+        var stamp = res.collected_at
+          ? new Intl.DateTimeFormat("en-US", {
+              month: "short",
+              day: "numeric",
+              hour: "numeric",
+              minute: "2-digit",
+              timeZoneName: "short",
+              timeZone: EVENT_TZ,
+            }).format(new Date(res.collected_at))
+          : "";
+        var bd =
+          res.items &&
+          res.items.length &&
+          res.items.every(function (item) {
+            return item.source && item.source.provider === "brightdata";
+          });
+        var provenance =
+          res.data_source === "cached"
+            ? "Collected prices"
+            : res.data_source === "live"
+              ? "Freshly collected"
+              : q.mode === "live" ? "Live prices unavailable" : "No matching collection";
+        $("travel-offer-context").textContent =
+          (bd
+            ? "Bright Data · "
+            : res.items && res.items.length
+              ? (q.kind === "flights" ? "Google Flights · " : "Travel providers · ")
+              : "") +
+          provenance +
+          (stamp ? " · " + stamp : "") +
+          " · " +
+          q.adults +
+          (q.adults === 1 ? " adult" : " adults");
+        if (q.mode === "live" && !res.items.length) {
+          $("travel-search-feedback").innerHTML =
+            "<p>" +
+            esc(
+              (res.warnings || [])[0] ||
+                "Live prices are unavailable for these criteria.",
+            ) +
+            '</p><button type="button" class="text-button" id="travel-use-collected">Use collected offers</button>';
+          $("travel-use-collected").onclick = function () {
+            searchTravel("cached");
+          };
+        }
+        $("travel-research-form").dataset.changed = "";
+        if (kind === "flights") renderFlights(res);
+        else renderStays(res);
+      })
+      .catch(function () {
+        if (sequence !== travelSearchSequence) return;
+        $("travel-offer-context").textContent = "Search unavailable";
+        var link = $(
+          kind === "flights" ? "research-flights-link" : "research-stays-link",
+        ).href;
+        $(kind === "flights" ? "flights" : "stays").innerHTML = travelEmpty(
+          "We couldn’t complete this search. Try again or use the same criteria with a travel provider.",
+          link,
+        );
+      })
+      .finally(function () {
+        if (sequence !== travelSearchSequence) return;
+        $("travel-search-button").disabled = false;
+        $("travel-refresh-prices").disabled = false;
+        $("travel-show-collected").disabled = false;
+        $("travel-search-button").querySelector("span").textContent = "Search";
+        $("travel-results-workspace").setAttribute("aria-busy", "false");
+      });
+  }
+  function flightMinutes(offer) {
+    var slice = (offer.slices || [])[0] || {},
+      segments = slice.segments || [],
+      first = segments[0] || {},
+      last = segments[segments.length - 1] || {};
+    if (slice.duration_minutes != null) return slice.duration_minutes;
+    if (first.departure_at && last.arrival_at)
+      return Math.round(
+        (Date.parse(last.arrival_at) - Date.parse(first.departure_at)) / 60000,
+      );
+    return null;
+  }
+  function travelMoney(value, currency) {
+    if (value == null) return "Price unavailable";
+    try {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: currency || "USD",
+        maximumFractionDigits: 2,
+        minimumFractionDigits: 0,
+      }).format(Number(value));
+    } catch (e) {
+      return value + " " + (currency || "");
+    }
+  }
   function renderFlights(res) {
-    var items = ((res && res.items) || []).filter(function (offer) {
+    if (
+      res &&
+      !res.query &&
+      $("travel-research-form").dataset.changed &&
+      travelSearchKind === "flights"
+    )
+      return;
+    if (res && !res.query && travelSearchResults.flights)
+      res = travelSearchResults.flights;
+    var all = ((res && res.items) || []).filter(function (o) {
       return !(
-        offer.source &&
-        offer.source.provider === "fixture" &&
-        offer.total_price == null &&
-        !offer.booking_url
+        o.source &&
+        o.source.provider === "fixture" &&
+        o.total_price == null
       );
     });
-    items = items.filter(function (offer) {
+    var stops = document.querySelector(
+        'input[name="travel-stops"]:checked',
+      ).value,
+      max = Number($("travel-max-price").value) || Infinity;
+    var items = all.filter(function (o) {
+      var segments = ((o.slices || [])[0] || {}).segments || [];
       return (
-        $("flight-type").value === "all" ||
+        (stops === "all" || segments.length - 1 <= Number(stops)) &&
+        (o.total_price == null || Number(o.total_price) <= max)
+      );
+    });
+    function direction(offer) {
+      if (
         offer.trip_type === "round_trip" ||
         offer.return_slice_collected === false
-      );
-    });
+      )
+        return 0;
+      var slice = (offer.slices || [])[0] || {};
+      var first = (slice.segments || [])[0] || {};
+      return res &&
+        res.query &&
+        first.departure_at &&
+        first.departure_at.slice(0, 10) === res.query.return_date
+        ? 2
+        : 1;
+    }
+    var directionLabels = [
+      "Round-trip quotes",
+      "Outbound · One-way fares",
+      "Return · One-way fares",
+    ];
+    var presentDirections = Array.from(new Set(items.map(direction)));
+    var lastDirection = null;
     var sort = $("flight-sort").value;
     items.sort(function (a, b) {
+      if (direction(a) !== direction(b)) return direction(a) - direction(b);
       if (sort === "price" && a.currency === b.currency)
         return (
           (a.total_price == null ? Infinity : Number(a.total_price)) -
           (b.total_price == null ? Infinity : Number(b.total_price))
         );
-      return String(a.id).localeCompare(String(b.id));
+      if (sort === "duration")
+        return (flightMinutes(a) || Infinity) - (flightMinutes(b) || Infinity);
+      var aa = (((a.slices || [])[0] || {}).segments || [])[0] || {},
+        bb = (((b.slices || [])[0] || {}).segments || [])[0] || {};
+      return String(
+        sort === "departure" ? aa.departure_at || "z" : aa.origin_iata,
+      ).localeCompare(
+        String(sort === "departure" ? bb.departure_at || "z" : bb.origin_iata),
+      );
     });
+    $("flight-result-count").textContent = items.length + " matching offers";
+    $("flight-compare-title").textContent =
+      "Flights to " +
+      ((res && res.query && res.query.destination) ||
+        $("research-destination").value ||
+        "your conference");
     $("flights").innerHTML = items.length
       ? items
           .map(function (leg) {
-            return TravelCards.flight(leg,
+            var heading = presentDirections.length > 1 && direction(leg) !== lastDirection
+              ? '<h3 class="flight-direction">' + directionLabels[direction(leg)] + '</h3>' : '';
+            lastDirection = direction(leg);
+            return heading + TravelCards.flight(leg,
               sourceApiBadge(leg.source) + "<p>Observed price: " + esc(flightPriceText(leg)) +
               " · Price status: " + esc(leg.price_status || "unknown") + "</p>",
               sourceBadge(recordMode(leg), leg.collected_at || (leg.source && leg.source.collected_at)));
           })
           .join("")
-      : '<p class="travel-empty">No flight offers collected yet. Search flights above to compare current options.</p>';
+      : travelEmpty(
+          all.length
+            ? "Try fewer filters to see more options."
+            : "No collected offers match these dates, travelers and cabin. Continue your search with the same criteria.",
+          (res && res.fallback_url) || $("research-flights-link").href,
+        );
   }
 
   function renderStays(s) {
+    if (
+      s &&
+      !s.query &&
+      $("travel-research-form").dataset.changed &&
+      travelSearchKind === "stays"
+    )
+      return;
+    if (s && !s.query && travelSearchResults.stays)
+      s = travelSearchResults.stays;
     var items = ((s && s.items) || []).filter(function (stay) {
       return !isPlaceholderStay(stay.name);
     });
+    var max = Number($("travel-max-price").value) || Infinity;
+    items = items.filter(function (st) {
+      return st.total_price == null || Number(st.total_price) <= max;
+    });
+    if (s && s.query && lastMapData) renderMap(lastMapData);
+    $("stay-result-count").textContent =
+      items.length + " matching stays · Total for the full stay";
     if ($("stay-sort").value === "distance")
       items.sort(function (a, b) {
         return (
@@ -1393,7 +1674,10 @@
               sourceBadge(recordMode(st), st.collected_at || (st.source && st.source.collected_at)));
           })
           .join("")
-      : '<div class="trip-stay-empty"><span class="trip-stay-symbol" aria-hidden="true">⌂</span><div><h3>A good stay starts with the right location.</h3><p>No stay offers are available for these dates yet. Use the map to find the neighborhoods around your agenda.</p></div></div>';
+      : travelEmpty(
+          "No collected stays match these dates, guests and rooms. Try different criteria or continue with a travel provider.",
+          (s && s.fallback_url) || $("research-stays-link").href,
+        );
   }
 
   var travelMapState = { day: "all", scope: "planned", selected: null };
@@ -1421,7 +1705,28 @@
     events.forEach(function (event) {
       byId[event.id] = event;
     });
-    var markers = ((m && m.markers) || []).filter(function (place) {
+    var mapPlaces = ((m && m.markers) || []).slice();
+    if (travelSearchResults.stays) {
+      mapPlaces = mapPlaces.filter(function (place) {
+        return place.kind !== "stay";
+      });
+      travelSearchResults.stays.items.forEach(function (stay) {
+        var venue = stay.venue || {};
+        if (
+          typeof venue.latitude === "number" &&
+          typeof venue.longitude === "number"
+        )
+          mapPlaces.push({
+            id: stay.id,
+            kind: "stay",
+            label: stay.name,
+            lat: venue.latitude,
+            lng: venue.longitude,
+            precision: venue.coordinate_precision,
+          });
+      });
+    }
+    var markers = mapPlaces.filter(function (place) {
       return (
         typeof place.lat === "number" &&
         typeof place.lng === "number" &&
@@ -1503,7 +1808,12 @@
         (byId[b.id] || {}).start_at || "z",
       );
     });
-    var cap = travelMapState.scope === "nearby" ? 30 : 13,
+    var cap =
+        travelSearchKind === "stays"
+          ? 50
+          : travelMapState.scope === "nearby"
+            ? 30
+            : 13,
       visible = candidates.slice(0, cap);
     if (
       !visible.some(function (place) {
@@ -1713,7 +2023,9 @@
       esc(orUnknown(e.confidence)) +
       " | observed at " +
       esc(orUnknown(e.observed_at)) +
-      (e.rationale ? '<br><span class="muted">' + esc(e.rationale) + "</span>" : "")
+      (e.rationale
+        ? '<br><span class="muted">' + esc(e.rationale) + "</span>"
+        : "")
     );
   }
 
@@ -2658,8 +2970,10 @@
                 return entry.id === opportunity.event_id;
               },
             );
-            var evidence = (opportunity.evidence && opportunity.evidence.length
-              ? opportunity.evidence : person.evidence) || [];
+            var evidence =
+              (opportunity.evidence && opportunity.evidence.length
+                ? opportunity.evidence
+                : person.evidence) || [];
             var whyEdges = (card.why && card.why.edges) || [];
             var sources = evidence
               .map(function (entry) {
@@ -2677,10 +2991,17 @@
                   sourceModeBadge(entry.source_mode) +
                   whyEdges
                     .filter(function (w) {
-                      return entry.source_url && (w.evidence_ids || []).indexOf(entry.source_url) >= 0;
+                      return (
+                        entry.source_url &&
+                        (w.evidence_ids || []).indexOf(entry.source_url) >= 0
+                      );
                     })
                     .map(function (w) {
-                      return '<br><span class="muted">' + esc(w.rationale) + "</span>";
+                      return (
+                        '<br><span class="muted">' +
+                        esc(w.rationale) +
+                        "</span>"
+                      );
                     })
                     .join("") +
                   "</li>"
@@ -2869,21 +3190,97 @@
 
   $("travel-research-form").addEventListener("input", function () {
     this.dataset.changed = "true";
+    travelSearchSequence++;
+    $("travel-search-button").disabled = false;
+    $("travel-search-button").querySelector("span").textContent = "Search";
+    $("travel-offer-context").textContent =
+      "Search to update results for your new criteria.";
+    $(travelSearchKind === "flights" ? "flights" : "stays").innerHTML =
+      '<p class="travel-empty">Your criteria have changed. Search to see matching offers.</p>';
     updateResearchLinks();
   });
-  ["research-flights-link", "research-stays-link"].forEach(function (id) {
-    $(id).onclick = function (event) {
-      if (!$("travel-research-form").reportValidity()) event.preventDefault();
+  $("travel-research-form").onsubmit = function (event) {
+    event.preventDefault();
+    searchTravel();
+  };
+  $("travel-flights-tab").onclick = function () {
+    switchTravelKind("flights");
+  };
+  $("travel-stays-tab").onclick = function () {
+    switchTravelKind("stays");
+  };
+  ["travel-flights-tab", "travel-stays-tab"].forEach(function (id) {
+    $(id).onkeydown = function (event) {
+      if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+        event.preventDefault();
+        var kind = travelSearchKind === "flights" ? "stays" : "flights";
+        switchTravelKind(kind);
+        $(
+          kind === "flights" ? "travel-flights-tab" : "travel-stays-tab",
+        ).focus();
+      }
     };
   });
+  function filterTravelResults() {
+    if ($("travel-research-form").dataset.changed) return;
+    if (travelSearchKind === "flights")
+      renderFlights(travelSearchResults.flights || envelopes.flights);
+    else renderStays(travelSearchResults.stays || envelopes.stays);
+  }
   $("flight-type").onchange = function () {
-    renderFlights(envelopes.flights);
+    var one = this.value === "one_way" && travelSearchKind === "flights";
+    $("research-return").closest("label").hidden = one;
+    $("research-return").required = !one;
+    document
+      .querySelector(".travel-search-fields")
+      .classList.toggle("is-oneway", one);
+    updateResearchLinks();
   };
-  $("flight-sort").onchange = function () {
-    renderFlights(envelopes.flights);
+  $("flight-sort").onchange = filterTravelResults;
+  $("stay-sort").onchange = filterTravelResults;
+  $("travel-max-price").oninput = filterTravelResults;
+  document
+    .querySelectorAll('input[name="travel-stops"]')
+    .forEach(function (input) {
+      input.onchange = filterTravelResults;
+    });
+  $("travel-stay-radius").onchange = function () {
+    searchTravel("cached");
   };
-  $("stay-sort").onchange = function () {
-    renderStays(envelopes.stays);
+  $("travel-show-collected").onclick = function () {
+    searchTravel("cached");
+  };
+  $("travel-refresh-prices").onclick = function () {
+    searchTravel("live");
+  };
+  $("travel-mobile-filters").onclick = function () {
+    var open = this.getAttribute("aria-expanded") !== "true";
+    this.setAttribute("aria-expanded", String(open));
+    document
+      .querySelector(".travel-filter-sidebar")
+      .classList.toggle("filters-open", open);
+  };
+  $("travel-clear-filters").onclick = function () {
+    $("travel-max-price").value = "";
+    document.querySelector('input[name="travel-stops"][value="all"]').checked =
+      true;
+    filterTravelResults();
+  };
+  $("travel-local-toggle").onclick = function () {
+    $("travel-research-form").hidden = true;
+    $("travel-results-workspace").hidden = true;
+    $("travel-local-note").hidden = false;
+    $("travel-offer-context").hidden = true;
+    if (map)
+      setTimeout(function () {
+        map.invalidateSize();
+      }, 0);
+  };
+  $("travel-resume").onclick = function () {
+    $("travel-research-form").hidden = false;
+    $("travel-results-workspace").hidden = false;
+    $("travel-local-note").hidden = true;
+    $("travel-offer-context").hidden = false;
   };
   function refreshAll() {
     clearError();
@@ -2952,6 +3349,10 @@
       .then(function () {
         if (envelopes.plan) renderPlan(envelopes.plan);
         if (envelopes.travel) renderTravel(envelopes.travel);
+        if (!travelAutoSearch && envelopes.conference) {
+          travelAutoSearch = true;
+          searchTravel("cached");
+        }
         if (envelopes.people) renderPeople(envelopes.people);
         if (lastMapData) renderMap(lastMapData);
         if (selectedConnectionId)
@@ -3431,17 +3832,13 @@
     var table = products.length
       ? '<table class="pipeline-table bd-products"><thead><tr><th>Product</th><th>API</th>' +
         "<th>Requests</th><th>Records</th><th>Collected (records' own time)</th>" +
-        "<th>List price estimate</th></tr></thead><tbody>" +
+        "</tr></thead><tbody>" +
         products
           .map(function (p) {
             return (
               "<tr><td>" + esc(p.product) + "</td><td>" + esc(apiName[p.api] || p.api) +
               "</td><td>" + esc(p.requests) + "</td><td>" + esc(p.records) + "</td><td>" +
-              esc(range(p)) + "</td><td>" +
-              esc(p.list_price_usd !== null && p.list_price_usd !== undefined
-                ? "$" + p.list_price_usd
-                : "not priced") +
-              "</td></tr>"
+              esc(range(p)) + "</td></tr>"
             );
           })
           .join("") +
@@ -3454,10 +3851,11 @@
       "<b>Bright Data: " + esc(res && res.requests != null ? res.requests : 0) +
       " requests, " + esc(res && res.records != null ? res.records : 0) + " records</b>" +
       ' <span class="bd-detail">(a request is one API call; one Web Unlocker page can yield many records). ' +
-      "Estimated cost $" + esc((res && res.list_price_usd) || "0") + ", " +
-      esc((res && res.cost_label) || "list price estimate, not billed") +
-      ", dataset records only." +
-      (u.total ? " This process: " + esc(u.total) + " records returned live." : "") +
+      "Cost: " + esc((res && res.cost_note) || "not read from any Bright Data response") + "." +
+      (u.requests && u.requests.total
+        ? " This process: " + esc(u.requests.total) + " requests, " +
+          esc(u.returned.total) + " rows or pages returned live."
+        : "") +
       (notReady.length
         ? ' <span class="muted">(not configured here: ' + esc(notReady.join(", ")) + ")</span>"
         : "") +
@@ -3513,7 +3911,7 @@
     $("pipeline-table").innerHTML = rows.length
       ? '<table class="pipeline-table"><thead><tr>' +
         "<th>Source</th><th>Provider</th><th>Mode</th><th>Bright Data API</th><th>Records</th>" +
-        "<th>Collected</th><th>Run report</th><th>Est. cost</th></tr></thead><tbody>" +
+        "<th>Collected</th><th>Run report</th></tr></thead><tbody>" +
         rows
           .map(function (r) {
             var outcome =
@@ -3538,12 +3936,6 @@
               esc(r.collected_at ? fmtTime(r.collected_at) : "—") +
               "</td><td>" +
               esc(outcome) +
-              "</td><td>" +
-              esc(
-                r.estimated_cost_usd !== null
-                  ? "$" + r.estimated_cost_usd + " (list price estimate, not billed)"
-                  : "—",
-              ) +
               "</td></tr>"
             );
           })
@@ -3557,10 +3949,9 @@
     $("pipeline-calls").innerHTML =
       "Bright Data records in these runs: " +
       esc(t.brightdata_records || 0) +
-      ", estimated cost $" +
-      esc(t.estimated_cost_usd || "0") +
-      " (list price estimate, not billed: dataset records × 1.5 / 1000; Web Unlocker rows not priced)." +
-      " Bright Data calls in this process: " +
+      ". Cost: " +
+      esc(t.cost_note || "not read from any Bright Data response") +
+      ". Bright Data calls in this process: " +
       (calls.length
         ? calls
             .map(function (c) {
@@ -3596,10 +3987,10 @@
     };
     box.innerHTML =
       "<b>Bright Data, live in this process:</b> " + esc(c.requests) + " requests, " +
-      esc(c.records) + " records, $" + esc(c.usd) +
-      ' <span class="muted">(' + esc(c.cost_label) + ", dataset records only)</span> · " +
+      esc(c.records) + " records · " +
       part("datasets", "datasets") + " · " + part("unlocker", "unlocker") + " · " +
-      part("serp", "serp");
+      part("serp", "serp") +
+      ' <span class="muted">(' + esc(c.cost_note || "cost not read from any Bright Data response") + ")</span>";
   }
 
   function renderTimings(t, overall) {
@@ -3617,15 +4008,26 @@
     box.innerHTML =
       "<h3>Durations</h3>" +
       (overall && overall.display
-        ? '<p>Sources overall: <b class="overall-' + esc(overall.display.label) + '">' +
-          esc(overall.display.label) + "</b>: " + esc(overall.display.reason) + "</p>"
+        ? '<p>Sources overall: <b class="overall-' +
+          esc(overall.display.label) +
+          '">' +
+          esc(overall.display.label) +
+          "</b>: " +
+          esc(overall.display.reason) +
+          "</p>"
         : "") +
       '<table class="pipeline-table"><thead><tr><th>Step</th><th>Time</th></tr></thead><tbody>' +
       steps
         .map(function (s) {
           return (
-            "<tr><td>" + esc(s.step) + (s.note ? ' <span class="muted">(' + esc(s.note) + ")</span>" : "") +
-            "</td><td>" + esc(secs(s.seconds)) + "</td></tr>"
+            "<tr><td>" +
+            esc(s.step) +
+            (s.note
+              ? ' <span class="muted">(' + esc(s.note) + ")</span>"
+              : "") +
+            "</td><td>" +
+            esc(secs(s.seconds)) +
+            "</td></tr>"
           );
         })
         .join("") +
@@ -3634,9 +4036,17 @@
       sources
         .map(function (s) {
           return (
-            "<tr><td>" + esc(s.source) + "</td><td>" +
-            esc(s.status === "degraded" ? "partial (not exhausted)" : s.status) + "</td><td>" +
-            esc(s.records) + "</td><td>" + esc(secs(s.seconds)) + "</td></tr>"
+            "<tr><td>" +
+            esc(s.source) +
+            "</td><td>" +
+            esc(
+              s.status === "degraded" ? "partial (not exhausted)" : s.status,
+            ) +
+            "</td><td>" +
+            esc(s.records) +
+            "</td><td>" +
+            esc(secs(s.seconds)) +
+            "</td></tr>"
           );
         })
         .join("") +
@@ -3890,15 +4300,22 @@
               return (
                 "<li>" +
                 (link
-                  ? '<a href="' + esc(link) + '" target="_blank" rel="noopener noreferrer">' +
-                    esc(ev.evidence_id) + "</a>"
+                  ? '<a href="' +
+                    esc(link) +
+                    '" target="_blank" rel="noopener noreferrer">' +
+                    esc(ev.evidence_id) +
+                    "</a>"
                   : esc(ev.evidence_id)) +
                 "</li>"
               );
             })
             .join("");
           whyBox.innerHTML = why.answer
-            ? "<p>" + esc(why.answer) + '</p><ul class="plain-list">' + links + "</ul>"
+            ? "<p>" +
+              esc(why.answer) +
+              '</p><ul class="plain-list">' +
+              links +
+              "</ul>"
             : '<p class="muted">No connection path in the graph for this person.</p>';
         })
         .catch(function (e) {

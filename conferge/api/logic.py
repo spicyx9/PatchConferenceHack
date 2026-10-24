@@ -192,7 +192,7 @@ def build_plan(
     candidates become anti-FOMO conflicts with a verdict and the people the user misses.
     """
     from conferge.agents.antifomo.models import Constraints
-    from conferge.agents.antifomo.travel import compatible
+    from conferge.agents.antifomo.travel import compatible, site_name, travel_minutes
 
     skipped = skipped or set()
     attended = attended or set()
@@ -228,7 +228,7 @@ def build_plan(
         if e.start_at and not e.end_at and e.status not in {"cancelled", "sold_out"}
         and e.id not in skipped and in_trip(data, e) and e.id not in off_hours
     ]
-    constraints = Constraints(timezone=tz)
+    constraints = Constraints(timezone=tz, conference_site=site_name(data.conference.venue_name))
     unscheduled = [{"event_id": e.id, "title": e.title} for e in data.events if not e.start_at]
     days: dict[str, list[Event]] = {}
     for event in available:
@@ -260,6 +260,12 @@ def build_plan(
                 "computed_by": FALLBACK,
             })
         chosen.sort(key=lambda e: e.start_at)  # type: ignore[arg-type, return-value]
+        # Travel from the previous kept event, as the feasibility check computed it; the
+        # conservative default (two distinct sites without coordinates) is labelled "default".
+        travel: dict[str, dict[str, Any]] = {}
+        for prev, cur in zip(chosen, chosen[1:], strict=False):
+            minutes, basis = travel_minutes(prev, cur, constraints)
+            travel[cur.id] = {"minutes": minutes, "basis": "default" if basis == "unknown_default" else basis}
         plan_days.append({
             "day": day,
             "items": [
@@ -276,6 +282,7 @@ def build_plan(
                         for pid in _event_people(data, e) if pid in opp_by_person
                     ],
                     "source_mode": _mode_of(e.evidence),
+                    "travel_from_previous": travel.get(e.id),
                 }
                 for e in chosen
             ],

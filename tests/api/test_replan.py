@@ -80,9 +80,13 @@ def test_brightdata_counter_reports_usage_and_config_without_the_key(monkeypatch
         lambda cls: cls("secret-value", serp_zone=None, unlocker_zone="z")))
     brightdata.reset_usage()
     brightdata.record_usage("datasets", 7)
+    brightdata.record_call("datasets", rows=7, status="ready", dataset_id="gd_x")
     brightdata.record_usage("web_unlocker")
+    brightdata.record_call("web_unlocker", rows=1, status="ready")
     body = _client().get("/api/v1/brightdata").json()
-    assert body["usage"] == {"datasets": 7, "web_unlocker": 1, "serp": 0, "total": 8}
+    assert body["usage"]["returned"] == {"datasets": 7, "web_unlocker": 1, "serp": 0, "total": 8}
+    assert body["usage"]["requests"] == {"datasets": 1, "web_unlocker": 1, "serp": 0, "total": 2}
+    assert body["cost_usd"] is None and "list price" not in str(body)
     assert body["ready"] == {"datasets": True, "web_unlocker": True, "serp": False}
     assert "secret-value" not in str(body)
     brightdata.reset_usage()

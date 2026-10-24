@@ -57,6 +57,8 @@ class Constraints(_Model):
     same_venue_buffer_minutes: int = Field(default=5, ge=0)
     travel_overhead_minutes: int = Field(default=8, ge=0)
     travel_speed_kmh: float = Field(default=18.0, gt=0)
+    # Site name of the conference venue (e.g. "fort mason"): official sessions are held there.
+    conference_site: str | None = None
 
 
 class Candidate(_Model):

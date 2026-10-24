@@ -26,6 +26,7 @@ from conferge.api import logic, providers
 from conferge.api.data import DemoData, load_fixture
 from conferge.api.provenance import source_of
 from conferge.extras.router import router as calendar_router
+from conferge.extras.travel_search import router as travel_search_router
 from conferge.flights.round_trip_total import display as rt_display
 from conferge.core.schemas import AgentContext, Goal, Opportunity
 
@@ -418,13 +419,12 @@ def create_app(
 
     @api.get("/cost")
     def cost() -> dict[str, Any]:
-        """Bright Data requests and records of this process; list-price estimate, not billed."""
+        """Bright Data requests and records of this process; no USD figure (none ever read)."""
         from conferge.core import cost as bd_cost
 
         snap = bd_cost.snapshot()
         return _envelope(state, [], snap, mode_override="live" if snap["requests"] else "unknown",
-                         extra_warnings=[f"{bd_cost.COST_LABEL}: dataset records only, "
-                                         "Unlocker and SERP requests are not priced"])
+                         extra_warnings=[bd_cost.COST_NOTE])
 
     @api.get("/brightdata")
     def brightdata_usage() -> dict[str, Any]:
@@ -947,6 +947,7 @@ def create_app(
 
     app.include_router(api)
     app.include_router(calendar_router)
+    app.include_router(travel_search_router)
 
     if STATIC_DIR.is_dir():
         app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")

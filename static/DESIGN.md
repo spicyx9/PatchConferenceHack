@@ -98,3 +98,7 @@ The full network and raw evidence remain available through secondary disclosures
 ### Travel research and identity corrections
 
 Travel begins with editable origin/dates and provider search links. These links research current offers externally; editing dates does not relabel the collected API offers. Flight and lodging cards compare collected offers, preserve observed prices and collection provenance, and never imply a booking or a selected itinerary. Map includes real geolocated stays alongside conference/events. Neutral illustrated placeholders avoid inventing a person's appearance when no verified portrait is provided.
+
+### Travel search implementation
+
+Flights and Stays are separate tasks with visible destination, dates and occupancy. Search submits one structured request; changing criteria clears stale offers. Flights use a time–duration–arrival row with a separate total-fare column, filters for stops and price, and actual sorting. Stay searches use check-in/out, guests, rooms and venue radius; the map reflects searched stay coordinates. Local/already-arranged travelers can skip the search. Search is against attributed collected offers, with an exact-criteria provider fallback when no collection covers the query. Reference: https://www.kayak.com/flights and https://www.airbnb.com/help/article/479.
