@@ -7,14 +7,14 @@ Objectif : identifier qui participe aux événements et enrichir les profils. Re
 1. Speakers (site officiel, Sessionize, Sched) : nom, titre, entreprise, talk, bio, liens sociaux. Présence `confirmed`. Source la plus riche et la plus ciblable.
 2. Hosts et co-hosts des side events (Luma, Partiful, agrégateurs, sites exposants) : entreprise organisatrice, personnes nommées. Présence `confirmed` à leur event.
 3. Sponsors et exposants (site officiel) : entreprises → employés pertinents via LinkedIn companies + people search. Présence `probable`.
-4. Inscrits visibles (Luma partiel, nom + photo, parfois entreprise ; Partiful seulement connecté ; Meetup partiel ; posts X et LinkedIn "see you at") : présence `probable`, nom seul → recherche SERP nom + entreprise → profil LinkedIn avec `match_confidence`.
+4. Inscrits visibles (Luma partiel, nom + photo, parfois entreprise ; Partiful seulement connecté ; Meetup partiel ; posts X et LinkedIn "see you at") : présence `probable`, nom seul → recherche SERP nom + entreprise → profil LinkedIn avec `identity_confidence` (voir "Trois scores séparés").
 
 Les listes d'inscrits ne sont jamais la source principale : à 5 semaines elles sont à 10 ou 20 %, à 5 jours (Universe) elles sont pleines.
 
 ## Enrichissement
 
 - LinkedIn via Bright Data Web Scraper APIs : profils (titre, entreprise, expériences, bio, posts récents), entreprises (taille, secteur, description), posts. Synchrone ou batch, délai 30 s à 2 min, 1,50 $ / 1 000. Exemples : luminati-io/LinkedIn-Scraper.
-- Appariement nom → URL LinkedIn : SERP Bright Data `"<nom>" "<entreprise>" site:linkedin.com/in`, scorer titre + entreprise + ville, `match_confidence` 0 à 1, seuil 0.7, sinon `linkedin_url` null.
+- Appariement nom → URL LinkedIn : SERP Bright Data `"<nom>" "<entreprise>" site:linkedin.com/in`, scorer titre + entreprise + ville ; seuils dans "Trois scores séparés" (lien automatique si `identity_confidence` >= 0.85, sinon revue ou `linkedin_url` null).
 - GitHub (API publique, pas de Bright Data) pour les ingénieurs : repos, langages, bio.
 - X : Web Scraper API posts, pour sujets et présence probable.
 - Crunchbase et pages portfolio VCs via Web Unlocker : `Company.investor`, INVESTED_IN.
@@ -53,7 +53,7 @@ id, name, title, company (CompanyRef), linkedin_url, github_url, x_handle, bio, 
 
 Depuis le 13 novembre 2025, Experience/Position/Education de LinkedIn Profiles sont remplis à environ 2 % ; `current_company.industry` n'est pas supporté. S'appuyer sur `current_company`, `about`, `city`, posts, et LinkedIn Companies (`gd_l1vikfnt1wgvvqz95w`). Proxycurl fermé le 4 juillet 2025.
 
-### Trois scores séparés, jamais confondus (remplace le seuil unique `match_confidence` 0.7)
+### Trois scores séparés, jamais confondus
 
 - `presence_confidence` : checked_in 1.0, announced_speaker 0.85, registered 0.8, declared 0.65, possible 0.3, relationship_only 0.05.
 - `identity_confidence` : nom seul plafonné à 0.40 ; lien automatique si >= 0.85 ; revue entre 0.60 et 0.85.
