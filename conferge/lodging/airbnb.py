@@ -175,7 +175,7 @@ class PyAirbnbBackend:
 
     def _load(self) -> Any:
         if self._module is None:
-            self._module = importlib.import_module("pyairbnb")  # optional, not in pyproject
+            self._module = importlib.import_module("pyairbnb")  # pinned in pyproject; still guarded
         return self._module
 
     async def _call(self, fn: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:

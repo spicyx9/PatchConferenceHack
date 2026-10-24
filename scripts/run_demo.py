@@ -7,8 +7,6 @@ GraphStore, and serves the API on the same ``DemoData`` so API and graph ids mat
 
 Stays and flights are searched live by default (w05 lodging, w06 flights; 90 s each).
 A domain that fails or returns nothing falls back to the API fixture, labelled ``fixture``.
-``pyairbnb`` and ``fast-flights`` are not project dependencies: when missing, the script
-re-runs itself once through ``uv run --with pyairbnb --with fast-flights`` (ephemeral).
 ``--travel fixture`` skips the live travel searches.
 
 ``--keep-graph`` serves on the graph as it is (no reset, no reload): restarting the API
@@ -16,43 +14,51 @@ process this way keeps what the session wrote to FalkorDB (meetings, skips).
 
 Run: ``uv run python scripts/run_demo.py [--mode fixture|live] [--travel live|fixture] [--graph conferge_demo] [--port 8000] [--keep-graph]``
 FalkorDB address: FALKORDB_HOST / FALKORDB_PORT from the env or .env (default 127.0.0.1:6379).
+Startup check: the port must answer GRAPH.LIST; a plain Redis or a closed port stops with one line.
 """
 
 from __future__ import annotations
 
 import argparse
 import asyncio
-import importlib.util
 import os
-import subprocess
 import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
-CHILD_FLAG = "CONFERGE_DEMO_TRAVEL_CHILD"
-TRAVEL_PACKAGES = {"pyairbnb": "pyairbnb", "fast_flights": "fast-flights"}
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
-def _maybe_reexec_with_travel_packages() -> None:
-    missing = [pkg for mod, pkg in TRAVEL_PACKAGES.items() if importlib.util.find_spec(mod) is None]
-    if not missing or os.environ.get(CHILD_FLAG):
-        return
-    cmd = ["uv", "run", *(arg for pkg in missing for arg in ("--with", pkg)),
-           "python", str(Path(__file__).resolve()), *sys.argv[1:]]
+def falkordb_preflight() -> str | None:
+    """None when FALKORDB_HOST:FALKORDB_PORT answers GRAPH.LIST, else a one-line reason."""
+    import redis
+
+    from conferge.core.settings import env_value, falkordb_address
+
+    host, port = falkordb_address()
+    client = redis.Redis(host=host, port=port, password=env_value("FALKORDB_PASSWORD") or None,
+                         socket_timeout=3, socket_connect_timeout=3)
     try:
-        code = subprocess.call(cmd, env={**os.environ, CHILD_FLAG: "1"}, cwd=ROOT)
-    except OSError:
-        return  # no uv: run without them, the live searches fail visibly and fall back
-    raise SystemExit(code)
+        client.execute_command("GRAPH.LIST")
+    except redis.ResponseError as exc:
+        if "unknown command" in str(exc).lower():
+            return f"port {port} is a plain Redis, set FALKORDB_PORT to the FalkorDB port"
+        return f"FalkorDB at {host}:{port} refused GRAPH.LIST: {str(exc)[:120]}"
+    except redis.RedisError as exc:
+        return (f"nothing answers on {host}:{port} ({type(exc).__name__}); run `make up`, "
+                "or set FALKORDB_PORT to the FalkorDB port")
+    finally:
+        client.close()
+    return None
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--mode", choices=["fixture", "live"], default="fixture")
-    parser.add_argument("--graph", default="conferge_demo", help="FalkorDB graph name (reset on start)")
+    parser.add_argument("--graph", default="conferge_demo", help="FalkorDB graph name")
+    parser.add_argument("--reset-graph", action="store_true",
+                        help="delete the graph first (drops the user's MET/SKIPPED memory)")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument("--no-graph", action="store_true", help="serve without loading FalkorDB")
@@ -61,9 +67,10 @@ def main() -> int:
     parser.add_argument("--travel", choices=["live", "fixture"], default="live",
                         help="stays/flights: live search with fixture fallback, or fixture only")
     args = parser.parse_args()
-    if args.travel == "live":
-        _maybe_reexec_with_travel_packages()
     os.environ["FALKORDB_GRAPH"] = args.graph  # the API reads the same graph it was loaded into
+    if not args.no_graph and (problem := falkordb_preflight()):
+        print(f"make demo: {problem}", file=sys.stderr)
+        return 2
 
     import uvicorn
 
@@ -99,12 +106,14 @@ def main() -> int:
         from conferge.core.store import connect_graph
 
         store = connect_graph()
-        try:
-            store.graph.delete()
-        except Exception:  # noqa: BLE001 - absent graph
-            pass
-        store = connect_graph()
-        index_errors = store.ensure_indexes(force=True)  # the graph was just deleted
+        if args.reset_graph:
+            try:
+                store.graph.delete()
+            except Exception:  # noqa: BLE001 - absent graph
+                pass
+            store = connect_graph()
+        # Without --reset-graph the load is MERGE-only: memory survives a restart.
+        index_errors = store.ensure_indexes(force=True)
         bundle = GraphBundle(
             source_mode="live" if assembly.data_mode == "live" else "fixture",
             note=f"scripts/run_demo.py, data_mode={assembly.data_mode}",

@@ -77,24 +77,77 @@ class DemoState:
         self.agent_mode: str | None = None
         self.agent_opportunities: list[Opportunity] | None = None
         self.agent_warnings: list[str] = []
+        self.rank_mode: str | None = None  # "graph" or DEGRADED_NO_GRAPH, set by _ranking()
+        self.rank_warnings: list[str] = []
+        self._rank_cache: tuple[list[Opportunity], dict[str, float]] | None = None
+        self._synced_goals: tuple[str, ...] | None = None
+
+    def invalidate(self) -> None:
+        """Drop the cached ranking: goals, memory or the graph changed."""
+        self._rank_cache = None
 
     def store(self) -> Any | None:
         return providers.connect_store() if self.graph_probe else None
 
-    def opportunities(self) -> list[Opportunity]:
+    def _graph_ranking(self) -> tuple[list[Opportunity], dict[str, float]] | None:
+        """people_for_goal / events_for_goal in FalkorDB; None when the graph is unavailable."""
+        store = self.store()
+        if store is None:
+            self.rank_warnings = ["FalkorDB not reachable"]
+            return None
+        try:
+            from conferge.graph import ranking
+            from conferge.graph.ingest import GraphIngestor
+
+            ids = tuple(g.id for g in self.goals)
+            if self._synced_goals != ids:  # goals live in the graph, written through GraphStore
+                GraphIngestor(store, default_mode="live").ingest_goals(USER_ID, self.goals)
+                self._synced_goals = ids
+            known = {p.id for p in self.data.people}
+            people = [o for o in ranking.rank_people(store, USER_ID, self.goals)
+                      if set(o.person_ids) <= known]
+            return people, ranking.event_scores(store, USER_ID, self.goals, people)
+        except Exception as exc:  # noqa: BLE001 - graph down mid-request: degraded, visibly
+            self.rank_warnings = [f"FalkorDB ranking failed: {type(exc).__name__}"]
+            return None
+
+    def _ranking(self) -> tuple[list[Opportunity], dict[str, float]]:
+        if self._rank_cache is not None:
+            return self._rank_cache
+        graph = self._graph_ranking()
+        if graph is not None:
+            self.rank_mode = "graph"
+            self.rank_warnings = ["ranking computed from FalkorDB traversals (people_for_goal, events_for_goal)"]
+            self._rank_cache = graph
+            return graph
+        # Degraded fallback only: the graph did not answer. Python ranking, labelled as such.
+        self.rank_mode = DEGRADED_NO_GRAPH
+        self.rank_warnings = [*self.rank_warnings,
+                              "degraded_no_graph: ranking computed in Python without FalkorDB"]
         if self.agent_opportunities:
             met = set(self.met)
-            return sorted(
-                self.agent_opportunities,
-                key=lambda o: (bool(set(o.person_ids) & met), -o.score, o.id),
-            )
-        return logic.rank_people(self.data, self.goals, self.met)
+            people = sorted(self.agent_opportunities,
+                            key=lambda o: (bool(set(o.person_ids) & met), -o.score, o.id))
+        else:
+            people = logic.rank_people(self.data, self.goals, self.met)
+        self._rank_cache = (people, logic.event_scores(self.data, self.goals, people))
+        return self._rank_cache
+
+    def opportunities(self) -> list[Opportunity]:
+        return self._ranking()[0]
+
+    def event_scores(self) -> dict[str, float]:
+        return self._ranking()[1]
 
     def plan(self) -> dict[str, Any]:
         return logic.build_plan(
             self.data, self.goals, self.opportunities(),
-            skipped=self.skipped, attended=self.attended,
+            skipped=self.skipped, attended=self.attended, scores=self.event_scores(),
         )
+
+
+USER_ID = "demo-user"
+DEGRADED_NO_GRAPH = "degraded_no_graph"
 
 
 def _now() -> str:
@@ -109,6 +162,8 @@ def _envelope(
     modes = {mode_override} if mode_override else {s.source_mode for s in slices}
     data_source = modes.pop() if len(modes) == 1 else ("mixed" if modes else "unknown")
     status = max((s.status for s in slices), key=lambda s: _STATUS_RANK[s], default="ok")
+    if state.rank_mode == DEGRADED_NO_GRAPH and {"people", "events"} & set(domains) and not mode_override:
+        data_source, status = DEGRADED_NO_GRAPH, "degraded"
     warnings = sorted({w for s in slices for w in s.warnings} | set(extra_warnings or []))
     collected = max((s.collected_at for s in slices), default=None)
     return {
@@ -199,12 +254,16 @@ def create_app(
             "goals": [g.model_dump(mode="json") for g in state.goals],
             "plan": state.plan(),
             "people": [o.model_dump(mode="json") for o in opps[:10]],
-            "computed_by": state.agent_mode or logic.FALLBACK,
+            "computed_by": ("falkordb" if state.rank_mode == "graph"
+                            else state.agent_mode or logic.FALLBACK),
+            "ranking_mode": state.rank_mode,
             "scenario_id": state.scenario_id,
         }
 
     def _plan_warnings() -> list[str]:
-        base = list(state.agent_warnings)
+        if state.rank_mode == "graph":
+            return list(state.rank_warnings)
+        base = [*state.rank_warnings, *state.agent_warnings]
         if state.agent_mode is None:
             base.append("planner agent not available: deterministic api-fallback ranking")
         return base
@@ -218,9 +277,13 @@ def create_app(
             raise HTTPException(422, "no goal recognised; mention investors, founders, PMs or engineers")
         state.goal_text, state.goals = req.text, goals
         state.agent_mode, state.agent_opportunities, state.agent_warnings = None, None, []
+        state.invalidate()
+        state._ranking()
         agent = state.providers.agents.get("planner") or state.providers.agents.get("networking")
-        if agent is not None:
-            mode = _envelope(state, ["events", "people"], {})["data_source"]
+        if agent is not None and state.rank_mode != "graph":  # Python agent: degraded fallback only
+            data_modes = {state.data.domains[d].source_mode for d in ("events", "people")
+                          if d in state.data.domains}
+            mode = data_modes.pop() if len(data_modes) == 1 else "mixed"
             ctx = AgentContext(
                 conference=state.data.conference, goals=goals, user_id=req.user_id,
                 data_mode=mode if mode in {"live", "cached", "fixture"} else "mixed",
@@ -237,6 +300,7 @@ def create_app(
                     state.agent_warnings = [f"{result.agent} returned {result.status} with no opportunities; using api-fallback"]
             except Exception as exc:  # noqa: BLE001 - visible degradation, not a 500
                 state.agent_warnings = [f"planner agent error {type(exc).__name__}; using api-fallback"]
+            state.invalidate()
         return _envelope(state, ["events", "people"], _plan_payload(), extra_warnings=_plan_warnings())
 
     @api.get("/plan")
@@ -309,7 +373,7 @@ def create_app(
                          extra_warnings=_plan_warnings())
 
     def _events_view(event_type: str | None, day: str | None, min_score: float | None) -> list[dict[str, Any]]:
-        scores = logic.event_scores(state.data, state.goals, state.opportunities())
+        scores = state.event_scores()
         out = []
         for event in state.data.events:
             if event_type and event.event_type != event_type:
@@ -480,6 +544,7 @@ def create_app(
                     persisted = "falkordb"
             except Exception:  # noqa: BLE001 - memory still holds the meeting
                 persisted = "memory"
+        state.invalidate()  # the next ranking is re-read from FalkorDB (MET excluded by the query)
         payload = _plan_payload()
         payload.update({"person_id": person.id, "persisted": persisted,
                         "memory_id": memory_id if persisted == "falkordb" else None})

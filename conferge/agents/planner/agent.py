@@ -158,5 +158,13 @@ _DEFAULT = PlannerAgent()
 
 
 async def run(ctx: AgentContext) -> AgentResult:
-    """Module-level entry point discovered by the API (``conferge.api.providers``)."""
-    return await _DEFAULT.run(ctx)
+    """Module-level entry point discovered by the API (``conferge.api.providers``).
+
+    Connected to FalkorDB by default (FALKORDB_HOST/PORT from the env or .env); without a
+    graph it runs on AgentContext facts only and says so in its explanations.
+    """
+    from conferge.core.store import connect_graph_or_none
+
+    store = connect_graph_or_none()
+    agent = _DEFAULT if store is None else PlannerAgent(graph=store, memory=_DEFAULT.memory)
+    return await agent.run(ctx)

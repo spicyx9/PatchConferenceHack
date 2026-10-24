@@ -122,3 +122,23 @@ def connect_graph():  # type: ignore[no-untyped-def]
     store = GraphStore(db.select_graph(env_value("FALKORDB_GRAPH", "conferge") or "conferge"))
     store.ensure_indexes()
     return store
+
+
+def connect_graph_or_none(timeout: float = 0.3) -> GraphStore | None:
+    """connect_graph() when FalkorDB answers a Cypher ping within ``timeout``, else None.
+
+    The port check comes first so a stopped server costs ``timeout``, not a client hang.
+    """
+    import socket
+
+    from conferge.core.settings import falkordb_address
+
+    host, port = falkordb_address()
+    try:
+        with socket.create_connection((host, port), timeout=timeout):
+            pass
+        store = connect_graph()
+        store.graph.query("RETURN 1")
+        return store
+    except Exception:  # noqa: BLE001 - absent or non-FalkorDB server (plain Redis rejects GRAPH.QUERY)
+        return None

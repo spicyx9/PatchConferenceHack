@@ -61,7 +61,8 @@ def test_goal_demo_returns_people_and_two_day_plan(client: TestClient) -> None:
     res = client.post("/api/v1/goal", json={"text": DEMO_TEXT, "user_id": "demo-user"})
     assert res.status_code == 200
     body = res.json()
-    assert body["data_source"] == "fixture"
+    assert body["data_source"] == "degraded_no_graph"  # no FalkorDB in this client
+    assert body["ranking_mode"] == "degraded_no_graph"
     assert body["status"] == "degraded"
     assert len(body["people"]) >= 5
     days = [d["day"] for d in body["plan"]["days"] if d["items"]]
@@ -87,7 +88,10 @@ def test_every_get_route_is_labelled_fixture(client: TestClient, path: str) -> N
     res = client.get(path)
     assert res.status_code == 200, res.text
     body = res.json()
-    assert body["data_source"] == "fixture"
+    # No graph in this client: anything ranked is explicitly degraded, the rest is fixture.
+    ranked = path in {"/api/v1/plan", "/api/v1/people", "/api/v1/events", "/api/v1/sessions",
+                      "/api/v1/travel", "/api/v1/travel/map", "/api/v1/roi"}
+    assert body["data_source"] == ("degraded_no_graph" if ranked else "fixture")
     assert body["data_source"] != "live"
     assert body["collected_at"]
     assert any(w.startswith("FIXTURE") for w in body["warnings"])

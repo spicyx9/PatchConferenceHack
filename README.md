@@ -54,6 +54,8 @@ Most attendees go home with a few business cards and the feeling they were in th
 
 ## Graph model and Cypher queries
 
+Rankings are computed from FalkorDB traversals; without FalkorDB the API runs in an explicitly degraded mode.
+
 FalkorDB `6.0.3` (pinned in `docker-compose.yml`), client `falkordb==1.8.0`. Labels and relationship types come from an allowlist in `conferge/core/store.py`; every value is a `$parameter`.
 
 **Nodes**: `Conference`, `Event {event_type, start_at, end_at, status}`, `Person {name, title, roles, participation}`, `Company`, `Venue {latitude, longitude}`, `Topic`, `Goal {user_id, priority}`, `Opportunity`, `Lodging`, `FlightOffer`, `Meeting {user_id, kind, at_ms, target_id, reason}`.
@@ -145,10 +147,12 @@ Fort Mason Center, San Francisco, October 28 and 29. Fictional traveller from Ne
 ## Quickstart
 
 ```bash
-make up        # FalkorDB in Docker (set FALKORDB_PORT in .env if 6379 is taken)
+make up        # FalkorDB in Docker on 127.0.0.1:6379, Browser on :3000
 make install   # Python deps with uv
 make demo      # API + UI on http://127.0.0.1:8000, demo data loaded into FalkorDB
 ```
+
+No `.env` is needed. Port: if 6379 is already taken by a local Redis, run `FALKORDB_PORT=6380 make up` and `FALKORDB_PORT=6380 make demo` (or put `FALKORDB_PORT=6380` in `.env`); `make demo` stops with "port 6379 is a plain Redis, set FALKORDB_PORT to the FalkorDB port" when it finds a Redis without the FalkorDB module.
 
 `uv run python scripts/run_demo.py --mode live` collects from the public sources instead of the snapshot. Copy `.env.example` to `.env` and add `BRIGHTDATA_API_KEY` to enable the Bright Data connectors.
 
