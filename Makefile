@@ -1,4 +1,4 @@
-.PHONY: install lint format test check up down demo
+.PHONY: install lint format test check up down demo e2e
 
 install:
 	uv sync --group dev
@@ -24,6 +24,10 @@ down:
 # Demo API + front on http://127.0.0.1:8000, assembled data loaded into FalkorDB.
 demo:
 	uv run python scripts/run_demo.py
+
+# Full journey against the real API process and FalkorDB (FALKORDB_PORT, default 6380).
+e2e:
+	CONFERGE_E2E=1 FALKORDB_PORT=$${FALKORDB_PORT:-6380} uv run pytest -v -rA -p no:cacheprovider tests/e2e
 
 # Each window owns scripts/probes/<name>.py; the shared Makefile never changes.
 probe-%:
