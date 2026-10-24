@@ -65,7 +65,7 @@ def card(state: Any, person: Any) -> dict[str, Any]:
         "photo": {**photo, "url": "/api/v1/connections/photos/" + photo["filename"]} if photo else None,
         "id": person.id, "name": person.name, "title": person.title or person.role or "",
         "company": company.name if company else "", "bio": person.bio or "",
-        "topics": person.topics, "roles": person.roles,
+        "topics": person.topics, "roles": person.roles, "participation": person.participation,
         "session_topics": sorted({t for e in events if e for t in e.topics}),
         "met": person.id in state.met,
         "events": [{"id": e.id, "title": e.title} for e in events if e],

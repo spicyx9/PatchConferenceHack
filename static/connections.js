@@ -61,11 +61,12 @@
     const sources=p.sources.filter(s=>s.source_url && /^https?:\/\//.test(s.source_url));
     $('graph-detail').innerHTML=`<div class="connection-detail"><span class="detail-kicker">${p.met?'RECORDED MEETING':'PROFILE'} · ${esc(p.source_mode)}</span>
       ${p.photo?`<img class="connection-profile-photo" src="${esc(p.photo.url)}" alt="${esc(p.name)}" />`:""}<h3>${esc(p.name)}</h3><p>${esc([p.title,p.company].filter(Boolean).join(' · '))}</p>
+      ${p.participation==='relevant_candidate'?'<p class="muted">Potential connection · attendance unconfirmed</p>':''}
       ${p.bio?`<p class="detail-bio">${esc(p.bio.slice(0,420))}</p>`:''}
       <div class="topic-pills">${p.topics.slice(0,5).map(t=>`<span>${esc(t)}</span>`).join('')}</div>
       ${path && path.path && path.path.length?`<h4>Connection path</h4><ol class="connection-path">${path.path.filter(x=>x.node).map(x=>`<li>${esc(x.node.label)}</li>`).join('')}</ol>`:'<p class="muted">No goal path recorded.</p>'}
       ${p.events.length?`<h4>Sessions</h4><ul class="connection-sessions">${p.events.slice(0,3).map(e=>`<li>${esc(e.title)}</li>`).join('')}</ul>`:''}
-      ${p.photo?`<a class="connection-source-link" href="${esc(p.photo.source_url)}" target="_blank" rel="noopener noreferrer">Photo: LinkedIn · via Bright Data ↗</a>`:""}
+      ${p.photo?`<a class="connection-source-link" href="${esc(p.photo.source_url)}" target="_blank" rel="noopener noreferrer">Photo: ${p.photo.provider==='brightdata:web_unlocker'?'LinkedIn · via Bright Data':'Official team profile'} ↗</a>`:""}
       ${sources.length?`<h4>Sources</h4>${sources.slice(0,3).map(s=>`<a class="connection-source-link" href="${esc(s.source_url)}" target="_blank" rel="noopener noreferrer">${esc(s.provider)} ↗</a>`).join('')}`:''}</div>`;
   }
   async function focus(id) {
@@ -87,7 +88,7 @@
       const data=await api('connections?'+params());
       if(ticket!==request)return;
       filterControls(data);all=data.items;const visible=new Set(data.graph.nodes.filter(n=>n.type==='Person').map(n=>n.id));shown=[...all.filter(p=>visible.has(p.id)),...all.filter(p=>!visible.has(p.id))];selected=null;
-      $('connections-count').textContent=`${all.length} people in ${scope==='met'?'your recorded meetings':'the conference directory'}`;
+      $('connections-count').textContent=`${all.length} people in ${scope==='met'?'your recorded meetings':'your directory'}`;
       $('connection-results-title').textContent='People';$('connection-clear').hidden=!Object.values(filters).some(Boolean);$('network-all').hidden=!Object.values(filters).some(Boolean);
       $('connection-summary').textContent='';
       $('graph-detail').innerHTML='';personRows(shown);draw(data.graph);

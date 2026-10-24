@@ -8,6 +8,7 @@ reported as live. Run with ``uv run uvicorn conferge.api.app:app``.
 from __future__ import annotations
 
 import copy
+import os
 import platform
 import subprocess
 from datetime import datetime, timezone
@@ -210,8 +211,13 @@ def create_app(
     graph_probe: bool = True,
 ) -> FastAPI:
     """Build the app. Inject ``data`` (live envelopes) or ``found`` providers in tests."""
+    data = data or load_fixture()
+    if os.getenv("CONFERGE_NETWORK_ROSTER") == "1":
+        from conferge.api.network_roster import extend
+
+        data = extend(data)
     state = DemoState(
-        data or load_fixture(), found if found is not None else providers.discover_providers(),
+        data, found if found is not None else providers.discover_providers(),
         graph_probe,
     )
     app = FastAPI(title="Conferge demo API", version="0.1.0")

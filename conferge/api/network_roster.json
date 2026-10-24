@@ -1,0 +1,184 @@
+[
+  {
+    "id": "public:tom-drummond",
+    "name": "Tom Drummond",
+    "title": "Managing Director",
+    "bio": "Enterprise infrastructure investor helping technical startups scale.",
+    "roles": [
+      "investor"
+    ],
+    "topics": [
+      "enterprise infrastructure",
+      "venture capital"
+    ],
+    "company": "Heavybit",
+    "source_url": "https://heavybit.capital/team",
+    "photo_source_url": "https://cdn.sanity.io/images/50q6fr1p/production/44ff93dd0186b14bc23adf8dd131d9a218b8f879-4800x6000.jpg?rect=185,462,4430,5538&w=1080&h=1350&auto=format&dpr=2",
+    "collected_at": "2026-10-24T21:20:55.666674+00:00"
+  },
+  {
+    "id": "public:joseph-ruscio",
+    "name": "Joseph Ruscio",
+    "title": "General Partner",
+    "bio": "Investor advising practitioner-first teams on growth and go-to-market.",
+    "roles": [
+      "investor"
+    ],
+    "topics": [
+      "developer tools",
+      "go-to-market"
+    ],
+    "company": "Heavybit",
+    "source_url": "https://heavybit.capital/team",
+    "photo_source_url": "https://cdn.sanity.io/images/50q6fr1p/production/6ef9c9d958990f65424c0cf26ae57978c37993a5-4800x6000.jpg?rect=1106,0,2830,3538&w=1080&h=1350&auto=format&dpr=2",
+    "collected_at": "2026-10-24T21:20:55.667019+00:00"
+  },
+  {
+    "id": "public:amir-zohrenejad",
+    "name": "Amir Zohrenejad",
+    "title": "General Partner",
+    "bio": "Dataherald and CloudFish co-founder; invests with interests in databases and applied AI.",
+    "roles": [
+      "founder",
+      "investor"
+    ],
+    "topics": [
+      "databases",
+      "AI",
+      "language models"
+    ],
+    "company": "Heavybit",
+    "source_url": "https://heavybit.capital/team",
+    "photo_source_url": "https://cdn.sanity.io/images/50q6fr1p/production/a516037bcbe74034f1006d758dac5b252ea2d957-4800x6000.jpg?rect=1012,325,2436,3045&w=1080&h=1350&auto=format&dpr=2",
+    "collected_at": "2026-10-24T21:20:55.667021+00:00"
+  },
+  {
+    "id": "public:james-lindenbaum",
+    "name": "James Lindenbaum",
+    "title": "Founding Partner",
+    "bio": "Heroku and Heavybit co-founder advising developer companies on product and go-to-market.",
+    "roles": [
+      "founder",
+      "investor"
+    ],
+    "topics": [
+      "developer tools",
+      "go-to-market"
+    ],
+    "company": "Heavybit",
+    "source_url": "https://heavybit.capital/team",
+    "photo_source_url": "https://cdn.sanity.io/images/50q6fr1p/production/91ff1c84675f23b1e152b9288dffdebc1b14f6aa-4800x5538.jpg?rect=188,0,4430,5538&w=1080&h=1350&auto=format&dpr=2",
+    "collected_at": "2026-10-24T21:20:55.667022+00:00"
+  },
+  {
+    "id": "public:jesse-robbins",
+    "name": "Jesse Robbins",
+    "title": "General Partner",
+    "bio": "Chef and Orion Labs co-founder, DevOps community builder and technical advisor.",
+    "roles": [
+      "founder",
+      "investor"
+    ],
+    "topics": [
+      "DevOps",
+      "developer tools"
+    ],
+    "company": "Heavybit",
+    "source_url": "https://heavybit.capital/team",
+    "photo_source_url": "https://cdn.sanity.io/images/50q6fr1p/production/9a8f35b91b4f52c518bf668debf266feeb8e2a4a-4000x6000.jpg?rect=1004,787,1981,2476&w=1080&h=1350&auto=format&dpr=2",
+    "collected_at": "2026-10-24T21:20:55.667023+00:00"
+  },
+  {
+    "id": "public:dana-oshiro",
+    "name": "Dana Oshiro",
+    "title": "Part-time Partner",
+    "bio": "Investor helping technical founders bring products to market.",
+    "roles": [
+      "investor"
+    ],
+    "topics": [
+      "go-to-market",
+      "venture capital"
+    ],
+    "company": "Heavybit",
+    "source_url": "https://heavybit.capital/team",
+    "photo_source_url": "https://cdn.sanity.io/images/50q6fr1p/production/3bab6fdb1ae6b52808af1a9c2d38f623c2ba94b7-4800x6000.jpg?rect=1036,847,2906,3632&w=1080&h=1350&auto=format&dpr=2",
+    "collected_at": "2026-10-24T21:20:55.667024+00:00"
+  },
+  {
+    "id": "public:jonathan-lehr",
+    "name": "Jonathan Lehr",
+    "title": "Co-founder & General Partner",
+    "bio": "Work-Bench co-founder investing in AI, machine learning, developer tools and infrastructure.",
+    "roles": [
+      "founder",
+      "investor"
+    ],
+    "topics": [
+      "AI",
+      "machine learning",
+      "developer tools",
+      "infrastructure"
+    ],
+    "company": "Work-Bench",
+    "source_url": "https://www.work-bench.com/team",
+    "photo_source_url": "https://cdn.prod.website-files.com/6a2adcd5d0d66ad5da382c2f/6a83215b791ba5b5e53cfbbe_jonathan-lehr.png",
+    "collected_at": "2026-10-24T21:20:55.667026+00:00"
+  },
+  {
+    "id": "public:jessica-lin",
+    "name": "Jessica Lin",
+    "title": "Co-founder & General Partner",
+    "bio": "Work-Bench co-founder investing in horizontal and vertical SaaS.",
+    "roles": [
+      "founder",
+      "investor"
+    ],
+    "topics": [
+      "SaaS",
+      "enterprise software"
+    ],
+    "company": "Work-Bench",
+    "source_url": "https://www.work-bench.com/team",
+    "photo_source_url": "https://cdn.prod.website-files.com/6a2adcd5d0d66ad5da382c2f/6a83215ca79cd69bc82482f0_jessica-lin.png",
+    "collected_at": "2026-10-24T21:20:55.667027+00:00"
+  },
+  {
+    "id": "public:daniel-chesley",
+    "name": "Daniel Chesley",
+    "title": "Principal",
+    "bio": "Investor evaluating AI, machine learning, developer tools and SaaS companies.",
+    "roles": [
+      "investor"
+    ],
+    "topics": [
+      "AI",
+      "machine learning",
+      "developer tools",
+      "SaaS"
+    ],
+    "company": "Work-Bench",
+    "source_url": "https://www.work-bench.com/team",
+    "photo_source_url": "https://cdn.prod.website-files.com/6a2adcd5d0d66ad5da382c2f/6a83236fd516ae5b67a0599b_daniel-chesley.png",
+    "collected_at": "2026-10-24T21:20:55.667028+00:00"
+  },
+  {
+    "id": "public:proby-shandilya",
+    "name": "Proby Shandilya",
+    "title": "Associate",
+    "bio": "Venture investor exploring agentic systems, developer tools, security and enterprise applications.",
+    "roles": [
+      "investor"
+    ],
+    "topics": [
+      "AI agents",
+      "developer tools",
+      "security",
+      "enterprise software"
+    ],
+    "company": "Work-Bench",
+    "source_url": "https://www.work-bench.com/team",
+    "photo_source_url": "https://cdn.prod.website-files.com/6a2adcd5d0d66ad5da382c2f/6a83242d361773e17eef94d3_proby-shandilya.jpg",
+    "collected_at": "2026-10-24T21:20:55.667029+00:00"
+  }
+]

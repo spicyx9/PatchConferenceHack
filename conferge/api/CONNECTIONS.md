@@ -50,3 +50,30 @@ provider errors once. Final result: 77 photos cached, 88 linked profiles without
 photo, and 18 directory members without a linked profile. Use repeated `--name` arguments
 for targeted retries. The complete offline suite passed with credentials excluded from
 settings (1,114 passed, 22 skipped); the real image endpoint and browser were also checked.
+
+### Public founder and investor roster (2026-10-24)
+
+`network_roster.json` contains ten sourced public profiles from the official
+[Heavybit](https://heavybit.capital/team) and
+[Work-Bench](https://www.work-bench.com/team) team pages. Five also have verified
+co-founder backgrounds. All are `relevant_candidate` with no event IDs or
+attendance claims. Each has dated source evidence and an official headshot URL.
+
+Enable with `CONFERGE_NETWORK_ROSTER=1` when starting the demo API. Import the
+company/person/topic graph and cache the official headshots with:
+
+```sh
+FALKORDB_PORT=6380 FALKORDB_GRAPH=conferge_demo uv run python -m conferge.api.network_roster
+CONFERGE_NETWORK_ROSTER=1 FALKORDB_PORT=6380 uv run python scripts/run_demo.py --keep-graph --mode fixture --travel fixture
+```
+
+The importer uses GraphIngestor/GraphStore and creates no attendance edges.
+Repeated runs skip cached photos. All ten photos downloaded successfully:
+local directory 193 people, 87 total cached portraits. Official portraits are
+attributed separately from LinkedIn/Bright Data photos. Caches under `raw/`
+remain local and must be provisioned separately on a deployment. AI search
+indexes the new candidates on demand; a live investor/devtools/AI query returned
+Jonathan Lehr, Daniel Chesley, Proby Shandilya and Amir Zohrenejad.
+
+Validation: Ruff, JavaScript syntax, 1,116 tests passed (22 skipped; provider
+credentials isolated), live semantic search, investor filter and portrait preview.
