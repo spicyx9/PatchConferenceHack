@@ -7,15 +7,15 @@ Nobody opens the repo. Everything rests on what the judges see on screen.
 Two roles on stage. **Speaker** holds the mic and never touches the laptop. **Driver** clicks and says nothing unless asked.
 Default: Ilan speaks, Axel drives. Swap if you prefer, the script does not change.
 
-Companion files: `slides.html` (7 slides, arrow keys), `CHECKLIST.md` (the 10 minutes before), `demo-backup.mp4` (26 s, 1280 x 720, the six demo steps recorded on the snapshot).
+Companion files: `slides.html` (7 slides, arrow keys), `CHECKLIST.md` (the 10 minutes before), `demo-backup.mp4` (22 s, 1280 x 720, the six demo steps recorded on the snapshot).
 
 ## Two opening hooks, pick one
 
 **Hook A, the business card.**
-"Two days, 161 sessions, 231 side events, thousands of people. Most of us fly home with four business cards and the feeling we were in the wrong room. Conferge starts from your goal, not from the agenda."
+"Two days, 161 official sessions, 46 side events in our dataset, thousands of people. Most of us fly home with four business cards and the feeling we were in the wrong room. Conferge starts from your goal, not from the agenda."
 
 **Hook B, the question to the jury.**
-"Who in this room is going to GitHub Universe next week? If you want to meet seed investors, which of the 231 side events do you pick, and who do you talk to when you get there? Conferge answers that in one sentence, and shows you why."
+"Who in this room is going to GitHub Universe next week? If you want to meet seed investors, which of the 46 side events do you pick, and who do you talk to when you get there? Conferge answers that in one sentence, and shows you why."
 
 Hook A is safer and 5 seconds shorter. Hook B works if the room is awake and someone raises a hand.
 
@@ -23,7 +23,7 @@ Hook A is safer and 5 seconds shorter. Hook B works if the room is awake and som
 
 - Never present a fixture as live. The header badge says `fixture` for the snapshot, `live` only when the data was collected during the demo. Say out loud what the badge says.
 - Say "snapshot of the public collection from October 24" rather than "live data" unless the badge reads `live`.
-- Every number you say is in `SUBMISSION.md` and was measured. Nothing rounded up.
+- Every number you say comes from `SUBMISSION.md` at the repository root (read from the running app). If a number changes, change it there first, then here and in `slides.html`.
 - If a click fails, the Driver does not retry more than once. The Speaker keeps talking from the slide while the Driver switches to the backup video.
 
 ## The script, minute by minute
@@ -36,12 +36,12 @@ The UI is served on http://127.0.0.1:8000 and opens on the **Demo** tab, six num
 | 0:15 | Speaker | "Give it your goal in one sentence. Not a schedule, a goal." | Switch to the Conferge tab. The goal is already in the box: founder of an AI dev tool, wants seed investors, AI agent founders, Copilot PMs. Click **Lancer**. | Step 1: three weighted goals as chips (seed investors 0.45, AI agent founders 0.35, Copilot PMs 0.20). Header badge reads `fixture`, collection date October 24, 2026. | both |
 | 0:30 | Speaker | "The badge says fixture. This is a snapshot of what we collected from public sources this morning: official catalog, Luma, Partiful, Eventbrite, party aggregators. Bright Data connectors sit behind the same client for the pages that block plain HTTP: search discovery, flights, hotels, LinkedIn." | Point at the badge and the collection date. Point at the Bright Data counter line at the top of the Demo tab. | Badge, date, counter. | Bright Data |
 | 0:45 | Speaker | "Who should you meet, and why. Each card is a person, and the why is a real path in the graph, not a score from a black box." | Scroll to step 2. Click the first card's path. | Step 2: ranked people. Under the card, the chain goal, topic, event, person, with the source URL and timestamp on each hop. | FalkorDB |
-| 1:05 | Speaker | "Same path, in FalkorDB. Goal, topic, event, speaker. Four hops, 11 milliseconds, and every edge carries where it came from." | Switch to the FalkorDB Browser tab, graph `conferge_demo`, run the prepared query (see below). | The path lights up in the browser. | FalkorDB |
+| 1:05 | Speaker | "Same path, in FalkorDB. Goal, topic, event, speaker. Four hops, and every edge carries where it came from." | Switch to the FalkorDB Browser tab, graph `conferge_demo`, run the prepared query (see below). | The path lights up in the browser. | FalkorDB |
 | 1:25 | Speaker | "From the people and events, a day by day plan for the days you are in town, with the venues on a map." | Back to Conferge. Scroll to step 3. | Step 3: plan per day, map with venues. | both |
 | 1:40 | Speaker | "Anti-FOMO. Two events at the same time on the 28th evening. It picks one, explains why, and tells you what you give up." | Scroll to step 4. | Step 4: the conflict, the verdict, the reason, what is lost. | FalkorDB |
 | 2:00 | Speaker | "Things change. We simulate that the first event of the plan sells out. It is a simulation, labelled as such." | Scroll to step 5. Click **Simuler : l'evenement n°1 du plan est complet**. | Step 5: the diff. Removed, replacement, and the reason, found through the people who also appear at another event. | FalkorDB |
 | 2:20 | Speaker | "You met someone. One click writes it to the graph. The ranking changes now, and it is still there at the next conference." | Scroll to step 6. Click **J'ai rencontré ...**. | Step 6: confirmation line, top 3 before and after. | FalkorDB |
-| 2:40 | Speaker | "697 nodes, 2,195 edges, every edge with a source. 984 tests. What stays after Universe is the graph itself: your memory of who you met, ready for the next conference." | Slides, slide 6 then 7. | Numbers, then what remains. | both |
+| 2:40 | Speaker | "703 nodes, 2,201 edges, every edge with a source. 1,175 tests. What stays after Universe is the graph itself: your memory of who you met, ready for the next conference." | Slides, slide 6 then 7. | Numbers, then what remains. | both |
 | 2:55 | Speaker | "Conferge. Be in the right place, with the right people, at the right time. Thank you." | Slide 7 stays up. | | |
 
 Total speaking time at normal pace: 2 min 50 s. If you are over 2:30 when you reach step 5, skip step 4 (anti-FOMO) and go straight to the simulated change.
@@ -59,17 +59,11 @@ What the FalkorDB judge should have seen by 2:40: a multi-hop query, the path sh
 
 ### What the Bright Data judge should have seen
 
-Honest version, the default today: the collection comes from public endpoints that a plain request can reach, snapshot labelled `fixture`, and the Bright Data connectors are built behind one client and report `missing_credentials` instead of inventing data. Say it that way. The judge will respect the badge more than a vague "powered by".
-
-If a Bright Data key was added at the morning workshop and `make demo --mode live` worked at rehearsal, add this at 0:30 and drop the sentence about the snapshot:
-
-"The badge says live. The flights and the hotel came through Bright Data datasets during the last minutes, with the collection time on screen. The LinkedIn enrichment on the people cards came the same way."
-
-Then at 0:45, point at a card whose source reads `brightdata`. Do not promise it if rehearsal did not show it.
+What `make demo` shows today (see `SUBMISSION.md`, "What is real"): events and people are the October 24 public snapshot, labelled `fixture`; stays, flights and the LinkedIn cards came through Bright Data earlier today (datasets and Web Unlocker) and are served from the cache of those runs, labelled `cached`, with their collection time. Say it that way: "collected through Bright Data this afternoon, stored in the graph, nothing fetched while you watch". Point at the Data pipeline panel (records per run, Bright Data API, collection time) and at its Reachability section (sites reachable with and without Bright Data). Say the KYC figure only as a projection.
 
 ## Backup when the wifi or the API drops
 
-The video `demo-backup.mp4` is 26 seconds, 1280 x 720, and shows the six steps on the snapshot, in order: goal, who to meet, plan, anti-FOMO, simulated change, meeting recorded. It was recorded with `record_demo.py` against a local server.
+The video `demo-backup.mp4` is 22 seconds, 1280 x 720, and shows the six steps on the snapshot, in order: goal, who to meet, plan, anti-FOMO, simulated change, meeting recorded. It was recorded with `record_demo.py` against a local server.
 
 What changes in the script:
 
