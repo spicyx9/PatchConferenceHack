@@ -25,7 +25,7 @@ FalkorDB is at the core of the reasoning. 194 events with their speakers, compan
 
 ## Tech stack
 
-Python, FastAPI, Pydantic, FalkorDB 6.0.3 (falkordb-py, Cypher), Bright Data (Datasets, Web Unlocker, SERP API), httpx, HTML/CSS/vanilla JavaScript with Cytoscape.js, Docker Compose, uv, pytest (1470 tests in `make check`).
+Python, FastAPI, Pydantic, FalkorDB 6.0.3 (falkordb-py, Cypher), Bright Data (Datasets, Web Unlocker, SERP API), httpx, HTML/CSS/vanilla JavaScript with Cytoscape.js, Docker Compose, uv, pytest (1476 tests in `make check`).
 
 ## Repository URL
 
