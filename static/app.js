@@ -208,6 +208,19 @@
     return list.length ? " (price " + list.join(", ") + ")" : " (price status unknown)";
   }
 
+  // What the draft is based on, and its warnings, under every draft (audit fix 2).
+  function followupFacts(draft) {
+    var labels = { goal: "Goal", event: "Met at", person_event: "Where they speak or host",
+      company: "Company", shared_topic: "Shared topic", note: "Your note", path: "Graph path" };
+    var b = draft.based_on || {};
+    var facts = Object.keys(labels).filter(function (k) { return b[k]; }).map(function (k) {
+      return "<li><b>" + esc(labels[k]) + ":</b> " + esc(b[k]) + "</li>";
+    }).join("");
+    var warns = (draft.warnings || []).map(function (w) { return '<li class="warn">' + esc(w) + "</li>"; }).join("");
+    return (facts ? '<p class="small-text muted">Based on</p><ul class="small-text followup-facts">' + facts + "</ul>" : "") +
+      (warns ? '<ul class="small-text followup-warnings">' + warns + "</ul>" : "");
+  }
+
   function fmtUsd(value) {
     if (value === null || value === undefined) return "Not provided";
     var n = Number(value);
@@ -2596,7 +2609,7 @@
         return api("/followup?person=" + encodeURIComponent(id), null, "people").then(function (draft) {
           var box = $("followup-" + id), next = draft.next_action || {}, link = safeUrl(next.url);
           if (!box) return;
-          box.innerHTML = '<p class="small-text muted">Your draft · review before sending</p><pre class="followup-text">' + esc(draft.message) + '</pre><p class="small-text">' + esc(next.label || "") + (link ? ' <a href="' + esc(link) + '" target="_blank" rel="noopener noreferrer">Open profile</a>' : "") + (next.due_at ? ' · ' + esc(shortDate(String(next.due_at).slice(0,10))) : "") + '</p><button class="secondary" data-action="copy-followup" data-id="' + esc(id) + '">Copy draft</button>';
+          box.innerHTML = '<p class="small-text muted">Your draft · review before sending</p><pre class="followup-text">' + esc(draft.message) + '</pre><p class="small-text">' + esc(next.label || "") + (link ? ' <a href="' + esc(link) + '" target="_blank" rel="noopener noreferrer">Open profile</a>' : "") + (next.due_at ? ' · ' + esc(shortDate(String(next.due_at).slice(0,10))) : "") + '</p>' + followupFacts(draft) + '<button class="secondary" data-action="copy-followup" data-id="' + esc(id) + '">Copy draft</button>';
         });
       });
     } else if (action === "copy-followup") {

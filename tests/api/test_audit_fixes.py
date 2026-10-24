@@ -114,3 +114,13 @@ def test_fix1_draft_never_asserts_where_the_meeting_happened() -> None:
     client.post("/api/v1/attended", json={"event_id": event.id})  # the user says they were there
     draft = client.get("/api/v1/followup", params={"person": person.id}).json()
     assert f"Good to meet you at {event.title}" in draft["message"]
+
+
+def test_fix2_drafts_show_their_facts_and_warnings() -> None:
+    facts = _js_function("followupFacts")
+    for key in ("based_on", "warnings", "person_event", "note", "path"):
+        assert key in facts
+    from pathlib import Path
+
+    js = (Path(__file__).resolve().parents[2] / "static" / "app.js").read_text()
+    assert "followupFacts(draft)" in js
