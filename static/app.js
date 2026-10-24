@@ -1423,6 +1423,7 @@
       ? "Destination set from your conference."
       : "Search near the conference. Quoted stays use the guest count above.";
     updateResearchLinks();
+    document.dispatchEvent(new Event("travel:kindchange"));
     searchTravel("cached");
   }
   function searchTravel(mode) {
@@ -1642,6 +1643,11 @@
       return st.total_price == null || Number(st.total_price) <= max;
     });
     if (s && s.query && lastMapData) renderMap(lastMapData);
+    $("trip-stays-title").textContent =
+      "Stays in " +
+      ((s && s.query && s.query.destination) ||
+        $("research-destination").value ||
+        "your destination");
     $("stay-result-count").textContent =
       items.length + " matching stays · Total for the full stay";
     if ($("stay-sort").value === "distance")

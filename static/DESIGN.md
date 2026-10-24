@@ -102,3 +102,7 @@ Travel begins with editable origin/dates and provider search links. These links 
 ### Travel search implementation
 
 Flights and Stays are separate tasks with visible destination, dates and occupancy. Search submits one structured request; changing criteria clears stale offers. Flights use a time–duration–arrival row with a separate total-fare column, filters for stops and price, and actual sorting. Stay searches use check-in/out, guests, rooms and venue radius; the map reflects searched stay coordinates. Local/already-arranged travelers can skip the search. Search is against attributed collected offers, with an exact-criteria provider fallback when no collection covers the query. Reference: https://www.kayak.com/flights and https://www.airbnb.com/help/article/479.
+
+### Travel search interactions
+
+Search groups route, date range and party beside a single submit action. City and airport suggestions name the location and show IATA codes; city selections keep the collector’s actual city expansion. A shared range calendar guides departure/check-in then return/check-out, with one-way support. A party picker edits supported adult, cabin and room criteria. Children and daily fare estimates are not offered without collector support. Common real sorts and a nearby map action precede the results. Popovers support keyboard navigation, Escape, outside dismissal and viewport-aware placement; the underlying visible fields remain usable. Booking and Kayak public search interactions were reviewed on October 24, 2026.
