@@ -1,4 +1,4 @@
-"""(1) FalkorDB down (closed port): the API answers, degraded_no_graph, red banner, no 500."""
+"""(1) FalkorDB down (closed port): the API answers, degraded_no_graph, accessible status, no 500."""
 
 from __future__ import annotations
 
@@ -41,11 +41,11 @@ def test_falkordb_closed_port_degrades_visibly_without_500(monkeypatch: pytest.M
     assert all(r.status_code < 500 for r in posts), [(r.url, r.status_code) for r in posts]
     assert client.post("/api/v1/met", json={"person_id": pid}).json()["data_source"] != "live"
 
-    # Front: the banner exists, is red, and is driven by data_source=degraded_no_graph.
+    # Front: fallback status is explicit, accessible, and driven by the API mode.
     html = client.get("/").text
     assert 'id="degraded-banner"' in html and "degraded_no_graph" in html
     js = client.get("/static/app.js").text
     assert re.search(r'data_source === "degraded_no_graph"', js)
     assert re.search(r'"degraded-banner"\)\.classList\.toggle\("hidden", !degraded\)', js)
-    css = client.get("/static/styles.css").text
-    assert re.search(r"\.degraded-banner\s*\{[^}]*background:\s*var\(--red\)", css)
+    assert re.search(r'id="degraded-banner"[^>]*role="status"', html, re.S)
+    assert "Graph unavailable" in html

@@ -1,219 +1,813 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Conferge: conference plan</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="/static/styles.css">
-</head>
-<body>
-  <header class="topbar">
-    <div class="brand">
-      <h1>Conferge</h1>
-      <span id="conf-name" class="muted"></span>
-    </div>
-    <div class="goal-row">
-      <label for="goal-text" class="sr-only">Goal</label>
-      <textarea id="goal-text" rows="2" placeholder="Describe your goal for the conference"></textarea>
-      <button id="btn-goal" class="primary">Run</button>
-    </div>
-    <div class="controls-row">
-      <span class="label">Data</span>
-      <span id="badge-source" class="badge neutral">...</span>
-      <span class="label">Status</span>
-      <span id="badge-status" class="badge neutral">...</span>
-      <span class="label">Collected</span>
-      <span id="collected-at" class="mono">unknown</span>
-      <span class="spacer"></span>
-      <label for="scenario-select" class="label">Scenario</label>
-      <select id="scenario-select"></select>
-      <button id="btn-simulate">Simulate a change</button>
-      <button id="btn-reset" class="danger">Reset</button>
-    </div>
-  </header>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1f2926" />
+    <title>Conferge — make the right connections</title>
+    <link rel="icon" type="image/svg+xml" href="/static/mark.svg" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      crossorigin=""
+    />
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <svg
+      class="icon-defs"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <symbol id="i-grid" viewBox="0 0 24 24">
+        <rect x="3" y="3" width="7" height="7" rx="1.5" />
+        <rect x="14" y="3" width="7" height="7" rx="1.5" />
+        <rect x="3" y="14" width="7" height="7" rx="1.5" />
+        <rect x="14" y="14" width="7" height="7" rx="1.5" />
+      </symbol>
+      <symbol id="i-calendar" viewBox="0 0 24 24">
+        <rect x="3" y="5" width="18" height="16" rx="3" />
+        <path d="M7 3v4m10-4v4M3 11h18m-14 5h3" />
+      </symbol>
+      <symbol id="i-people" viewBox="0 0 24 24">
+        <circle cx="9" cy="8" r="3" />
+        <path
+          d="M3 21v-3a6 6 0 0 1 12 0v3M16 5a3 3 0 0 1 0 6m2 4a5 5 0 0 1 3 5"
+        />
+      </symbol>
+      <symbol id="i-plane" viewBox="0 0 24 24">
+        <path d="m22 2-7 20-4-9-9-4 20-7ZM11 13 22 2" />
+      </symbol>
+      <symbol id="i-nodes" viewBox="0 0 24 24">
+        <circle cx="5" cy="12" r="3" />
+        <circle cx="18" cy="5" r="3" />
+        <circle cx="18" cy="19" r="3" />
+        <path d="m8 10 7-4M8 14l7 4" />
+      </symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24">
+        <path d="M4 12h16m-6-6 6 6-6 6" />
+      </symbol>
+      <symbol id="i-pin" viewBox="0 0 24 24">
+        <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z" />
+        <circle cx="12" cy="10" r="2.5" />
+      </symbol>
+      <symbol id="i-search" viewBox="0 0 24 24">
+        <circle cx="10.5" cy="10.5" r="7" />
+        <path d="m16 16 5 5" />
+      </symbol>
+      <symbol id="i-spark" viewBox="0 0 24 24">
+        <path
+          d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5L12 3Z"
+        />
+      </symbol>
+      <symbol id="i-edit" viewBox="0 0 24 24">
+        <path d="m16 3 5 5L9 20l-6 1 1-6L16 3ZM13 6l5 5" />
+      </symbol>
+      <symbol id="i-check" viewBox="0 0 24 24">
+        <path d="m5 12 4 4L19 6" />
+      </symbol>
+      <symbol id="i-close" viewBox="0 0 24 24">
+        <path d="m6 6 12 12M6 18 18 6" />
+      </symbol>
+      <symbol id="i-info" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 11v6m0-10v.1" />
+      </symbol>
+      <symbol id="i-play" viewBox="0 0 24 24">
+        <path d="m8 4 12 8-12 8V4Z" />
+      </symbol>
+    </svg>
 
-  <div id="error-banner" class="error-banner hidden" role="alert"></div>
-  <div id="degraded-banner" class="degraded-banner hidden" role="alert">
-    DEGRADED MODE (degraded_no_graph): FalkorDB unreachable, ranking computed in Python without the graph.
-  </div>
-
-  <section id="diff-panel" class="panel diff-panel hidden" aria-live="polite">
-    <div class="panel-head">
-      <h2>Simulated change</h2>
-      <button id="btn-close-diff" class="small">Close</button>
-    </div>
-    <div id="diff-body"></div>
-  </section>
-
-  <nav class="tabs" role="tablist">
-    <button class="tab active" data-tab="story" role="tab">Demo</button>
-    <button class="tab" data-tab="dashboard" role="tab">Dashboard</button>
-    <button class="tab" data-tab="travel" role="tab">Travel</button>
-    <button class="tab" data-tab="events" role="tab">Events</button>
-    <button class="tab" data-tab="graph" role="tab">Graph</button>
-    <button class="tab" data-tab="people" role="tab">People</button>
-  </nav>
-
-  <main>
-    <section id="tab-story" class="tab-panel active story">
-      <div class="bd-counter" id="bd-counter">Records collected via Bright Data: ...</div>
-      <div class="step" id="step-goal">
-        <h2><span class="num">1</span>Goal</h2>
-        <p id="story-goal" class="story-goal"></p>
-        <div id="story-goals" class="chips"></div>
-      </div>
-      <div class="step" id="step-opps">
-        <h2><span class="num">2</span>Who to meet, and why (graph path)</h2>
-        <div id="story-opps"></div>
-      </div>
-      <div class="step" id="step-plan">
-        <h2><span class="num">3</span>Plan</h2>
-        <div class="grid two">
-          <div id="story-plan"></div>
-          <div id="story-map" class="map story-map"></div>
+    <div class="app-shell">
+      <header class="site-header">
+        <a class="brand" href="#story" aria-label="Conferge home"
+          >conferge<img
+            src="/static/mark.svg"
+            class="brand-mark"
+            alt=""
+            width="22"
+            height="22"
+        /></a>
+        <nav class="main-nav" aria-label="Main navigation">
+          <a
+            class="nav-item active"
+            href="#story"
+            data-tab="story"
+            data-mobile-label="Discover"
+            aria-current="page"
+            >Discover</a
+          >
+          <a
+            class="nav-item"
+            href="#events"
+            data-tab="events"
+            data-mobile-label="Agenda"
+            >My agenda <span id="nav-plan-count" class="nav-count">—</span></a
+          >
+          <a
+            class="nav-item"
+            href="#people"
+            data-tab="people"
+            data-mobile-label="People"
+            >People</a
+          >
+          <a
+            class="nav-item"
+            href="#travel"
+            data-tab="travel"
+            data-mobile-label="Travel"
+            >Travel</a
+          >
+          <a
+            class="nav-item"
+            href="#graph"
+            data-tab="graph"
+            data-mobile-label="Connections"
+            >Connections</a
+          >
+        </nav>
+        <div class="header-tools">
+          <button
+            class="text-button"
+            data-open="sources-dialog"
+            aria-label="Sources and how it works"
+          >
+            <svg class="icon"><use href="#i-info" /></svg></button
+          ><button class="replan-button" data-open="simulation-dialog">
+            <span>Replan</span></button
+          ><button
+            class="profile-avatar"
+            data-open="goal-dialog"
+            aria-label="Edit your priorities"
+          >
+            V
+          </button>
         </div>
-      </div>
-      <div class="step" id="step-antifomo">
-        <h2><span class="num">4</span>Anti-FOMO: what we skip, and what we gain</h2>
-        <div id="story-antifomo"></div>
-      </div>
-      <div class="step" id="step-change">
-        <h2><span class="num">5</span>Live change</h2>
-        <button id="story-simulate" class="primary big-btn">Simulate: event #1 of the plan is sold out</button>
-        <div id="story-diff"></div>
-      </div>
-      <div class="step" id="step-met">
-        <h2><span class="num">6</span>Meeting recorded</h2>
-        <div id="story-met"></div>
-      </div>
-      <div class="step" id="step-roi">
-        <h2><span class="num">7</span>ROI: the graph stays for the next conference</h2>
-        <div class="roi-grid roi-story">
-          <div class="roi-tile">
-            <div id="roi-spend" class="value unknown">unknown</div>
-            <div class="name">Flight + hotel spend</div>
-            <div id="roi-spend-note" class="note muted"></div>
+      </header>
+      <span id="page-label" class="sr-only">Discover</span>
+      <main id="main" tabindex="-1">
+        <div id="error-banner" class="error-banner hidden" role="alert"></div>
+        <section
+          id="diff-panel"
+          class="panel diff-panel hidden"
+          aria-live="polite"
+        >
+          <div class="panel-head">
+            <div>
+              <span class="eyebrow">SIMULATION</span>
+              <h2>Your agenda, adjusted.</h2>
+            </div>
+            <button
+              id="btn-close-diff"
+              class="icon-button"
+              aria-label="Close change summary"
+            >
+              <svg class="icon"><use href="#i-close" /></svg>
+            </button>
           </div>
-          <div class="roi-tile">
-            <div id="roi-meetings" class="value unknown">unknown</div>
-            <div class="name">Meetings</div>
+          <div id="diff-body"></div>
+        </section>
+
+        <section
+          id="tab-story"
+          class="tab-panel active"
+          aria-labelledby="overview-title"
+        >
+          <section class="city-hero" aria-labelledby="overview-title">
+            <div class="city-hero-shade"></div>
+            <div class="city-hero-content">
+              <div class="city-context">
+                <svg class="icon"><use href="#i-pin" /></svg> AROUND GITHUB
+                UNIVERSE
+              </div>
+              <h1 id="overview-title">
+                <span class="hero-pretitle">Your week in</span><br /><span
+                  id="hero-city"
+                  >San Francisco</span
+                >
+              </h1>
+              <p>Find the right events.<br />Meet the right people.</p>
+              <div class="hero-meta">
+                <span id="conference-title">GitHub Universe 2026</span
+                ><span aria-hidden="true">·</span
+                ><span id="conference-dates">October 28–29</span>
+              </div>
+              <button class="hero-cta" data-nav="events">
+                Explore your agenda
+              </button>
+            </div>
+          </section>
+          <div class="discovery-layout">
+            <div class="discovery-feed">
+              <section class="event-discovery-section">
+                <div class="section-heading">
+                  <div>
+                    <span class="eyebrow">AROUND THE CONFERENCE</span>
+                    <h2>Worth making time for</h2>
+                  </div>
+                  <a href="#events" data-nav="events" class="text-button"
+                    >View all</a
+                  >
+                </div>
+                <p class="discovery-note">
+                  Discover what’s happening during your trip.
+                </p>
+                <div id="discover-events" class="discover-events">
+                  <div class="skeleton-card"></div>
+                  <div class="skeleton-card"></div>
+                </div>
+              </section>
+              <section id="step-opps" class="overview-section">
+                <div class="section-heading">
+                  <div>
+                    <span class="eyebrow">BEYOND THE BADGE</span>
+                    <h2>People to connect with</h2>
+                  </div>
+                  <a href="#people" data-nav="people" class="text-button"
+                    >View all people</a
+                  >
+                </div>
+                <div id="story-opps" class="people-preview">
+                  <div class="skeleton-card"></div>
+                  <div class="skeleton-card"></div>
+                  <div class="skeleton-card"></div>
+                </div>
+              </section>
+              <div class="overview-lower">
+                <section id="step-plan" class="panel agenda-preview">
+                  <div class="section-heading">
+                    <div>
+                      <span class="eyebrow">TIME WELL SPENT</span>
+                      <h2>Your agenda</h2>
+                    </div>
+                    <a
+                      href="#events"
+                      data-nav="events"
+                      class="text-button"
+                      aria-label="View your agenda"
+                      >View agenda</a
+                    >
+                  </div>
+                  <div
+                    id="story-day-tabs"
+                    class="day-tabs"
+                    aria-label="Agenda day"
+                  ></div>
+                  <div id="story-plan"></div>
+                </section>
+                <section class="panel map-preview">
+                  <div class="section-heading">
+                    <div>
+                      <span class="eyebrow">ON THE GROUND</span>
+                      <h2>Your meeting places</h2>
+                    </div>
+                    <svg class="icon"><use href="#i-pin" /></svg>
+                  </div>
+                  <div
+                    id="story-map"
+                    class="map story-map"
+                    aria-label="Map of agenda locations"
+                  ></div>
+                  <p class="map-note">Your agenda, mapped out.</p>
+                </section>
+              </div>
+              <section id="step-antifomo" class="antifomo-panel">
+                <div class="section-heading">
+                  <div>
+                    <span class="eyebrow">MAKE ROOM FOR WHAT MATTERS</span>
+                    <h2>You don’t need to be everywhere.</h2>
+                    <p>
+                      Know what to skip, and what you gain by keeping your time.
+                    </p>
+                  </div>
+                  <span class="antifomo-stamp"
+                    >ANTI-FOMO <svg class="icon"><use href="#i-check" /></svg
+                  ></span>
+                </div>
+                <div id="story-antifomo"></div>
+              </section>
+              <div class="overview-lower">
+                <section class="panel" id="step-change">
+                  <span class="eyebrow">WHEN PLANS CHANGE</span>
+                  <h2>An event sold out?</h2>
+                  <p class="muted">
+                    Find your next best option and see how your agenda adapts.
+                  </p>
+                  <button id="story-simulate" class="secondary">
+                    Explore a sold-out scenario
+                  </button>
+                  <div id="story-diff" aria-live="polite"></div>
+                </section>
+                <section class="panel" id="step-met">
+                  <span class="eyebrow">AFTER THE CONVERSATION</span>
+                  <h2>Keep the connection going.</h2>
+                  <p class="muted">
+                    Save a conversation and make room for your next connection.
+                  </p>
+                  <div id="story-met" aria-live="polite"></div>
+                </section>
+              </div>
+              <section class="panel" id="step-roi" aria-labelledby="trip-results-title">
+                <span class="eyebrow">BEYOND THIS CONFERENCE</span><h2 id="trip-results-title">Your trip, in perspective.</h2>
+                <div class="roi-grid roi-story">
+                  <div class="roi-tile"><div id="roi-spend" class="value unknown">unknown</div><div class="name">Known travel costs</div><div id="roi-spend-note" class="note muted"></div></div>
+                  <div class="roi-tile"><div id="roi-meetings" class="value unknown">unknown</div><div class="name">Meetings recorded</div></div>
+                  <div class="roi-tile"><div id="roi-qualified" class="value unknown">unknown</div><div class="name">Qualified contacts</div></div>
+                  <div class="roi-tile"><div id="roi-opportunities" class="value unknown">unknown</div><div class="name">Opportunities scoring 30+</div></div>
+                </div>
+              </section>
+            </div>
+            <aside class="context-column" aria-label="Your trip and priorities">
+              <div class="conference-context">
+                <div class="context-avatar">
+                  <svg class="icon"><use href="#i-calendar" /></svg>
+                </div>
+                <span class="eyebrow">YOUR TRIP</span>
+                <h2 id="sidebar-conference">GitHub Universe 2026</h2>
+                <p>
+                  <span id="conference-place">Fort Mason Center</span
+                  ><br /><span id="conference-city">San Francisco</span>
+                </p>
+                <div class="trip-pill">
+                  <svg class="icon"><use href="#i-plane" /></svg
+                  ><span id="trip-dates">Your trip</span>
+                </div>
+                <button class="primary full-width" data-nav="events">
+                  View your agenda
+                </button>
+              </div>
+              <section class="goal-context" id="step-goal">
+                <div class="section-heading">
+                  <h3>Your priorities</h3>
+                  <button
+                    class="text-button"
+                    data-open="goal-dialog"
+                    aria-label="Edit priorities"
+                  >
+                    <svg class="icon"><use href="#i-edit" /></svg>
+                  </button>
+                </div>
+                <p id="story-goal" class="story-goal">
+                  Loading your priorities…
+                </p>
+                <div id="story-goals" class="chips"></div>
+                <button class="text-button goal-adjust" data-open="goal-dialog">
+                  Edit priorities
+                </button>
+              </section>
+              <div class="overview-stats" aria-label="Your trip at a glance">
+                <div>
+                  <strong id="stat-events">—</strong
+                  ><span class="stat-label">events to explore</span>
+                </div>
+                <div>
+                  <strong id="stat-plan">—</strong
+                  ><span class="stat-label">on your agenda</span>
+                </div>
+                <div>
+                  <strong id="stat-people">—</strong
+                  ><span class="stat-label">suggested connections</span>
+                </div>
+                <div>
+                  <strong id="stat-met">—</strong
+                  ><span class="stat-label">conversations saved</span>
+                </div>
+              </div>
+              <div
+                id="degraded-banner"
+                data-ranking-mode="degraded_no_graph"
+                class="degraded-banner hidden"
+                role="status"
+              >
+                <svg class="icon"><use href="#i-info" /></svg
+                ><span>Graph unavailable · fallback ranking active.</span>
+              </div>
+              <button class="sources-link" data-open="sources-dialog">
+                <svg class="icon"><use href="#i-info" /></svg>How are
+                suggestions made?
+              </button>
+            </aside>
           </div>
-          <div class="roi-tile">
-            <div id="roi-qualified" class="value unknown">unknown</div>
-            <div class="name">Qualified contacts</div>
+        </section>
+
+        <section
+          id="tab-events"
+          class="tab-panel"
+          aria-labelledby="agenda-title"
+          hidden
+        >
+          <div class="page-heading">
+            <div>
+              <span class="eyebrow">MAKE YOUR TIME COUNT</span>
+              <h1 id="agenda-title">An agenda built around you.</h1>
+              <p>Your suggested schedule, with time for what matters.</p>
+            </div>
+            <button class="secondary" data-open="goal-dialog">
+              <svg class="icon"><use href="#i-edit" /></svg>Edit priorities
+            </button>
           </div>
-          <div class="roi-tile">
-            <div id="roi-opportunities" class="value unknown">unknown</div>
-            <div class="name">Opportunities (score &gt;= 30)</div>
+          <div class="panel">
+            <div class="section-heading">
+              <h2>My agenda</h2>
+              <span class="timezone-label"
+                >Pacific Time unless otherwise noted</span
+              >
+            </div>
+            <div
+              id="agenda-day-tabs"
+              class="day-tabs"
+              aria-label="Filter agenda by day"
+            ></div>
+            <div id="plan-days"></div>
           </div>
-        </div>
-      </div>
-    </section>
+          <details class="panel">
+            <summary>
+              Your agenda’s trade-offs
+              <span class="muted">Conflicts and skipped events</span>
+            </summary>
+            <div id="conflicts"></div>
+            <h3>Skipped events</h3>
+            <ul id="excluded" class="plain-list"></ul>
+          </details>
+          <div class="panel">
+            <div class="section-heading">
+              <div>
+                <span class="eyebrow">KEEP YOUR OPTIONS OPEN</span>
+                <h2>Explore events</h2>
+              </div>
+              <span id="events-result-count" class="muted"></span>
+            </div>
+            <div class="filter-row">
+              <label class="search-input"
+                ><svg class="icon"><use href="#i-search" /></svg
+                ><span class="sr-only">Search events or venues</span
+                ><input
+                  id="events-search"
+                  type="search"
+                  placeholder="Search events or venues…" /></label
+              ><label class="filter-select"
+                ><span class="sr-only">Event type</span
+                ><select id="events-type">
+                  <option value="all">All formats</option>
+                  <option value="session">Sessions</option>
+                  <option value="side_event">Side events</option>
+                  <option value="meetup">Meetups</option>
+                  <option value="party">Parties</option>
+                  <option value="workshop">Workshops</option>
+                  <option value="other">Other</option>
+                  <option value="conference">Conferences</option>
+                </select></label
+              >
+            </div>
+            <div id="events-list"></div>
+          </div>
+        </section>
 
-    <section id="tab-dashboard" class="tab-panel">
-      <div class="grid two">
-        <div class="panel">
-          <h2>Parsed goals</h2>
-          <div id="goals-list"></div>
-          <p id="computed-by" class="muted small-text"></p>
-        </div>
-        <div class="panel">
-          <h2>ROI</h2>
-          <div id="roi-grid" class="roi-grid"></div>
-          <p id="roi-note" class="muted small-text"></p>
-        </div>
-      </div>
-      <div class="panel">
-        <h2>Next actions</h2>
-        <ol id="next-actions" class="next-actions"></ol>
-      </div>
-    </section>
+        <section
+          id="tab-people"
+          class="tab-panel"
+          aria-labelledby="people-title"
+          hidden
+        >
+          <div class="page-heading">
+            <div>
+              <span class="eyebrow">ONE CONVERSATION AT A TIME</span>
+              <h1 id="people-title">Meet your kind of people.</h1>
+              <p>
+                Who to meet, why it matters, and how to start the conversation.
+              </p>
+            </div>
+            <span class="soft-label">Matched to your priorities</span>
+          </div>
+          <div class="people-toolbar">
+            <label class="search-input"
+              ><svg class="icon"><use href="#i-search" /></svg
+              ><span class="sr-only">Search people, roles, or companies</span
+              ><input
+                id="people-search"
+                type="search"
+                placeholder="Search people, roles, or companies…" /></label
+            ><span
+              id="people-result-count"
+              class="muted"
+              aria-live="polite"
+            ></span>
+          </div>
+          <div id="people-cards" class="cards"></div>
+          <p class="section-note">
+            Find the context behind each connection on their profile.
+          </p>
+        </section>
 
-    <section id="tab-travel" class="tab-panel">
-      <div class="grid two">
-        <div class="panel">
-          <h2>Itinerary</h2>
-          <ol id="itinerary" class="itinerary"></ol>
+        <section
+          id="tab-travel"
+          class="tab-panel"
+          aria-labelledby="travel-title"
+          hidden
+        >
+          <div class="page-heading">
+            <div>
+              <span class="eyebrow">LESS PLANNING, MORE POSSIBILITY</span>
+              <h1 id="travel-title">Your whole trip, in one place.</h1>
+              <p>Flights, stays, and the details that keep your trip moving.</p>
+            </div>
+          </div>
+          <div class="grid two">
+            <div class="panel">
+              <span class="eyebrow">FROM DEPARTURE TO RETURN</span>
+              <h2>Your itinerary</h2>
+              <ol id="itinerary" class="itinerary"></ol>
+            </div>
+            <div class="panel">
+              <span class="eyebrow">YOUR TRIP IN NUMBERS</span>
+              <h2>Trip budget</h2>
+              <div id="budget"></div>
+            </div>
+          </div>
+          <div class="panel">
+            <h2>Suggestions for your trip</h2>
+            <p class="muted">Save the options you want to keep.</p>
+            <div id="proposals"></div>
+          </div>
+          <section>
+            <div class="section-heading">
+              <div>
+                <span class="eyebrow">A PLACE TO LAND</span>
+                <h2>Places to stay</h2>
+              </div>
+            </div>
+            <div id="stays" class="cards"></div>
+          </section>
+          <div class="panel travel-map-panel">
+            <h2>Find your way around</h2>
+            <div
+              id="map"
+              class="map"
+              aria-label="Map of events and places to stay"
+            ></div>
+            <p class="map-note">See your visits in order.</p>
+            <details>
+              <summary>View locations as a list</summary>
+              <div id="map-places"></div>
+            </details>
+          </div>
+        </section>
+
+        <section
+          id="tab-graph"
+          class="tab-panel"
+          aria-labelledby="connections-title"
+          hidden
+        >
+          <div class="page-heading">
+            <div>
+              <span class="eyebrow">EVERY CONNECTION HAS CONTEXT</span>
+              <h1 id="connections-title">See how it all connects.</h1>
+              <p>
+                Explore the links between your priorities, people, and events.
+              </p>
+            </div>
+            <span class="soft-label"
+              >Powered by: <span id="graph-backend">Loading…</span></span
+            >
+          </div>
+          <div class="panel">
+            <div id="graph-legend" class="legend"></div>
+            <p class="muted">
+              Select a person to explore their connection. Select a relationship
+              to see its source.
+            </p>
+            <div
+              id="graph"
+              role="region"
+              class="graph"
+              aria-label="Connections graph; a text version is available below"
+            ></div>
+            <div
+              id="graph-detail"
+              class="graph-detail"
+              role="status"
+              aria-live="polite"
+            >
+              Select a person to see the connection.
+            </div>
+            <details class="graph-text">
+              <summary>Explore connections as text</summary>
+              <div id="graph-fallback"></div>
+            </details>
+          </div>
+          <details class="panel">
+            <summary>
+              How your planning agents coordinate
+              <span>Version <span id="agents-plan-version">—</span></span>
+            </summary>
+            <div id="agents-state"></div>
+          </details>
+        </section>
+
+        <section
+          id="tab-dashboard"
+          class="tab-panel"
+          aria-label="Trip overview"
+          hidden
+        >
+          <div class="page-heading">
+            <div>
+              <span class="eyebrow">THE BIGGER PICTURE</span>
+              <h1>Your trip at a glance.</h1>
+            </div>
+          </div>
+          <div class="grid two">
+            <div class="panel">
+              <h2>Your priorities</h2>
+              <div id="goals-list"></div>
+              <p id="computed-by" class="muted small-text"></p>
+            </div>
+            <div class="panel">
+              <h2>Your progress</h2>
+              <div id="roi-grid" class="roi-grid"></div>
+              <p id="roi-note" class="muted small-text"></p>
+            </div>
+          </div>
+          <div class="panel">
+            <h2>What’s next</h2>
+            <ol id="next-actions" class="next-actions"></ol>
+          </div>
+        </section>
+        <footer class="footer">
+          <span>Your next conversation starts here.</span
+          ><a href="#dashboard" data-nav="dashboard">View your progress</a
+          ><button class="text-button" data-open="sources-dialog">
+            Sources and details
+          </button>
+        </footer>
+      </main>
+    </div>
+
+    <dialog id="goal-dialog" aria-labelledby="goal-dialog-title">
+      <div class="dialog-head">
+        <span class="eyebrow">YOUR PRIORITIES</span
+        ><button
+          class="icon-button"
+          data-close="goal-dialog"
+          aria-label="Close"
+        >
+          <svg class="icon"><use href="#i-close" /></svg>
+        </button>
+      </div>
+      <h2 id="goal-dialog-title">What would make this trip worthwhile?</h2>
+      <p class="muted">
+        Tell us who you want to meet: seed investors, AI agent founders, Copilot
+        product managers, or engineers.
+      </p>
+      <form id="goal-form">
+        <label for="goal-text">Your priorities for this conference</label
+        ><textarea
+          id="goal-text"
+          rows="4"
+          maxlength="2000"
+          aria-describedby="goal-help goal-error"
+          required
+        ></textarea>
+        <p id="goal-help" class="small-text muted">Describe the people and topics you care about. Specific priorities help shape your agenda.</p>
+        <p id="goal-error" class="form-error" role="alert"></p>
+        <div class="dialog-actions">
+          <button type="button" class="secondary" data-close="goal-dialog">
+            Cancel</button
+          ><button id="btn-goal" type="submit" class="primary">
+            Update your agenda
+          </button>
         </div>
-        <div class="panel">
-          <h2>Budget</h2>
-          <div id="budget"></div>
+      </form>
+    </dialog>
+    <dialog id="meeting-dialog" aria-labelledby="meeting-title">
+      <div class="dialog-head">
+        <span class="eyebrow">KEEP IN TOUCH</span
+        ><button
+          class="icon-button"
+          data-close="meeting-dialog"
+          aria-label="Close"
+        >
+          <svg class="icon"><use href="#i-close" /></svg>
+        </button>
+      </div>
+      <h2 id="meeting-title">A conversation worth remembering.</h2>
+      <p id="meeting-person" class="muted"></p>
+      <form id="meeting-form">
+        <label for="meeting-note"
+          >A note for later <span class="muted">(optional)</span></label
+        ><textarea
+          id="meeting-note"
+          rows="3"
+          maxlength="1000"
+          placeholder="A topic you discussed, an idea to follow up on…"
+        ></textarea>
+        <div class="dialog-actions">
+          <button type="button" class="secondary" data-close="meeting-dialog">
+            Cancel</button
+          ><button id="btn-met-save" type="submit" class="primary">
+            Save conversation
+          </button>
         </div>
+      </form>
+    </dialog>
+    <dialog id="simulation-dialog" aria-labelledby="simulation-title">
+      <div class="dialog-head">
+        <span class="eyebrow">WHEN PLANS CHANGE</span
+        ><button
+          class="icon-button"
+          data-close="simulation-dialog"
+          aria-label="Close"
+        >
+          <svg class="icon"><use href="#i-close" /></svg>
+        </button>
       </div>
-      <div class="panel">
-        <h2>Proposals</h2>
-        <div id="proposals"></div>
+      <h2 id="simulation-title">What if your plans changed?</h2>
+      <p class="muted">
+        Choose a scenario to explore how your agenda would adapt.
+      </p>
+      <label for="scenario-select">Choose a scenario</label
+      ><select id="scenario-select"></select
+      ><button id="btn-simulate" class="primary full-width">
+        Explore changes
+      </button>
+      <div class="dialog-separator"></div>
+      <h3>Start fresh</h3>
+      <p class="small-text muted">
+        Restore this session’s original agenda and choices.
+      </p>
+      <button class="text-button danger" data-open="reset-dialog">
+        Reset session
+      </button>
+    </dialog>
+    <dialog id="reset-dialog" aria-labelledby="reset-title">
+      <h2 id="reset-title">Reset this session?</h2>
+      <p>
+        Your agenda, choices, and recorded meeting history will return to their starting point.
+      </p>
+      <div class="dialog-actions">
+        <button class="secondary" data-close="reset-dialog">Cancel</button
+        ><button id="btn-reset" class="danger-solid">Reset session</button>
       </div>
-      <div class="panel">
-        <h2>Stays</h2>
-        <div id="stays" class="cards"></div>
+    </dialog>
+    <dialog id="sources-dialog" aria-labelledby="sources-title">
+      <div class="dialog-head">
+        <span class="eyebrow">BEHIND YOUR AGENDA</span
+        ><button
+          class="icon-button"
+          data-close="sources-dialog"
+          aria-label="Close"
+        >
+          <svg class="icon"><use href="#i-close" /></svg>
+        </button>
       </div>
-      <div class="panel">
-        <h2>Map <span id="map-kind" class="hidden"></span></h2>
-        <div id="map" class="map"></div>
+      <h2 id="sources-title">Sources and how it works</h2>
+      <p id="conf-name" class="muted"></p>
+      <div class="source-summary">
+        <span>Data provenance</span>
+        <span id="badge-source" class="badge fixture">Loading data</span>
       </div>
-    </section>
-
-    <section id="tab-events" class="tab-panel">
-      <div class="panel">
-        <h2>Day by day plan</h2>
-        <p class="muted small-text">Times shown in the event timezone (America/Los_Angeles).</p>
-        <div id="plan-days"></div>
+      <div class="source-summary">
+        <span>Source status</span
+        ><span id="badge-status" class="badge neutral">Loading</span>
       </div>
-      <div class="panel">
-        <h2>Conflicts (anti-FOMO)</h2>
-        <div id="conflicts"></div>
+      <div class="source-summary">
+        <span>Last collected</span
+        ><span id="collected-at" class="small-text">—</span>
       </div>
-      <div class="panel">
-        <h2>Excluded</h2>
-        <ul id="excluded" class="plain-list"></ul>
-      </div>
-      <div class="panel">
-        <h2>All events</h2>
-        <div id="events-list"></div>
-      </div>
-    </section>
-
-    <section id="tab-graph" class="tab-panel">
-      <div class="panel">
-        <div class="panel-head">
-          <h2>Relationship graph</h2>
-          <span>Backend: <span id="graph-backend" class="badge neutral">unknown</span></span>
-        </div>
-        <div id="graph-legend" class="legend"></div>
-        <p class="muted small-text">Click a person to see the path from you. Click an edge to see its evidence.</p>
-        <div id="graph" class="graph"></div>
-        <div id="graph-fallback" class="hidden"></div>
-        <div id="graph-detail" class="graph-detail muted">No selection.</div>
-      </div>
-      <div class="panel">
-        <div class="panel-head">
-          <h2>Agents on the graph</h2>
-          <span>Plan version: <span id="agents-plan-version" class="badge neutral">?</span></span>
-        </div>
-        <p class="muted small-text">The planner, the anti-FOMO agent and the replanner coordinate through FalkorDB: each reads what the others wrote.</p>
-        <div id="agents-state"></div>
-      </div>
-    </section>
-
-    <section id="tab-people" class="tab-panel">
-      <div class="panel">
-        <h2>Top 10 people to meet</h2>
-        <div id="people-cards" class="cards"></div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <details id="warnings-box">
-      <summary>Warnings (<span id="warnings-count">0</span>)</summary>
-      <ul id="warnings-list"></ul>
-    </details>
-  </footer>
-
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script src="https://unpkg.com/cytoscape@3.30.2/dist/cytoscape.min.js"></script>
-  <script src="/static/app.js"></script>
-</body>
+      <p class="small-text muted">
+        Fixture data is replayed or fictional; live data comes from a real
+        collection. Availability and prices may have changed since collection.
+        Speaker listings do not guarantee a meeting. Conference affiliation and
+        attendance evidence are shown on individual records.
+      </p>
+      <p class="small-text muted">
+        The ranking uses your selected profiles and priorities, with a fallback
+        when the graph is unavailable. Map lines show the order of visits, not
+        calculated routes, and some location coordinates are approximate.
+      </p>
+      <p class="small-text muted">
+        Saving a travel suggestion does not make a booking. Change scenarios
+        affect this session and are not source updates. Resetting a session
+        preserves conversation history already saved in FalkorDB.
+      </p>
+      <div id="source-domains"></div>
+      <div id="bd-counter" class="bd-counter"></div>
+      <details id="warnings-box">
+        <summary>
+          Details and warnings <span id="warnings-count">0</span>
+        </summary>
+        <ul id="warnings-list"></ul>
+      </details>
+    </dialog>
+    <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      crossorigin=""
+    ></script>
+    <script src="https://unpkg.com/cytoscape@3.30.2/dist/cytoscape.min.js"></script>
+    <script src="/static/app.js"></script>
+    <script src="/static/event-detail.js" defer></script>
+  </body>
 </html>
