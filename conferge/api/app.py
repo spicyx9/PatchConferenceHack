@@ -381,14 +381,18 @@ def create_app(
         """Data pipeline button: 2 real Bright Data calls (Web Unlocker flights, SERP LinkedIn)."""
         from conferge.integration.live_refresh import refresh
 
-        speaker = None
+        from conferge.integration.live_refresh import cached_profiles
+
+        # A top-5 speaker, preferring one whose LinkedIn URL is already cached (verifiable).
+        known = cached_profiles()
+        candidates = []
         for opp in state.opportunities()[:5]:
             person = next((state.data.person(p) for p in opp.person_ids if state.data.person(p)), None)
             if person is not None:
                 company = state.data.company(person.company_id)
-                speaker = (person.name, company.name if company else None)
-                if company:
-                    break
+                candidates.append((person.name, company.name if company else None))
+        speaker = next((c for c in candidates if c[0].casefold() in known),
+                       next((c for c in candidates if c[1]), candidates[0] if candidates else None))
         result = await refresh(state.data, speaker)
         return _envelope(state, ["flights"], {"refresh": result},
                          extra_warnings=result["errors"])

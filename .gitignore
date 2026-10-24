@@ -41,3 +41,6 @@ data/snapshots/
 # Local drafts: never committed
 *.draft
 *.draft.md
+
+# Refresh button: raw SERP answers (scraped bodies, never committed)
+data/probes/refresh_serp_*.json
