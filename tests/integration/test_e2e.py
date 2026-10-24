@@ -8,6 +8,7 @@ import pytest
 
 from conferge.integration import pipeline, render_markdown, run_e2e
 from conferge.integration.sources import SourceSlice, fixture_slices
+from conferge.integration.stays_flights import LiveDomain
 
 EXPECTED_STAGES = [
     "inventory", "sources", "check:provenance", "check:labels", "check:relations",
@@ -52,6 +53,11 @@ def test_planning_never_claims_live_on_fixture(fixture_report: pipeline.E2ERepor
     assert planning.data["top"]
 
 
+async def travel_failed(timeout: float = 90.0) -> dict[str, LiveDomain]:
+    # pyairbnb uses curl_cffi (native sockets): no_network cannot block it, so stub live travel
+    return {n: LiveDomain(n, errors=["timeout"]) for n in ("stays", "flights")}
+
+
 def test_live_failure_without_fallback_is_failed_not_fixture(
     monkeypatch: pytest.MonkeyPatch, no_network: None,
 ) -> None:
@@ -59,6 +65,7 @@ def test_live_failure_without_fallback_is_failed_not_fixture(
         return [SourceSlice("luma", "01", "live", "live", "failed", errors=["HTTP 403"])]
 
     monkeypatch.setattr(pipeline, "live_slices", all_failed)
+    monkeypatch.setattr(pipeline, "collect_stays_flights", travel_failed)
     report = asyncio.run(run_e2e("live", include_backup=False, sources=["luma"]))
     assert report.stage("sources").outcome == "fail"
     assert [s.source_mode for s in report.slices] == ["live"]
@@ -72,6 +79,7 @@ def test_live_failure_with_explicit_fallback_is_labelled_fixture(
         return [SourceSlice("official", "03", "live", "live", "failed", errors=["timeout"])]
 
     monkeypatch.setattr(pipeline, "live_slices", all_failed)
+    monkeypatch.setattr(pipeline, "collect_stays_flights", travel_failed)
     report = asyncio.run(run_e2e("live", fallback_fixture=True, include_backup=False,
                                  sources=["official"]))
     modes = [(s.attempted, s.source_mode, s.status) for s in report.slices]
