@@ -51,8 +51,9 @@ def test_cache_is_served_labelled_cached_with_provenance_and_pipeline_rows(no_ne
     assert any(r["provider"] == "google_hotels_direct" and r["kind"] == "direct" for r in cached)
     assert sum(r["records"] for r in cached) == 55  # 21 stays + 34 itineraries
     bd = client.get("/api/v1/brightdata").json()["cached"]
-    assert bd["total"] == 55 and bd["datasets"] == 21 and bd["web_unlocker"] == 34
-    assert all(v.startswith("2026-10-24") for v in bd["collected_at"].values())
+    # From the cached records: stays 21 + LinkedIn 15 + Crunchbase 2 dataset rows, 34 itineraries
+    assert bd["web_unlocker"] == 34 and bd["datasets"] == 38 and bd["total"] == 72
+    assert all(t.startswith("2026-10-24") for pair in bd["collected_at"].values() for t in pair)
 
 
 def test_no_cache_keeps_the_labelled_fixture(tmp_path: Path, no_network: None) -> None:

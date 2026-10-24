@@ -397,12 +397,13 @@ def create_app(
 
     @api.get("/cost")
     def cost() -> dict[str, Any]:
-        """Bright Data calls made by this process and their estimated USD cost (estimate only)."""
+        """Bright Data requests and records of this process; list-price estimate, not billed."""
         from conferge.core import cost as bd_cost
 
         snap = bd_cost.snapshot()
-        return _envelope(state, [], snap, mode_override="live" if snap["calls"] else "unknown",
-                         extra_warnings=["estimate: flat USD 0.0015 per call, real price not verified"])
+        return _envelope(state, [], snap, mode_override="live" if snap["requests"] else "unknown",
+                         extra_warnings=[f"{bd_cost.COST_LABEL}: dataset records only, "
+                                         "Unlocker and SERP requests are not priced"])
 
     @api.get("/brightdata")
     def brightdata_usage() -> dict[str, Any]:
@@ -415,14 +416,21 @@ def create_app(
         # "live" only when at least one Bright Data API can actually be called from this
         # process; without a key nothing here is live, so the label says "unknown".
         notes = [] if any(ready.values()) else ["Bright Data not configured: no API ready in this process"]
+        from conferge.integration import brightdata_usage
+
+        # Requests and records per product, with the records' own collected_at (never a
+        # run report's finished_at, which can be the demo start time).
+        summary = brightdata_usage.summary()
         cached: dict[str, Any] = {"datasets": 0, "web_unlocker": 0, "serp": 0, "collected_at": {}}
         api_key = {"dataset": "datasets", "unlocker": "web_unlocker", "serp": "serp"}
-        for r in state.data.pipeline:
-            if r.get("cached") and r["kind"] == "brightdata" and r["brightdata_api"] in api_key:
-                cached[api_key[r["brightdata_api"]]] += r["records"] or 0
-                cached["collected_at"][r["provider"]] = r["collected_at"]
+        for p in summary["products"]:
+            if p["source"] == "cached" and p["api"] in api_key:
+                cached[api_key[p["api"]]] += p["records"]
+                if p["collected_first"]:
+                    cached["collected_at"][p["product"]] = [p["collected_first"], p["collected_last"]]
         cached["total"] = cached["datasets"] + cached["web_unlocker"] + cached["serp"]
         return _envelope(state, [], {
+            **summary,
             "usage": bd.usage(),
             "cached": cached,
             "ready": ready,

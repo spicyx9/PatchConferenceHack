@@ -56,3 +56,14 @@ def test_pipeline_endpoint_serves_rows_and_headline() -> None:
     body = TestClient(create_app(data=data, found=Providers(), graph_probe=False)).get("/api/v1/pipeline").json()
     assert body["headline"].startswith("Agents never fetch the web at query time")
     assert body["rows"][0]["provider"] == "booking" and body["totals"]["brightdata_records"] == 3
+
+
+def test_estimate_only_on_dataset_rows_and_collected_at_override() -> None:
+    from conferge.integration.pipeline_view import row
+
+    unlocker = _report("brightdata_unlocker_google_flights", 34, warnings=["via Web Unlocker 1x"])
+    r = row("flights", unlocker)
+    assert r["brightdata_api"] == "unlocker" and r["estimated_cost_usd"] is None
+    ds = row("linkedin", _report("brightdata:linkedin", 9), collected_at="2026-10-24T20:07:29Z")
+    assert ds["estimated_cost_usd"] == "0.0135" and "not billed" in ds["estimate_basis"]
+    assert ds["collected_at"] == "2026-10-24T20:07:29Z"
