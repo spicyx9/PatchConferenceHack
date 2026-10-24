@@ -1,0 +1,24 @@
+# Connections search
+
+Open `http://127.0.0.1:8000/#graph` with the local demo API and FalkorDB running.
+Set `OPENAI_API_KEY` in the local `.env` and restart the API to enable semantic search.
+Do not commit the key. `CONNECTIONS_OPENAI_MODEL` optionally overrides the explanation model
+(default `gpt-5.6-terra`). Embeddings use `text-embedding-3-small` at 512 dimensions.
+
+The first search embeds public profile and session fields. FalkorDB stores the vectors,
+model and content hash on Person nodes through the GraphStore write boundary. Later
+searches reuse unchanged embeddings. The query is embedded, FalkorDB retrieves candidates,
+and OpenAI returns evidence-based reasons. Unknown result IDs are rejected. Private meeting
+notes are excluded from model input. Empty saved lists stay empty. Without a key, the UI
+explicitly uses keyword matching; it does not simulate AI answers.
+
+`Conference people` is the loaded directory; `People I've met` is scoped to recorded
+meetings for the existing demo user. This does not import an address book or provide
+multi-user isolation. Profile evidence retains fixture/live labels and source links.
+The default graph shows five ranked people; selecting a person shows their real graph
+neighbourhood and goal path. Vector relevance is not represented as factual confidence.
+
+Validation: unit tests cover scope, malformed embeddings and rejecting unknown model IDs.
+The vector adapter, index creation, cache and scoped nearest-neighbour query were also
+checked against local FalkorDB 6.0.3 using a separate disposable test graph. Live OpenAI
+quality and account access require a configured key and have not been verified.

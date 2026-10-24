@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#1f2926" />
-    <title>Conferge — make the right connections</title>
+    <title>Conferge</title>
     <link rel="icon" type="image/svg+xml" href="/static/mark.svg" />
     <link
       rel="stylesheet"
@@ -187,7 +187,7 @@
                   >San Francisco</span
                 >
               </h1>
-              <p>Find the right events.<br />Meet the right people.</p>
+
               <div class="hero-meta">
                 <span id="conference-title">GitHub Universe 2026</span
                 ><span aria-hidden="true">·</span
@@ -203,16 +203,13 @@
               <section class="event-discovery-section">
                 <div class="section-heading">
                   <div>
-                    <span class="eyebrow">AROUND THE CONFERENCE</span>
-                    <h2>Worth making time for</h2>
+
+                    <h2>Events</h2>
                   </div>
                   <a href="#events" data-nav="events" class="text-button"
                     >View all</a
                   >
                 </div>
-                <p class="discovery-note">
-                  Discover what’s happening during your trip.
-                </p>
                 <div id="discover-events" class="discover-events">
                   <div class="skeleton-card"></div>
                   <div class="skeleton-card"></div>
@@ -221,8 +218,8 @@
               <section id="step-opps" class="overview-section">
                 <div class="section-heading">
                   <div>
-                    <span class="eyebrow">BEYOND THE BADGE</span>
-                    <h2>People to connect with</h2>
+
+                    <h2>People</h2>
                   </div>
                   <a href="#people" data-nav="people" class="text-button"
                     >View all people</a
@@ -238,7 +235,7 @@
                 <section id="step-plan" class="panel agenda-preview">
                   <div class="section-heading">
                     <div>
-                      <span class="eyebrow">TIME WELL SPENT</span>
+
                       <h2>Your agenda</h2>
                     </div>
                     <a
@@ -259,8 +256,8 @@
                 <section class="panel map-preview">
                   <div class="section-heading">
                     <div>
-                      <span class="eyebrow">ON THE GROUND</span>
-                      <h2>Your meeting places</h2>
+
+                      <h2>Locations</h2>
                     </div>
                     <svg class="icon"><use href="#i-pin" /></svg>
                   </div>
@@ -269,17 +266,14 @@
                     class="map story-map"
                     aria-label="Map of agenda locations"
                   ></div>
-                  <p class="map-note">Your agenda, mapped out.</p>
                 </section>
               </div>
               <section id="step-antifomo" class="antifomo-panel">
                 <div class="section-heading">
                   <div>
-                    <span class="eyebrow">MAKE ROOM FOR WHAT MATTERS</span>
-                    <h2>You don’t need to be everywhere.</h2>
-                    <p>
-                      Know what to skip, and what you gain by keeping your time.
-                    </p>
+
+                    <h2>Suggested skips</h2>
+
                   </div>
                   <span class="antifomo-stamp"
                     >ANTI-FOMO <svg class="icon"><use href="#i-check" /></svg
@@ -289,27 +283,23 @@
               </section>
               <div class="overview-lower">
                 <section class="panel" id="step-change">
-                  <span class="eyebrow">WHEN PLANS CHANGE</span>
-                  <h2>An event sold out?</h2>
-                  <p class="muted">
-                    Find your next best option and see how your agenda adapts.
-                  </p>
+
+                  <h2>Replan</h2>
+
                   <button id="story-simulate" class="secondary">
                     Explore a sold-out scenario
                   </button>
                   <div id="story-diff" aria-live="polite"></div>
                 </section>
                 <section class="panel" id="step-met">
-                  <span class="eyebrow">AFTER THE CONVERSATION</span>
-                  <h2>Keep the connection going.</h2>
-                  <p class="muted">
-                    Save a conversation and make room for your next connection.
-                  </p>
+
+                  <h2>Meetings</h2>
+
                   <div id="story-met" aria-live="polite"></div>
                 </section>
               </div>
               <section class="panel" id="step-roi" aria-labelledby="trip-results-title">
-                <span class="eyebrow">BEYOND THIS CONFERENCE</span><h2 id="trip-results-title">Your trip, in perspective.</h2>
+                <h2 id="trip-results-title">Trip summary</h2>
                 <div class="roi-grid roi-story">
                   <div class="roi-tile"><div id="roi-spend" class="value unknown">unknown</div><div class="name">Known travel costs</div><div id="roi-spend-note" class="note muted"></div></div>
                   <div class="roi-tile"><div id="roi-meetings" class="value unknown">unknown</div><div class="name">Meetings recorded</div></div>
@@ -323,7 +313,7 @@
                 <div class="context-avatar">
                   <svg class="icon"><use href="#i-calendar" /></svg>
                 </div>
-                <span class="eyebrow">YOUR TRIP</span>
+
                 <h2 id="sidebar-conference">GitHub Universe 2026</h2>
                 <p>
                   <span id="conference-place">Fort Mason Center</span
@@ -399,9 +389,9 @@
         >
           <div class="page-heading">
             <div>
-              <span class="eyebrow">MAKE YOUR TIME COUNT</span>
-              <h1 id="agenda-title">An agenda built around you.</h1>
-              <p>Your suggested schedule, with time for what matters.</p>
+
+              <h1 id="agenda-title">My agenda</h1>
+
             </div>
             <button class="secondary" data-open="goal-dialog">
               <svg class="icon"><use href="#i-edit" /></svg>Edit priorities
@@ -433,7 +423,7 @@
           <div class="panel">
             <div class="section-heading">
               <div>
-                <span class="eyebrow">KEEP YOUR OPTIONS OPEN</span>
+
                 <h2>Explore events</h2>
               </div>
               <span id="events-result-count" class="muted"></span>
@@ -472,13 +462,11 @@
         >
           <div class="page-heading">
             <div>
-              <span class="eyebrow">ONE CONVERSATION AT A TIME</span>
-              <h1 id="people-title">Meet your kind of people.</h1>
-              <p>
-                Who to meet, why it matters, and how to start the conversation.
-              </p>
+
+              <h1 id="people-title">People</h1>
+
             </div>
-            <span class="soft-label">Matched to your priorities</span>
+
           </div>
           <div class="people-toolbar">
             <label class="search-input"
@@ -495,9 +483,7 @@
             ></span>
           </div>
           <div id="people-cards" class="cards"></div>
-          <p class="section-note">
-            Find the context behind each connection on their profile.
-          </p>
+
         </section>
 
         <section
@@ -508,45 +494,43 @@
         >
           <div class="page-heading">
             <div>
-              <span class="eyebrow">LESS PLANNING, MORE POSSIBILITY</span>
-              <h1 id="travel-title">Your whole trip, in one place.</h1>
-              <p>Flights, stays, and the details that keep your trip moving.</p>
+
+              <h1 id="travel-title">Travel</h1>
+
             </div>
           </div>
           <div class="grid two">
             <div class="panel">
-              <span class="eyebrow">FROM DEPARTURE TO RETURN</span>
+
               <h2>Your itinerary</h2>
               <ol id="itinerary" class="itinerary"></ol>
             </div>
             <div class="panel">
-              <span class="eyebrow">YOUR TRIP IN NUMBERS</span>
+
               <h2>Trip budget</h2>
               <div id="budget"></div>
             </div>
           </div>
           <div class="panel">
             <h2>Suggestions for your trip</h2>
-            <p class="muted">Save the options you want to keep.</p>
             <div id="proposals"></div>
           </div>
           <section>
             <div class="section-heading">
               <div>
-                <span class="eyebrow">A PLACE TO LAND</span>
+
                 <h2>Places to stay</h2>
               </div>
             </div>
             <div id="stays" class="cards"></div>
           </section>
           <div class="panel travel-map-panel">
-            <h2>Find your way around</h2>
+            <h2>Map</h2>
             <div
               id="map"
               class="map"
               aria-label="Map of events and places to stay"
             ></div>
-            <p class="map-note">See your visits in order.</p>
             <details>
               <summary>View locations as a list</summary>
               <div id="map-places"></div>
@@ -560,43 +544,50 @@
           aria-labelledby="connections-title"
           hidden
         >
-          <div class="page-heading">
-            <div>
-              <span class="eyebrow">EVERY CONNECTION HAS CONTEXT</span>
-              <h1 id="connections-title">See how it all connects.</h1>
-              <p>
-                Explore the links between your priorities, people, and events.
-              </p>
-            </div>
-            <span class="soft-label"
-              >Powered by: <span id="graph-backend">Loading…</span></span
-            >
+          <div class="page-heading connections-heading">
+            <div><h1 id="connections-title">Connections<span class="title-dot">.</span></h1>
+              <p id="connections-count">Loading people…</p></div>
+            <span class="connection-engine"><i></i><span id="graph-backend">Connecting</span></span>
           </div>
-          <div class="panel">
-            <div id="graph-legend" class="legend"></div>
-            <p class="muted">
-              Select a person to explore their connection. Select a relationship
-              to see its source.
-            </p>
-            <div
-              id="graph"
-              role="region"
-              class="graph"
-              aria-label="Connections graph; a text version is available below"
-            ></div>
-            <div
-              id="graph-detail"
-              class="graph-detail"
-              role="status"
-              aria-live="polite"
-            >
-              Select a person to see the connection.
-            </div>
-            <details class="graph-text">
-              <summary>Explore connections as text</summary>
-              <div id="graph-fallback"></div>
-            </details>
+          <div class="connections-controls">
+            <div class="scope-tabs" role="group" aria-label="Connection list">
+              <button type="button" data-connection-scope="all" aria-pressed="true">Conference people</button>
+              <button type="button" data-connection-scope="met" aria-pressed="false">People I’ve met</button>
+            </div><span class="connection-source">Demo snapshot</span>
           </div>
+          <form id="connection-search" class="connection-search">
+            <span class="search-spark" aria-hidden="true">✳</span>
+            <label class="sr-only" for="connection-query">Ask about people in this list</label>
+            <input id="connection-query" maxlength="1000" minlength="2" required autocomplete="off"
+              placeholder="Who can help me with…" />
+            <button type="submit" id="connection-submit">Find people <span aria-hidden="true">↗</span></button>
+          </form>
+          <div class="connection-examples">
+            <button type="button" data-connection-query="Who works on AI agents?">AI agents</button>
+            <button type="button" data-connection-query="Who can help with developer tools?">Developer tools</button>
+            <button type="button" data-connection-query="Who works on open source security?">Open source security</button>
+            <span id="connection-ai-status"></span>
+          </div>
+          <div class="connection-workspace">
+            <div class="network-pane">
+              <div class="network-toolbar"><span>Network <span id="network-count"></span></span>
+                <div><button type="button" id="network-fit" aria-label="Fit graph">Fit</button>
+                  <button type="button" id="network-zoom-in" aria-label="Zoom in">+</button>
+                  <button type="button" id="network-zoom-out" aria-label="Zoom out">−</button></div>
+              </div>
+              <div id="graph" class="graph" role="region" aria-label="Connections network"></div>
+              <div id="graph-legend" class="legend"></div>
+              <p id="graph-focus-summary" class="sr-only"></p>
+            </div>
+            <aside class="connection-sidebar" aria-label="People and connection details">
+              <div class="connection-sidebar-head"><h2 id="connection-results-title">People</h2>
+                <button type="button" id="connection-clear" hidden>Clear</button></div>
+              <p id="connection-summary" role="status" aria-live="polite"></p>
+              <div id="connection-results"></div>
+              <div id="graph-detail" class="graph-detail" role="status" aria-live="polite"></div>
+            </aside>
+          </div>
+          <details class="graph-text"><summary>Network data</summary><div id="graph-fallback"></div></details>
           <details class="panel">
             <summary>
               How your planning agents coordinate
@@ -614,8 +605,8 @@
         >
           <div class="page-heading">
             <div>
-              <span class="eyebrow">THE BIGGER PICTURE</span>
-              <h1>Your trip at a glance.</h1>
+
+              <h1>Summary</h1>
             </div>
           </div>
           <div class="grid two">
@@ -636,7 +627,7 @@
           </div>
         </section>
         <footer class="footer">
-          <span>Your next conversation starts here.</span
+          <span>Conferge</span
           ><a href="#dashboard" data-nav="dashboard">View your progress</a
           ><button class="text-button" data-open="sources-dialog">
             Sources and details
@@ -647,8 +638,7 @@
 
     <dialog id="goal-dialog" aria-labelledby="goal-dialog-title">
       <div class="dialog-head">
-        <span class="eyebrow">YOUR PRIORITIES</span
-        ><button
+        <button
           class="icon-button"
           data-close="goal-dialog"
           aria-label="Close"
@@ -656,11 +646,7 @@
           <svg class="icon"><use href="#i-close" /></svg>
         </button>
       </div>
-      <h2 id="goal-dialog-title">What would make this trip worthwhile?</h2>
-      <p class="muted">
-        Tell us who you want to meet: seed investors, AI agent founders, Copilot
-        product managers, or engineers.
-      </p>
+      <h2 id="goal-dialog-title">Edit priorities</h2>
       <form id="goal-form">
         <label for="goal-text">Your priorities for this conference</label
         ><textarea
@@ -670,7 +656,7 @@
           aria-describedby="goal-help goal-error"
           required
         ></textarea>
-        <p id="goal-help" class="small-text muted">Describe the people and topics you care about. Specific priorities help shape your agenda.</p>
+        <p id="goal-help" class="small-text muted">People and topics you want to focus on.</p>
         <p id="goal-error" class="form-error" role="alert"></p>
         <div class="dialog-actions">
           <button type="button" class="secondary" data-close="goal-dialog">
@@ -683,8 +669,7 @@
     </dialog>
     <dialog id="meeting-dialog" aria-labelledby="meeting-title">
       <div class="dialog-head">
-        <span class="eyebrow">KEEP IN TOUCH</span
-        ><button
+        <button
           class="icon-button"
           data-close="meeting-dialog"
           aria-label="Close"
@@ -692,7 +677,7 @@
           <svg class="icon"><use href="#i-close" /></svg>
         </button>
       </div>
-      <h2 id="meeting-title">A conversation worth remembering.</h2>
+      <h2 id="meeting-title">Record meeting</h2>
       <p id="meeting-person" class="muted"></p>
       <form id="meeting-form">
         <label for="meeting-note"
@@ -714,8 +699,7 @@
     </dialog>
     <dialog id="simulation-dialog" aria-labelledby="simulation-title">
       <div class="dialog-head">
-        <span class="eyebrow">WHEN PLANS CHANGE</span
-        ><button
+        <button
           class="icon-button"
           data-close="simulation-dialog"
           aria-label="Close"
@@ -723,10 +707,7 @@
           <svg class="icon"><use href="#i-close" /></svg>
         </button>
       </div>
-      <h2 id="simulation-title">What if your plans changed?</h2>
-      <p class="muted">
-        Choose a scenario to explore how your agenda would adapt.
-      </p>
+      <h2 id="simulation-title">Simulate a change</h2>
       <label for="scenario-select">Choose a scenario</label
       ><select id="scenario-select"></select
       ><button id="btn-simulate" class="primary full-width">
@@ -753,8 +734,7 @@
     </dialog>
     <dialog id="sources-dialog" aria-labelledby="sources-title">
       <div class="dialog-head">
-        <span class="eyebrow">BEHIND YOUR AGENDA</span
-        ><button
+        <button
           class="icon-button"
           data-close="sources-dialog"
           aria-label="Close"
@@ -789,8 +769,7 @@
       </p>
       <p class="small-text muted">
         Saving a travel suggestion does not make a booking. Change scenarios
-        affect this session and are not source updates. Resetting a session
-        preserves conversation history already saved in FalkorDB.
+        affect this session and are not source updates. Resetting clears this demo user’s meeting and planning state.
       </p>
       <div id="source-domains"></div>
       <div id="bd-counter" class="bd-counter"></div>
@@ -807,6 +786,7 @@
       crossorigin=""
     ></script>
     <script src="https://unpkg.com/cytoscape@3.30.2/dist/cytoscape.min.js"></script>
+    <script src="/static/connections.js"></script>
     <script src="/static/app.js"></script>
     <script src="/static/event-detail.js" defer></script>
   </body>

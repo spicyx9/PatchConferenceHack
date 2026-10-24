@@ -1280,6 +1280,7 @@
   }
 
   function renderGraph(g) {
+    if (window.Connections) return window.Connections.render();
     pathRequest++;
     $("graph-detail").textContent =
       "Select a person to explore the connection.";
@@ -1524,6 +1525,7 @@
   }
 
   function highlightPath(personId) {
+    if (window.Connections) return window.Connections.focus(personId);
     var request = ++pathRequest;
     $("graph-detail").textContent = "Loading connections and evidence…";
     return api(
@@ -1792,11 +1794,11 @@
               (c.met ? '<span class="badge met">Meeting recorded</span>' : "") +
               '<span class="score" title="Relevance score, not a probability">' +
               esc(o.score == null ? "—" : Math.round(o.score)) +
-              '</span></div><div class="field"><b>WHY THIS PERSON</b>' +
+              '</span></div><details class="field"><summary>Why this person</summary>' +
               esc(friendlyRationale(orUnknown(o.rationale))) +
-              '</div><div class="field field-location"><b>WHERE TO MEET</b>' +
+              '</details><div class="field field-location"><b>SESSION</b>' +
               esc(orUnknown(o.where)) +
-              '</div><details><summary>Prepare a conversation &amp; view sources</summary><div class="field"><b>CONVERSATION STARTER</b>' +
+              '</div><details><summary>Conversation notes and sources</summary><div class="field"><b>CONVERSATION STARTER</b>' +
               esc(orUnknown(o.opener)) +
               "</div>" +
               (c.met_note
@@ -2214,7 +2216,7 @@
           })
           .join("")
       : emptyState(
-          "Your next connections start with a goal.",
+          "Set your priorities.",
           "Choose the people you would like to meet.",
           "edit-goal",
           "Set my goal",

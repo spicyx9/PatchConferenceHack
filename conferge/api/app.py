@@ -775,6 +775,9 @@ def create_app(
         return _envelope(state, ["flights", "stays", "people"], view)
 
     app.include_router(api)
+    from conferge.api.connections import router as connections_router
+
+    app.include_router(connections_router(state))
 
     if STATIC_DIR.is_dir():
         app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
