@@ -107,3 +107,20 @@ def test_graph_path_is_queried_in_falkordb_not_the_capped_sample(monkeypatch) ->
     assert body["hops"] == 1
     assert body["explanation"]
     assert body["data_source"] == "fixture"
+
+
+def test_graph_path_returns_literal_cypher_and_browser_link(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    from conferge.graph import queries as graph_queries
+
+    client, _ = _client(monkeypatch, [])
+    path = {"nodes": [{"id": "g-1", "label": "Goal", "props": {"source_mode": "fixture"}},
+                      {"id": "per-x", "label": "Person", "props": {"source_mode": "fixture"}}],
+            "edges": [{"source": "g-1", "target": "per-x", "type": "ABOUT", "props": {}}]}
+    monkeypatch.setattr(graph_queries, "path_user_to_person", lambda store, user, person: {
+        "rows": [{"goal_id": "g-1", "hops": 1, "signature": "speaker"}], "paths": [path]})
+    monkeypatch.setenv("FALKORDB_BROWSER_URL", "http://localhost:3000/")
+    body = client.get("/api/v1/graph/path", params={"person": "per-x"}).json()
+    assert body["signature"] == "speaker"
+    assert "{id: 'per-x'}" in body["cypher"] and "$" not in body["cypher"]
+    assert body["browser_url"].startswith("http://localhost:3000/graph?graph=")
+    assert "query=MATCH" in body["browser_url"] and "view=Graph" in body["browser_url"]

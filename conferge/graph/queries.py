@@ -359,6 +359,21 @@ def path_user_to_person(target: GraphStore | GraphQuery, user_id: str, person_id
     return {"rows": [], "paths": []}
 
 
+def literal_cypher(query: str, params: dict[str, Any]) -> str:
+    """The query with $params written as literals, to paste into FalkorDB Browser.
+
+    Display only: the application always sends parameters, never this string.
+    """
+    def lit(value: Any) -> str:
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            return str(value)
+        return "'" + str(value).replace("\\", "\\\\").replace("'", "\\'") + "'"
+
+    for name in sorted(params, key=len, reverse=True):
+        query = query.replace(f"${name}", lit(params[name]))
+    return query
+
+
 _FULLTEXT_SPECIAL = re.compile(r"[^\w\s]+", re.UNICODE)
 
 

@@ -232,3 +232,7 @@ th { color: var(--muted); font-weight: 600; }
 .diff-row .tag-r { color: var(--red); font-weight: 700; }
 .diff-row .tag-a { color: var(--green); font-weight: 700; }
 .met-ok { color: var(--green); font-weight: 700; font-size: 1.3rem; }
+.cypher-panel { margin-top: 0.6rem; }
+.cypher-panel .btn { display: inline-block; text-decoration: none; padding: 0.45rem 1rem; border-radius: 6px; font-size: 1.1rem; }
+.cypher-panel .btn.primary { background: var(--accent); color: var(--bg); font-weight: 700; }
+.cypher { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 0.7rem; font-size: 1rem; white-space: pre-wrap; word-break: break-word; margin-top: 0.5rem; }

@@ -96,6 +96,17 @@ def _falkordb_address() -> tuple[str, int]:
     return falkordb_address()
 
 
+def browser_url(cypher: str) -> str:
+    """FalkorDB Browser link with the graph and query pre-filled (Browser share parameters)."""
+    from urllib.parse import urlencode
+
+    from conferge.core.settings import env_value
+
+    base = (env_value("FALKORDB_BROWSER_URL", "http://localhost:3000") or "").rstrip("/")
+    graph = env_value("FALKORDB_GRAPH", "conferge") or "conferge"
+    return f"{base}/graph?" + urlencode({"graph": graph, "query": cypher, "view": "Graph"})
+
+
 def falkordb_reachable(timeout: float = 0.3) -> bool:
     host, port = _falkordb_address()
     try:

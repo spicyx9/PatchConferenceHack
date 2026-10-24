@@ -398,12 +398,14 @@ def create_app(
             from conferge.graph import queries as graph_queries
             from conferge.graph.explain import path_to_text
 
-            found = graph_queries.path_user_to_person(store, user, person)["paths"]
+            result = graph_queries.path_user_to_person(store, user, person)
+            found = result["paths"]
         except Exception:  # noqa: BLE001 - fall back to the sampled graph, visibly
             return None
         if not found:
             return None
         path, steps = found[0], []
+        signature = result["rows"][0].get("signature") if result["rows"] else None
         for i, node in enumerate(path["nodes"]):
             props = node["props"]
             steps.append({"node": {
@@ -421,7 +423,11 @@ def create_app(
                     "observed_at": e["props"].get("observed_at"),
                 }})
         modes = {s["node"]["source_mode"] for s in steps if "node" in s}
-        return {"steps": steps, "explanation": path_to_text(path),
+        cypher = graph_queries.literal_cypher(
+            dict(graph_queries.PATH_SIGNATURES).get(signature, ""),
+            {"user_id": user, "person_id": person, "cap": 1}) if signature else None
+        return {"steps": steps, "explanation": path_to_text(path), "signature": signature,
+                "cypher": cypher, "browser_url": providers.browser_url(cypher) if cypher else None,
                 "mode": modes.pop() if len(modes) == 1 else "mixed"}
 
     @api.get("/graph/path")
@@ -435,6 +441,8 @@ def create_app(
                 "edge_ids": [s["edge"]["id"] for s in steps if "edge" in s],
                 "hops": sum(1 for s in steps if "edge" in s),
                 "explanation": live["explanation"], "backend": "falkordb",
+                "signature": live["signature"], "cypher": live["cypher"],
+                "browser_url": live["browser_url"],
             }, extra_warnings=["path queried in FalkorDB; node source_mode taken from node properties"],
                 mode_override=live["mode"])
         g, mode, notes = _graph()

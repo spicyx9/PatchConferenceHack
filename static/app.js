@@ -599,6 +599,15 @@
     return '<div class="path">' + nodes.join('<span class="path-arrow">&rarr;</span>') + "</div>";
   }
 
+  function cypherPanel(res) {
+    var open = res.browser_url && safeUrl(res.browser_url)
+      ? '<a class="btn primary" target="_blank" rel="noopener" href="' + esc(safeUrl(res.browser_url)) + '">Show in FalkorDB Browser</a> '
+      : "";
+    return '<div class="cypher-panel">' + open +
+      '<button data-action="copy-cypher" class="small">Copier la requete</button>' +
+      '<pre id="story-cypher" class="cypher">' + esc(res.cypher) + "</pre></div>";
+  }
+
   function renderStoryGoal(plan) {
     $("story-goal").textContent = (plan && plan.goal_text) || "";
     $("story-goals").innerHTML = ((plan && plan.goals) || []).map(function (g) {
@@ -619,7 +628,9 @@
       return api("/graph/path?person=" + encodeURIComponent(c.person.id), null, "graph_path").then(function (res) {
         $("story-path-" + i).innerHTML = pathHtml(res.path) +
           (res.explanation ? '<div class="explain">' + esc(res.explanation) + "</div>" : "") +
-          '<div class="explain">source: ' + esc(res.backend || "graph") + " / " + esc(res.data_source) + "</div>";
+          '<div class="explain">source: ' + esc(res.backend || "graph") + " / " + esc(res.data_source) +
+          (res.signature ? " / signature: " + esc(res.signature) : "") + "</div>" +
+          (i === 0 && res.cypher ? cypherPanel(res) : "");
       }).catch(function () { $("story-path-" + i).textContent = "pas de chemin dans le graphe"; });
     }));
   }
@@ -788,6 +799,9 @@
       var note = window.prompt("Note sur la rencontre (optionnel):", "");
       if (note === null) return;
       withBusy(btn, function () { return mutate("/met", { person_id: id, note: note || null }); });
+    } else if (action === "copy-cypher") {
+      var text = $("story-cypher") ? $("story-cypher").textContent : "";
+      if (navigator.clipboard) navigator.clipboard.writeText(text).then(function () { btn.textContent = "Copie"; });
     } else if (action === "showpath" || action === "path") {
       if (action === "showpath") switchTab("graph");
       setTimeout(function () { highlightPath(id); }, action === "showpath" ? 300 : 0);
