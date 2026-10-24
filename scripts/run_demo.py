@@ -93,6 +93,18 @@ def linkedin_enrichment(args: argparse.Namespace, assembly: Any, goals: list[Any
           f"({len(res.written.works_at_corroborated) if res.written else 0} corroborated)")
 
 
+def port_preflight(host: str, port: int) -> str | None:
+    """None when the UI port can be bound, else a one-line reason (checked before collecting)."""
+    import socket
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        try:
+            s.bind((host, port))
+        except OSError:
+            return f"port {port} is already in use, run `make demo DEMO_PORT={port + 1}`"
+    return None
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--mode", choices=["fixture", "live"], default="fixture")
@@ -118,6 +130,9 @@ def main() -> int:
                         help="hosts of fixtures/people.json with a linkedin_url to enrich")
     args = parser.parse_args()
     os.environ["FALKORDB_GRAPH"] = args.graph  # the API reads the same graph it was loaded into
+    if problem := port_preflight(args.host, args.port):
+        print(f"make demo: {problem}", file=sys.stderr)
+        return 2
     if not args.no_graph and (problem := falkordb_preflight()):
         print(f"make demo: {problem}", file=sys.stderr)
         return 2
