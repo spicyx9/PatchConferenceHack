@@ -185,7 +185,7 @@
 
   // Renderers
 
-  var DEFAULT_GOALS_NOTE = "Aucun role reconnu dans le texte : objectifs par defaut.";
+  var DEFAULT_GOALS_NOTE = "No role recognised in the text: default goals.";
 
   function usesDefaultGoals(goals) {
     return goals.some(function (g) {
