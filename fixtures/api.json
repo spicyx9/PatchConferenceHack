@@ -6,7 +6,7 @@
     "note": "FIXTURE for the w12 demo API only. Every session, side event, person, company, hotel and flight below is FICTIONAL and labelled as such. Only the anchor conference (name, dates, city, venue, coordinates) comes from docs/knowledge/03-demo-scenario.md. Unknown prices, flight times and availability are null on purpose."
   },
   "conference": {
-    "id": "conf-github-universe-2026",
+    "id": "github-universe-2026",
     "name": "GitHub Universe 2026",
     "start_date": "2026-10-28",
     "end_date": "2026-10-29",
@@ -36,7 +36,7 @@
   "events": [
     {
       "id": "evt-fx-universe-day1-agents",
-      "conference_id": "conf-github-universe-2026",
+      "conference_id": "github-universe-2026",
       "title": "[FIXTURE] Fictional session: shipping AI agents with Copilot",
       "event_type": "session",
       "start_at": "2026-10-28T10:00:00-07:00",
@@ -52,7 +52,7 @@
     },
     {
       "id": "evt-fx-universe-day1-mcp",
-      "conference_id": "conf-github-universe-2026",
+      "conference_id": "github-universe-2026",
       "title": "[FIXTURE] Fictional session: MCP servers for developer tools",
       "event_type": "session",
       "start_at": "2026-10-28T14:00:00-07:00",
@@ -68,7 +68,7 @@
     },
     {
       "id": "evt-fx-universe-day2-copilot-pm",
-      "conference_id": "conf-github-universe-2026",
+      "conference_id": "github-universe-2026",
       "title": "[FIXTURE] Fictional session: the Copilot product roadmap, from the PM seat",
       "event_type": "session",
       "start_at": "2026-10-29T11:00:00-07:00",
@@ -84,7 +84,7 @@
     },
     {
       "id": "evt-fx-eve-devmeetup",
-      "conference_id": "conf-github-universe-2026",
+      "conference_id": "github-universe-2026",
       "title": "[FIXTURE] Fictional pre-conference developer meetup",
       "event_type": "meetup",
       "start_at": "2026-10-27T18:00:00-07:00",
@@ -100,7 +100,7 @@
     },
     {
       "id": "evt-fx-agents-founders-night",
-      "conference_id": "conf-github-universe-2026",
+      "conference_id": "github-universe-2026",
       "title": "[FIXTURE] Fictional AI agent founders evening",
       "event_type": "side_event",
       "start_at": "2026-10-28T18:30:00-07:00",
@@ -116,7 +116,7 @@
     },
     {
       "id": "evt-fx-devtools-happy-hour",
-      "conference_id": "conf-github-universe-2026",
+      "conference_id": "github-universe-2026",
       "title": "[FIXTURE] Fictional devtools happy hour",
       "event_type": "party",
       "start_at": "2026-10-28T19:00:00-07:00",
@@ -132,7 +132,7 @@
     },
     {
       "id": "evt-fx-seed-breakfast",
-      "conference_id": "conf-github-universe-2026",
+      "conference_id": "github-universe-2026",
       "title": "[FIXTURE] Fictional seed investors breakfast",
       "event_type": "meetup",
       "start_at": "2026-10-29T08:00:00-07:00",
@@ -148,7 +148,7 @@
     },
     {
       "id": "evt-fx-mcp-workshop",
-      "conference_id": "conf-github-universe-2026",
+      "conference_id": "github-universe-2026",
       "title": "[FIXTURE] Fictional MCP hands-on workshop",
       "event_type": "workshop",
       "start_at": "2026-10-29T17:30:00-07:00",

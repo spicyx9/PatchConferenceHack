@@ -220,11 +220,11 @@
         "provider": "conferge-demo-seed",
         "raw_ref": "docs/knowledge/03-demo-scenario.md",
         "source_mode": "fixture",
-        "source_record_id": "conf-github-universe-2026",
+        "source_record_id": "github-universe-2026",
         "source_url": null
       }
     ],
-    "id": "conf-github-universe-2026",
+    "id": "github-universe-2026",
     "latitude": 37.806,
     "longitude": -122.432,
     "name": "GitHub Universe 2026",
@@ -247,7 +247,7 @@
     "items": [
       {
         "capacity": null,
-        "conference_id": "conf-github-universe-2026",
+        "conference_id": "github-universe-2026",
         "conference_relation": "candidate",
         "currency": null,
         "description": "Synthetic side event for the offline demo.",
@@ -303,7 +303,7 @@
       },
       {
         "capacity": null,
-        "conference_id": "conf-github-universe-2026",
+        "conference_id": "github-universe-2026",
         "conference_relation": "official",
         "currency": null,
         "description": "Synthetic session for the offline demo; not from the official program.",
@@ -357,7 +357,7 @@
       },
       {
         "capacity": null,
-        "conference_id": "conf-github-universe-2026",
+        "conference_id": "github-universe-2026",
         "conference_relation": "official",
         "currency": null,
         "description": "Synthetic session for the offline demo; not from the official program.",
@@ -411,7 +411,7 @@
       },
       {
         "capacity": null,
-        "conference_id": "conf-github-universe-2026",
+        "conference_id": "github-universe-2026",
         "conference_relation": "candidate",
         "currency": null,
         "description": "Synthetic side event for the offline demo.",
@@ -468,7 +468,7 @@
       },
       {
         "capacity": null,
-        "conference_id": "conf-github-universe-2026",
+        "conference_id": "github-universe-2026",
         "conference_relation": "candidate",
         "currency": null,
         "description": "Synthetic side event for the offline demo.",
@@ -525,7 +525,7 @@
       },
       {
         "capacity": null,
-        "conference_id": "conf-github-universe-2026",
+        "conference_id": "github-universe-2026",
         "conference_relation": "candidate",
         "currency": null,
         "description": "Synthetic side event for the offline demo.",
@@ -580,7 +580,7 @@
       },
       {
         "capacity": null,
-        "conference_id": "conf-github-universe-2026",
+        "conference_id": "github-universe-2026",
         "conference_relation": "official",
         "currency": null,
         "description": "Synthetic session for the offline demo; not from the official program.",
@@ -634,7 +634,7 @@
       },
       {
         "capacity": null,
-        "conference_id": "conf-github-universe-2026",
+        "conference_id": "github-universe-2026",
         "conference_relation": "official",
         "currency": null,
         "description": "Synthetic session for the offline demo; not from the official program.",
@@ -687,7 +687,7 @@
       },
       {
         "capacity": null,
-        "conference_id": "conf-github-universe-2026",
+        "conference_id": "github-universe-2026",
         "conference_relation": "candidate",
         "currency": null,
         "description": "Synthetic side event for the offline demo.",
@@ -743,7 +743,7 @@
       },
       {
         "capacity": null,
-        "conference_id": "conf-github-universe-2026",
+        "conference_id": "github-universe-2026",
         "conference_relation": "candidate",
         "currency": null,
         "description": "Synthetic side event for the offline demo.",
@@ -823,7 +823,7 @@
       "label": "fixture: simulated cancellation for the live-replanning demo",
       "type": "cancelled"
     },
-    "conference_id": "conf-github-universe-2026",
+    "conference_id": "github-universe-2026",
     "diff": {
       "added": [
         "evt-side-devtools-dinner"

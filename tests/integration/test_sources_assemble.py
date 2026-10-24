@@ -70,7 +70,7 @@ def test_assemble_uses_official_conference_and_labels_missing_domains(no_network
     assert domains["stays"].source_mode == "fixture"
     assert any("w05" in w for w in domains["stays"].warnings)
     assert any("w06" in w for w in domains["flights"].warnings)
-    assert any("conference id mismatch" in w for w in assembly.warnings)
+    assert not any("conference id mismatch" in w for w in assembly.warnings)
     # Official sessions share the catalog URL: that URL must not collapse them.
     official = next(s for s in fixture_slices(["official"]))
     assert len([e for e in assembly.events if e.id in {x.id for x in official.events}]) == len(

@@ -40,7 +40,7 @@ PROVIDER = "conferge-demo-seed"
 BASE_URL = "https://demo.conferge.invalid"
 SEED = 42  # recorded for traceability; the builder itself is randomness-free
 FIXTURE_NOTE = "fixture-demo: synthetic record, not collected from any provider"
-CONFERENCE_ID = "conf-github-universe-2026"
+CONFERENCE_ID = "github-universe-2026"
 
 
 def _evidence(kind: str, record_id: str, confidence: float = 1.0) -> list[SourceEvidence]:

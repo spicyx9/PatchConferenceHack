@@ -7,7 +7,7 @@
     "note": "Synthetic planning fixture. Only the anchor conference name, dates, city and Fort Mason coordinates come from docs/knowledge/03-demo-scenario.md. Every event, time, venue other than Fort Mason, person, price and registration link below is fictional and labelled [Fixture]. Registration links point to example.com on purpose."
   },
   "conference": {
-    "id": "conf-github-universe-2026",
+    "id": "github-universe-2026",
     "name": "GitHub Universe 2026",
     "start_date": "2026-10-28",
     "end_date": "2026-10-29",

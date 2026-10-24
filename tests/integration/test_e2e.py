@@ -86,7 +86,7 @@ def test_report_markdown_lists_labels_and_mismatches(fixture_report: pipeline.E2
     md = render_markdown(fixture_report)
     assert "E2E verdict: **PASS**" in md
     assert "## Interface mismatches for window 00" in md
-    assert "conference id mismatch" in md
+    assert "conference id mismatch" not in md
     assert "| official | w03 | fixture | fixture |" in md
     assert "luma:host:" not in md  # organizer ids are aggregated, not dumped
 
