@@ -1,6 +1,6 @@
 services:
   falkordb:
-    image: falkordb/falkordb:latest
+    image: falkordb/falkordb:6.0.3
     restart: unless-stopped
     ports:
       - "127.0.0.1:${FALKORDB_PORT:-6379}:6379"
