@@ -295,6 +295,21 @@ def test_corroboration_is_idempotent_and_never_lowers_identity() -> None:
     assert props["snapshot_id"] is None  # the first version's edge key is removed
 
 
+@pytest.mark.parametrize(("edge", "expected"), [
+    # demo reload: ingest wrote evidence_count=1 back, evidence_sources kept LinkedIn
+    ({**ORIGINAL, "evidence_sources": [ORIGINAL["source"], "brightdata:linkedin"]}, 2),
+    # edge created by LinkedIn without a count (first version)
+    ({"source": "brightdata:linkedin", "verification": "linkedin_profile",
+      "evidence_sources": ["brightdata:linkedin"]}, 1),
+])
+def test_evidence_count_never_below_the_number_of_sources(edge: dict, expected: int) -> None:
+    enrichments, _ = li.match(PEOPLE, COMPANIES,
+                              _profiles([_record("avery", "Avery Sample", "AgentWorks")]))
+    props = li._corroboration(edge, enrichments[0])
+    assert props["evidence_count"] == expected
+    assert "verification" not in props and "source" not in props
+
+
 def test_in_memory_people_only_change_identity_confidence() -> None:
     enrichments, _ = li.match(PEOPLE, COMPANIES,
                               _profiles([_record("avery", "Avery Sample", "AgentWorks")]))
