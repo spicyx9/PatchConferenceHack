@@ -185,16 +185,25 @@
 
   // Renderers
 
+  var DEFAULT_GOALS_NOTE = "No role recognised in the text: default goals.";
+
+  function usesDefaultGoals(goals) {
+    return goals.some(function (g) {
+      return (g.tags || []).some(function (t) { return t.indexOf("default:") === 0; });
+    });
+  }
+
   function renderGoals(plan) {
     var goals = (plan && plan.goals) || [];
-    $("goals-list").innerHTML = goals.length ? goals.map(function (g) {
+    $("goals-list").innerHTML = (usesDefaultGoals(goals) ? '<p class="muted">' + DEFAULT_GOALS_NOTE + "</p>" : "") +
+      (goals.length ? goals.map(function (g) {
       var w = typeof g.priority === "number" ? g.priority : null;
       var pct = w === null ? 0 : Math.round(w * 100);
       return '<div class="goal"><span class="weight">' + esc(w === null ? "unknown" : w.toFixed(2)) +
         '</span><span class="bar"><span style="width:' + pct + '%"></span></span><span>' +
         esc(g.description) + ' <span class="muted small-text">' + esc((g.target_roles || []).join(", ")) +
         "</span></span></div>";
-    }).join("") : '<p class="muted">No goal recognized.</p>';
+    }).join("") : '<p class="muted">No goal recognized.</p>');
     $("computed-by").textContent = plan ? "Computed by: " + orUnknown(plan.computed_by) +
       (plan.scenario_id ? " | active scenario: " + plan.scenario_id : "") : "";
   }
@@ -684,9 +693,11 @@
 
   function renderStoryGoal(plan) {
     $("story-goal").textContent = (plan && plan.goal_text) || "";
-    $("story-goals").innerHTML = ((plan && plan.goals) || []).map(function (g) {
-      return '<span class="chip">' + esc(g.description || g.id) + (g.priority ? " (" + esc(g.priority) + ")" : "") + "</span>";
-    }).join("");
+    var storyGoals = (plan && plan.goals) || [];
+    $("story-goals").innerHTML = (usesDefaultGoals(storyGoals) ? '<p class="muted">' + DEFAULT_GOALS_NOTE + "</p>" : "") +
+      storyGoals.map(function (g) {
+        return '<span class="chip">' + esc(g.description || g.id) + (g.priority ? " (" + esc(g.priority) + ")" : "") + "</span>";
+      }).join("");
   }
 
   function renderStoryOpps(people) {

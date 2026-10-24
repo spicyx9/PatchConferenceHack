@@ -108,7 +108,7 @@ async def test_graph_hint_adds_bonus_and_fact(monkeypatch: pytest.MonkeyPatch) -
     base_eve = next(o for o in baseline.opportunities if o.person_ids == ["fx-p-pm-eve"])
 
     def for_goal(target: Any, user_id: str, goal_id: str, limit: int) -> dict[str, Any]:
-        if goal_id != "goal-pm":
+        if goal_id != "goal-copilot-pms":
             return {"rows": [], "paths": []}
         return {"rows": [{"person_id": "fx-p-pm-eve", "shortest_hops": 2,
                           "reasons": ["speaks on copilot"]}], "paths": []}

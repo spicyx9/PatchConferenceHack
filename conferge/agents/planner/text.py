@@ -19,6 +19,10 @@ ROLE_ALIASES: dict[str, str] = {
     "developers": "engineer", "staff engineer": "engineer",
     "devrel": "devrel", "developer advocate": "devrel",
     "executive": "executive", "vp": "executive", "cto": "executive",
+    "recruiter": "recruiter", "recruiters": "recruiter", "talent partner": "recruiter",
+    "designer": "designer", "designers": "designer", "product designer": "designer",
+    "data scientist": "data", "data engineer": "data", "ml engineer": "data",
+    "security engineer": "security", "security researcher": "security",
 }
 
 

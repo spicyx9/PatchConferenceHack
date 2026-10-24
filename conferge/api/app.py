@@ -278,8 +278,8 @@ def create_app(
 
     def _plan_warnings() -> list[str]:
         if state.rank_mode == "graph":
-            return list(state.rank_warnings)
-        base = [*state.rank_warnings, *state.agent_warnings]
+            return [*state.rank_warnings, *logic.goal_warnings(state.goals)]
+        base = [*state.rank_warnings, *state.agent_warnings, *logic.goal_warnings(state.goals)]
         if state.agent_mode is None:
             base.append("planner agent not available: deterministic api-fallback ranking")
         return base
@@ -288,9 +288,7 @@ def create_app(
     async def goal(req: GoalRequest) -> dict[str, Any]:
         if req.conference_id and req.conference_id != state.data.conference.id:
             raise HTTPException(404, f"unknown conference_id {req.conference_id!r}")
-        goals = logic.parse_goals(req.text)
-        if not goals:
-            raise HTTPException(422, "no goal recognised; mention investors, founders, PMs or engineers")
+        goals = logic.parse_goals(req.text)  # never empty: unknown role -> tagged defaults + warning
         state.goal_text, state.goals = req.text, goals
         state.agent_mode, state.agent_opportunities, state.agent_warnings = None, None, []
         state.invalidate()
