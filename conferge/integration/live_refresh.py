@@ -4,8 +4,11 @@
    fetch and parser): offers live, collected_at = now; the shown flight becomes the cheapest
    live round trip.
 2. SERP (brd_json=1) ``site:linkedin.com/in "<speaker>" <company>`` for a top-5 speaker.
-Each call: 20 s, one attempt (client retries=0), no dataset. A failed call is reported with
-its reason and changes nothing: the cache stays on screen.
+One attempt each (client retries=0), no dataset: Web Unlocker 45 s (past it: "Bright Data
+slow, cache kept"), SERP 20 s. The raw SERP answer is kept in data/probes/refresh_serp_<ts>.json
+(gitignored) and read with Bright Data's real keys (organic[].link/title/description/rank);
+a profile URL already in data/cache/linkedin_public.json is reported as confirmed. A failed
+call is reported with its reason and changes nothing: the cache stays on screen.
 """
 
 from __future__ import annotations
@@ -15,6 +18,7 @@ import json
 import time
 from collections.abc import Callable
 from datetime import date, datetime, timezone
+from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
@@ -36,7 +40,12 @@ from conferge.flights.unlocker_provider import (
 from conferge.integration.pipeline_view import row
 from conferge.integration.stays_flights import pick_flights
 
-TIMEOUT = 20.0
+TIMEOUT = 20.0  # SERP
+UNLOCKER_TIMEOUT = 45.0  # Google Flights page through the Web Unlocker
+SLOW = "Bright Data slow, cache kept"
+ROOT = Path(__file__).resolve().parents[2]
+PROBE_DIR = ROOT / "data" / "probes"
+LINKEDIN_CACHE = ROOT / "data" / "cache" / "linkedin_public.json"
 DEPART, RETURN = date(2026, 10, 27), date(2026, 10, 30)
 LOCAL = ZoneInfo("America/Los_Angeles")
 
@@ -47,7 +56,8 @@ def make_client(http: httpx.AsyncClient | None = None) -> BrightDataClient:
         env_value("BRIGHTDATA_API_KEY") or None,
         serp_zone=env_value("BRIGHTDATA_SERP_ZONE") or None,
         unlocker_zone=env_value("BRIGHTDATA_UNLOCKER_ZONE") or None,
-        client=http or httpx.AsyncClient(base_url="https://api.brightdata.com", timeout=TIMEOUT),
+        client=http or httpx.AsyncClient(base_url="https://api.brightdata.com",
+                                         timeout=UNLOCKER_TIMEOUT + 5),
         retries=0)
 
 
@@ -62,40 +72,72 @@ def _hhmm(at: datetime | None) -> str:
 
 async def _flights(client: BrightDataClient, now: Callable[[], datetime]) -> list[FlightOffer]:
     url = google_flights_url(DEPART, RETURN)
-    html = await asyncio.wait_for(client.unlock(url), TIMEOUT)
+    html = await asyncio.wait_for(client.unlock(url), UNLOCKER_TIMEOUT)
     offers, _ = offers_from_rows(parse_google_flights(html, url), url, now(), client.unlocker_zone)
     return offers
 
 
-def linkedin_links(text: str) -> list[str]:
-    """linkedin.com/in/ URLs from brd_json organic results, or from the HTML page when the
-    SERP zone answered raw HTML (same fallback as people.crunchbase.parse_serp)."""
-    from conferge.people.crunchbase import _HREF_RE, _SCRIPT_RE, _unwrap_google
-
-    links: list[str] = []
+def serp_organic(text: str) -> list[dict[str, Any]]:
+    """Organic results with Bright Data's real keys (PR #34): link, title, description, rank."""
     try:
         data = json.loads(text)
     except json.JSONDecodeError:
-        data = None
-    if isinstance(data, dict):
-        links = [i.get("link") or i.get("url") for i in (data.get("organic") or [])
-                 if isinstance(i, dict)]
-    else:
+        return []
+    items = data.get("organic") if isinstance(data, dict) else None
+    return [{"link": i.get("link"), "title": i.get("title"), "description": i.get("description"),
+             "rank": i.get("rank")} for i in items or [] if isinstance(i, dict)]
+
+
+def _norm_profile(url: str | None) -> str | None:
+    """https://fr.linkedin.com/in/RyanAHecht/?x=1 -> linkedin.com/in/ryanahecht"""
+    if not isinstance(url, str) or "linkedin.com/in/" not in url:
+        return None
+    slug = url.split("linkedin.com/in/", 1)[1].split("?")[0].split("#")[0].strip("/")
+    return f"linkedin.com/in/{slug.lower()}" if slug else None
+
+
+def linkedin_links(text: str) -> list[str]:
+    """linkedin.com/in/ URLs from the organic results (HTML answer as fallback)."""
+    from conferge.people.crunchbase import _HREF_RE, _SCRIPT_RE, _unwrap_google
+
+    links = [r["link"] for r in serp_organic(text)]
+    if not links and not text.lstrip().startswith("{"):
         links = [_unwrap_google(h) for h in _HREF_RE.findall(_SCRIPT_RE.sub(" ", text))]
     out: list[str] = []
     for link in links:
-        if isinstance(link, str) and "linkedin.com/in/" in link:
-            clean = link.split("?")[0].rstrip("/")
-            if clean not in out:
-                out.append(clean)
+        if _norm_profile(link) and link.split("?")[0].rstrip("/") not in out:
+            out.append(link.split("?")[0].rstrip("/"))
     return out
 
 
-async def _linkedin(client: BrightDataClient, name: str, company: str | None) -> list[str]:
+def cached_profiles(path: Path = LINKEDIN_CACHE) -> dict[str, str]:
+    """name (casefolded) -> cached LinkedIn URL, from the public LinkedIn cache."""
+    try:
+        rows = json.loads(path.read_text(encoding="utf-8")).get("profiles") or []
+    except (OSError, ValueError, AttributeError):
+        return {}
+    return {r["name"].casefold(): r["linkedin_url"] for r in rows
+            if isinstance(r, dict) and r.get("name") and r.get("linkedin_url")}
+
+
+def _save_serp(query: str, text: str, at: datetime, directory: Path) -> Path:
+    directory.mkdir(parents=True, exist_ok=True)
+    path = directory / f"refresh_serp_{at.strftime('%Y%m%dT%H%M%SZ')}.json"
+    path.write_text(json.dumps({"query": query, "collected_at": at.isoformat(),
+                                "organic": serp_organic(text), "raw": text}, indent=1),
+                    encoding="utf-8")
+    return path
+
+
+async def _linkedin(client: BrightDataClient, name: str, company: str | None, *,
+                    now: Callable[[], datetime], probe_dir: Path) -> dict[str, Any]:
     from conferge.people.crunchbase import serp_json
 
     query = f'site:linkedin.com/in "{name}" {company or ""}'.strip()
-    return linkedin_links(await asyncio.wait_for(serp_json(client, query), TIMEOUT))
+    text = await asyncio.wait_for(serp_json(client, query), TIMEOUT)
+    saved = _save_serp(query, text, now(), probe_dir)
+    return {"links": linkedin_links(text), "organic": len(serp_organic(text)),
+            "json": text.lstrip().startswith("{"), "saved": saved.name}
 
 
 def _report(provider: str, started: datetime, now: datetime, *, ok: bool, records: int,
@@ -108,7 +150,9 @@ def _report(provider: str, started: datetime, now: datetime, *, ok: bool, record
 
 async def refresh(data: DemoData, speaker: tuple[str, str | None] | None, *,
                   client: BrightDataClient | None = None,
-                  now: Callable[[], datetime] = lambda: datetime.now(timezone.utc)) -> dict[str, Any]:
+                  now: Callable[[], datetime] = lambda: datetime.now(timezone.utc),
+                  probe_dir: Path = PROBE_DIR, linkedin_cache: Path = LINKEDIN_CACHE,
+                  ) -> dict[str, Any]:
     """Run both calls, update ``data`` only with what succeeded, return the panel result."""
     own = client is None
     client = client or make_client()
@@ -116,7 +160,7 @@ async def refresh(data: DemoData, speaker: tuple[str, str | None] | None, *,
     cached = _cheapest(list(data.flights))
     calls: list[Any] = [_flights(client, now)]
     if speaker:
-        calls.append(_linkedin(client, *speaker))
+        calls.append(_linkedin(client, *speaker, now=now, probe_dir=probe_dir))
     try:
         results = await asyncio.gather(*calls, return_exceptions=True)
     finally:
@@ -125,10 +169,16 @@ async def refresh(data: DemoData, speaker: tuple[str, str | None] | None, *,
     seconds = round(time.perf_counter() - t0, 1)
     lines: list[str] = []
     errors: list[str] = []
+    slow: list[str] = []
     records = 0
 
     flights = results[0]
-    if isinstance(flights, BaseException) or not flights:
+    if isinstance(flights, (asyncio.TimeoutError, TimeoutError)) or (
+            isinstance(flights, Exception) and str(flights).endswith(": timeout")):
+        slow.append(f"{SLOW} (Web Unlocker over {UNLOCKER_TIMEOUT:.0f} s)")
+        data.pipeline.append(row("flights", _report(UNLOCKER_FLIGHTS, started, now(), ok=False,
+                                                    records=0, error=SLOW, warnings=[])))
+    elif isinstance(flights, BaseException) or not flights:
         reason = (f"{type(flights).__name__}: {flights}"[:200] if isinstance(flights, BaseException)
                   else "no itinerary parsed from the page")
         errors.append(f"Flights via Web Unlocker failed: {reason}; cached flights kept")
@@ -162,17 +212,28 @@ async def refresh(data: DemoData, speaker: tuple[str, str | None] | None, *,
                                                        ok=False, records=0, error=reason,
                                                        warnings=[])))
         else:
-            records += len(found)
-            lines.append(f"LinkedIn: {speaker[0]} → " + (found[0] if found else "no profile in SERP"))
-            data.pipeline.append(row("people", _report("brightdata_serp", started, now(), ok=True,
-                                                       records=len(found), error=None,
-                                                       warnings=["refresh button"])))
-    return {"ok": not errors, "requests": len(calls), "records": records, "seconds": seconds,
-            "lines": lines, "errors": errors,
+            links = found["links"]
+            records += len(links)
+            known = _norm_profile(cached_profiles(linkedin_cache).get(speaker[0].casefold()))
+            if known and known in {_norm_profile(u) for u in links}:
+                lines.append("LinkedIn: 1 profile confirmed (cached)")
+            elif links:
+                lines.append(f"LinkedIn: {speaker[0]} → {links[0]}"
+                             + (" (differs from the cached URL)" if known else ""))
+            else:
+                lines.append(f"LinkedIn: {speaker[0]} → no profile in SERP "
+                             f"({found['organic']} organic results"
+                             f"{'' if found['json'] else ', answer not JSON'})")
+            data.pipeline.append(row("people", _report(
+                "brightdata_serp", started, now(), ok=True, records=len(links), error=None,
+                warnings=["refresh button", f"raw answer kept in data/probes/{found['saved']}"])))
+    return {"ok": not errors and not slow, "requests": len(calls), "records": records,
+            "seconds": seconds, "lines": lines, "errors": errors, "slow": slow,
             "cached_price": str(trip_price(cached)) if cached and trip_price(cached) else None,
             "live_price": (str(trip_price(_cheapest(results[0])))
                            if not isinstance(results[0], BaseException) and results[0]
                            and _cheapest(results[0]) else None)}
 
 
-__all__ = ["TIMEOUT", "linkedin_links", "make_client", "refresh"]
+__all__ = ["TIMEOUT", "UNLOCKER_TIMEOUT", "cached_profiles", "linkedin_links", "make_client",
+           "refresh", "serp_organic"]

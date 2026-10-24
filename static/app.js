@@ -3590,15 +3590,24 @@
     $("pipeline-refresh-result").innerHTML =
       '<div class="refresh-head">' + head + "</div>" +
       (r.lines || []).map(function (l) { return '<div class="refresh-line">' + esc(l) + "</div>"; }).join("") +
+      (r.slow || []).map(function (e) { return '<div class="refresh-slow">' + esc(e) + "</div>"; }).join("") +
       (r.errors || []).map(function (e) { return '<div class="refresh-error">' + esc(e) + "</div>"; }).join("");
   }
 
   function bdRefresh() {
     var btn = $("btn-bd-refresh");
     btn.disabled = true;
-    $("pipeline-refresh-result").innerHTML = '<div class="muted">Calling Bright Data...</div>';
+    var started = Date.now();
+    function tick() {
+      var s = Math.floor((Date.now() - started) / 1000);
+      $("pipeline-refresh-result").innerHTML = '<div class="muted">Calling Bright Data... ' + s + " s</div>";
+      btn.textContent = "Refreshing... " + s + " s";
+    }
+    tick();
+    var timer = setInterval(tick, 1000);
     api("/pipeline/refresh", { method: "POST" }, null)
       .then(function (res) {
+        clearInterval(timer);
         renderRefresh(res);
         return Promise.all([api("/pipeline", null, null).then(renderPipeline),
           api("/brightdata", null, null).then(renderBrightData),
@@ -3608,7 +3617,11 @@
         $("pipeline-refresh-result").innerHTML = '<div class="refresh-error">Refresh failed: ' +
           esc(err && err.message ? err.message : String(err)) + "; cached data kept</div>";
       })
-      .then(function () { btn.disabled = false; });
+      .then(function () {
+        clearInterval(timer);
+        btn.disabled = false;
+        btn.textContent = "Refresh via Bright Data";
+      });
   }
 
   function renderPipeline(res) {

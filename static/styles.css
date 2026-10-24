@@ -3404,3 +3404,4 @@ dialog .eyebrow {
 .pipeline-refresh { margin: 0.6rem 0; }
 .pipeline-refresh .refresh-head { font-weight: 600; margin-top: 0.4rem; }
 .pipeline-refresh .refresh-error { color: #fff; background: var(--red); padding: 0.3rem 0.5rem; margin-top: 0.3rem; border-radius: 4px; }
+.pipeline-refresh .refresh-slow { color: #3b2a00; background: #f0b429; padding: 0.3rem 0.5rem; margin-top: 0.3rem; border-radius: 4px; }

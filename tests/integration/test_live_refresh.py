@@ -35,7 +35,7 @@ def _client(handler):
     return client
 
 
-def test_refresh_success_two_requests_live_flights_and_linkedin() -> None:
+def test_refresh_success_two_requests_live_flights_and_linkedin(tmp_path: Path) -> None:
     calls: list[str] = []
 
     def handler(request: httpx.Request) -> httpx.Response:
@@ -49,7 +49,7 @@ def test_refresh_success_two_requests_live_flights_and_linkedin() -> None:
     demo = _demo()
     assert demo.domains["flights"].source_mode == "cached"
     result = asyncio.run(refresh(demo, ("Jane Doe", "Acme"), client=_client(handler),
-                                 now=lambda: NOW))
+                                 now=lambda: NOW, probe_dir=tmp_path))
     assert result["ok"] and result["requests"] == 2 and sorted(calls) == ["serp_api1", "web_unlocker1"]
     assert result["records"] == 3  # 2 itineraries + 1 LinkedIn profile
     assert result["lines"][0] == "Flights: cheapest round trip 413 USD cached at 11:18 → unchanged"
@@ -59,10 +59,10 @@ def test_refresh_success_two_requests_live_flights_and_linkedin() -> None:
     assert demo.flights[0].collected_at == NOW
 
 
-def test_refresh_failure_red_reason_and_cache_kept() -> None:
+def test_refresh_failure_red_reason_and_cache_kept(tmp_path: Path) -> None:
     demo = _demo()
     before_flights, before_domain = list(demo.flights), demo.domains["flights"]
-    result = asyncio.run(refresh(demo, ("Jane Doe", "Acme"), now=lambda: NOW,
+    result = asyncio.run(refresh(demo, ("Jane Doe", "Acme"), now=lambda: NOW, probe_dir=tmp_path,
                                  client=_client(lambda r: httpx.Response(403, text="denied"))))
     assert not result["ok"] and result["lines"] == [] and result["records"] == 0
     assert result["errors"][0].startswith("Flights via Web Unlocker failed: BrightDataError")
@@ -84,3 +84,42 @@ def test_endpoint_without_key_reports_and_changes_nothing(monkeypatch: pytest.Mo
     js = client.get("/static/app.js").text
     assert 'api("/pipeline/refresh", { method: "POST" }' in js and "refresh-error" in js
     assert 'id="btn-bd-refresh"' in client.get("/").text
+
+
+def test_cached_profile_is_confirmed_and_the_raw_serp_is_kept(tmp_path: Path) -> None:
+    serp = {"organic": [{"link": "https://fr.linkedin.com/in/RyanAHecht/", "title": "Ryan Hecht - GitHub",
+                         "description": "Product at GitHub", "rank": 1}]}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if json.loads(request.content)["zone"] == "web_unlocker1":
+            return httpx.Response(200, text=SAMPLE)
+        return httpx.Response(200, json=serp)
+
+    result = asyncio.run(refresh(_demo(), ("Ryan Hecht", "GitHub"), client=_client(handler),
+                                 now=lambda: NOW, probe_dir=tmp_path))
+    assert "LinkedIn: 1 profile confirmed (cached)" in result["lines"]
+    saved = json.loads(next(tmp_path.glob("refresh_serp_*.json")).read_text())
+    assert saved["organic"][0] == {"link": "https://fr.linkedin.com/in/RyanAHecht/",
+                                   "title": "Ryan Hecht - GitHub",
+                                   "description": "Product at GitHub", "rank": 1}
+    assert saved["query"] == 'site:linkedin.com/in "Ryan Hecht" GitHub'
+
+
+def test_slow_unlocker_is_amber_cache_kept(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from conferge.integration import live_refresh
+
+    monkeypatch.setattr(live_refresh, "UNLOCKER_TIMEOUT", 0.05)
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        if json.loads(request.content)["zone"] == "web_unlocker1":
+            await asyncio.sleep(0.5)
+            return httpx.Response(200, text=SAMPLE)
+        return httpx.Response(200, json={"organic": []})
+
+    demo = _demo()
+    before = list(demo.flights)
+    result = asyncio.run(refresh(demo, ("Jane Doe", "Acme"), client=_client(handler),
+                                 now=lambda: NOW, probe_dir=tmp_path))
+    assert result["slow"] and result["slow"][0].startswith("Bright Data slow, cache kept")
+    assert result["errors"] == [] and result["ok"] is False and demo.flights == before
+    assert "no profile in SERP (0 organic results)" in result["lines"][-1]
