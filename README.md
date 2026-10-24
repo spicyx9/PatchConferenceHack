@@ -154,13 +154,25 @@ No `.env` is needed for the demo. Ports:
 - If 6379 is already taken by a local Redis, run `FALKORDB_PORT=6380 make up` and `FALKORDB_PORT=6380 make demo` (or put `FALKORDB_PORT=6380` in `.env`). When `make demo` finds a Redis without the FalkorDB module, it stops with "port 6379 is a plain Redis, set FALKORDB_PORT to the FalkorDB port".
 - If 8000 is taken, run `make demo DEMO_PORT=8001`. `make demo` checks this before loading anything.
 
-By default `make demo` makes no Bright Data call at startup: travel comes from labelled fixtures and LinkedIn from cached probe files. `make demo DEMO_ARGS="--travel live"` adds the live stays and flights searches. With a key, these took 2 to 3 min on 2026-10-24, because each Bright Data source is capped at 120 s.
+Before going on stage, run `FALKORDB_PORT=6380 make predemo`: it starts the demo on a reset graph and checks it against `STATUS.md`.
+
+By default `make demo` reads the dated Bright Data cache in `data/cache/` (records collected on 2026-10-24, labelled `cached` with their `collected_at`) and makes no Bright Data call at startup.
+
+| Bright Data product | In the demo cache |
+|---|---|
+| Booking and Airbnb datasets | 21 stays |
+| Web Unlocker (Google Flights) | 34 itineraries from one page |
+| LinkedIn dataset (+ SERP for URLs) | 17 profiles |
+| Crunchbase dataset (+ SERP for URLs) | 2/10 companies |
+| Google Maps dataset | 4/9 venues |
+
+`make demo` without the cache falls back to labelled fixtures. `make demo DEMO_ARGS="--travel live"` adds the live stays and flights searches. With a key, these took 2 to 3 min on 2026-10-24, because each Bright Data source is capped at 120 s.
 
 `uv run python scripts/run_demo.py --mode live` collects from the public sources instead of the snapshot. Copy `.env.example` to `.env` and set `BRIGHTDATA_API_KEY` (plus `BRIGHTDATA_UNLOCKER_ZONE` and `BRIGHTDATA_SERP_ZONE`) to enable the Bright Data connectors.
 
 ## Tracks
 
-- **FalkorDB**: the graph of record, written only through `GraphStore` MERGE methods, queried for explainable goal to person paths, conflicts, replanning impact and meeting memory.
+- **FalkorDB**: the graph of record, written only through `GraphStore` MERGE methods, queried for the ranking, explainable goal to person paths and meeting memory; the Python planner builds the plan, the conflicts and the replanning diff.
 - **Bright Data**: one client (`conferge/core/brightdata.py`) behind every connector; without a key they report `missing_credentials` instead of inventing data. Records received on 2026-10-24: Booking and Airbnb datasets (21 stays), Web Unlocker (34 Google Flights itineraries from one page), LinkedIn dataset (15 profiles, 6 of them found by SERP), Crunchbase and Google Maps datasets. Implemented, no record received yet: Google Flights dataset (snapshots still `running` after 396 s), Google Hotels dataset (0 records, provider `no_peers` at 18:12 UTC), SERP event discovery, Facebook Events.
 - **Qodo**: installed on the repository as the GitHub app `qodo-code-review[bot]`; it posted a PR summary on pull requests 6 and 7 and its full review on pull request 6 failed on Qodo's side. No Qodo finding has been acted on yet.
 
@@ -172,7 +184,7 @@ Checked against the code on main (2026-10-24) and the wiring audit of 2026-10-24
 - **The demo runs on a snapshot** of that public collection captured on 2026-10-24, labelled `fixture` in every API response and in the UI badge, so it works offline on stage.
 - **Collected through Bright Data on 2026-10-24 and served from `data/cache/`** (labelled `cached`, with the collection time on every card): 21 stays (Booking and Airbnb datasets), 34 Google Flights itineraries (Web Unlocker, one page, the round-trip total shown on the page, return slice not collected), 15 LinkedIn profiles, Crunchbase funding rows.
 - **Implemented, no record received yet**: Google Flights dataset, Google Hotels dataset, SERP event discovery, Facebook Events. Without `BRIGHTDATA_API_KEY` the client reports "Bright Data key missing", `GET /brightdata` answers `data_source: unknown` with a warning, lodging providers report `missing_credentials`, and flights and stays fall back to fixtures labelled as such.
-- **The traveller profile is a fixture even in live mode**: New York, October 27 to 30, budget $2,500 come from `fixtures/api.json`; the budget block carries `source_mode: fixture` in `GET /travel` and a FIXTURE badge in the UI.
+- **The traveller profile is a fixture even in live mode**: New York, October 27 to 30 and the budget come from `fixtures/api.json`; the budget block carries `source_mode: fixture` in `GET /travel` and a FIXTURE badge in the UI.
 - **People are the speakers of the official catalog**: LinkedIn profiles and Crunchbase funding are read from the Bright Data cache at startup, never fetched at query time.
 - **Ground travel is not in the demo**: BART, OSRM and walking connectors exist with a probe (`make probe-travel`) but the demo API does not call them; the map draws straight lines in visit order and says so.
 - **A travel proposal books nothing**: the button is "Note" and the API returns `books: false`.
@@ -181,19 +193,28 @@ Checked against the code on main (2026-10-24) and the wiring audit of 2026-10-24
 
 ## Measured numbers
 
-| Measure | Value (measured 2026-10-24 14:13 PDT) | Read from |
+Measured on c6c4d7d at 15:18 PDT, same values as `STATUS.md`.
+
+Every value below was read by command on this checkout after `make predemo` (fresh demo on a reset graph).
+
+| Measure | Value | Read from |
 |---|---|---|
-| FalkorDB graph | 684 nodes, 2,214 edges: Person 215, Event 194, Company 141, Venue 58, Topic 54, Opportunity 10, Lodging 6, Goal 3, Conference 1, FlightOffer 1, User 1 | `count()` queries on `conferge_demo` after `make predemo` (`GET /api/v1/graph` serves a capped sample: 332 nodes, 400 edges) |
-| Events in the demo | 194: RainFocus official catalog 161, Luma 12, Eventbrite 8, conferenceparties/github26 7, Partiful 6 (partial: Partiful not exhausted, `page_cap`) | `GET /api/v1/events`, `GET /api/v1/pipeline` |
-| Stays | 21 Bright Data dataset records (Booking 15, Airbnb 6), 6 shown; Google Hotels dataset 0 (`no_peers`) | `GET /api/v1/pipeline`, `GET /api/v1/stays` (`cached`) |
-| Flights | 34 Google Flights itineraries from 1 Bright Data Web Unlocker request, 1 shown | `GET /api/v1/pipeline`, `GET /api/v1/flights` (`cached`) |
-| Bright Data requests and records | 38 requests, 79 records. Datasets 10 / 38 (Booking 1 / 15, Airbnb 1 / 6, Google Hotels 1 / 0, LinkedIn 6 / 15, Crunchbase 1 / 2); Web Unlocker 1 / 34 (Google Flights); SERP 27 / 7 (LinkedIn URL search 17 / 5, Crunchbase URL search 10 / 2). No USD cost shown: no captured Bright Data response carried one. 0 requests made by the running demo (all from cache); Google Maps not merged | `GET /api/v1/brightdata`, `GET /api/v1/cost` |
-| LinkedIn | 10 of the 50 people cards carry a Bright Data LinkedIn profile (9 in the first 10); 15 `Person` nodes with `provider brightdata:linkedin` in the graph, 6 of their URLs found by SERP | `GET /api/v1/people?limit=50`, FalkorDB |
-| Crunchbase | funding on 27 of the 50 people cards, from 2 companies (GitHub, Swamp Club); read from the cache by the API, not written to the graph | `GET /api/v1/people?limit=50` |
-| People and plan | 50 people ranked from FalkorDB traversals; top 3 Ryan Hecht 56, Camila Maia 47, Nick Liffen 40; 32 items on the agenda | `GET /api/v1/people`, `GET /api/v1/plan` |
-| Reachability (block matrix run 2026-10-24 19:01 UTC, 21 sites) | 10 without Bright Data, 12 with Web Unlocker alone, 14 with Bright Data; 18 projected once KYC is approved (Kayak, Hotels.com, Expedia, Marriott) | `GET /api/v1/pipeline` `reachability` |
-| Tests | `make check`: 1,355 passed, 27 skipped (main `b12c425`) | local run |
-| Live collection totals (probes, not the demo snapshot) | Luma 1,092 raw rows (194 in Oct 27-30); Partiful Explore 85 unique events (11 in the window, `page_cap`, not exhaustive); RainFocus 210 records (156 sessions, 54 exhibitors) | `probes/luma.md`, `probes/partiful.md`, `probes/official.md` |
+| Events in the demo fixture | 194: 161 catalogue slots (142 official sessions outside Social, 19 catalogue Social items classed `confirmed_side_event`) + 33 external side events (Luma 12, Eventbrite 8, conferenceparties 7, Partiful 6) | `GET /api/v1/events` (`conference_relation`, first evidence provider) |
+| FalkorDB `conferge_demo` | 691 nodes, 2213 edges | `GRAPH.RO_QUERY conferge_demo "MATCH (n) RETURN count(n)"` and `"MATCH ()-[r]->() RETURN count(r)"` |
+| Agenda items (`GET /api/v1/plan`) | 25 | `GET /api/v1/plan` |
+| Sold-out event (labelled simulation) | Agentic engineering past the pilot: An enterprise playbook | `POST /api/v1/simulate-change` (scenario `w15-simulated-sold-out`), then `POST /api/v1/reset` |
+| Replacement event | How one open source project turned funding into security at scale | same call, `diff.added` |
+| Top 3 before "I met Ryan Hecht" | Ryan Hecht 56, Camila Maia 47, Nick Liffen 40 | `GET /api/v1/people` |
+| Top 3 after "I met Ryan Hecht" | Camila Maia 47, Nick Liffen 40, Annamalai Chockalingam 38.5 | `POST /api/v1/met`, `GET /api/v1/people`, then `POST /api/v1/reset` |
+| LinkedIn | 13 cards with a Bright Data LinkedIn profile in the top 50 loaded by the page; 17 profiles in `data/cache/linkedin_public.json` | `GET /api/v1/people?limit=100` |
+| Stays shown | 12: Airbnb 6, Booking 6 (21 collected through Bright Data datasets) | `GET /api/v1/stays`, `GET /api/v1/pipeline` |
+| Flights | 34 shown; 34 itineraries collected through Bright Data Web Unlocker | `GET /api/v1/flights`, `GET /api/v1/pipeline` |
+| Bright Data requests / records (cache) | 39 / 81: Airbnb (dataset) 1 / 6; Booking (dataset) 1 / 15; Crunchbase (dataset) 1 / 2; Google Hotels (dataset) 1 / 0; LinkedIn (dataset) 7 / 17; Google Flights (unlocker) 1 / 34; Crunchbase URL search (serp) 10 / 2; LinkedIn URL search (serp) 17 / 5; Google Maps not in this counter | `GET /api/v1/brightdata` |
+| Crunchbase | 2/10 companies normalized | `probes/crunchbase.md` |
+| Google Maps | 4/9 venues found (snapshot `sd_mvmvwe7c2bqi2xcka6`) | `data/cache/venues.json` |
+| Reachability (21 sites, block matrix) | 10 without Bright Data, 12 with Web Unlocker alone, 14 with Bright Data; 18 projected once KYC is approved | `GET /api/v1/pipeline` `reachability` |
+| `make check` | 1457 passed, 29 skipped on `c6c4d7d` (1461 passed, 29 skipped with this PR's 4 predemo tests) | local run |
+| HEAD | `c6c4d7d` | `git rev-parse --short HEAD`, `/health` `git_sha` |
 
 ## Team
 

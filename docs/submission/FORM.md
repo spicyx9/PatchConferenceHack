@@ -1,8 +1,6 @@
 # Patch the Conference: submission form
 
-Copy each field as is. Placeholders in double braces (`{{EVENTS}}`, `{{AGENDA}}`, `{{NODES}}`, `{{EDGES}}`,
-`{{TESTS}}`, `{{LINKEDIN}}`, `{{STAYS}}`, `{{FLIGHTS}}`) are filled by the final numbers pass from
-`STATUS.md`; never type a number by hand.
+Copy each field as is. Numbers filled from `STATUS.md` (measured on c6c4d7d at 15:18 PDT).
 
 ## Project name
 
@@ -16,9 +14,9 @@ Tell it why you're going to a conference; it tells you who to meet, where, and w
 
 Big conferences bury the people who matter to you under hundreds of sessions and side events. Conferge starts from your goal, not the agenda: one sentence such as "meet seed investors, AI agent founders, Copilot PMs" becomes weighted priorities, then who to meet and why, a day-by-day plan, what to skip, and a new plan when an event sells out.
 
-Bright Data is at the core of the data. Its datasets (Booking, Airbnb, LinkedIn, Crunchbase, Google Maps), Web Unlocker (Google Flights) and SERP API collected what a plain request cannot reach: {{STAYS}} stays, {{FLIGHTS}} flight itineraries, {{LINKEDIN}} LinkedIn profiles. Every record keeps its source URL and collection time, and the demo replays that timestamped collection.
+Bright Data is at the core of the data. Its datasets (Booking, Airbnb, LinkedIn, Crunchbase, Google Maps), Web Unlocker (Google Flights) and SERP API collected what a plain request cannot reach: 21 stays, 34 flight itineraries, 17 LinkedIn profiles. Every record keeps its source URL and collection time, and the demo replays that timestamped collection.
 
-FalkorDB is at the core of the reasoning. {{EVENTS}} events with their speakers, companies and topics form a graph of {{NODES}} nodes and {{EDGES}} edges. FalkorDB ranks the connections, returns the goal-to-person path behind each one as evidence, and remembers who you met. A rule-based planner builds the {{AGENDA}}-item itinerary from them. No LLM in the loop: no invented price, attendance or guest list.
+FalkorDB is at the core of the reasoning. 194 events with their speakers, companies and topics form a graph of 691 nodes and 2213 edges. FalkorDB ranks the connections, returns the goal-to-person path behind each one as evidence, and remembers who you met. A rule-based planner builds the 25-item itinerary from them. No LLM in the loop: no invented price, attendance or guest list.
 
 ## Tracks
 
@@ -27,7 +25,7 @@ FalkorDB is at the core of the reasoning. {{EVENTS}} events with their speakers,
 
 ## Tech stack
 
-Python, FastAPI, Pydantic, FalkorDB 6.0.3 (falkordb-py, Cypher), Bright Data (Datasets, Web Unlocker, SERP API), httpx, HTML/CSS/vanilla JavaScript with Cytoscape.js, Docker Compose, uv, pytest ({{TESTS}} tests in `make check`).
+Python, FastAPI, Pydantic, FalkorDB 6.0.3 (falkordb-py, Cypher), Bright Data (Datasets, Web Unlocker, SERP API), httpx, HTML/CSS/vanilla JavaScript with Cytoscape.js, Docker Compose, uv, pytest (1457 tests in `make check`).
 
 ## Repository URL
 

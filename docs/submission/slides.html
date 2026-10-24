@@ -64,7 +64,7 @@
   <p class="kicker">Conferge</p>
   <h1>Conferences are organised by time slot, not by what you came for.</h1>
   <ul>
-    <li>GitHub Universe: 2 days, 161 official sessions, 46 side events in our dataset, thousands of people.</li>
+    <li>GitHub Universe: 2 days, 161 catalogue slots (142 official sessions outside Social, 19 catalogue Social items classed confirmed_side_event), plus 33 external side events in our dataset, thousands of people.</li>
     <li>The people who matter to you stay invisible.</li>
     <li>Most attendees go home feeling they were in the wrong room.</li>
   </ul>
@@ -84,7 +84,7 @@
 </section>
 
 <section class="slide dense">
-  <p class="kicker">FalkorDB, the graph that decides</p>
+  <p class="kicker">FalkorDB, the graph that ranks and explains</p>
   <h1>"Why this person" is a path, not a score.</h1>
   <div class="path">
     <div class="node"><b>Goal</b><span>seed investors 0.45</span></div>
@@ -100,7 +100,7 @@
 RETURN g.id, length(p), p ORDER BY length(p) LIMIT $cap</pre>
   <ul>
     <li>One graph for the planner, the replanner and your memory. Same ids, shared state between agents.</li>
-    <li>Replanning is one traversal: who else is at the sold-out event, where else do they appear. Writes only through GraphStore MERGE.</li>
+    <li>FalkorDB ranks, remembers and provides the evidence paths; the Python planner builds the plan and the diff. Writes only through GraphStore MERGE.</li>
   </ul>
 </section>
 
@@ -112,7 +112,6 @@ RETURN g.id, length(p), p ORDER BY length(p) LIMIT $cap</pre>
       <h2>Collected live today, public endpoints</h2>
       <ul>
         <li>Official catalog, Luma, Partiful, Eventbrite, party aggregators</li>
-        <li>BART fares, OSRM routes</li>
         <li>Every record: source URL, collected_at, source_mode</li>
       </ul>
     </div>
@@ -143,13 +142,13 @@ RETURN g.id, length(p), p ORDER BY length(p) LIMIT $cap</pre>
 
 <section class="slide dense">
   <p class="kicker">Measured numbers</p>
-  <h1>Read from the running app, October 24, 2026, main at e6c08e4.</h1>
+  <h1>Read from the running app, October 24, 2026, main at c6c4d7d.</h1>
   <table>
-    <tr><th>Events in the dataset</th><td class="num">207: 161 official sessions, 12 Luma, 6 Partiful, 8 Eventbrite, 20 conferenceparties</td></tr>
-    <tr><th>FalkorDB graph</th><td class="num">704 nodes, 2,233 edges; 50 people ranked for the goal</td></tr>
-    <tr><th>Through Bright Data</th><td class="num">21 stays, 34 flight itineraries, 9 LinkedIn cards (64 records)</td></tr>
+    <tr><th>Events in the dataset</th><td class="num">194: 161 catalogue slots (142 official sessions outside Social, 19 catalogue Social items classed confirmed_side_event); 33 external side events (Luma 12, Eventbrite 8, conferenceparties 7, Partiful 6)</td></tr>
+    <tr><th>FalkorDB graph</th><td class="num">691 nodes, 2213 edges; top 50 people ranked for the goal</td></tr>
+    <tr><th>Through Bright Data</th><td class="num">21 stays, 34 flight itineraries, 17 LinkedIn profiles (39 requests, 81 records)</td></tr>
     <tr><th>Reachable sites, of 21</th><td class="num">10 without Bright Data, 12 Unlocker, 14 Unlocker or dataset<br>18 projected once KYC is approved</td></tr>
-    <tr><th>Tests</th><td class="num">make check 1,216 passed, 26 skipped; make e2e 16 passed</td></tr>
+    <tr><th>Tests</th><td class="num">make check 1457 passed, 29 skipped</td></tr>
   </table>
 </section>
 

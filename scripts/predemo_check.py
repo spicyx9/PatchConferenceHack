@@ -5,12 +5,17 @@
 
 Expected values come from the committed demo data on a freshly reset graph; override with
 PREDEMO_TOP3 (comma separated names), PREDEMO_STAYS_BD, PREDEMO_FLIGHTS_BD, PREDEMO_LINKEDIN_MIN.
+
+The agenda size, the sold-out event of the simulation and its replacement are compared with
+the values measured in STATUS.md (rows "Agenda items", "Sold-out event", "Replacement event");
+a missing STATUS.md value is a FAIL, never a default.
 """
 
 from __future__ import annotations
 
 import json
 import os
+import re
 import sys
 import time
 import urllib.request
@@ -21,6 +26,10 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 DEFAULT_TOP3 = "Ryan Hecht,Camila Maia,Nick Liffen"
+STATUS_MD = Path(__file__).resolve().parents[1] / "STATUS.md"
+_STATUS_ROWS = {"agenda": r"^\| Agenda items[^|]*\| (\d+) \|",
+                "sold_out": r"^\| Sold-out event[^|]*\| ([^|]+?) \|",
+                "replacement": r"^\| Replacement event[^|]*\| ([^|]+?) \|"}
 MIN_NODES, MIN_EDGES = 600, 2000
 ANTIFOMO_MAX_S = 2.0
 
@@ -32,6 +41,54 @@ def expected() -> dict[str, Any]:
         "flights_bd": int(os.environ.get("PREDEMO_FLIGHTS_BD", "34")),
         "linkedin_min": int(os.environ.get("PREDEMO_LINKEDIN_MIN", "12")),
     }
+
+
+def status_values(path: Path = STATUS_MD) -> dict[str, str | None]:
+    """Agenda size, sold-out event and replacement as written in STATUS.md (None if absent)."""
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        text = ""
+    found = {k: re.search(rx, text, re.M) for k, rx in _STATUS_ROWS.items()}
+    return {k: (m.group(1).strip() if m else None) for k, m in found.items()}
+
+
+def stage_rows(agenda: int | None, sold_out: str | None, replacement: str | None,
+               status: dict[str, str | None]) -> list[tuple[str, bool, str]]:
+    """Pure: the three stage values against STATUS.md."""
+    def row(name: str, got: Any, want: str | None) -> tuple[str, bool, str]:
+        if want is None:
+            return name, False, f"{got} (STATUS.md has no measured value)"
+        return name, got is not None and str(got) == want, f"{got} (STATUS.md: {want})"
+
+    return [row("Agenda items", agenda, status["agenda"]),
+            row("Sold-out event (simulation)", sold_out, status["sold_out"]),
+            row("Replacement event", replacement, status["replacement"])]
+
+
+def _post(url: str, body: dict[str, Any], timeout: float = 30.0) -> Any:
+    req = urllib.request.Request(url, data=json.dumps(body).encode(), method="POST",
+                                 headers={"content-type": "application/json"})
+    with urllib.request.urlopen(req, timeout=timeout) as r:  # noqa: S310 - local demo API
+        return json.loads(r.read())
+
+
+def scenario(base: str) -> tuple[str | None, str | None]:
+    """Sold-out event and its replacement from the labelled simulation; session reset after."""
+    api = base.rstrip("/") + "/api/v1"
+    items = _get(api + "/scenarios").get("items") or []
+    if not items:
+        return None, None
+    try:
+        res = _post(api + "/simulate-change", {"scenario_id": items[0]["id"]})
+    finally:
+        _post(api + "/reset", {})
+    diff = res.get("diff") or {}
+    titles = {e["id"]: e["title"] for e in _get(api + "/events").get("items") or []}
+    sold = [titles.get(c if isinstance(c, str) else c.get("id"), str(c))
+            for c in res.get("changed_events") or []]
+    added = [a["title"] for a in diff.get("added") or []]
+    return (sold[0] if sold else None), (added[0] if added else None)
 
 
 def falkordb_address() -> tuple[str, int]:
@@ -94,7 +151,8 @@ def _get(url: str, timeout: float = 30.0) -> Any:
 def collect(base: str, counts: Callable[[], tuple[int, int]] = graph_counts) -> dict[str, Any]:
     api = base.rstrip("/") + "/api/v1"
     # Same order as the page: plan, people and pipeline load before /antifomo is called.
-    _get(api + "/plan")
+    plan = _get(api + "/plan")
+    agenda = sum(len(d.get("items") or []) for d in (plan.get("plan") or {}).get("days") or [])
     people, pipeline = _get(api + "/people?limit=50"), _get(api + "/pipeline")
     started = time.perf_counter()
     try:
@@ -102,7 +160,8 @@ def collect(base: str, counts: Callable[[], tuple[int, int]] = graph_counts) -> 
         antifomo: float | None = time.perf_counter() - started
     except Exception:  # noqa: BLE001 - reported as a FAIL line
         antifomo = None
-    return {"graph": counts(), "pipeline": pipeline, "people": people, "antifomo_seconds": antifomo}
+    return {"graph": counts(), "pipeline": pipeline, "people": people, "antifomo_seconds": antifomo,
+            "agenda_items": agenda}
 
 
 def table(rows: list[tuple[str, bool, str]]) -> str:
@@ -122,7 +181,10 @@ def main(argv: list[str]) -> int:
         print(f"FalkorDB answers on {host}:{port} ({len(graphs)} graphs)")
         return 0
     if argv[:1] == ["api"] and len(argv) == 2:
-        rows = evaluate(collect(argv[1]), expected())
+        data = collect(argv[1])
+        rows = evaluate(data, expected())
+        sold, replacement = scenario(argv[1])
+        rows += stage_rows(data.get("agenda_items"), sold, replacement, status_values())
         print(table(rows))
         return 0 if all(ok for _, ok, _ in rows) else 1
     print(__doc__)
