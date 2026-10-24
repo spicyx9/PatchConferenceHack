@@ -20,7 +20,7 @@ def test_graphstore_round_trip() -> None:
                                              "title": "CTO"}
     assert graph.edges[("Person", "p1", "SPEAKS_AT", "Event", "e1")] == {
         "confidence": 1.0, "source": "luma", "source_url": "https://lu.ma/b",
-        "rationale": "SPEAKS_AT recorded from the Luma event page",
+        "rationale": "'Ada' SPEAKS_AT 'Talk', recorded from the Luma event page",
         "evidence_ids": ["https://lu.ma/a", "https://lu.ma/b"]}
     assert graph.count_nodes() == {"Event": 1, "Person": 1}
     assert graph.count_edges() == {"SPEAKS_AT": 1}

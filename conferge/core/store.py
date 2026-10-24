@@ -9,7 +9,7 @@ from __future__ import annotations
 import re
 from typing import Any, Protocol
 
-from conferge.core.edge_rationale import annotate
+from conferge.core.edge_rationale import FROM, TO, annotate
 
 _ALLOWED_NODE_LABELS = frozenset({
     "Conference", "Event", "Person", "Company", "Goal", "Opportunity", "Venue",
@@ -24,6 +24,8 @@ _ALLOWED_EDGES = frozenset({
     # Shared agent state: (User)-[:PLANS|SKIPS]->(Event), (Change)-[:AFFECTS]->(Event).
     "PLANS", "SKIPS", "AFFECTS",
 })
+# Display name of an edge endpoint inside merge_edge's Cypher (node alias a or b).
+_NAME = "coalesce({0}.name, {0}.title, {0}.description, {0}.id)"
 _PROP_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 # DDL only (FalkorDB 6.x): range index on id for every allowed label, full-text for search.
 # Labels cannot be query parameters, hence the allowlist above.
@@ -124,19 +126,22 @@ class GraphStore:
             raise ValueError("edge endpoints must not be empty")
         # Every edge gets a rule-based rationale and at least one evidence id (refused
         # otherwise); evidence ids accumulate across MERGEs, so corroboration never drops one.
+        # The rationale names both endpoints from the MATCHed nodes themselves.
         props = annotate(relation, from_kind, from_id, properties or {})
-        ids = props.pop("evidence_ids")
+        ids, rationale = props.pop("evidence_ids"), props.pop("rationale")
         set_clause, prop_params = self._properties(props, "r")
         set_clause = (set_clause or " SET") + (", " if set_clause else " ") + (
             "r.evidence_ids = CASE WHEN r.evidence_ids IS NULL THEN $evidence_ids "
-            "ELSE r.evidence_ids + [x IN $evidence_ids WHERE NOT x IN r.evidence_ids] END")
+            "ELSE r.evidence_ids + [x IN $evidence_ids WHERE NOT x IN r.evidence_ids] END, "
+            f"r.rationale = replace(replace($rationale, '{FROM}', {_NAME.format('a')}), "
+            f"'{TO}', {_NAME.format('b')})")
         cypher = (
             f"MATCH (a:{from_kind} {{id: $from_id}}), (b:{to_kind} {{id: $to_id}}) "
             f"MERGE (a)-[r:{relation}]->(b){set_clause} RETURN a.id, b.id"
         )
         return self.graph.query(
             cypher, params={"from_id": from_id, "to_id": to_id, "evidence_ids": ids,
-                            **prop_params}
+                            "rationale": rationale, **prop_params}
         )
 
 

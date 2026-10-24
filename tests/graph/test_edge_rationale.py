@@ -47,12 +47,18 @@ def test_no_edge_without_evidence_id_in_the_demo_graph(loaded):
     assert not [s for s in report.skipped_edges if "no evidence id" in s]
 
 
-def test_demo_rationales_are_rule_sentences(loaded):
+def test_demo_rationales_name_their_entities(loaded):
     graph, _ = loaded
-    speaks = [p for (_, _, rel, _, _), p in graph.edges.items() if rel == "SPEAKS_AT"]
-    assert speaks and all(p["rationale"] == "[fixture] Listed as speaker on the official "
-                          "GitHub Universe session page" for p in speaks)
-    assert all(p["source_url"] in p["evidence_ids"] for p in speaks)
+    speaks = [(key, p) for key, p in graph.edges.items() if key[2] == "SPEAKS_AT"]
+    assert speaks
+    for (_, _, _, kind, event_id), props in speaks:
+        title = graph.nodes[(kind, event_id)]["title"]
+        assert props["rationale"] == (f"[fixture] Listed as speaker of '{title}' on the official "
+                                      "GitHub Universe session page")
+        assert props["source_url"] in props["evidence_ids"]
+    for props in graph.edges.values():  # no placeholder left, no nameless sentence
+        assert "{from}" not in props["rationale"] and "{to}" not in props["rationale"]
+        assert "'" in props["rationale"], props["rationale"]
 
 
 @pytest.mark.skipif(os.getenv("CONFERGE_FALKORDB_TEST") != "1",
