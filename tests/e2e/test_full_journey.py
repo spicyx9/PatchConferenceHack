@@ -62,12 +62,15 @@ class Api:
     """One ``run_demo.py`` process; ``restart`` keeps the graph."""
 
     def __init__(self) -> None:
-        self.port = _free_port()
-        self.base = f"http://127.0.0.1:{self.port}/api/v1"
         self.proc: subprocess.Popen[bytes] | None = None
-        self.log = Path(tempfile.gettempdir()) / f"conferge-e2e-api-{self.port}.log"
+        self.log = Path(tempfile.gettempdir()) / "conferge-e2e-api.log"
+        self.port = 0
+        self.base = ""
 
     def start(self, keep_graph: bool = False) -> None:
+        # A fresh port per process: a readiness probe can never be answered by the previous one.
+        self.port = _free_port()
+        self.base = f"http://127.0.0.1:{self.port}/api/v1"
         env = {**os.environ, "FALKORDB_HOST": HOST, "FALKORDB_PORT": str(PORT), "PYTHONUNBUFFERED": "1"}
         cmd = [sys.executable, "scripts/run_demo.py", "--mode", "fixture", "--travel", "fixture",
                "--graph", GRAPH, "--port", str(self.port)] + (["--keep-graph"] if keep_graph else [])
@@ -95,7 +98,10 @@ class Api:
         self.proc = None
 
     def restart(self) -> None:
+        old = self.port
         self.stop()
+        with socket.socket() as s:
+            assert s.connect_ex(("127.0.0.1", old)) != 0, f"old API still listening on {old}"
         self.start(keep_graph=True)
 
     def call(self, method: str, path: str, body: dict[str, Any] | None = None) -> dict[str, Any]:
