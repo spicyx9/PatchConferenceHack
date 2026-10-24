@@ -57,6 +57,28 @@ def falkordb_preflight() -> str | None:
     return None
 
 
+def venues_enrichment(assembly: Any, store: Any) -> None:
+    """Google Maps venues from data/cache/venues.json (scripts/probes/venues_google_maps.py): no call.
+
+    Graph: Venue nodes filled through GraphStore without overwriting a non-null property.
+    Travel: the Google Maps coordinates replace the fixture ones on the served events (the
+    anti-FOMO travel times use them), each such event carrying a brightdata:google_maps evidence.
+    """
+    from conferge.integration.pipeline_view import row
+    from conferge.venues import google_maps as gm
+
+    cache = gm.load_cache()
+    if not cache or not cache.get("venues"):
+        return
+    entries = cache["venues"]
+    written = gm.write_graph(store, entries) if store is not None else None
+    assembly.demo.events, changed = gm.apply_to_events(assembly.demo.events, entries)
+    assembly.demo.pipeline.append(row("venues", gm.run_report(cache)))
+    found = sum(1 for e in entries if e.get("found"))
+    print(f"  venues (google maps, cached): {found} of {len(entries)} found, "
+          f"{changed} events with Google Maps coordinates, graph {written}")
+
+
 def linkedin_enrichment(args: argparse.Namespace, assembly: Any, goals: list[Any], store: Any,
                         ranked: list[str] | None = None) -> None:
     """Bright Data LinkedIn profiles onto the best ranked speakers (+ fixture hosts).
@@ -236,6 +258,7 @@ def main() -> int:
               + (f", errors: {index_errors}" if index_errors else ""))
         if args.linkedin != "off":
             linkedin_enrichment(args, assembly, goals, store)
+        venues_enrichment(assembly, store)
     elif args.linkedin != "off":
         linkedin_enrichment(args, assembly, goals, None, ranked=[
             pid for o in opps for pid in o.person_ids])
