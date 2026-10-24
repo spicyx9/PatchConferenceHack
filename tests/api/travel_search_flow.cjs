@@ -210,6 +210,28 @@ const pass = (name) => {
   pass(
     "Stays return actual priced offers for matching two-adult occupancy and map the hotels",
   );
+  let collectionPolls = 0;
+  const pendingStay = async (route) => route.fulfill({
+    status: 202, contentType: "application/json",
+    body: JSON.stringify({status: "running", job_id: "test-stay-job", items: []}),
+  });
+  await page.route("**/api/v1/travel/search", pendingStay);
+  await page.route("**/api/v1/travel/search/test-stay-job", async (route) => {
+    collectionPolls++;
+    return route.fulfill({status: 200, contentType: "application/json",
+      body: JSON.stringify({...stays, data_source: "live"})});
+  });
+  await page.locator("#travel-search-button").click();
+  await page.waitForFunction(() => document.querySelector("#travel-offer-context")
+    .textContent.includes("Collection can take"));
+  assert.equal(await page.locator("#travel-search-button").isDisabled(), true);
+  await page.waitForFunction(() => document.querySelector("#travel-results-workspace")
+    .getAttribute("aria-busy") === "false");
+  assert.equal(collectionPolls, 1);
+  assert.equal(await page.locator("#stays .trip-stay").count(), stays.items.length);
+  assert.match(await page.locator("#travel-offer-context").innerText(), /Freshly collected/);
+  await page.unroute("**/api/v1/travel/search", pendingStay);
+  pass("Pending hotel collection is polled and its completed offers replace the loading state (mock provider)");
   await page.locator("#research-adults").selectOption("1");
   const solo = await search();
   assert.equal(

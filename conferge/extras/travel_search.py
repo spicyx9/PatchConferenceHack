@@ -8,13 +8,16 @@ from __future__ import annotations
 
 import asyncio
 import json
+import time
+from uuid import uuid4
 from datetime import date
 from decimal import Decimal
 from pathlib import Path
 from typing import Literal
 from urllib.parse import urlencode
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from conferge.api.provenance import source_of
@@ -195,12 +198,17 @@ async def _run_live_flights(query: TravelSearch):
 async def _run_live_stays(query: TravelSearch):
     from conferge.lodging import run
     from conferge.lodging.models import LodgingQuery
+    from conferge.lodging.service import LodgingService
 
-    return await run(LodgingQuery(
-        check_in=query.depart, check_out=query.return_date, adults=query.adults,
-        rooms=query.rooms, radius_km=query.radius_km, location="San Francisco",
-        search_term="hotels near Fort Mason Center San Francisco", currency="USD",
-        limit=30, verify_top=0))
+    service = LodgingService(provider_timeout=320)
+    try:
+        return await run(LodgingQuery(
+            check_in=query.depart, check_out=query.return_date, adults=query.adults,
+            rooms=query.rooms, radius_km=query.radius_km, location="San Francisco",
+            search_term="hotels near Fort Mason Center San Francisco", currency="USD",
+            limit=30, verify_top=0), service=service)
+    finally:
+        await service.aclose()
 
 
 def _flight_matches(offer: FlightOffer, query: TravelSearch) -> bool:
@@ -247,9 +255,9 @@ async def search_live(query: TravelSearch) -> dict:
     try:
         envelope = await asyncio.wait_for(
             _run_live_flights(query) if query.kind == "flights" else _run_live_stays(query),
-            timeout=LIVE_TIMEOUT_SECONDS)
+            timeout=360 if query.kind == "stays" else LIVE_TIMEOUT_SECONDS)
     except (asyncio.TimeoutError, TimeoutError):
-        warnings.append("The provider did not finish within 50 seconds. No cached offers were substituted.")
+        warnings.append("The provider did not finish within the collection time limit. No cached offers were substituted.")
         return result
     except Exception:  # Provider messages can contain credentials: expose only the outcome.
         warnings.append("The live provider could not complete this search. No cached offers were substituted.")
@@ -299,6 +307,53 @@ async def search_live(query: TravelSearch) -> dict:
     return result
 
 
+# Hotel datasets finish asynchronously at the provider. Keep the HTTP request short,
+# deduplicate repeated searches, and let the UI observe the actual collection state.
+_JOBS: dict[str, dict] = {}
+
+
+async def _finish_job(job_id: str, query: TravelSearch) -> None:
+    try:
+        result = await search_live(query)
+    except asyncio.CancelledError:
+        _JOBS[job_id]["result"]["status"] = "failed"
+        raise
+    except Exception:
+        result = {**_JOBS[job_id]["result"], "status": "failed",
+                  "warnings": ["Collection could not finish. Try again or search with the provider."]}
+    _JOBS[job_id]["result"] = {**result, "job_id": job_id}
+
+
+@router.get("/search/{job_id}")
+async def search_progress(job_id: str) -> dict:
+    job = _JOBS.get(job_id)
+    if not job:
+        raise HTTPException(404, "Search expired. Start a new search.")
+    return job["result"]
+
+
 @router.post("/search")
-async def search(query: TravelSearch) -> dict:
-    return await search_live(query) if query.mode == "live" else search_cached(query)
+async def search(query: TravelSearch):
+    if query.mode != "live":
+        return search_cached(query)
+    if query.kind != "stays":
+        return await search_live(query)
+    now, key = time.monotonic(), query.model_dump_json()
+    for job_id, job in list(_JOBS.items()):
+        if job["task"].done() and now - job["started"] > 600:
+            del _JOBS[job_id]
+        elif job["key"] == key and not job["task"].done():
+            return JSONResponse(job["result"], status_code=202)
+    if sum(not job["task"].done() for job in _JOBS.values()) >= 4:
+        raise HTTPException(429, "Four travel searches are already running. Wait for a result.")
+    completed = [job_id for job_id, job in _JOBS.items() if job["task"].done()]
+    for job_id in completed[:-20]:
+        del _JOBS[job_id]
+    job_id = uuid4().hex
+    result = {"job_id": job_id, "query": query.model_dump(mode="json"),
+              "status": "running", "data_source": "unknown", "items": [], "count": 0,
+              "collected_at": None, "supported": True,
+              "warnings": [], "fallback_url": fallback_url(query)}
+    _JOBS[job_id] = {"started": now, "key": key, "result": result,
+                     "task": asyncio.create_task(_finish_job(job_id, query))}
+    return JSONResponse(result, status_code=202)

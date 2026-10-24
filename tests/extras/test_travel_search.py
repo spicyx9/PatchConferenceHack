@@ -187,7 +187,7 @@ async def test_live_timeout_and_provider_errors_are_explicit_and_redacted(monkey
 
     monkeypatch.setattr(travel_search, "_run_live_flights", timeout)
     result = await travel_search.search_live(query(mode="live"))
-    assert any("50 seconds" in text for text in result["warnings"])
+    assert any("collection time limit" in text for text in result["warnings"])
     assert result["data_source"] == "unknown"
 
 
@@ -213,7 +213,8 @@ async def test_live_hotel_adapter_passes_dates_rooms_occupancy_and_radius(monkey
     from conferge import lodging
     captured = []
 
-    async def run(data):
+    async def run(data, **kwargs):
+        assert kwargs["service"].provider_timeout == 320
         captured.append(data)
         return "result"
 

@@ -1366,7 +1366,18 @@
     $("travel-results-workspace").setAttribute("aria-busy", "true");
     $("travel-search-feedback").textContent = "";
     $("travel-offer-context").textContent = "Finding offers for your dates…";
+    function awaitCollection(res) {
+      if(sequence !== travelSearchSequence) return Promise.resolve(res);
+      if(res.status !== "running" || !res.job_id) return Promise.resolve(res);
+      $("travel-search-button").querySelector("span").textContent = "Collecting…";
+      $("travel-offer-context").textContent = "Checking Booking and Airbnb. Collection can take a few minutes.";
+      return new Promise(function(resolve){setTimeout(resolve,2500);}).then(function(){
+        if(sequence !== travelSearchSequence) return res;
+        return api("/travel/search/" + encodeURIComponent(res.job_id), null, null).then(awaitCollection);
+      });
+    }
     return api("/travel/search", { method: "POST", body: q }, null)
+      .then(awaitCollection)
       .then(function (res) {
         if (sequence !== travelSearchSequence) return;
         travelSearchResults[kind] = res;
@@ -1391,12 +1402,12 @@
             ? "Collected prices"
             : res.data_source === "live"
               ? "Freshly collected"
-              : "No matching collection";
+              : q.mode === "live" ? "Live prices unavailable" : "No matching collection";
         $("travel-offer-context").textContent =
           (bd
             ? "Bright Data · "
             : res.items && res.items.length
-              ? "Google Flights · "
+              ? (q.kind === "flights" ? "Google Flights · " : "Travel providers · ")
               : "") +
           provenance +
           (stamp ? " · " + stamp : "") +
