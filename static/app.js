@@ -108,6 +108,95 @@
     return document.getElementById(id);
   }
 
+  var PROVIDER_LABELS = {
+    brightdata: "Bright Data",
+    pyairbnb: "pyairbnb",
+    "fast-flights": "fast-flights",
+    serpapi: "SerpApi",
+  };
+  var BD_API_LABELS = { dataset: "dataset", unlocker: "Web Unlocker", serp: "SERP API" };
+
+  function sourceApiText(src) {
+    var prov = src.provider || "unknown";
+    if (prov === "fixture" || src.api === "fixture") return "Sample data";
+    if (prov === "brightdata")
+      return "Bright Data · " + (BD_API_LABELS[src.api] || src.api || "unknown");
+    if (src.api === "fallback") return "Fallback " + (PROVIDER_LABELS[prov] || prov);
+    return (
+      (PROVIDER_LABELS[prov] || prov) +
+      (src.api && src.api !== "unknown" ? " · " + src.api : "")
+    );
+  }
+
+  // How a travel record was collected (Bright Data API, fallback or sample data).
+  function sourceApiBadge(src) {
+    if (!src || typeof src !== "object") return "";
+    var tier = Number(src.tier);
+    var cls =
+      tier === 0 || tier === 1
+        ? "src-bd"
+        : tier === 2
+          ? "src-fallback"
+          : tier === 3
+            ? "src-fixture"
+            : "neutral";
+    var tip = [];
+    if (src.label) tip.push(src.label);
+    if (src.id) tip.push("id: " + src.id);
+    if (src.site) tip.push("site: " + src.site);
+    if (src.snapshot_id) tip.push("snapshot: " + src.snapshot_id);
+    return (
+      '<span class="badge src ' +
+      cls +
+      '" title="' +
+      esc(tip.join(" | ")) +
+      '">' +
+      esc(sourceApiText(src)) +
+      "</span>"
+    );
+  }
+
+  // Observed price only: total_price as given, else the raw scraped text. Never computed.
+  function flightPriceText(f) {
+    if (f.total_price !== null && f.total_price !== undefined) {
+      return (
+        f.total_price +
+        " " +
+        (f.currency || "") +
+        (f.price_label ? " (" + f.price_label + ")" : "") +
+        (f.return_slice_collected === false ? ", return not collected" : "")
+      );
+    }
+    if (f.raw_price_text) return "observed price: " + f.raw_price_text;
+    return "price not available";
+  }
+
+  // LinkedIn evidence collected through Bright Data: headline and company only, never presence.
+  function linkedinField(li) {
+    if (!li) return "";
+    var tip = [
+      "dataset: " + li.dataset_id,
+      "snapshot: " + orUnknown(li.snapshot_id),
+      "collected_at: " + li.collected_at,
+      "identity_confidence: " + orUnknown(li.identity_confidence),
+    ];
+    var url = safeUrl(li.source_url);
+    return (
+      '<div class="field field-linkedin"><b>LINKEDIN</b>' +
+      esc(orUnknown(li.headline)) +
+      (li.company ? " · " + esc(li.company) : "") +
+      " " +
+      (url
+        ? '<a href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">profile</a> '
+        : "") +
+      '<span class="badge src src-bd" title="' +
+      esc(tip.join(" | ")) +
+      '">' +
+      esc(li.provider || "brightdata:linkedin") +
+      "</span></div>"
+    );
+  }
+
   function sourceBadge(mode) {
     if (["fixture", "cached", "live"].indexOf(mode) >= 0) return "";
     return sourceModeBadge(mode);
@@ -938,7 +1027,12 @@
                 esc(fmtDay(leg.date)) +
                 '</span><span class="muted">' +
                 esc(details.join(" · ") || "Flight details not available yet") +
-                '</span><span class="badge neutral">' +
+                '</span><span class="muted">' +
+                esc(flightPriceText(leg)) +
+                "</span>" +
+                sourceBadge(leg.source_mode) +
+                sourceApiBadge(leg.source) +
+                '<span class="badge neutral">' +
                 esc(orUnknown(leg.price_status)) +
                 "</span></li>"
               );
@@ -955,7 +1049,8 @@
               (selected
                 ? '<span class="badge neutral">' +
                   esc(orUnknown(leg.price_status)) +
-                  "</span>"
+                  "</span>" +
+                  sourceApiBadge(leg.source)
                 : '<span class="muted">Explore stays near your conference.</span>') +
               "</li>"
             );
@@ -1005,6 +1100,8 @@
       "<table><tbody>" +
       "<tr><th>Budget</th><td>" +
       esc(fmtUsd(b.budget_usd) + (b.budget_source ? " (" + b.budget_source + ")" : "")) +
+      " " +
+      sourceModeBadge(b.source_mode) +
       "</td></tr>" +
       "<tr><th>Flights</th><td>" +
       esc(fmtUsd(b.flights_usd) + priceStatusText(b.flights_price_status)) +
@@ -1013,7 +1110,7 @@
       esc(fmtUsd(b.lodging_usd) + priceStatusText(b.lodging_price_status)) +
       "</td></tr>" +
       "<tr><th>Remaining</th><td>" +
-      esc(fmtUsd(b.remaining_usd)) +
+      esc(fmtUsd(b.remaining_usd) + priceStatusText([].concat(b.flights_price_status || [], b.lodging_price_status == null ? [] : [b.lodging_price_status]))) +
       "</td></tr>" +
       "</tbody></table>" +
       (b.note
@@ -1058,6 +1155,7 @@
               esc(orUnknown(st.availability)) +
               "</span>" +
               sourceBadge(st.source_mode) +
+              sourceApiBadge(st.source) +
               "</div>" +
               '<div class="field"><b>Type:</b> ' +
               esc(orUnknown(st.lodging_type)) +
@@ -1095,9 +1193,24 @@
     return planned ? "#87a361" : "#b2bd9f";
   }
 
+  function routeKindLabel(polylines) {
+    var kinds = {};
+    (polylines || []).forEach(function (p) {
+      if (p && p.kind) kinds[p.kind] = true;
+    });
+    if (kinds.straight_line_order_of_visits) return "Straight lines, not routes";
+    return Object.keys(kinds).join(", ");
+  }
+
   function renderMap(m) {
     lastMapData = m;
     $("map-places").innerHTML = placesHtml((m && m.markers) || []);
+    var kindEl = $("map-kind");
+    if (kindEl) {
+      var kindLabel = routeKindLabel(m && m.polylines);
+      kindEl.textContent = kindLabel;
+      kindEl.className = kindLabel ? "badge neutral" : "hidden";
+    }
     var el = $("map");
     if (typeof L === "undefined") {
       el.innerHTML =
@@ -1125,7 +1238,11 @@
         opacity: 0.8,
         dashArray: "6 6",
       })
-        .bindTooltip("Day " + esc(p.day))
+        .bindTooltip(
+          "Day " +
+            esc(p.day) +
+            (p.kind === "straight_line_order_of_visits" ? ", straight line" : ""),
+        )
         .addTo(mapLayer);
     });
     ((m && m.markers) || []).forEach(function (mk) {
@@ -1815,7 +1932,9 @@
               '</div><div class="person-role">' +
               esc(orUnknown(person.title)) +
               (company.name ? " · " + esc(company.name) : "") +
-              '</div></div></div><div class="row">' +
+              "</div></div></div>" +
+              linkedinField(c.linkedin) +
+              '<div class="row">' +
               presenceBadge(person, o) +
               sourceBadge(modeOfEvidence(evidence)) +
               (c.met ? '<span class="badge met">Meeting recorded</span>' : "") +
@@ -2002,6 +2121,12 @@
         api("/brightdata", null, null),
         "collection",
         renderBrightData,
+        errors,
+      ),
+      settle(
+        api("/pipeline", null, null),
+        "data pipeline",
+        renderPipeline,
         errors,
       ),
     ])
@@ -2459,9 +2584,37 @@
       "</button>";
   }
 
-  function renderBrightData(res) {
+  // "X/Y" of items whose source.provider is brightdata; null when the list was not loaded.
+  function bdShare(res) {
+    if (!res || !Array.isArray(res.items)) return null;
+    var n = res.items.filter(function (it) {
+      return it && it.source && it.source.provider === "brightdata";
+    }).length;
+    return n + "/" + res.items.length;
+  }
+
+  function renderBrightData(res, stays, flights) {
+    if (stays === undefined && flights === undefined) {
+      // Null keys: these reads must not feed the global source badge.
+      Promise.all([
+        api("/stays", null, null).catch(function () { return null; }),
+        api("/flights", null, null).catch(function () { return null; }),
+      ]).then(function (r) {
+        renderBrightData(res, r[0], r[1]);
+      });
+    }
     var u = (res && res.usage) || {},
       ready = (res && res.ready) || {};
+    var sShare = bdShare(stays),
+      fShare = bdShare(flights);
+    var travel =
+      sShare !== null || fShare !== null
+        ? '<div class="bd-travel">' +
+          (sShare !== null ? "Stays via Bright Data: " + esc(sShare) : "") +
+          (sShare !== null && fShare !== null ? " · " : "") +
+          (fShare !== null ? "Flights via Bright Data: " + esc(fShare) : "") +
+          "</div>"
+        : "";
     function part(api, label) {
       return (
         esc(label) +
@@ -2480,7 +2633,95 @@
       part("web_unlocker", "Web Unlocker") +
       " | " +
       part("serp", "SERP API") +
-      "</span>";
+      "</span>" +
+      travel;
+  }
+
+  function renderPipeline(res) {
+    $("pipeline-headline").textContent = (res && res.headline) || "";
+    var rows = (res && res.rows) || [];
+    $("pipeline-table").innerHTML = rows.length
+      ? '<table class="pipeline-table"><thead><tr>' +
+        "<th>Source</th><th>Provider</th><th>Mode</th><th>Bright Data API</th><th>Records</th>" +
+        "<th>Collected</th><th>Run report</th><th>Est. cost</th></tr></thead><tbody>" +
+        rows
+          .map(function (r) {
+            var outcome =
+              r.status === "failed"
+                ? "failed: " + (r.reason || r.termination)
+                : (r.termination || r.status) + (r.reason ? " (" + r.reason + ")" : "");
+            return (
+              '<tr class="kind-' + esc(r.kind) + '"><td>' + esc(r.source) +
+              "</td><td>" + esc(r.provider) + "</td><td>" + esc(r.kind) +
+              "</td><td>" + esc(r.brightdata_api || "—") + "</td><td>" +
+              esc(r.records === null ? "—" : r.records) + "</td><td>" +
+              esc(r.collected_at ? fmtTime(r.collected_at) : "—") + "</td><td>" +
+              esc(outcome) + "</td><td>" +
+              esc(r.estimated_cost_usd !== null ? "$" + r.estimated_cost_usd + " (estimate)" : "—") +
+              "</td></tr>"
+            );
+          })
+          .join("") +
+        "</tbody></table>"
+      : '<p class="muted">' + esc((res && res.note) || "No collection run in this session.") + "</p>";
+    var t = (res && res.totals) || {},
+      calls = (res && res.brightdata_calls) || [];
+    $("pipeline-calls").innerHTML =
+      "Bright Data records: " + esc(t.brightdata_records || 0) +
+      ", estimated cost $" + esc(t.estimated_cost_usd || "0") +
+      " (estimate: records × 1.5 / 1000). Bright Data calls: " +
+      (calls.length
+        ? calls
+            .map(function (c) {
+              return (
+                esc(c.api) + (c.dataset_id ? " " + esc(c.dataset_id) : "") +
+                (c.snapshot_id ? " snapshot " + esc(c.snapshot_id) : "") +
+                " (" + esc(c.rows) + " rows)"
+              );
+            })
+            .join("; ")
+        : "none");
+    renderReachability(res && res.reachability);
+  }
+
+  function renderReachability(r) {
+    var box = $("pipeline-reach");
+    if (!box) return;
+    if (!r) {
+      box.innerHTML =
+        '<h3>Reachability: plain fetch vs Bright Data</h3><p class="muted">Block matrix not run yet (scripts/probes/block_matrix.py).</p>';
+      return;
+    }
+    var c = r.counts || {};
+    var cell = function (v) {
+      return '<span class="reach-' + esc(v) + '">' + esc(v) + "</span>";
+    };
+    box.innerHTML =
+      "<h3>Reachability: plain fetch vs Bright Data</h3><p><b>" +
+      esc(c.reachable_without_brightdata) + " of " + esc(c.n) + " sites reachable without Bright Data, " +
+      esc(c.reachable_with_brightdata) + " of " + esc(c.n) + " with</b> (Web Unlocker or dataset; Web Unlocker alone " +
+      esc(c.reachable_with_unlocker_only) + " of " + esc(c.n) + ') <span class="muted">(run ' +
+      esc(fmtTime(r.run_at)) + ", Web Unlocker zone " + esc(r.zone) + ")</span></p>" +
+      (c.kyc_pending && c.kyc_pending.length
+        ? "<p><b>KYC pending:</b> " + esc(c.kyc_pending.join(", ")) +
+          ' <span class="muted">(refused by Web Unlocker until KYC is approved; then ' +
+          esc(c.reachable_with_brightdata_if_kyc_approved) + " of " + esc(c.n) +
+          " with Bright Data, projection)</span></p>"
+        : "") +
+      '<table class="pipeline-table"><thead><tr><th>Site</th><th>Plain fetch</th><th>Plain fetch, browser UA</th>' +
+      "<th>Web Unlocker</th><th>Bright Data dataset</th></tr></thead><tbody>" +
+      (r.sites || [])
+        .map(function (s) {
+          return (
+            "<tr><td>" + esc(s.site) + "</td><td>" + cell(s.plain_default_ua) + "</td><td>" +
+            cell(s.plain_browser_ua) + '</td><td title="' + esc(s.detail) + '">' +
+            cell(s.brightdata_unlocker) + '</td><td title="' + esc(s.dataset_detail || "") + '">' +
+            (s.brightdata_dataset === "not_run" ? '<span class="muted">—</span>' : cell(s.brightdata_dataset)) +
+            "</td></tr>"
+          );
+        })
+        .join("") +
+      "</tbody></table>";
   }
 
   function loadStory() {

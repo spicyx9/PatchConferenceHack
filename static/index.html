@@ -541,13 +541,12 @@
             <div id="stays" class="cards"></div>
           </section>
           <div class="panel travel-map-panel">
-            <h2>Find your way around</h2>
+            <h2>Find your way around <span id="map-kind" class="hidden"></span></h2>
             <div
               id="map"
               class="map"
               aria-label="Map of events and places to stay"
             ></div>
-            <p class="map-note">See your visits in order.</p>
             <details>
               <summary>View locations as a list</summary>
               <div id="map-places"></div>
@@ -791,10 +790,17 @@
       <p class="small-text muted">
         Saving a travel suggestion does not make a booking. Change scenarios
         affect this session and are not source updates. Resetting a session
-        preserves conversation history already saved in FalkorDB.
+        clears the conversation memory saved in FalkorDB.
       </p>
       <div id="source-domains"></div>
       <div id="bd-counter" class="bd-counter"></div>
+      <details id="pipeline-panel" class="pipeline-panel" open>
+        <summary>Data pipeline</summary>
+        <p id="pipeline-headline" class="pipeline-headline"></p>
+        <div id="pipeline-table"></div>
+        <div id="pipeline-calls" class="small-text muted"></div>
+        <div id="pipeline-reach" class="pipeline-reach"></div>
+      </details>
       <details id="warnings-box">
         <summary>
           Details and warnings <span id="warnings-count">0</span>

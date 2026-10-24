@@ -89,6 +89,8 @@ def main() -> int:
     hosts_with_url = [h for h in li.fixture_hosts() if h.linkedin_url]
     res = asyncio.run(li.enrich(targets, assembly.companies, store,
                                 allow_collect=not args.no_collect))
+    if res.enrichments:  # keep the committed public cache in step with a fresh run
+        li.write_public(res.enrichments)
     after = people_for_goal(store, "demo-user", goal.id, 5)["rows"]
     tagged = store.graph.query(
         "MATCH (p:Person {provider: 'brightdata:linkedin'}) RETURN count(p)").result_set[0][0]
@@ -124,7 +126,9 @@ def main() -> int:
         "", "## FalkorDB writes (GraphStore MERGE)", "",
         f"- Person nodes written: {len(res.written.persons_written) if res.written else 0}; "
         f"nodes with provider brightdata:linkedin: {tagged}",
-        f"- WORKS_AT edges: {len(res.written.works_at) if res.written else 0}; Company nodes created: "
+        f"- WORKS_AT edges: {len(res.written.works_at) if res.written else 0} (existing, kept their "
+        f"provenance + LinkedIn corroboration: "
+        f"{len(res.written.works_at_corroborated) if res.written else 0}); Company nodes created: "
         f"{len(res.written.companies_created) if res.written else 0}",
         "- no ATTENDS edge, no presence_confidence change (identity only)",
         "", "## people_for_goal top 5", "", "Before:", *_top(before), "", "After:", *_top(after), "",

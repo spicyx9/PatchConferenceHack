@@ -1,0 +1,76 @@
+{
+  "profiles": [
+    {
+      "name": "Carlin Cherry",
+      "company": "GitHub",
+      "linkedin_url": "https://www.linkedin.com/in/carlincherry/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": "sd_mvms2ssrh1bjodbs9",
+      "collected_at": "2026-10-24T19:18:16.620Z",
+      "provider": "brightdata:linkedin"
+    },
+    {
+      "name": "Jon Janego",
+      "company": null,
+      "linkedin_url": "https://www.linkedin.com/in/jonjanego/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": "sd_mvms2ssrh1bjodbs9",
+      "collected_at": "2026-10-24T19:15:06.538Z",
+      "provider": "brightdata:linkedin"
+    },
+    {
+      "name": "Mina Tawadrous",
+      "company": "SiriusXM",
+      "linkedin_url": "https://www.linkedin.com/in/mina-tawadrous/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": "sd_mvms2ssrh1bjodbs9",
+      "collected_at": "2026-10-24T19:16:57.530Z",
+      "provider": "brightdata:linkedin"
+    },
+    {
+      "name": "N. Jenny Hwang",
+      "company": "GitHub",
+      "linkedin_url": "https://www.linkedin.com/in/njennyhwang/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": "sd_mvms2ssrh1bjodbs9",
+      "collected_at": "2026-10-24T19:16:17.584Z",
+      "provider": "brightdata:linkedin"
+    },
+    {
+      "name": "Pierre Tempel",
+      "company": "GitHub",
+      "linkedin_url": "https://www.linkedin.com/in/pierre-tempel/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": "sd_mvms2ssrh1bjodbs9",
+      "collected_at": "2026-10-24T19:15:38.802Z",
+      "provider": "brightdata:linkedin"
+    },
+    {
+      "name": "Ron Efroni",
+      "company": "NixOS Foundation",
+      "linkedin_url": "https://www.linkedin.com/in/ronefroni/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": "sd_mvms2ssrh1bjodbs9",
+      "collected_at": "2026-10-24T19:16:02.276Z",
+      "provider": "brightdata:linkedin"
+    },
+    {
+      "name": "Ryan Hecht",
+      "company": "GitHub",
+      "linkedin_url": "https://www.linkedin.com/in/ryanahecht/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": "sd_mvms2ssrh1bjodbs9",
+      "collected_at": "2026-10-24T19:16:06.865Z",
+      "provider": "brightdata:linkedin"
+    },
+    {
+      "name": "Tim Rogers",
+      "company": "GitHub",
+      "linkedin_url": "https://www.linkedin.com/in/timrogers1/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": "sd_mvms2ssrh1bjodbs9",
+      "collected_at": "2026-10-24T19:16:10.842Z",
+      "provider": "brightdata:linkedin"
+    }
+  ]
+}

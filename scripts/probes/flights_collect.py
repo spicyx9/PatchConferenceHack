@@ -8,7 +8,7 @@ writes data/snapshots/google_flights_<YYYY-MM-DD>.json with the dataset id, snap
 collected_at and every row (gitignored). The demo reads that file while it is < 24 h old
 (conferge/flights/snapshot_provider.py). Nothing is relabelled or completed.
 
-Run: ``uv run python scripts/probes/flights_collect.py`` (background friendly).
+Run: ``uv run python scripts/probes/flights_collect.py [--resume sd_xxx]`` (background friendly).
 """
 
 from __future__ import annotations
@@ -37,6 +37,8 @@ ORIGINS = ("JFK", "EWR", "LGA")
 WAIT_S = 15 * 60
 POLL_S = 15
 MAX_SYNC_INPUTS = 20
+# --resume sd_xxx: finish a run that timed out from its snapshot, without a new scrape.
+RESUME = sys.argv[sys.argv.index("--resume") + 1] if "--resume" in sys.argv else None
 
 
 def log(msg: str) -> None:
@@ -68,12 +70,17 @@ async def main() -> int:
                               "status": "failed", "rows": [], "errors": []}
     async with BrightDataClient.from_env() as client:
         try:
-            out = await client.scrape_dataset(DATASET_ID, inputs,
-                                              method="discover_by_input_filters",
-                                              limit_per_input=10)
-            log(f"discover: {out.status} snapshot={out.snapshot_id}")
-            out = await _wait(client, out, deadline)
+            if RESUME:
+                out = CollectionOutput(status="running", source_mode="live", snapshot_id=RESUME)
+                log(f"resume: snapshot={RESUME} (no new scrape)")
+            else:
+                out = await client.scrape_dataset(DATASET_ID, inputs,
+                                                  method="discover_by_input_filters",
+                                                  limit_per_input=10)
+                log(f"discover: {out.status} snapshot={out.snapshot_id}")
+            # Recorded at once: a run that times out can be finished later with --resume.
             result["snapshots"].append({"kind": "discover", "snapshot_id": out.snapshot_id})
+            out = await _wait(client, out, deadline)
             rows = _rows(out.data)
             urls = [r["url"] for r in rows if not has_itinerary_data(r) and isinstance(r.get("url"), str)
                     and not (r.get("error") or r.get("error_code"))][:MAX_SYNC_INPUTS]
@@ -81,8 +88,8 @@ async def main() -> int:
                 more = await client.scrape_dataset(DATASET_ID, [{"url": u} for u in urls],
                                                    method="collect_by_url")
                 log(f"collect_by_url ({len(urls)} urls): {more.status} snapshot={more.snapshot_id}")
-                more = await _wait(client, more, deadline)
                 result["snapshots"].append({"kind": "collect_by_url", "snapshot_id": more.snapshot_id})
+                more = await _wait(client, more, deadline)
                 rows = [r for r in rows if has_itinerary_data(r)] + _rows(more.data)
             result["rows"] = rows
             result["status"] = "ready"

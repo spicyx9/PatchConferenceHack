@@ -76,6 +76,7 @@ def test_fix5_every_amount_in_the_ui_shows_its_price_status() -> None:
     assert "leg.price_status" in flight_branch
     assert "priceStatusText(b.flights_price_status)" in travel
     assert "priceStatusText(b.lodging_price_status)" in travel
+    assert "fmtUsd(b.remaining_usd) + priceStatusText(" in travel
     assert "spend_price_status" in _js_function("renderRoi")
 
 

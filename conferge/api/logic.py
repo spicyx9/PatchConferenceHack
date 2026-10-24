@@ -497,6 +497,7 @@ def travel_view(
             ),
             "reason": f"event score {first['score']} on your arrival day",
             "accepted": pid in accepted,
+            "books": False,
             "computed_by": FALLBACK,
         })
     budget = Decimal(str(user["budget_usd"]))
@@ -511,6 +512,7 @@ def travel_view(
         "budget": {
             "budget_usd": str(budget),
             "budget_source": BUDGET_SOURCE,
+            "source_mode": user.get("source_mode", "fixture"),
             "flights_usd": flight_total, "lodging_usd": stay_total,
             "flights_price_status": [rt_display(f).get("price_status", f.price_status) for f in trip],
             "lodging_price_status": stay.price_status if stay else None,
