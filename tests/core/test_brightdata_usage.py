@@ -23,7 +23,8 @@ def test_from_env_reads_dotenv(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
 @pytest.mark.asyncio
 async def test_usage_counts_only_successful_responses() -> None:
     brightdata.reset_usage()
-    ok = httpx.MockTransport(lambda r: httpx.Response(200, json=[{"a": 1}, {"a": 2}]))
+    ok = httpx.MockTransport(lambda r: httpx.Response(200, json=[
+        {"a": 1}, {"a": 2}, {"error": "Crawler error: Unexpected Status 502 (no_peer)"}]))
     async with httpx.AsyncClient(transport=ok, base_url="https://api.brightdata.com") as http:
         out = await BrightDataClient("k", client=http).scrape_dataset("gd_x", [{"url": "u"}])
     assert out.status == "ready" and brightdata.usage()["datasets"] == 2

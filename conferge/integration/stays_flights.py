@@ -31,7 +31,7 @@ from decimal import Decimal
 from typing import Any
 
 from conferge.api.provenance import source_of
-from conferge.core.schemas import FlightOffer, Lodging, RunStatus
+from conferge.core.schemas import FlightOffer, Lodging, RunReport, RunStatus
 from conferge.flights.round_trip_total import is_round_trip, trip_price
 from conferge.lodging.dedupe import normalize_name
 
@@ -90,6 +90,8 @@ class LiveDomain:
     collected_at: datetime | None = None
     warnings: list[str] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)
+    reports: list[RunReport] = field(default_factory=list)
+    """Provider RunReports, kept for the data pipeline panel."""
 
 
 async def _stays(timeout: float) -> LiveDomain:
@@ -104,7 +106,7 @@ async def _stays(timeout: float) -> LiveDomain:
     warnings = [f"{r.provider}: {r.status}" for r in env.reports]
     warnings.append(f"stays sources: {source_counts(stays)}")
     return LiveDomain("stays", stays, env.source_mode, env.status,
-                      env.collected_at, warnings, list(env.errors))
+                      env.collected_at, warnings, list(env.errors), list(env.reports))
 
 
 def _departs(offer: FlightOffer) -> date | None:
@@ -190,7 +192,7 @@ async def _flights(timeout: float) -> LiveDomain:
     if env.items and not picked:
         errors.append(f"no priced offer into {ARRIVAL_AIRPORT} on {DEPART} / back on {RETURN}")
     return LiveDomain("flights", picked, env.source_mode, env.status, env.collected_at,
-                      warnings, errors)
+                      warnings, errors, list(env.reports))
 
 
 async def _guarded(name: str, coro: Any) -> LiveDomain:

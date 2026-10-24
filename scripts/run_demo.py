@@ -26,6 +26,7 @@ import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -66,6 +67,10 @@ def main() -> int:
                         help="serve on the existing graph without resetting or reloading it")
     parser.add_argument("--travel", choices=["live", "fixture"], default="live",
                         help="stays/flights: live search with fixture fallback, or fixture only")
+    parser.add_argument("--travel-timeout", type=float, default=150.0,
+                        help="seconds for live stays/flights (Bright Data snapshots are slow)")
+    parser.add_argument("--linkedin", type=int, default=5,
+                        help="enrich the first N speakers with a linkedin_url via Bright Data (0: off)")
     args = parser.parse_args()
     os.environ["FALKORDB_GRAPH"] = args.graph  # the API reads the same graph it was loaded into
     if not args.no_graph and (problem := falkordb_preflight()):
@@ -84,8 +89,30 @@ def main() -> int:
     t0 = time.perf_counter()
     report = pipeline.E2EReport(mode=args.mode, started_at=datetime.now(timezone.utc))
     slices = asyncio.run(pipeline._collect(args.mode, False, 90.0, None))
-    travel = asyncio.run(collect_stays_flights(90.0)) if args.travel == "live" else None
-    assembly = assemble(pipeline._usable(slices), travel)
+    official = next((s for s in slices if s.name == "official"), None)
+
+    async def collect_extras() -> tuple[Any, Any]:
+        from conferge.integration.people_linkedin import enrich_with_linkedin
+
+        async def none() -> None:
+            return None
+        travel_task = (collect_stays_flights(args.travel_timeout)
+                       if args.travel == "live" else none())
+        linkedin_task = (enrich_with_linkedin(official.people, limit=args.linkedin)
+                         if official and args.linkedin > 0 else none())
+        return await asyncio.gather(travel_task, linkedin_task)  # concurrent: no extra wall time
+
+    travel, linkedin = asyncio.run(collect_extras())
+    usable_slices = pipeline._usable(slices)
+    if linkedin is not None and official is not None:
+        from conferge.integration.sources import SourceSlice
+
+        official.people, li_report = linkedin
+        print(f"  linkedin: {li_report.status} {li_report.unique_count}/{li_report.fetched_count} "
+              f"profiles {li_report.errors[:1]}")
+        usable_slices.append(SourceSlice("linkedin", "07", "live", "live", li_report.status,
+                                         reports=[li_report], collected_at=li_report.finished_at))
+    assembly = assemble(usable_slices, travel)
     goals = parse_goals(assembly.demo.demo_goal_text)
     opps = asyncio.run(pipeline._stage_planning(report, assembly, goals))
     print(f"assembled data_mode={assembly.data_mode}: {len(assembly.events)} events, "

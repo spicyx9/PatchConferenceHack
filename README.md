@@ -47,6 +47,7 @@ Most attendees go home with a few business cards and the feeling they were in th
 ```
 
 - **Bright Data** is the acquisition layer for everything a plain HTTP request cannot reach: long-tail event discovery through SERP, flights and hotels through Web Scraper datasets, LinkedIn profiles for people matching, and unblocking dynamic pages.
+  Agents never fetch the web at query time: all reasoning runs on the stored, deduplicated, provenance-tagged graph.
 - **FalkorDB** is the opportunity graph: every relation carries its evidence, the "why this person" explanation is a real graph path query, and the user's memory (who they met) lives in the same graph.
 
 ## Graph model and Cypher queries

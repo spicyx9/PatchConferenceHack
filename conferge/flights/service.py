@@ -96,7 +96,7 @@ class FlightService:
     def __init__(
         self, providers: Sequence[tuple[str, FlightProvider]] | None = None, *,
         cache_ttl: timedelta = CACHE_TTL, clock: Callable[[], datetime] = _now,
-        fixture_path: Path = FIXTURE_PATH, provider_timeout: float = 90.0,
+        fixture_path: Path = FIXTURE_PATH, provider_timeout: float = 40.0,
     ) -> None:
         self._providers = list(providers) if providers is not None else None
         self.cache_ttl = cache_ttl

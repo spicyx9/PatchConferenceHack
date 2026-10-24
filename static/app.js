@@ -826,7 +826,34 @@
       " | " + part("serp", "SERP API") + "</span>" + travel;
   }
 
+  function renderPipeline(res) {
+    $("pipeline-headline").textContent = (res && res.headline) || "";
+    var rows = (res && res.rows) || [];
+    $("pipeline-table").innerHTML = rows.length ? '<table class="pipeline-table"><thead><tr>' +
+      "<th>Source</th><th>Provider</th><th>Mode</th><th>Bright Data API</th><th>Records</th>" +
+      "<th>Collected at</th><th>RunReport</th><th>Est. cost</th></tr></thead><tbody>" +
+      rows.map(function (r) {
+        var outcome = r.status === "failed" ? "failed: " + (r.reason || r.termination) :
+          (r.termination || r.status) + (r.reason ? " (" + r.reason + ")" : "");
+        return '<tr class="kind-' + esc(r.kind) + '"><td>' + esc(r.source) + "</td><td>" + esc(r.provider) +
+          "</td><td>" + esc(r.kind) + "</td><td>" + esc(r.brightdata_api || "-") + "</td><td>" +
+          esc(r.records === null ? "-" : r.records) + "</td><td>" + esc(r.collected_at ? fmtTime(r.collected_at) : "-") +
+          "</td><td>" + esc(outcome) + "</td><td>" +
+          esc(r.estimated_cost_usd !== null ? "$" + r.estimated_cost_usd + " (estimate)" : "-") + "</td></tr>";
+      }).join("") + "</tbody></table>" : '<p class="muted">' + esc((res && res.note) || "No collection run.") + "</p>";
+    var t = (res && res.totals) || {}, calls = (res && res.brightdata_calls) || [];
+    $("pipeline-calls").innerHTML = "Bright Data records: " + esc(t.brightdata_records || 0) +
+      ", estimated cost $" + esc(t.estimated_cost_usd || "0") + " (estimate: records x 1.5 / 1000). " +
+      "Bright Data calls: " + (calls.length ? calls.map(function (c) {
+        return esc(c.api) + (c.dataset_id ? " " + esc(c.dataset_id) : "") +
+          (c.snapshot_id ? " snapshot " + esc(c.snapshot_id) : "") + " (" + esc(c.rows) + " rows)";
+      }).join("; ") : "none");
+  }
+
   function loadStory() {
+    api("/pipeline", null, "pipeline").then(renderPipeline).catch(function () {
+      $("pipeline-table").textContent = "pipeline unavailable";
+    });
     function optional(path, key) { return api(path, null, key).catch(function () { return null; }); }
     api("/brightdata", null, "brightdata").then(function (bd) {
       renderBrightData(bd);

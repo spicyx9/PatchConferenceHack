@@ -326,6 +326,19 @@ def create_app(
     def plan() -> dict[str, Any]:
         return _envelope(state, ["events", "people"], _plan_payload(), extra_warnings=_plan_warnings())
 
+    @api.get("/pipeline")
+    def pipeline_view() -> dict[str, Any]:
+        """How every source of this demo was collected, from the RunReports of the run."""
+        from conferge.core import brightdata as bd
+        from conferge.integration.pipeline_view import HEADLINE, totals
+
+        rows = state.data.pipeline
+        return _envelope(state, [], {
+            "headline": HEADLINE, "rows": rows, "totals": totals(rows),
+            "brightdata_calls": bd.calls(),
+            "note": None if rows else "no collection run in this process (dataset served as loaded)",
+        }, mode_override="live" if any(r["kind"] != "fallback" for r in rows) else "fixture")
+
     @api.get("/brightdata")
     def brightdata_usage() -> dict[str, Any]:
         """What Bright Data actually returned in this process, per API; config state, never the key."""

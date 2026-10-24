@@ -26,6 +26,8 @@ BrightDataApi = Literal["datasets", "web_unlocker", "serp"]
 # Process-wide count of what Bright Data actually returned (successful responses only):
 # dataset rows, Web Unlocker pages, SERP result pages. Shown on the demo home screen.
 _USAGE: dict[str, int] = {"datasets": 0, "web_unlocker": 0, "serp": 0}
+# Every Bright Data call that got an answer: api, dataset_id, snapshot_id, rows, status, at.
+_CALLS: list[dict[str, Any]] = []
 
 
 def parse_body(response: httpx.Response) -> Any:
@@ -47,6 +49,23 @@ def record_usage(api: BrightDataApi, count: int = 1) -> None:
     _USAGE[api] = _USAGE.get(api, 0) + max(count, 0)
 
 
+def record_call(api: BrightDataApi, *, rows: int, status: str, dataset_id: str | None = None,
+                snapshot_id: str | None = None) -> None:
+    _CALLS.append({"api": api, "dataset_id": dataset_id, "snapshot_id": snapshot_id,
+                   "rows": rows, "status": status,
+                   "at": datetime.now(timezone.utc).isoformat()})
+
+
+def _data_rows(payload: Any) -> int:
+    """Rows that are records: Bright Data returns failed inputs as rows with an ``error`` key."""
+    rows = payload if isinstance(payload, list) else [payload]
+    return sum(1 for r in rows if isinstance(r, dict) and r and "error" not in r)
+
+
+def calls() -> list[dict[str, Any]]:
+    return [dict(c) for c in _CALLS]
+
+
 def usage() -> dict[str, int]:
     return {**_USAGE, "total": sum(_USAGE.values())}
 
@@ -54,6 +73,7 @@ def usage() -> dict[str, int]:
 def reset_usage() -> None:
     for key in _USAGE:
         _USAGE[key] = 0
+    _CALLS.clear()
 
 
 class BrightDataError(RuntimeError):
@@ -122,7 +142,7 @@ class BrightDataClient:
 
     async def _request(
         self, method: str, path: str, *, params: dict[str, Any] | None = None,
-        payload: Any = None,
+        payload: Any = None, timeout: float | None = None, retry_network: bool = True,
     ) -> httpx.Response:
         if not self._api_key:
             raise BrightDataError("Bright Data key missing; set BRIGHTDATA_API_KEY")
@@ -132,6 +152,7 @@ class BrightDataClient:
                 response = await self._client.request(
                     method, path, params=params, json=payload,
                     headers={"Authorization": f"Bearer {self._api_key}"},
+                    **({"timeout": timeout} if timeout is not None else {}),
                 )
                 if response.status_code in _RETRY_STATUSES and attempt < self.retries:
                     await asyncio.sleep(min(2 ** attempt, 4))
@@ -142,8 +163,9 @@ class BrightDataClient:
                     )
                 return response
             except (httpx.RequestError, httpx.TimeoutException) as exc:
-                if attempt == self.retries:
-                    raise BrightDataError(f"Bright Data {path}: network error") from exc
+                if attempt == self.retries or not retry_network:
+                    kind = "timeout" if isinstance(exc, httpx.TimeoutException) else "network error"
+                    raise BrightDataError(f"Bright Data {path}: {kind}") from exc
                 await asyncio.sleep(min(2 ** attempt, 4))
         raise BrightDataError(f"Bright Data {path}: exhausted retries")
 
@@ -166,18 +188,25 @@ class BrightDataClient:
     ) -> CollectionOutput:
         if not inputs:
             raise ValueError("dataset inputs cannot be empty")
+        # The synchronous endpoint holds the connection up to about a minute, then answers 202
+        # with a snapshot_id (client timeout SYNC_TIMEOUT); never resend on a network timeout
+        # (each resend would start a new, billed collection).
         response = await self._request(
             "POST", "/datasets/v3/scrape",
             params=self._dataset_params(dataset_id, method, limit_per_input),
-            payload={"input": inputs},
+            payload={"input": inputs}, retry_network=False,
         )
         payload = parse_body(response)
         if response.status_code == 202:
             snapshot_id = payload.get("snapshot_id") if isinstance(payload, dict) else None
             if not snapshot_id:
                 raise BrightDataError("Bright Data returned HTTP 202 without snapshot_id")
+            record_call("datasets", rows=0, status="running", dataset_id=dataset_id,
+                        snapshot_id=str(snapshot_id))
             return CollectionOutput(status="running", source_mode="live", snapshot_id=snapshot_id)
-        record_usage("datasets", len(payload) if isinstance(payload, list) else 1)
+        rows = _data_rows(payload)
+        record_usage("datasets", rows)
+        record_call("datasets", rows=rows, status="ready", dataset_id=dataset_id)
         return CollectionOutput(status="ready", source_mode="live", data=payload)
 
     async def trigger_dataset(
@@ -214,7 +243,9 @@ class BrightDataClient:
             return CollectionOutput(status="running", source_mode="live", snapshot_id=snapshot_id)
         if isinstance(data, dict) and data.get("status") in {"failed", "canceled"}:
             raise BrightDataError("Bright Data snapshot failed")
-        record_usage("datasets", len(data) if isinstance(data, list) else 1)
+        rows = _data_rows(data)
+        record_usage("datasets", rows)
+        record_call("datasets", rows=rows, status="ready", snapshot_id=snapshot_id)
         return CollectionOutput(
             status="ready", source_mode="live", snapshot_id=snapshot_id, data=data
         )
@@ -227,6 +258,7 @@ class BrightDataClient:
             "POST", "/request", payload={"zone": self.serp_zone, "url": url, "format": "raw"}
         )
         record_usage("serp")
+        record_call("serp", rows=1, status="ready")
         return response.text
 
     async def unlock(self, url: str) -> str:
@@ -245,6 +277,7 @@ class BrightDataClient:
             kyc = " (KYC required for this site)" if "kyc" in text.lower() else ""
             raise BrightDataError(f"Web Unlocker refused {reason}{kyc}")
         record_usage("web_unlocker")
+        record_call("web_unlocker", rows=1, status="ready")
         return text
 
     @staticmethod

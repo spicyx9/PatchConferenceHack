@@ -240,3 +240,8 @@ th { color: var(--muted); font-weight: 600; }
 .degraded-banner { background: var(--red); color: #fff; font-weight: 700; font-size: 1.3rem; padding: 0.8rem 1.2rem; text-align: center; }
 .bd-counter { font-size: 1.35rem; padding: 0.7rem 1.1rem; margin-bottom: 1rem; border: 2px solid var(--accent); border-radius: 10px; background: var(--panel); }
 .bd-counter .bd-detail { font-size: 1.05rem; color: var(--muted); margin-left: 0.6rem; }
+.pipeline-headline { font-size: 1.25rem; font-weight: 700; margin: 0.4rem 0 0.8rem; }
+.pipeline-table { width: 100%; border-collapse: collapse; font-size: 1rem; }
+.pipeline-table th, .pipeline-table td { border-bottom: 1px solid var(--border); padding: 0.35rem 0.5rem; text-align: left; }
+.pipeline-table tr.kind-brightdata td:nth-child(3) { color: var(--accent); font-weight: 700; }
+.pipeline-table tr.kind-fallback td:nth-child(3) { color: var(--amber); font-weight: 700; }
