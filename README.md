@@ -54,6 +54,8 @@ Most attendees go home with a few business cards and the feeling they were in th
 
 ## Graph model and Cypher queries
 
+Rankings are computed from FalkorDB traversals; without FalkorDB the API runs in an explicitly degraded mode.
+
 FalkorDB `6.0.3` (pinned in `docker-compose.yml`), client `falkordb==1.8.0`. Labels and relationship types come from an allowlist in `conferge/core/store.py`; every value is a `$parameter`.
 
 **Nodes**: `Conference`, `Event {event_type, start_at, end_at, status}`, `Person {name, title, roles, participation}`, `Company`, `Venue {latitude, longitude}`, `Topic`, `Goal {user_id, priority}`, `Opportunity`, `Lodging`, `FlightOffer`, `Meeting {user_id, kind, at_ms, target_id, reason}`.

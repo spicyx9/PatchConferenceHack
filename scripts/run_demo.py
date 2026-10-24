@@ -49,7 +49,9 @@ def _maybe_reexec_with_travel_packages() -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--mode", choices=["fixture", "live"], default="fixture")
-    parser.add_argument("--graph", default="conferge_demo", help="FalkorDB graph name (reset on start)")
+    parser.add_argument("--graph", default="conferge_demo", help="FalkorDB graph name")
+    parser.add_argument("--reset-graph", action="store_true",
+                        help="delete the graph first (drops the user's MET/SKIPPED memory)")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument("--no-graph", action="store_true", help="serve without loading FalkorDB")
@@ -92,12 +94,14 @@ def main() -> int:
         from conferge.core.store import connect_graph
 
         store = connect_graph()
-        try:
-            store.graph.delete()
-        except Exception:  # noqa: BLE001 - absent graph
-            pass
-        store = connect_graph()
-        index_errors = store.ensure_indexes(force=True)  # the graph was just deleted
+        if args.reset_graph:
+            try:
+                store.graph.delete()
+            except Exception:  # noqa: BLE001 - absent graph
+                pass
+            store = connect_graph()
+        # Without --reset-graph the load is MERGE-only: memory survives a restart.
+        index_errors = store.ensure_indexes(force=True)
         bundle = GraphBundle(
             source_mode="live" if assembly.data_mode == "live" else "fixture",
             note=f"scripts/run_demo.py, data_mode={assembly.data_mode}",

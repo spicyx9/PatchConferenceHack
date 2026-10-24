@@ -93,6 +93,8 @@ def person_goal_match(person: Person, goal: Goal) -> float:
     return min(role_hit + topic_hit, 1.0) if role_hit else topic_hit
 
 
+# Degraded fallback only (no FalkorDB): rank_people and event_scores below. When the graph
+# answers, the API ranks with conferge.graph.ranking (people_for_goal, events_for_goal).
 def rank_people(
     data: DemoData, goals: list[Goal], met: dict[str, str] | None = None
 ) -> list[Opportunity]:
@@ -217,6 +219,7 @@ def build_plan(
     *,
     skipped: set[str] | None = None,
     attended: set[str] | None = None,
+    scores: dict[str, float] | None = None,
 ) -> dict[str, Any]:
     """Greedy reverse plan: per day keep the best non-overlapping events.
 
@@ -225,7 +228,8 @@ def build_plan(
     """
     skipped = skipped or set()
     attended = attended or set()
-    scores = event_scores(data, goals, opportunities)
+    # Graph-derived scores when given (API graph mode); Python scores only as degraded fallback.
+    scores = scores if scores is not None else event_scores(data, goals, opportunities)
     opp_by_person = {pid: o for o in opportunities for pid in o.person_ids}
     # Only the days the user is in town, and only events attendable from the conference city.
     tz = data.conference.timezone

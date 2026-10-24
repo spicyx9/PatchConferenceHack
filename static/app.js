@@ -142,7 +142,15 @@
     });
   }
 
+  function updateDegradedBanner() {
+    var degraded = Object.keys(envelopes).some(function (k) {
+      return envelopes[k] && envelopes[k].data_source === "degraded_no_graph";
+    });
+    $("degraded-banner").classList.toggle("hidden", !degraded);
+  }
+
   function updateGlobalBadges() {
+    updateDegradedBanner();
     var modes = {};
     var worst = null;
     var collected = null;
