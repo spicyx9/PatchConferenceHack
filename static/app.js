@@ -205,14 +205,36 @@
       esc(unknown ? "unknown" : value) + '</div><div class="name">' + esc(name) + "</div></div>";
   }
 
+  // One value per tile: a count or a formatted amount; null stays "unknown", never 0.
+  function setRoiFigure(id, value) {
+    var el = $(id);
+    if (!el) return;
+    var unknown = value === null || value === undefined;
+    el.textContent = unknown ? "unknown" : String(value);
+    el.classList.toggle("unknown", unknown);
+  }
+
   function renderRoi(roi) {
     if (!roi) { $("roi-grid").innerHTML = '<p class="muted">ROI indisponible.</p>'; return; }
+    var spendKnown = roi.spend_usd !== null && roi.spend_usd !== undefined;
+    var spend = spendKnown ? fmtUsd(roi.spend_usd) : null;
+    // Dashboard tab (same figures, grid rebuilt).
     $("roi-grid").innerHTML =
-      roiTile("Depenses (USD)", roi.spend_usd === null || roi.spend_usd === undefined ? null : fmtUsd(roi.spend_usd)) +
+      roiTile("Depenses vol + hotel", spend) +
       roiTile("Rencontres", roi.meetings) +
       roiTile("Contacts qualifies", roi.qualified_contacts) +
       roiTile("Opportunites (score >= 30)", roi.opportunities);
     $("roi-note").textContent = "Budget: " + fmtUsd(roi.budget_usd) + (roi.spend_note ? " | " + roi.spend_note : "");
+    // Demo tab, step 7: fixed ids so the figures can be checked after each /met, /attended, /skipped.
+    setRoiFigure("roi-spend", spend);
+    setRoiFigure("roi-meetings", roi.meetings);
+    setRoiFigure("roi-qualified", roi.qualified_contacts);
+    setRoiFigure("roi-opportunities", roi.opportunities);
+    if ($("roi-spend-note")) $("roi-spend-note").textContent = spendKnown ? "" : (roi.spend_note || "");
+  }
+
+  function refreshRoi() {
+    return api("/roi", null, "roi").then(renderRoi).catch(function (e) { showError("ROI: " + e.message); });
   }
 
   function planItems(plan) {
@@ -793,7 +815,7 @@
         var opps = renderStoryOpps(r[2]);
         storyMetButton();
         var fomo = api("/antifomo", null, "antifomo").then(renderStoryAntifomo).then(loadAgentsState);
-        return Promise.all([opps, fomo]);
+        return Promise.all([opps, fomo, refreshRoi()]);
       }).catch(function (e) { showError("Demo: " + e.message); });
   }
 
@@ -818,7 +840,7 @@
         res.person_name = person.name;
         return api("/people?limit=3", null, "people").then(function (after) { renderStoryMet(before, res, after); });
       });
-    });
+    }).then(refreshRoi);
   }
 
   // Wiring
