@@ -183,9 +183,17 @@ def main() -> int:
     if problem := port_preflight(args.host, args.port):
         print(f"make demo: {problem}", file=sys.stderr)
         return 2
+    graph_down = None
     if not args.no_graph and (problem := falkordb_preflight()):
-        print(f"make demo: {problem}", file=sys.stderr)
-        return 2
+        if not problem.startswith("nothing answers"):  # a plain Redis / refusal: config error
+            print(f"make demo: {problem}", file=sys.stderr)
+            return 2
+        from conferge.core.settings import falkordb_address
+
+        # Unreachable: serve anyway, without the graph, and say so in the Data pipeline panel.
+        graph_down = "FalkorDB unreachable on {}:{}".format(*falkordb_address())
+        print(f"make demo: {graph_down}; serving without the graph", file=sys.stderr)
+        args.no_graph = True
 
     import uvicorn
 
@@ -213,6 +221,11 @@ def main() -> int:
     with timings.step("assemble"):
         usable_slices = pipeline._usable(slices)
         assembly = assemble(usable_slices, travel)
+    if graph_down:
+        assembly.demo.pipeline.insert(0, {
+            "source": "graph", "provider": "falkordb", "kind": "direct", "brightdata_api": None,
+            "records": None, "collected_at": None, "status": "failed", "termination": "error",
+            "reason": graph_down, "estimated_cost_usd": None, "estimate_basis": None})
     goals = parse_goals(assembly.demo.demo_goal_text)
     with timings.step("plan"):
         opps = asyncio.run(pipeline._stage_planning(report, assembly, goals))

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 import socket
 import subprocess
@@ -48,12 +49,35 @@ def _plain_redis(server: socket.socket) -> None:
                 conn.sendall(b"-ERR unknown command 'GRAPH.LIST', with args beginning with: \r\n")
 
 
-def test_closed_port_stops_with_one_line() -> None:
-    port = _free_port()
-    proc = _run_demo(port)
-    assert proc.returncode == 2
-    assert f"nothing answers on 127.0.0.1:{port}" in proc.stderr
-    assert "Traceback" not in proc.stderr + proc.stdout
+def test_unreachable_falkordb_serves_anyway_with_failed_status_and_reason() -> None:
+    import time
+    import urllib.request
+
+    port, ui = _free_port(), _free_port()
+    env = {**os.environ, "FALKORDB_HOST": "127.0.0.1", "FALKORDB_PORT": str(port),
+           "BRIGHTDATA_API_KEY": ""}
+    proc = subprocess.Popen([sys.executable, str(ROOT / "scripts" / "run_demo.py"), "--port", str(ui),
+                             "--graph", "conferge_w2_test"], env=env, cwd=ROOT,
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    try:
+        body = None
+        for _ in range(240):
+            try:
+                with urllib.request.urlopen(f"http://127.0.0.1:{ui}/api/v1/pipeline", timeout=2) as r:
+                    body = json.loads(r.read())
+                    break
+            except OSError:
+                if proc.poll() is not None:
+                    break
+                time.sleep(0.25)
+        assert body is not None, proc.stderr.read() if proc.poll() is not None else "no answer"
+        first = body["rows"][0]
+        assert first["provider"] == "falkordb" and first["status"] == "failed"
+        assert first["reason"] == f"FalkorDB unreachable on 127.0.0.1:{port}"
+    finally:
+        proc.terminate()
+        out, err = proc.communicate(timeout=20)
+    assert "Traceback" not in out + err
 
 
 def test_plain_redis_is_named_explicitly() -> None:
