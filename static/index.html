@@ -166,6 +166,14 @@
         <div id="graph-fallback" class="hidden"></div>
         <div id="graph-detail" class="graph-detail muted">Aucune selection.</div>
       </div>
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Agents on the graph</h2>
+          <span>Plan version: <span id="agents-plan-version" class="badge neutral">?</span></span>
+        </div>
+        <p class="muted small-text">Le planner, l'anti-FOMO et le replanner se coordonnent par FalkorDB : chacun lit ce que l'autre a ecrit.</p>
+        <div id="agents-state"></div>
+      </div>
     </section>
 
     <section id="tab-people" class="tab-panel">

@@ -247,12 +247,27 @@ def create_app(
             "user": state.data.user, "demo_goal_text": state.data.demo_goal_text,
         })
 
-    def _plan_payload() -> dict[str, Any]:
+    def _publish_plan(plan: dict[str, Any]) -> dict[str, Any] | None:
+        """Planner writes the plan to FalkorDB (shared agent state); None without a graph."""
+        store = state.store()
+        if store is None:
+            return None
+        try:
+            from conferge.agents.planner.graph_state import publish_plan
+
+            return publish_plan(store, USER_ID, plan, state.attended)
+        except Exception as exc:  # noqa: BLE001 - the plan is still served, visibly unshared
+            return {"error": type(exc).__name__}
+
+    def _plan_payload(publish: bool = True) -> dict[str, Any]:
         opps = state.opportunities()
+        plan = state.plan()
+        shared = _publish_plan(plan) if publish else None
         return {
             "goal_text": state.goal_text,
             "goals": [g.model_dump(mode="json") for g in state.goals],
-            "plan": state.plan(),
+            "plan": plan,
+            "plan_graph": shared,
             "people": [o.model_dump(mode="json") for o in opps[:10]],
             "computed_by": ("falkordb" if state.rank_mode == "graph"
                             else state.agent_mode or logic.FALLBACK),
@@ -362,11 +377,25 @@ def create_app(
         except Exception as exc:  # noqa: BLE001 - visible degradation, not a 500
             return _envelope(state, ["events"], {"skips": [], "computed_by": None},
                              extra_warnings=[f"anti-FOMO agent error {type(exc).__name__}"])
-        planned = {i["event_id"] for d in state.plan()["days"] for i in d["items"]}
+        # The plan comes from the graph (written by the planner), not from this process.
+        notes = [f"{result.agent}: {e}" for e in result.errors]
+        store, plan_version, skips_written = state.store(), None, None
+        if store is not None:
+            from conferge.agents.antifomo.graph_state import planned_from_graph, publish_skips
+
+            _publish_plan(state.plan())  # make sure the planner's current plan is in the graph
+            planned, plan_version = planned_from_graph(store, USER_ID)
+        else:
+            planned = {i["event_id"] for d in state.plan()["days"] for i in d["items"]}
+            notes.append("FalkorDB not reachable: anti-FOMO read the plan from the API process")
         skips = logic.antifomo_skips(result.decisions, state.data, planned=planned)
+        if store is not None:
+            skips_written = publish_skips(store, USER_ID, skips)
         return _envelope(state, ["events", "people"], {
             "skips": skips, "computed_by": result.agent, "status": result.status,
-        }, extra_warnings=[f"{result.agent}: {e}" for e in result.errors])
+            "plan_source": "falkordb" if store is not None else "process",
+            "plan_version": plan_version, "skips_graph": skips_written,
+        }, extra_warnings=notes)
 
     @api.get("/people")
     def people(limit: int = Query(10, ge=1, le=100)) -> dict[str, Any]:
@@ -623,9 +652,20 @@ def create_app(
             raise HTTPException(404, f"unknown scenario_id {req.scenario_id!r}")
         before = state.plan()
         scenario = logic.resolve_scenario(scenario, before)
+        _publish_plan(before)  # the replanner reads the plan in force from the graph
         changed = logic.apply_scenario(state.data, scenario)
         state.scenario_id = scenario["id"]
-        payload = _plan_payload()
+        payload = _plan_payload(publish=False)
+        store = state.store()
+        if store is not None:
+            from conferge.agents.replanner.graph_state import publish_replan
+
+            try:
+                payload["plan_graph"] = publish_replan(
+                    store, USER_ID, label=scenario["label"], scenario_id=scenario["id"],
+                    changed=changed, new_plan=payload["plan"], attended=state.attended)
+            except Exception as exc:  # noqa: BLE001 - the diff is still served
+                payload["plan_graph"] = {"error": type(exc).__name__}
         replan = logic.explain_replan(before, payload["plan"], changed, state.data)
         for entry in replan:
             entry["graph_path"] = _replacement_path(entry["replacement"])
@@ -637,6 +677,26 @@ def create_app(
         })
         return _envelope(state, ["events", "people"], payload,
                          extra_warnings=[*_plan_warnings(), "simulated change: not a real update from the source"])
+
+    @api.get("/agents/state")
+    def agents_state() -> dict[str, Any]:
+        """What the planner, anti-FOMO and replanner wrote to FalkorDB for the user."""
+        store = state.store()
+        if store is None:
+            return _envelope(state, ["events"], {"backend": None, "agents": [], "plan": None,
+                                                 "skips": [], "changes": [], "cypher": None},
+                             extra_warnings=["FalkorDB not reachable: no shared agent state"])
+        from conferge.graph import agent_state
+
+        cypher = agent_state.state_cypher(USER_ID)
+        return _envelope(state, ["events"], {
+            "backend": "falkordb", "user_id": USER_ID,
+            "agents": agent_state.agent_activity(store, USER_ID),
+            "plan": agent_state.read_plan(store, USER_ID),
+            "skips": agent_state.read_skips(store, USER_ID),
+            "changes": agent_state.read_changes(store, USER_ID),
+            "cypher": cypher, "browser_url": providers.browser_url(cypher),
+        })
 
     @api.post("/reset")
     def reset() -> dict[str, Any]:
