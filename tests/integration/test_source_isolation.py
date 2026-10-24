@@ -78,3 +78,17 @@ def test_sanitize_redacts_and_caps() -> None:
     out = sanitize("Bearer abc.def https://x.io/p?key=1&sig=2 password: hunter2 " + "z" * 500)
     assert "abc.def" not in out and "sig=2" not in out and "hunter2" not in out
     assert out.startswith("Bearer=<redacted> https://x.io/p?…") and len(out) <= 200
+
+
+def test_status_display_failed_partial_ok() -> None:
+    from conferge.integration.sources import status_display
+
+    partial = _with_event(SourceSlice("partiful", "01", "live", "live", "degraded"))
+    shown = status_display([partial, SourceSlice("luma", "01", "live", "live", "ok")])
+    assert shown == {"label": "partial", "reason": "Partiful not exhausted, 2 events kept"}
+    slices = asyncio.run(live_slices(timeout=0.5, runners=RUNNERS))
+    shown = status_display([*slices, partial])
+    assert shown["label"] == "failed"  # a source that raised outranks a partial one
+    assert shown["reason"].startswith("Eventbrite failed (RuntimeError: upstream 500")
+    assert "SECRET42" not in shown["reason"] and "degraded" not in shown["reason"]
+    assert status_display([_with_event(SourceSlice("a", "01", "live", "live", "ok"))])["label"] == "ok"

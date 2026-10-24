@@ -22,7 +22,13 @@ from conferge.integration import checks
 from conferge.integration.assemble import Assembly, assemble
 from conferge.integration.components import ComponentStatus, inventory
 from conferge.integration.memgraph import MemoryGraph
-from conferge.integration.sources import SourceSlice, fixture_slices, live_slices, overall_report
+from conferge.integration.sources import (
+    SourceSlice,
+    fixture_slices,
+    live_slices,
+    overall_report,
+    status_display,
+)
 from conferge.integration.stays_flights import collect_stays_flights
 
 Outcome = Literal["pass", "warn", "fail", "skip"]
@@ -399,7 +405,8 @@ def record_collection(demo: Any, slices: list[SourceSlice], timings: Timings,
     """Attach the per-source/per-step durations and the overall sources RunReport to the
     dataset the API serves (shown by /api/v1/pipeline)."""
     demo.timings = timings.as_dict(slices)
-    demo.sources_report = overall_report(slices, started_at).model_dump(mode="json")
+    demo.sources_report = {**overall_report(slices, started_at).model_dump(mode="json"),
+                           "display": status_display(slices)}
 
 
 def run_e2e_sync(*args: Any, **kwargs: Any) -> E2EReport:

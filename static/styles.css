@@ -3383,6 +3383,9 @@ dialog .eyebrow {
 .reach-ok { color: var(--green); font-weight: 700; }
 .reach-blocked, .reach-error { color: var(--red); font-weight: 700; }
 .reach-pending, .reach-shell_js { color: var(--amber); font-weight: 700; }
+.overall-failed { color: var(--red); font-weight: 700; }
+.overall-partial { color: var(--amber); font-weight: 700; }
+.overall-ok { color: var(--green); font-weight: 700; }
 .badge.src-bd { background: rgba(40, 115, 67, 0.12); color: var(--green); }
 .badge.src-fallback { background: rgba(139, 92, 24, 0.12); color: var(--amber); }
 .badge.src-fixture { background: var(--panel-2); color: var(--muted); }
