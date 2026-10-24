@@ -604,15 +604,56 @@ _SKIP_CATEGORY = {"outside_hours": "outside hours", "other_timezone": "other tim
                   "time_conflict": "time conflict", "travel": "travel too long", "low_score": "low score"}
 
 
+def _served_block(event: Event | None, decision: dict[str, Any], data: DemoData,
+                  plan_items: dict[str, dict[str, Any]], kept: dict[str, dict[str, Any]],
+                  ) -> dict[str, Any] | None:
+    """The plan event a rejected event loses to, taken from the served plan, never from the agent.
+
+    The agent's ``blocking_event_id`` counts only when the served plan keeps it; otherwise the
+    served plan's overlapping event, then its closest same-day event (a travel clash). Returns
+    ``{"event_id", "title", "utility", "names"}`` or None when the plan keeps nothing nearby.
+    """
+    def _item(event_id: str) -> dict[str, Any] | None:
+        item = plan_items.get(event_id)
+        if item is None:
+            return None
+        agent_item = kept.get(event_id)
+        names = [p["name"] for p in item.get("people", []) if p.get("name")]
+        if agent_item:
+            names = [p.name for pid in agent_item.get("targets_confirmed", [])
+                     if (p := data.person(pid))] or names
+        return {"event_id": event_id, "title": item["title"],
+                "utility": agent_item["utility"] if agent_item else None, "names": names}
+
+    hinted = decision.get("blocking_event_id") or ""
+    if hinted in plan_items:
+        return _item(hinted)
+    if event is None or event.start_at is None:
+        return None
+    candidates = [data.event(eid) for eid in plan_items]
+    same_day = [c for c in candidates if c and c.start_at and c.start_at.date() == event.start_at.date()]
+    overlapping = [c for c in same_day if _overlaps(event, c)]
+    pool = overlapping or same_day
+    if not pool:
+        return None
+    nearest = min(pool, key=lambda c: abs((c.start_at - event.start_at).total_seconds()))  # type: ignore[operator]
+    return _item(nearest.id)
+
+
 def antifomo_skips(decisions: list[dict[str, Any]], data: DemoData, limit: int = 4,
-                   planned: set[str] | None = None) -> list[dict[str, Any]]:
+                   planned: set[str] | None = None,
+                   plan_items: dict[str, dict[str, Any]] | None = None) -> list[dict[str, Any]]:
     """The anti-FOMO agent's most tempting rejections, with a category and what skipping gains.
 
     One per category first (outside hours, time conflict, travel, low score), then by utility,
     so the demo shows the different reasons instead of variations of the same one. Events kept
-    by the displayed plan (``planned``) are left out so the two views never contradict.
+    by the displayed plan (``planned``) are left out so the two views never contradict, and the
+    event a skip "gains" (``plan_items``, the served plan's items by event id) is always one the
+    displayed plan keeps. Without ``plan_items`` the agent's own plan items stand in.
     """
     kept = {d["event_id"]: d for d in decisions if d.get("type") == "plan_item"}
+    if plan_items is None:
+        plan_items = {eid: {"title": d["title"], "people": []} for eid, d in kept.items()}
     out = []
     tz = data.conference.timezone
     for event in data.events:
@@ -632,16 +673,16 @@ def antifomo_skips(decisions: list[dict[str, Any]], data: DemoData, limit: int =
             continue
         if (planned and r["event_id"] in planned) or r["event_id"] in seen:
             continue
-        event, block_item = data.event(r["event_id"]), kept.get(r.get("blocking_event_id") or "")
+        event = data.event(r["event_id"])
+        block_item = _served_block(event, r, data, plan_items, kept) if r["code"] == "conflict" else None
         block = data.event(block_item["event_id"]) if block_item else None
         utility = r.get("utility") or 0.0
-        if r["code"] == "conflict" and event and block:
+        if r["code"] == "conflict" and event and block_item and block:
             category = "time_conflict" if _overlaps(event, block) else "travel"
-            names = [p.name for pid in block_item.get("targets_confirmed", [])
-                     if (p := data.person(pid))]
+            names = block_item["names"]
             kept_u = block_item["utility"]
             gain = (f"you keep '{block_item['title']}' (+{kept_u - utility:.0f} utility)"
-                    if kept_u >= utility else
+                    if kept_u is not None and kept_u >= utility else
                     f"the day's best combination keeps '{block_item['title']}'")
             if names:
                 gain += f", where you meet {', '.join(names[:2])}"

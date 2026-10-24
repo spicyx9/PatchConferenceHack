@@ -105,3 +105,30 @@ def test_online_or_daytime_events_are_kept_and_abroad_daytime_is_other_timezone(
                        start_at=datetime(2026, 10, 28, 18, 0, tzinfo=timezone(timedelta(hours=1))))
     assert logic.off_hours_reason(day_abroad, tz)[0] == "other_timezone"  # type: ignore[index]
     assert logic.off_hours_reason(Event(id="d", title="D", start_at=night.replace(hour=9), timezone=tz), tz) is None
+
+
+def test_gain_names_an_event_the_served_plan_keeps_not_the_agents_choice() -> None:
+    # The agent kept KEEP, but the served plan keeps OVERLAP instead (and never KEEP): the skip
+    # for FAR must gain OVERLAP, the only neighbour the user actually sees in the plan.
+    data = _data()
+    plan_items = {"overlap": {"event_id": "overlap", "title": "OVERLAP", "score": 70.0,
+                              "people": [{"person_id": "p1", "name": "Ada Lovelace"}]},
+                  "planned": {"event_id": "planned", "title": "PLANNED", "score": 10.0, "people": []}}
+    skips = logic.antifomo_skips(_decisions(), data, planned=set(plan_items), plan_items=plan_items)
+    far = next(s for s in skips if s["event_id"] == "far")
+    assert far["blocking_event_id"] == "overlap" and far["category"] == "time_conflict"
+    assert far["gain"] == "the day's best combination keeps 'OVERLAP', where you meet Ada Lovelace"
+    assert all(s["event_id"] not in plan_items for s in skips)
+    assert all(s["blocking_event_id"] in (None, *plan_items) for s in skips)
+    # KEEP, kept by the agent but not by the served plan, is now a skip itself: no gain cites it.
+    assert "KEEP" not in " ".join(s["gain"] for s in skips)
+
+
+def test_antifomo_endpoint_gains_only_cite_the_served_plan() -> None:
+    client = TestClient(create_app(graph_probe=False))
+    plan = client.get("/api/v1/plan").json()["plan"]
+    titles = {i["event_id"]: i["title"] for d in plan["days"] for i in d["items"]}
+    for skip in client.get("/api/v1/antifomo").json()["skips"]:
+        if skip["blocking_event_id"] is not None:
+            assert skip["blocking_event_id"] in titles
+            assert f"'{titles[skip['blocking_event_id']]}'" in skip["gain"]
