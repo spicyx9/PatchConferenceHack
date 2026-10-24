@@ -1,0 +1,476 @@
+{
+ "source_mode": "fixture",
+ "description": "FICTIONAL demo offers for NYC -> SF round trips around GitHub Universe 2026 (Oct 27-30). Carrier ZZ and all prices/times are invented test data; never display as live.",
+ "generated_by": "w06-flights",
+ "collected_at": "2026-10-24T12:00:00+00:00",
+ "offers": [
+  {
+   "id": "fo-634a2af3591d358a",
+   "dedup_key": "itin-7aaaceba9d299f3d",
+   "trip_type": "round_trip",
+   "slices": [
+    {
+     "segments": [
+      {
+       "origin_iata": "JFK",
+       "destination_iata": "SFO",
+       "departure_at": "2026-10-27T08:00:00-04:00",
+       "arrival_at": "2026-10-27T11:30:00-07:00",
+       "marketing_carrier": "ZZ",
+       "operating_carrier": null,
+       "flight_number": "ZZ101",
+       "aircraft": null,
+       "duration_minutes": 390,
+       "connection_type": "unknown"
+      }
+     ],
+     "duration_minutes": null,
+     "self_transfer": null
+    },
+    {
+     "segments": [
+      {
+       "origin_iata": "SFO",
+       "destination_iata": "JFK",
+       "departure_at": "2026-10-30T13:00:00-07:00",
+       "arrival_at": "2026-10-30T21:35:00-04:00",
+       "marketing_carrier": "ZZ",
+       "operating_carrier": null,
+       "flight_number": "ZZ102",
+       "aircraft": null,
+       "duration_minutes": 335,
+       "connection_type": "unknown"
+      }
+     ],
+     "duration_minutes": null,
+     "self_transfer": null
+    }
+   ],
+   "total_price": "412",
+   "raw_price_text": "412",
+   "price_scope": "total_all_passengers",
+   "currency": "USD",
+   "price_status": "unknown",
+   "collected_at": "2026-10-24T12:00:00Z",
+   "booking_url": null,
+   "booking_url_type": "unknown",
+   "baggage_verified": null,
+   "carry_on_included": null,
+   "checked_bags_included": null,
+   "warnings": [
+    "test_data: FICTIONAL fixture offer (carrier ZZ), not a real flight or fare",
+    "fixture_label: direct JFK-SFO",
+    "baggage_unverified: price may exclude bags and card fees"
+   ],
+   "evidence": [
+    {
+     "provider": "fixture:w06",
+     "source_mode": "fixture",
+     "source_url": null,
+     "collected_at": "2026-10-24T12:00:00Z",
+     "raw_ref": null,
+     "source_record_id": null,
+     "confidence": null
+    }
+   ]
+  },
+  {
+   "id": "fo-0a242dd70b4828b7",
+   "dedup_key": "itin-9de5c0c82482668b",
+   "trip_type": "round_trip",
+   "slices": [
+    {
+     "segments": [
+      {
+       "origin_iata": "EWR",
+       "destination_iata": "SFO",
+       "departure_at": "2026-10-27T09:15:00-04:00",
+       "arrival_at": "2026-10-27T12:50:00-07:00",
+       "marketing_carrier": "ZZ",
+       "operating_carrier": null,
+       "flight_number": "ZZ201",
+       "aircraft": null,
+       "duration_minutes": 395,
+       "connection_type": "unknown"
+      }
+     ],
+     "duration_minutes": null,
+     "self_transfer": null
+    },
+    {
+     "segments": [
+      {
+       "origin_iata": "SFO",
+       "destination_iata": "EWR",
+       "departure_at": "2026-10-30T14:00:00-07:00",
+       "arrival_at": "2026-10-30T22:30:00-04:00",
+       "marketing_carrier": "ZZ",
+       "operating_carrier": null,
+       "flight_number": "ZZ202",
+       "aircraft": null,
+       "duration_minutes": 330,
+       "connection_type": "unknown"
+      }
+     ],
+     "duration_minutes": null,
+     "self_transfer": null
+    }
+   ],
+   "total_price": "389",
+   "raw_price_text": "389",
+   "price_scope": "total_all_passengers",
+   "currency": "USD",
+   "price_status": "unknown",
+   "collected_at": "2026-10-24T12:00:00Z",
+   "booking_url": null,
+   "booking_url_type": "unknown",
+   "baggage_verified": null,
+   "carry_on_included": null,
+   "checked_bags_included": null,
+   "warnings": [
+    "test_data: FICTIONAL fixture offer (carrier ZZ), not a real flight or fare",
+    "fixture_label: direct EWR-SFO",
+    "baggage_unverified: price may exclude bags and card fees"
+   ],
+   "evidence": [
+    {
+     "provider": "fixture:w06",
+     "source_mode": "fixture",
+     "source_url": null,
+     "collected_at": "2026-10-24T12:00:00Z",
+     "raw_ref": null,
+     "source_record_id": null,
+     "confidence": null
+    }
+   ]
+  },
+  {
+   "id": "fo-c2d33b880682c7e2",
+   "dedup_key": "itin-30f251d812081b83",
+   "trip_type": "round_trip",
+   "slices": [
+    {
+     "segments": [
+      {
+       "origin_iata": "LGA",
+       "destination_iata": "ORD",
+       "departure_at": "2026-10-27T07:00:00-04:00",
+       "arrival_at": "2026-10-27T08:40:00-05:00",
+       "marketing_carrier": "ZZ",
+       "operating_carrier": null,
+       "flight_number": "ZZ301",
+       "aircraft": null,
+       "duration_minutes": 160,
+       "connection_type": "unknown"
+      },
+      {
+       "origin_iata": "ORD",
+       "destination_iata": "SFO",
+       "departure_at": "2026-10-27T09:50:00-05:00",
+       "arrival_at": "2026-10-27T12:30:00-07:00",
+       "marketing_carrier": "ZZ",
+       "operating_carrier": null,
+       "flight_number": "ZZ302",
+       "aircraft": null,
+       "duration_minutes": 280,
+       "connection_type": "unknown"
+      }
+     ],
+     "duration_minutes": null,
+     "self_transfer": null
+    },
+    {
+     "segments": [
+      {
+       "origin_iata": "SFO",
+       "destination_iata": "ORD",
+       "departure_at": "2026-10-30T12:00:00-07:00",
+       "arrival_at": "2026-10-30T18:05:00-05:00",
+       "marketing_carrier": "ZZ",
+       "operating_carrier": null,
+       "flight_number": "ZZ303",
+       "aircraft": null,
+       "duration_minutes": 245,
+       "connection_type": "unknown"
+      },
+      {
+       "origin_iata": "ORD",
+       "destination_iata": "LGA",
+       "departure_at": "2026-10-30T19:10:00-05:00",
+       "arrival_at": "2026-10-30T22:25:00-04:00",
+       "marketing_carrier": "ZZ",
+       "operating_carrier": null,
+       "flight_number": "ZZ304",
+       "aircraft": null,
+       "duration_minutes": 135,
+       "connection_type": "unknown"
+      }
+     ],
+     "duration_minutes": null,
+     "self_transfer": null
+    }
+   ],
+   "total_price": "318",
+   "raw_price_text": "318",
+   "price_scope": "total_all_passengers",
+   "currency": "USD",
+   "price_status": "unknown",
+   "collected_at": "2026-10-24T12:00:00Z",
+   "booking_url": null,
+   "booking_url_type": "unknown",
+   "baggage_verified": null,
+   "carry_on_included": null,
+   "checked_bags_included": null,
+   "warnings": [
+    "test_data: FICTIONAL fixture offer (carrier ZZ), not a real flight or fare",
+    "fixture_label: one stop LGA-ORD-SFO",
+    "baggage_unverified: price may exclude bags and card fees"
+   ],
+   "evidence": [
+    {
+     "provider": "fixture:w06",
+     "source_mode": "fixture",
+     "source_url": null,
+     "collected_at": "2026-10-24T12:00:00Z",
+     "raw_ref": null,
+     "source_record_id": null,
+     "confidence": null
+    }
+   ]
+  },
+  {
+   "id": "fo-ed3105d09465c5af",
+   "dedup_key": "itin-25c4734fe4fd864d",
+   "trip_type": "round_trip",
+   "slices": [
+    {
+     "segments": [
+      {
+       "origin_iata": "JFK",
+       "destination_iata": "DEN",
+       "departure_at": "2026-10-27T06:30:00-04:00",
+       "arrival_at": "2026-10-27T08:55:00-06:00",
+       "marketing_carrier": "ZZ",
+       "operating_carrier": null,
+       "flight_number": "ZZ401",
+       "aircraft": null,
+       "duration_minutes": 265,
+       "connection_type": "unknown"
+      },
+      {
+       "origin_iata": "DEN",
+       "destination_iata": "OAK",
+       "departure_at": "2026-10-27T10:00:00-06:00",
+       "arrival_at": "2026-10-27T11:40:00-07:00",
+       "marketing_carrier": "ZZ",
+       "operating_carrier": null,
+       "flight_number": "ZZ402",
+       "aircraft": null,
+       "duration_minutes": 160,
+       "connection_type": "unknown"
+      }
+     ],
+     "duration_minutes": null,
+     "self_transfer": null
+    },
+    {
+     "segments": [
+      {
+       "origin_iata": "OAK",
+       "destination_iata": "DEN",
+       "departure_at": "2026-10-30T11:00:00-07:00",
+       "arrival_at": "2026-10-30T14:20:00-06:00",
+       "marketing_carrier": "ZZ",
+       "operating_carrier": null,
+       "flight_number": "ZZ403",
+       "aircraft": null,
+       "duration_minutes": 140,
+       "connection_type": "unknown"
+      },
+      {
+       "origin_iata": "DEN",
+       "destination_iata": "JFK",
+       "departure_at": "2026-10-30T15:30:00-06:00",
+       "arrival_at": "2026-10-30T21:20:00-04:00",
+       "marketing_carrier": "ZZ",
+       "operating_carrier": null,
+       "flight_number": "ZZ404",
+       "aircraft": null,
+       "duration_minutes": 230,
+       "connection_type": "unknown"
+      }
+     ],
+     "duration_minutes": null,
+     "self_transfer": null
+    }
+   ],
+   "total_price": "296",
+   "raw_price_text": "296",
+   "price_scope": "total_all_passengers",
+   "currency": "USD",
+   "price_status": "unknown",
+   "collected_at": "2026-10-24T12:00:00Z",
+   "booking_url": null,
+   "booking_url_type": "unknown",
+   "baggage_verified": null,
+   "carry_on_included": null,
+   "checked_bags_included": null,
+   "warnings": [
+    "test_data: FICTIONAL fixture offer (carrier ZZ), not a real flight or fare",
+    "fixture_label: one stop JFK-DEN-OAK",
+    "baggage_unverified: price may exclude bags and card fees"
+   ],
+   "evidence": [
+    {
+     "provider": "fixture:w06",
+     "source_mode": "fixture",
+     "source_url": null,
+     "collected_at": "2026-10-24T12:00:00Z",
+     "raw_ref": null,
+     "source_record_id": null,
+     "confidence": null
+    }
+   ]
+  },
+  {
+   "id": "fo-2bc1473aac6a980c",
+   "dedup_key": "itin-583043704b381a5c",
+   "trip_type": "round_trip",
+   "slices": [
+    {
+     "segments": [
+      {
+       "origin_iata": "JFK",
+       "destination_iata": "SFO",
+       "departure_at": "2026-10-26T08:00:00-04:00",
+       "arrival_at": "2026-10-26T11:30:00-07:00",
+       "marketing_carrier": "ZZ",
+       "operating_carrier": null,
+       "flight_number": "ZZ101",
+       "aircraft": null,
+       "duration_minutes": 390,
+       "connection_type": "unknown"
+      }
+     ],
+     "duration_minutes": null,
+     "self_transfer": null
+    },
+    {
+     "segments": [
+      {
+       "origin_iata": "SFO",
+       "destination_iata": "JFK",
+       "departure_at": "2026-10-30T13:00:00-07:00",
+       "arrival_at": "2026-10-30T21:35:00-04:00",
+       "marketing_carrier": "ZZ",
+       "operating_carrier": null,
+       "flight_number": "ZZ102",
+       "aircraft": null,
+       "duration_minutes": 335,
+       "connection_type": "unknown"
+      }
+     ],
+     "duration_minutes": null,
+     "self_transfer": null
+    }
+   ],
+   "total_price": "301",
+   "raw_price_text": "301",
+   "price_scope": "total_all_passengers",
+   "currency": "USD",
+   "price_status": "unknown",
+   "collected_at": "2026-10-24T12:00:00Z",
+   "booking_url": null,
+   "booking_url_type": "unknown",
+   "baggage_verified": null,
+   "carry_on_included": null,
+   "checked_bags_included": null,
+   "warnings": [
+    "test_data: FICTIONAL fixture offer (carrier ZZ), not a real flight or fare",
+    "fixture_label: alternative depart J-1",
+    "baggage_unverified: price may exclude bags and card fees"
+   ],
+   "evidence": [
+    {
+     "provider": "fixture:w06",
+     "source_mode": "fixture",
+     "source_url": null,
+     "collected_at": "2026-10-24T12:00:00Z",
+     "raw_ref": null,
+     "source_record_id": null,
+     "confidence": null
+    }
+   ]
+  },
+  {
+   "id": "fo-94633ad4c4da21f2",
+   "dedup_key": "itin-e155ffda30466493",
+   "trip_type": "round_trip",
+   "slices": [
+    {
+     "segments": [
+      {
+       "origin_iata": "JFK",
+       "destination_iata": "SFO",
+       "departure_at": "2026-10-27T08:00:00-04:00",
+       "arrival_at": "2026-10-27T11:30:00-07:00",
+       "marketing_carrier": "ZZ",
+       "operating_carrier": null,
+       "flight_number": "ZZ101",
+       "aircraft": null,
+       "duration_minutes": 390,
+       "connection_type": "unknown"
+      }
+     ],
+     "duration_minutes": null,
+     "self_transfer": null
+    },
+    {
+     "segments": [
+      {
+       "origin_iata": "SFO",
+       "destination_iata": "JFK",
+       "departure_at": "2026-10-31T13:00:00-07:00",
+       "arrival_at": "2026-10-31T21:35:00-04:00",
+       "marketing_carrier": "ZZ",
+       "operating_carrier": null,
+       "flight_number": "ZZ102",
+       "aircraft": null,
+       "duration_minutes": 335,
+       "connection_type": "unknown"
+      }
+     ],
+     "duration_minutes": null,
+     "self_transfer": null
+    }
+   ],
+   "total_price": "355",
+   "raw_price_text": "355",
+   "price_scope": "total_all_passengers",
+   "currency": "USD",
+   "price_status": "unknown",
+   "collected_at": "2026-10-24T12:00:00Z",
+   "booking_url": null,
+   "booking_url_type": "unknown",
+   "baggage_verified": null,
+   "carry_on_included": null,
+   "checked_bags_included": null,
+   "warnings": [
+    "test_data: FICTIONAL fixture offer (carrier ZZ), not a real flight or fare",
+    "fixture_label: alternative return J+1",
+    "baggage_unverified: price may exclude bags and card fees"
+   ],
+   "evidence": [
+    {
+     "provider": "fixture:w06",
+     "source_mode": "fixture",
+     "source_url": null,
+     "collected_at": "2026-10-24T12:00:00Z",
+     "raw_ref": null,
+     "source_record_id": null,
+     "confidence": null
+    }
+   ]
+  }
+ ]
+}
