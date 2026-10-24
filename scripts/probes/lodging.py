@@ -6,8 +6,7 @@ Writes probes/lodging.md. One real call per provider path:
 - Airbnb: pyairbnb (search_all + get_price + get_calendar), Bright Data gd_ld7ll037kqy322v05
   as fallback and also probed on its own.
 No BRIGHTDATA_API_KEY -> those paths end with an explicit ``missing_credentials`` status.
-pyairbnb is not a project dependency yet: when it is missing, the probe re-runs itself once
-through ``uv run --with pyairbnb`` (ephemeral, nothing written to pyproject or uv.lock).
+pyairbnb is a pinned project dependency (``make install``).
 Raw responses go to raw/lodging/ (gitignored). The labelled fixture is shown only as such.
 """
 
@@ -17,7 +16,6 @@ import asyncio
 import importlib.util
 import json
 import os
-import subprocess
 import sys
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -37,27 +35,12 @@ from conferge.lodging.models import LodgingQuery, Place  # noqa: E402
 
 OUT = ROOT / "probes" / "lodging.md"
 RAW = ROOT / "raw" / "lodging"
-CHILD_FLAG = "CONFERGE_LODGING_PROBE_CHILD"
 QUERY = LodgingQuery(
     check_in=date(2026, 10, 27), check_out=date(2026, 10, 30), adults=1, currency="USD",
     radius_km=3.0, limit=5, verify_top=5, conference_id="github-universe-2026",
     venues=[Place(id="venue:moscone-center", name="Moscone Center (not the venue, reference)",
                   lat=37.7842, lng=-122.4016)],
 )
-
-
-def _maybe_reexec_with_pyairbnb() -> None:
-    if importlib.util.find_spec("pyairbnb") is not None or os.environ.get(CHILD_FLAG):
-        return
-    env = {**os.environ, CHILD_FLAG: "1"}
-    cmd = ["uv", "run", "--with", "pyairbnb", "python", str(Path(__file__).resolve()),
-           *sys.argv[1:]]
-    try:
-        code = subprocess.call(cmd, env=env, cwd=ROOT)
-    except OSError:
-        return
-    if code == 0:
-        raise SystemExit(0)
 
 
 def _type(value: Any) -> str:
@@ -200,5 +183,4 @@ async def main() -> int:
 
 
 if __name__ == "__main__":
-    _maybe_reexec_with_pyairbnb()
     raise SystemExit(asyncio.run(main()))

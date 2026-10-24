@@ -298,6 +298,9 @@ def _stage_api(report: E2EReport, demo: Any, expected_mode: str, *, name: str = 
     from conferge.api.app import create_app
 
     app = create_app(data=demo, found=providers.discover_providers(), graph_probe=False)
+    # stays/flights may be live while events are fixture: their own endpoint may say live
+    live_paths = {f"/api/v1/{name}" for name in ("stays", "flights")
+                  if demo.domains[name].source_mode == "live"}
     findings: list[str] = []
     calls = 0
     with TestClient(app) as client:
@@ -310,7 +313,8 @@ def _stage_api(report: E2EReport, demo: Any, expected_mode: str, *, name: str = 
                 return None
             body = resp.json()
             label = body.get("data_source")
-            if label == "live" and (backup or expected_mode != "live"):
+            if label == "live" and (backup or (expected_mode != "live"
+                                               and path not in live_paths)):
                 findings.append(f"{method} {path}: labelled live over {expected_mode} data")
             return body
 

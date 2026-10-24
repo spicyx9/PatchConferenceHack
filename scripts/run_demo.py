@@ -7,8 +7,6 @@ GraphStore, and serves the API on the same ``DemoData`` so API and graph ids mat
 
 Stays and flights are searched live by default (w05 lodging, w06 flights; 90 s each).
 A domain that fails or returns nothing falls back to the API fixture, labelled ``fixture``.
-``pyairbnb`` and ``fast-flights`` are not project dependencies: when missing, the script
-re-runs itself once through ``uv run --with pyairbnb --with fast-flights`` (ephemeral).
 ``--travel fixture`` skips the live travel searches.
 
 Run: ``uv run python scripts/run_demo.py [--mode fixture|live] [--travel live|fixture] [--graph conferge_demo] [--port 8000]``
@@ -19,31 +17,13 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import importlib.util
 import os
-import subprocess
 import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
-CHILD_FLAG = "CONFERGE_DEMO_TRAVEL_CHILD"
-TRAVEL_PACKAGES = {"pyairbnb": "pyairbnb", "fast_flights": "fast-flights"}
-
-
-def _maybe_reexec_with_travel_packages() -> None:
-    missing = [pkg for mod, pkg in TRAVEL_PACKAGES.items() if importlib.util.find_spec(mod) is None]
-    if not missing or os.environ.get(CHILD_FLAG):
-        return
-    cmd = ["uv", "run", *(arg for pkg in missing for arg in ("--with", pkg)),
-           "python", str(Path(__file__).resolve()), *sys.argv[1:]]
-    try:
-        code = subprocess.call(cmd, env={**os.environ, CHILD_FLAG: "1"}, cwd=ROOT)
-    except OSError:
-        return  # no uv: run without them, the live searches fail visibly and fall back
-    raise SystemExit(code)
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
 def main() -> int:
@@ -58,8 +38,6 @@ def main() -> int:
     parser.add_argument("--travel", choices=["live", "fixture"], default="live",
                         help="stays/flights: live search with fixture fallback, or fixture only")
     args = parser.parse_args()
-    if args.travel == "live":
-        _maybe_reexec_with_travel_packages()
     os.environ["FALKORDB_GRAPH"] = args.graph  # the API reads the same graph it was loaded into
 
     import uvicorn
