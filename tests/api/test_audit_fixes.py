@@ -124,3 +124,18 @@ def test_fix2_drafts_show_their_facts_and_warnings() -> None:
 
     js = (Path(__file__).resolve().parents[2] / "static" / "app.js").read_text()
     assert "followupFacts(draft)" in js
+
+
+def test_fix7_artwork_is_labelled_as_a_dated_capture() -> None:
+    from conferge.api.artwork import event_artwork, fixture_captured_at, load_fixture_covers
+
+    covers = load_fixture_covers()
+    data = load_fixture()
+    with_cover = [e for e in data.events if e.id in covers]
+    captured = fixture_captured_at()
+    for event in with_cover:
+        art = event_artwork(event, covers)
+        if art:
+            assert art["cover_source_mode"] == "fixture" and art["cover_captured_at"] == captured
+    art_js = _js_function("eventArtwork")
+    assert "cover_captured_at" in art_js and "Luma capture" in art_js

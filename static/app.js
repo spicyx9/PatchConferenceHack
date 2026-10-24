@@ -1644,7 +1644,9 @@
         esc(cover) +
         '" alt="Artwork for ' +
         esc(event.title) +
-        '" loading="lazy" referrerpolicy="no-referrer"></div>'
+        '" title="' +
+        esc("Luma artwork from a capture" + (event.cover_captured_at ? " taken " + shortDate(String(event.cover_captured_at).slice(0, 10)) : "") + "; live events have no artwork yet") +
+        '" loading="lazy" referrerpolicy="no-referrer"><span class="artwork-credit">Luma capture</span></div>'
       );
     var kind =
       {
