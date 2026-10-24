@@ -5,6 +5,30 @@ Setup for that run: `main` at 7a4dbef, LinkedIn cache files present in `data/pro
 started on a freshly reset graph, then **Reset session** clicked in the UI. If any figure on the
 day differs, say the figure on screen, not the one written here.
 
+## Before the demo: make predemo
+
+Five minutes before going on stage, from `~/PatchConferenceHack`:
+
+```
+FALKORDB_PORT=6380 make predemo
+```
+
+It checks FalkorDB answers `GRAPH.LIST` (exit 2 with a clear message otherwise), stops any server
+already listening on `DEMO_PORT` (default 8000), starts `make demo DEMO_ARGS=--reset-graph` in the
+background (log: `logs/predemo-demo.log`), waits for `/health`, then prints one OK/FAIL line per check:
+
+| Check | Expected |
+|---|---|
+| FalkorDB graph `conferge_demo` | at least 600 nodes and 2,000 edges |
+| Bright Data stays in `/pipeline` | 21 (`PREDEMO_STAYS_BD`) |
+| Bright Data flights, Web Unlocker, in `/pipeline` | 34 (`PREDEMO_FLIGHTS_BD`) |
+| LinkedIn cards in `/people` | at least 9 (`PREDEMO_LINKEDIN_MIN`) |
+| Top 3 people | Ryan Hecht, Camila Maia, Nick Liffen (`PREDEMO_TOP3`, comma separated) |
+| `/antifomo`, called after plan, people and pipeline like the page | under 2 s |
+
+Exit code 0 means every line is OK and the server stays up at the printed URL; any FAIL gives a
+non-zero exit. Then continue with step 3 below (browser, Reset session).
+
 ## Before the demo
 
 1. **Start the demo on a clean graph** from the demo checkout (`~/PatchConferenceHack`):
@@ -20,7 +44,7 @@ day differs, say the figure on screen, not the one written here.
    **Reset session**. Reload the page.
 5. **Check the starting state** on **Discover**, "People to connect with":
    **Ryan Hecht 56**, **Camila Maia 47**, **Nick Liffen 40**; right column shows
-   **207** events to explore, **32** on your agenda, **0** conversations saved.
+   **194** events to explore, **32** on your agenda, **0** conversations saved.
    If the top 3 differs, repeat steps 1 and 4.
 6. After a rehearsal, repeat step 4: the rehearsal's "I met" is saved in FalkorDB.
 
@@ -30,8 +54,8 @@ day differs, say the figure on screen, not the one written here.
 |---|---|---|---|
 | 0:00 | "Every conference, you miss the three people who mattered. Conferge finds them before you land." | Stay on **Discover**. | Hero "Your week in **San Francisco**", "GitHub Universe 2026 · Oct 28 — Oct 29". |
 | 0:10 | "I tell it why I'm going: I build AI developer tools and I want seed investors, agent founders and Copilot PMs." | Click the **V** avatar (top right). The goal is prefilled. Click **Update your agenda**. | Toast "Goal updated. Your agenda and suggested people have been recalculated." Chips **Meet seed investors (developer tools) · 45 %**, **Meet founders (ai agents) · 35 %**, **Meet product managers (copilot) · 20 %**. |
-| 0:20 | "That goal became an agenda." | Point at the right column. | **207** events to explore, **32** on your agenda, **50** suggested connections. |
-| 0:25 | "Where does the data come from? The official catalog, Luma, Partiful, and Bright Data for what is hard to reach." | Click **How are suggestions made?** (right column), then scroll to **Data pipeline**. | official **210**, luma **12**, partiful **6**, eventbrite **8**, aggregators **20** records. |
+| 0:20 | "That goal became an agenda." | Point at the right column. | **194** events to explore, **32** on your agenda, **50** suggested connections. |
+| 0:25 | "Where does the data come from? The official catalog, Luma, Partiful, and Bright Data for what is hard to reach." | Click **How are suggestions made?** (right column), then scroll to **Data pipeline**. | official **210**, luma **12**, partiful **6**, eventbrite **8**, aggregators **7** records. |
 | 0:35 | "Bright Data collected the stays, the flights and the LinkedIn profiles. Here is what it took: no call at query time." | Stay in the dialog; point at the counter and the pipeline rows. | "Records collected through Bright Data: **64**", "Stays via Bright Data: **6/6** · Flights via Bright Data: **1/1**", linkedin row **9** records, "Bright Data calls: none". Reachability: **10 of 21** sites without Bright Data, **14 of 21** with. Close the dialog. |
 | 0:45 | "My first match is Ryan Hecht. His LinkedIn profile, collected by Bright Data, confirms he works at GitHub." | Tab **People**. Hover the green **brightdata:linkedin** badge on Ryan Hecht's card. | Card **Ryan Hecht**, Product Manager · GitHub, relevance **56**, "LINKEDIN · Not provided · GitHub profile **brightdata:linkedin**". Tooltip: dataset gd_l1viktl72bvl7bjuj0, snapshot sd_mvms2ssrh1bjodbs9, identity_confidence 1. |
 | 0:55 | "And this is why he's on my list: a path in the graph, from my goal to the session where he speaks." | Tab **Discover** → **See why** under Ryan Hecht. | Tab **Connections**, "**FalkorDB connected**". Path: Meet founders (ai agents) → ai agents → GitHub Copilot and Windows: Bringing local models into the workflow → Ryan Hecht. |

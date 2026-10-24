@@ -507,11 +507,19 @@
       mixed: "Mixed sources",
       unknown: "Sources need verification",
     };
+    // The API decides the badge: conference data's mode, travel named apart when it differs
+    // ("Sample data, live travel"), so live flights never turn the snapshot into "Mixed sources".
+    var apiBadge = envelopes.sources && envelopes.sources.badge;
+    var label = labels[mode] || labels.unknown;
+    if (apiBadge && apiBadge.label) {
+      mode = apiBadge.core_mode || mode;
+      label = apiBadge.label;
+    }
     var badge = $("badge-source");
     badge.className =
       "badge " +
       (mode === "fixture" ? "fixture" : mode === "live" ? "live" : "neutral");
-    badge.textContent = labels[mode] || labels.unknown;
+    badge.textContent = label;
     badge.title = "Record sources, separate from the ranking engine";
     var st = $("badge-status");
     st.className = "badge " + (worst || "neutral");
@@ -552,14 +560,7 @@
       .replace(/participation unknown/g, "attendance unconfirmed");
   }
   function displayGoalText(text) {
-    var value = String(text || "");
-    if (
-      /^fondateur d.un outil dev ia, je vais a github universe pour rencontrer des investisseurs seed, des fondateurs d.agents ia et des pm copilot\.$/.test(
-        fold(value),
-      )
-    )
-      return "I'm an AI developer tools founder attending GitHub Universe to meet seed investors, AI agent founders, and Copilot product managers.";
-    return value;
+    return String(text || "");
   }
   function fold(text) {
     return String(text || "")
@@ -2073,7 +2074,8 @@
       " | confidence " +
       esc(orUnknown(e.confidence)) +
       " | observed at " +
-      esc(orUnknown(e.observed_at))
+      esc(orUnknown(e.observed_at)) +
+      (e.rationale ? '<br><span class="muted">' + esc(e.rationale) + "</span>" : "")
     );
   }
 
@@ -3018,7 +3020,9 @@
                 return entry.id === opportunity.event_id;
               },
             );
-            var evidence = opportunity.evidence || person.evidence || [];
+            var evidence = (opportunity.evidence && opportunity.evidence.length
+              ? opportunity.evidence : person.evidence) || [];
+            var whyEdges = (card.why && card.why.edges) || [];
             var sources = evidence
               .map(function (entry) {
                 var link = safeUrl(entry.source_url);
@@ -3033,6 +3037,14 @@
                     : esc(entry.provider)) +
                   " " +
                   sourceModeBadge(entry.source_mode) +
+                  whyEdges
+                    .filter(function (w) {
+                      return entry.source_url && (w.evidence_ids || []).indexOf(entry.source_url) >= 0;
+                    })
+                    .map(function (w) {
+                      return '<br><span class="muted">' + esc(w.rationale) + "</span>";
+                    })
+                    .join("") +
                   "</li>"
                 );
               })
@@ -3086,7 +3098,11 @@
               (card.met
                 ? '<div class="followup" id="followup-' + esc(id) + '"></div>'
                 : "") +
+              '<div class="small-text" id="why-' + esc(id) + '"></div>' +
               '<div class="people-actions">' +
+              '<button class="secondary" data-action="why" data-id="' +
+              esc(id) +
+              '">Why?</button>' +
               (card.met
                 ? '<button class="primary" data-action="followup" data-id="' +
                   esc(id) +
@@ -3955,7 +3971,67 @@
             })
             .join("; ")
         : "none");
+    renderTimings(res && res.timings, res && res.sources_report);
     renderReachability(res && res.reachability);
+    api("/cost", null, null).then(renderCost, function () {
+      renderCost(null);
+    });
+  }
+
+  function renderCost(c) {
+    var box = $("pipeline-cost");
+    if (!box) return;
+    if (!c) {
+      box.innerHTML = '<span class="muted">Bright Data cost counter unavailable.</span>';
+      return;
+    }
+    var by = c.by_api || {};
+    box.innerHTML =
+      "<b>Bright Data, live in this process:</b> " + esc(c.calls) + " calls, $" + esc(c.usd) +
+      ' <span class="muted">(estimate: $' + esc(c.usd_per_call) +
+      " per call, real price not verified)</span> · datasets " + esc(by.datasets || 0) +
+      " · unlocker " + esc(by.unlocker || 0) + " · serp " + esc(by.serp || 0);
+  }
+
+  function renderTimings(t, overall) {
+    var box = $("pipeline-timings");
+    if (!box) return;
+    var steps = (t && t.steps) || [],
+      sources = (t && t.sources) || [];
+    if (!steps.length && !sources.length) {
+      box.innerHTML = "";
+      return;
+    }
+    var secs = function (v) {
+      return v === null || v === undefined ? "—" : Number(v).toFixed(2) + " s";
+    };
+    box.innerHTML =
+      "<h3>Durations</h3>" +
+      (overall && overall.display
+        ? '<p>Sources overall: <b class="overall-' + esc(overall.display.label) + '">' +
+          esc(overall.display.label) + "</b>: " + esc(overall.display.reason) + "</p>"
+        : "") +
+      '<table class="pipeline-table"><thead><tr><th>Step</th><th>Time</th></tr></thead><tbody>' +
+      steps
+        .map(function (s) {
+          return (
+            "<tr><td>" + esc(s.step) + (s.note ? ' <span class="muted">(' + esc(s.note) + ")</span>" : "") +
+            "</td><td>" + esc(secs(s.seconds)) + "</td></tr>"
+          );
+        })
+        .join("") +
+      "</tbody></table>" +
+      '<table class="pipeline-table"><thead><tr><th>Source</th><th>Status</th><th>Records</th><th>Time</th></tr></thead><tbody>' +
+      sources
+        .map(function (s) {
+          return (
+            "<tr><td>" + esc(s.source) + "</td><td>" +
+            esc(s.status === "degraded" ? "partial (not exhausted)" : s.status) + "</td><td>" +
+            esc(s.records) + "</td><td>" + esc(secs(s.seconds)) + "</td></tr>"
+          );
+        })
+        .join("") +
+      "</tbody></table>";
   }
 
   function renderReachability(r) {
@@ -4193,6 +4269,32 @@
           .catch(function () {
             toast("Copying is not available in this browser.");
           });
+    } else if (action === "why") {
+      var whyBox = $("why-" + id);
+      if (!whyBox) return;
+      whyBox.textContent = "Reading the graph…";
+      api("/graph/why/" + encodeURIComponent(id))
+        .then(function (why) {
+          var links = (why.evidence || [])
+            .map(function (ev) {
+              var link = safeUrl(ev.source_url);
+              return (
+                "<li>" +
+                (link
+                  ? '<a href="' + esc(link) + '" target="_blank" rel="noopener noreferrer">' +
+                    esc(ev.evidence_id) + "</a>"
+                  : esc(ev.evidence_id)) +
+                "</li>"
+              );
+            })
+            .join("");
+          whyBox.innerHTML = why.answer
+            ? "<p>" + esc(why.answer) + '</p><ul class="plain-list">' + links + "</ul>"
+            : '<p class="muted">No connection path in the graph for this person.</p>';
+        })
+        .catch(function (e) {
+          whyBox.textContent = e.message;
+        });
     } else if (action === "showpath" || action === "path") {
       if (action === "showpath") switchTab("graph");
       highlightPath(id);

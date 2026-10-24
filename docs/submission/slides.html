@@ -121,35 +121,35 @@ RETURN g.id, length(p), p ORDER BY length(p) LIMIT $cap</pre>
       <ul>
         <li>SERP discovery for the long tail of side events</li>
         <li>Google Flights, Booking and LinkedIn datasets, Web Unlocker for pages that block</li>
-        <li>No key: the connector says missing_credentials, the UI shows a fixture badge. Nothing invented.</li>
+        <li>No key: the connector says missing_credentials, the UI says Sample data. Nothing invented.</li>
       </ul>
     </div>
   </div>
-  <p class="note">The header badge reads fixture or live. We say on stage exactly what it says.</p>
+  <p class="note">The Sources dialog reads Sample data, Cached or Live per domain. We say on stage exactly what it says.</p>
 </section>
 
 <section class="slide">
   <p class="kicker">Live demo</p>
   <h1>Six steps, one page, two tabs.</h1>
   <div class="steps">
-    <div><b>Goal</b><span>Type it, press Lancer. Watch the badge and the collection date.</span></div>
-    <div><b>Who to meet</b><span>Open a card. Then the same path in the FalkorDB Browser.</span></div>
-    <div><b>Plan and map</b><span>Day by day, venues on the map.</span></div>
-    <div><b>Anti-FOMO</b><span>The evening conflict on October 28, the verdict, the loss.</span></div>
-    <div><b>Simulated sell-out</b><span>One click. The diff: removed, replacement, reason. Labelled simulation.</span></div>
-    <div><b>I met this person</b><span>One click. Top 3 before and after. Persisted in the graph.</span></div>
+    <div><b>Priorities</b><span>Edit priorities, Update your agenda. Three weighted chips. Sources: Sample data, Cached, collection time.</span></div>
+    <div><b>Who to meet</b><span>View connection: the reason, the place to start, the path with its sources. Then the same path in the FalkorDB Browser.</span></div>
+    <div><b>Agenda and map</b><span>Day tabs Oct 27 to 30, venues on the map.</span></div>
+    <div><b>Outside your agenda</b><span>Two sessions at 10:30 on October 28: which one, and why.</span></div>
+    <div><b>Sold-out scenario</b><span>My summary, Explore a sold-out scenario. Removed, added, reason. Labelled simulation.</span></div>
+    <div><b>I met Ryan Hecht</b><span>Save conversation. He leaves the ranking, the tiles move. Persisted in the graph.</span></div>
   </div>
 </section>
 
 <section class="slide dense">
   <p class="kicker">Measured numbers</p>
-  <h1>Read from the running app, October 24, 2026, 20:12 UTC.</h1>
+  <h1>Read from the running app, October 24, 2026, main at e6c08e4.</h1>
   <table>
     <tr><th>Events in the dataset</th><td class="num">207: 161 official sessions, 12 Luma, 6 Partiful, 8 Eventbrite, 20 conferenceparties</td></tr>
-    <tr><th>FalkorDB graph</th><td class="num">703 nodes, 2,201 edges; 50 people ranked for the goal</td></tr>
+    <tr><th>FalkorDB graph</th><td class="num">704 nodes, 2,233 edges; 50 people ranked for the goal</td></tr>
     <tr><th>Through Bright Data</th><td class="num">21 stays, 34 flight itineraries, 9 LinkedIn cards (64 records)</td></tr>
     <tr><th>Reachable sites, of 21</th><td class="num">10 without Bright Data, 12 Unlocker, 14 Unlocker or dataset<br>18 projected once KYC is approved</td></tr>
-    <tr><th>Tests</th><td class="num">make check 1,175 passed; make e2e 16 passed</td></tr>
+    <tr><th>Tests</th><td class="num">make check 1,216 passed, 26 skipped; make e2e 16 passed</td></tr>
   </table>
 </section>
 

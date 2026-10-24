@@ -44,7 +44,8 @@
     {
      "provider": "fixture:w08-graph",
      "source_mode": "fixture",
-     "collected_at": "2026-10-23T12:00:00Z"
+     "collected_at": "2026-10-23T12:00:00Z",
+     "raw_ref": "fixtures/graph.json#companies/c-fx-agentlabs"
     }
    ]
   },
@@ -60,7 +61,8 @@
     {
      "provider": "fixture:w08-graph",
      "source_mode": "fixture",
-     "collected_at": "2026-10-23T12:00:00Z"
+     "collected_at": "2026-10-23T12:00:00Z",
+     "raw_ref": "fixtures/graph.json#companies/c-fx-seedfund"
     }
    ]
   },
@@ -76,7 +78,8 @@
     {
      "provider": "fixture:w08-graph",
      "source_mode": "fixture",
-     "collected_at": "2026-10-23T12:00:00Z"
+     "collected_at": "2026-10-23T12:00:00Z",
+     "raw_ref": "fixtures/graph.json#companies/c-fx-devtools"
     }
    ]
   }
@@ -104,7 +107,8 @@
      "provider": "fixture:w08-graph",
      "source_mode": "fixture",
      "collected_at": "2026-10-23T12:00:00Z",
-     "confidence": 1.0
+     "confidence": 1.0,
+     "raw_ref": "fixtures/graph.json#people/p-fx-alice"
     }
    ]
   },
@@ -126,7 +130,8 @@
      "provider": "fixture:w08-graph",
      "source_mode": "fixture",
      "collected_at": "2026-10-23T12:00:00Z",
-     "confidence": 0.6
+     "confidence": 0.6,
+     "raw_ref": "fixtures/graph.json#people/p-fx-bob"
     }
    ]
   },
@@ -179,7 +184,8 @@
      "provider": "fixture:w08-graph",
      "source_mode": "fixture",
      "collected_at": "2026-10-23T12:00:00Z",
-     "confidence": 1.0
+     "confidence": 1.0,
+     "raw_ref": "fixtures/graph.json#people/p-fx-dana"
     }
    ]
   },
@@ -205,7 +211,8 @@
      "provider": "fixture:w08-graph",
      "source_mode": "fixture",
      "collected_at": "2026-10-23T12:00:00Z",
-     "confidence": 0.9
+     "confidence": 0.9,
+     "raw_ref": "fixtures/graph.json#people/p-fx-erin"
     }
    ]
   },
@@ -228,7 +235,8 @@
      "provider": "fixture:w08-graph",
      "source_mode": "fixture",
      "collected_at": "2026-10-23T12:00:00Z",
-     "confidence": 0.5
+     "confidence": 0.5,
+     "raw_ref": "fixtures/graph.json#people/p-fx-frank"
     }
    ]
   },
@@ -252,7 +260,8 @@
      "provider": "fixture:w08-graph",
      "source_mode": "fixture",
      "collected_at": "2026-10-23T12:00:00Z",
-     "confidence": 0.4
+     "confidence": 0.4,
+     "raw_ref": "fixtures/graph.json#people/p-fx-gina"
     }
    ]
   }
@@ -290,7 +299,8 @@
     {
      "provider": "fixture:w08-graph",
      "source_mode": "fixture",
-     "collected_at": "2026-10-23T12:00:00Z"
+     "collected_at": "2026-10-23T12:00:00Z",
+     "raw_ref": "fixtures/graph.json#events/e-fx-talk-agents"
     }
    ]
   },
@@ -326,7 +336,8 @@
     {
      "provider": "fixture:w08-graph",
      "source_mode": "fixture",
-     "collected_at": "2026-10-23T12:00:00Z"
+     "collected_at": "2026-10-23T12:00:00Z",
+     "raw_ref": "fixtures/graph.json#events/e-fx-talk-copilot"
     }
    ]
   },
@@ -420,7 +431,8 @@
     {
      "provider": "fixture:w08-graph",
      "source_mode": "fixture",
-     "collected_at": "2026-10-23T12:00:00Z"
+     "collected_at": "2026-10-23T12:00:00Z",
+     "raw_ref": "fixtures/graph.json#events/e-fx-oss-breakfast"
     }
    ]
   }
@@ -484,7 +496,8 @@
     {
      "provider": "fixture:w08-graph",
      "source_mode": "fixture",
-     "collected_at": "2026-10-23T12:00:00Z"
+     "collected_at": "2026-10-23T12:00:00Z",
+     "raw_ref": "fixtures/graph.json#opportunities/o-fx-alice-talk"
     }
    ]
   }

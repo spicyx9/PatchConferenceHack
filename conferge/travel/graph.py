@@ -2,7 +2,8 @@
 
 Places become `Venue` nodes; each leg with a known duration becomes a `NEAR` edge
 carrying mode, minutes, provider, source_mode, confidence and observed_at. Legs with
-unknown duration are skipped, never written as zero.
+unknown duration are skipped, never written as zero; so are legs without a source URL,
+since every graph edge must cite its evidence.
 """
 
 from __future__ import annotations
@@ -34,6 +35,9 @@ def write_plans(store: GraphStore, plans: Iterable[RoutePlan]) -> int:
             for leg in option.legs:
                 if leg.duration_minutes is None or leg.duration_status == "unknown":
                     continue
+                urls = [str(u) for u in [leg.source_url, *(e.source_url for e in leg.evidence)] if u]
+                if not urls:
+                    continue
                 _node(store, leg.from_place, written)
                 _node(store, leg.to_place, written)
                 # One NEAR edge per pair; properties are namespaced by mode so a
@@ -45,6 +49,7 @@ def write_plans(store: GraphStore, plans: Iterable[RoutePlan]) -> int:
                     f"{m}_duration_status": leg.duration_status,
                     f"{m}_confidence": _CONFIDENCE.get(leg.duration_status, 0.5),
                     f"{m}_observed_at": leg.collected_at.isoformat(),
+                    "evidence_ids": list(dict.fromkeys(urls)),
                 })
                 edges += 1
     return edges

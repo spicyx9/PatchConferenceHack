@@ -9,6 +9,10 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import random
+import re
+from collections.abc import Awaitable, Callable
+from email.utils import parsedate_to_datetime
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Literal
@@ -18,7 +22,57 @@ import httpx
 from pydantic import BaseModel, ConfigDict, Field
 
 logger = logging.getLogger(__name__)
-_RETRY_STATUSES = {429, 500, 502, 503, 504}
+_RETRY_STATUSES = {408, 429, 500, 502, 503, 504}
+# Backoff from Bright Data's ticket-hunter-agent browser-utils.ts (attempt n = 1, 2):
+# network error 0.25*n + U(0, 0.22) s; HTTP 429/408/5xx 0.32*n^2 + U(0, 0.26) s;
+# Retry-After honoured up to 30 s; a Bright Data "cooldown" / "no_peers" answer waits 15 then 30 s.
+NETWORK_BACKOFF = (0.25, 0.22)
+STATUS_BACKOFF = (0.32, 0.26)
+RETRY_AFTER_MAX = 30.0
+MAX_RETRIES = 2
+COOLDOWN_DELAYS = (15.0, 30.0)
+_COOLDOWN = re.compile(r"cooldown|no_peers", re.I)
+# Web Unlocker answered 200 but the page is a bot wall: title + first 4000 chars.
+BLOCK_PATTERNS = ("captcha", "verify you are human", "access denied", "unusual traffic",
+                  "cf-chl", "challenge-platform")
+BLOCK_VENDORS = ("cloudflare", "perimeterx", "incapsula", "recaptcha", "datadome", "akamai")
+_TITLE = re.compile(r"<title[^>]*>(.*?)</title>", re.I | re.S)
+
+
+def network_delay(attempt: int, rand: Callable[[float, float], float] = random.uniform) -> float:
+    return NETWORK_BACKOFF[0] * attempt + rand(0, NETWORK_BACKOFF[1])
+
+
+def status_delay(attempt: int, rand: Callable[[float, float], float] = random.uniform) -> float:
+    return STATUS_BACKOFF[0] * attempt ** 2 + rand(0, STATUS_BACKOFF[1])
+
+
+def retry_after_seconds(value: str | None, now: datetime | None = None) -> float | None:
+    """Retry-After as seconds (delta or HTTP date), capped at RETRY_AFTER_MAX; None if absent."""
+    if not value:
+        return None
+    try:
+        seconds = float(value.strip())
+    except ValueError:
+        try:
+            when = parsedate_to_datetime(value)
+        except (TypeError, ValueError):
+            return None
+        if when.tzinfo is None:
+            when = when.replace(tzinfo=timezone.utc)
+        seconds = (when - (now or datetime.now(timezone.utc))).total_seconds()
+    return max(0.0, min(seconds, RETRY_AFTER_MAX))
+
+
+def block_reason(html: str) -> str | None:
+    """``unlocker_blocked`` pattern when an unlocked page is a challenge, else None."""
+    m = _TITLE.search(html[:20000])
+    hay = f"{m.group(1) if m else ''} {html[:4000]}".lower()
+    for pattern in BLOCK_PATTERNS:
+        if pattern in hay:
+            return pattern
+    vendors = [v for v in BLOCK_VENDORS if v in hay]
+    return "+".join(vendors) if len(vendors) >= 2 else None
 # /datasets/v3/scrape holds the connection up to ~60 s before answering 202 + snapshot_id.
 SYNC_TIMEOUT = 75.0
 
@@ -99,15 +153,19 @@ class BrightDataClient:
         unlocker_zone: str | None = None,
         client: httpx.AsyncClient | None = None,
         retries: int = 2,
+        sleep: Callable[[float], Awaitable[Any]] | None = None,
+        rand: Callable[[float, float], float] | None = None,
     ) -> None:
         self._api_key = api_key
+        self._sleep = sleep or asyncio.sleep
+        self._rand = rand or random.uniform
         self.serp_zone = serp_zone
         self.unlocker_zone = unlocker_zone
         self._client = client or httpx.AsyncClient(
             base_url="https://api.brightdata.com", timeout=SYNC_TIMEOUT
         )
         self._owns_client = client is None
-        self.retries = retries
+        self.retries = min(retries, MAX_RETRIES)  # never more than 2 retries
 
     @classmethod
     def from_env(cls) -> BrightDataClient:
@@ -140,6 +198,13 @@ class BrightDataClient:
         if self._owns_client:
             await self._client.aclose()
 
+    def _status_wait(self, response: httpx.Response, attempt: int) -> float:
+        """Delay before retry ``attempt`` (1-based) after a retryable HTTP status."""
+        if _COOLDOWN.search(response.text[:2000] if response.content else ""):
+            return COOLDOWN_DELAYS[min(attempt, len(COOLDOWN_DELAYS)) - 1]
+        after = retry_after_seconds(response.headers.get("retry-after"))
+        return after if after is not None else status_delay(attempt, self._rand)
+
     async def _request(
         self, method: str, path: str, *, params: dict[str, Any] | None = None,
         payload: Any = None, timeout: float | None = None, retry_network: bool = True,
@@ -155,7 +220,7 @@ class BrightDataClient:
                     **({"timeout": timeout} if timeout is not None else {}),
                 )
                 if response.status_code in _RETRY_STATUSES and attempt < self.retries:
-                    await asyncio.sleep(min(2 ** attempt, 4))
+                    await self._sleep(self._status_wait(response, attempt + 1))
                     continue
                 if response.status_code >= 400:
                     raise BrightDataError(
@@ -166,7 +231,7 @@ class BrightDataClient:
                 if attempt == self.retries or not retry_network:
                     kind = "timeout" if isinstance(exc, httpx.TimeoutException) else "network error"
                     raise BrightDataError(f"Bright Data {path}: {kind}") from exc
-                await asyncio.sleep(min(2 ** attempt, 4))
+                await self._sleep(network_delay(attempt + 1, self._rand))
         raise BrightDataError(f"Bright Data {path}: exhausted retries")
 
     @staticmethod
@@ -271,6 +336,9 @@ class BrightDataClient:
             payload={"zone": self.unlocker_zone, "url": url, "format": "raw"},
         )
         text = response.text
+        if blocked := block_reason(text):
+            record_call("web_unlocker", rows=0, status="blocked")
+            raise BrightDataError(f"unlocker_blocked:{blocked}")
         if len(text) < 2000 and text.lstrip().startswith("Residential Failed"):
             # Bright Data answers its own refusal (e.g. KYC required) with HTTP 200.
             reason = text.split(":", 1)[0].strip()

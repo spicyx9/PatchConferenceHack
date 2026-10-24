@@ -62,7 +62,11 @@ class MemoryGraph:
                 )
                 return QueryResult([])
             key = (src[0], src[1], match["rel"], dst[0], dst[1])
-            self.edges.setdefault(key, {}).update(self._props(match["set"], values))
+            edge = self.edges.setdefault(key, {})
+            edge.update(self._props(match["set"], values))
+            if "r.evidence_ids = CASE" in (match["set"] or ""):  # appended, as in FalkorDB
+                known = list(edge.get("evidence_ids") or [])
+                edge["evidence_ids"] = known + [x for x in values["evidence_ids"] if x not in known]
             return QueryResult([[src[1], dst[1]]])
         self.refused.append(q[:120])
         raise ValueError("MemoryGraph accepts only GraphStore MERGE statements")
@@ -81,3 +85,7 @@ class MemoryGraph:
 
     def nodes_missing(self, prop: str) -> list[str]:
         return [f"{k}:{i}" for (k, i), props in self.nodes.items() if props.get(prop) is None]
+
+    def edges_missing(self, prop: str) -> list[str]:
+        return [f"{fk}:{fi} -[{rel}]-> {tk}:{ti}" for (fk, fi, rel, tk, ti), props
+                in self.edges.items() if not props.get(prop)]

@@ -156,7 +156,7 @@ def test_profile_keeps_the_documented_fields() -> None:
     assert p == li.LinkedInProfile(
         linkedin_url=URL.format("avery"), name="Avery Sample", headline="Avery Sample headline",
         title="Founder", company="AgentWorks", location="San Francisco", about="Builds agents.",
-        followers=1200)
+        followers=1200, headline_source="dataset:position")
     assert li.profile_from_record({"error": "dead page", "input": {"url": URL.format("x")}}) is None
 
 
@@ -221,7 +221,7 @@ class RecordingStore:
 
 PERSON_KEYS = {"identity_confidence", "headline", "company", "provider", "dataset_id",
                "snapshot_id", "linkedin_source_url", "linkedin_collected_at",
-               "linkedin_source_mode"}
+               "linkedin_source_mode", "headline_source"}
 PEOPLE = [Person(id="p1", name="Avery Sample", company_id="company:agentworks",
                  participation="confirmed_speaker", linkedin_url=URL.format("avery"),
                  event_ids=["ev1"], presence_confidence=0.9),

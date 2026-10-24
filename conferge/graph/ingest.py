@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 from decimal import Decimal
 from typing import Any
 
+from conferge.core.edge_rationale import MissingEvidence
 from conferge.core.schemas import (
     Company,
     Conference,
@@ -114,9 +115,18 @@ class GraphIngestor:
         self._edges.add(key)
         payload = {**self._provenance(evidence or []), **_clean(props),
                    "verification": verification}
+        # Every piece of evidence of the record is cited (its URL, else its raw_ref).
+        ids = [str(e.source_url or e.raw_ref) for e in evidence or [] if e.source_url or e.raw_ref]
+        if ids:
+            payload["evidence_ids"] = list(dict.fromkeys(ids))
         if confidence is not None:
             payload["confidence"] = confidence
-        self.store.merge_edge(from_kind, from_id, edge_type, to_kind, to_id, payload)
+        try:
+            self.store.merge_edge(from_kind, from_id, edge_type, to_kind, to_id, payload)
+        except MissingEvidence:  # visible in the report, never written without evidence
+            self.report.skipped_edges.append(
+                f"{edge_type} {from_id}->{to_id}: no evidence id (source_url or raw_ref)")
+            return
         self.report.edges += 1
 
     def has(self, kind: str, node_id: str) -> bool:

@@ -87,6 +87,28 @@ def _reports(domain: str, records: list[dict[str, Any]], items: list[Any]) -> li
     return out
 
 
+def _run_reports(doc: dict[str, Any]) -> list[RunReport]:
+    """Recorded collection runs without records (e.g. Google Hotels: no_peers, wrong dates)."""
+    out = []
+    for run in doc.get("runs") or []:
+        at = datetime.fromisoformat(run["collected_at"])
+        out.append(RunReport(provider=run["provider"], started_at=at, finished_at=at,
+                             status=run["status"], termination="error", source_mode="cached",
+                             fetched_count=run.get("records", 0), unique_count=run.get("records", 0),
+                             errors=[run["reason"]] if run.get("reason") else [],
+                             warnings=[f"recorded run, {run.get('records', 0)} records"]))
+    return out
+
+
+def add_run(domain: str, run: dict[str, Any], directory: Path = CACHE_DIR) -> None:
+    """Record a run (provider, status, records, reason, collected_at) in a cache file."""
+    path = directory / FILES[domain]
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    runs = [r for r in doc.get("runs") or [] if r["provider"] != run["provider"]]
+    doc["runs"] = [*runs, run]
+    path.write_text(json.dumps(doc, indent=1) + "\n", encoding="utf-8")
+
+
 def load(directory: Path = CACHE_DIR, *, flight_alternatives: bool = False) -> dict[str, LiveDomain] | None:
     """LiveDomain per domain from the cache files, or None when no cache file exists."""
     found: dict[str, LiveDomain] = {}
@@ -106,7 +128,7 @@ def load(directory: Path = CACHE_DIR, *, flight_alternatives: bool = False) -> d
              f"{len(picked)} shown",
              "cache sources: " + ", ".join(f"{k} x{v}" for k, v in labels.most_common())],
             [] if picked else [f"cache {path.name}: no usable record"],
-            _reports(domain, doc["records"], items),
+            [*_reports(domain, doc["records"], items), *_run_reports(doc)],
         )
     return found or None
 
@@ -115,4 +137,4 @@ def available(directory: Path = CACHE_DIR) -> bool:
     return any((directory / name).exists() for name in FILES.values())
 
 
-__all__ = ["CACHE_DIR", "available", "build", "load", "provenance"]
+__all__ = ["CACHE_DIR", "add_run", "available", "build", "load", "provenance"]

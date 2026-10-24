@@ -51,8 +51,8 @@ PEOPLE_FIXTURE = ROOT / "fixtures" / "people.json"
 PROBE_DIR = ROOT / "data" / "probes"
 # Committed, public fields only, for name-matched speakers: what a fresh clone shows.
 PUBLIC_CACHE = ROOT / "data" / "cache" / "linkedin_public.json"
-PUBLIC_FIELDS = ("name", "headline", "company", "linkedin_url", "dataset_id", "snapshot_id",
-                 "collected_at", "provider")
+PUBLIC_FIELDS = ("name", "headline", "headline_source", "company", "linkedin_url", "dataset_id",
+                 "snapshot_id", "collected_at", "provider", "person_id", "url_provider")
 POOL_MAX_AGE = timedelta(hours=24)
 _COMPANY_SUFFIXES = {"inc", "llc", "ltd", "corp", "corporation", "co", "company", "gmbh", "sas",
                      "sa", "plc", "limited", "incorporated"}
@@ -73,6 +73,11 @@ class LinkedInProfile:
     snapshot_id: str | None = None
     collected_at: str | None = None
     source_mode: str = "live"
+    headline_source: str | None = None
+    """``dataset:position`` (the record's own field) or ``serp:title`` (Google result title)."""
+    person_id: str | None = None
+    url_provider: str | None = None
+    """``brightdata:serp`` when the URL itself was found by SERP for ``person_id``."""
 
 
 @dataclass
@@ -280,6 +285,8 @@ def load_pool(directory: Path = PROBE_DIR, *, now: datetime | None = None,
     bodies = []
     for path in directory.glob("linkedin_*.json"):
         body = json.loads(path.read_text(encoding="utf-8"))
+        if "records" not in body or "collected_at" not in body:  # e.g. linkedin_serp_*.json
+            continue
         if now - datetime.fromisoformat(body["collected_at"]) <= max_age:
             bodies.append(body)
     snapshots = [b for b in bodies if b.get("kind") == "snapshot"]
@@ -295,18 +302,28 @@ def load_pool(directory: Path = PROBE_DIR, *, now: datetime | None = None,
     return pool
 
 
-def write_public(enrichments: Iterable[Enrichment], path: Path = PUBLIC_CACHE) -> Path:
+def write_public(enrichments: Iterable[Enrichment], path: Path = PUBLIC_CACHE, *,
+                 merge: bool = False) -> Path:
     """Public LinkedIn fields of the name-matched profiles, nothing else (no about, location,
-    followers or raw record). ``headline`` only when the profile has one."""
-    entries = []
-    for e in sorted(enrichments, key=lambda e: e.profile.linkedin_url):
+    followers or raw record); empty fields are left out. ``merge`` keeps the entries already
+    in the file and replaces those with the same linkedin_url."""
+    by_url: dict[str, dict[str, Any]] = {}
+    if merge:
+        try:
+            for entry in json.loads(path.read_text(encoding="utf-8")).get("profiles", []):
+                if url := _canon(_str(entry.get("linkedin_url"))):
+                    by_url[url] = entry
+        except (OSError, ValueError):
+            pass
+    for e in enrichments:
         p = e.profile
-        entry = {"name": p.name, "headline": p.headline, "company": p.company,
-                 "linkedin_url": p.linkedin_url, "dataset_id": DATASET_ID,
-                 "snapshot_id": p.snapshot_id, "collected_at": p.collected_at, "provider": PROVIDER}
-        if not entry["headline"]:
-            del entry["headline"]
-        entries.append(entry)
+        entry = {"name": p.name, "headline": p.headline, "headline_source": p.headline_source,
+                 "company": p.company, "linkedin_url": p.linkedin_url, "dataset_id": DATASET_ID,
+                 "snapshot_id": p.snapshot_id, "collected_at": p.collected_at, "provider": PROVIDER,
+                 "person_id": p.person_id, "url_provider": p.url_provider}
+        by_url[p.linkedin_url] = {k: v for k, v in entry.items()
+                                  if v is not None or k in {"snapshot_id"}}
+    entries = [by_url[u] for u in sorted(by_url)]
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps({"profiles": entries}, indent=2, ensure_ascii=False) + "\n",
                     encoding="utf-8")
@@ -328,8 +345,33 @@ def load_public(path: Path = PUBLIC_CACHE) -> dict[str, LinkedInProfile]:
         pool[url] = LinkedInProfile(
             linkedin_url=url, name=_str(entry.get("name")), headline=_str(entry.get("headline")),
             company=_str(entry.get("company")), snapshot_id=_str(entry.get("snapshot_id")),
-            collected_at=_str(entry.get("collected_at")), source_mode="cached")
+            collected_at=_str(entry.get("collected_at")), source_mode="cached",
+            headline_source=_str(entry.get("headline_source")),
+            person_id=_str(entry.get("person_id")), url_provider=_str(entry.get("url_provider")))
     return pool
+
+
+def merge_pools(public: dict[str, LinkedInProfile],
+                fresh: dict[str, LinkedInProfile]) -> dict[str, LinkedInProfile]:
+    """Fresh data/probes profiles win, but keep what only the public cache knows: the SERP
+    headline and the provenance of a URL found by SERP."""
+    from dataclasses import replace
+
+    out = {**public, **fresh}
+    for url, pub in public.items():
+        if url in fresh:
+            f = fresh[url]
+            out[url] = replace(
+                f, headline=f.headline or pub.headline,
+                headline_source=f.headline_source or (pub.headline_source if pub.headline else None),
+                person_id=f.person_id or pub.person_id, url_provider=f.url_provider or pub.url_provider)
+    return out
+
+
+def serp_urls(pool: dict[str, LinkedInProfile]) -> dict[str, str]:
+    """person_id -> linkedin_url for the URLs found by SERP (no call: read from the cache)."""
+    return {p.person_id: url for url, p in pool.items()
+            if p.url_provider == "brightdata:serp" and p.person_id}
 
 
 # -- mapping and identity -----------------------------------------------------------------
@@ -355,8 +397,12 @@ def _record_url(record: dict[str, Any]) -> str | None:
 def profile_from_record(record: dict[str, Any], *, snapshot_id: str | None = None,
                         collected_at: str | None = None,
                         source_mode: str = "live") -> LinkedInProfile | None:
-    """Keep name, headline, title, company, location, url, about, followers when present."""
-    if record.get("error"):
+    """Keep name, headline, title, company, location, url, about, followers when present.
+
+    Field names are the dataset's own (brightdata/linkedin-scraper): headline is
+    ``position``, title ``current_company.title``. A row with ``warning_code`` is a private
+    or hidden profile: no profile."""
+    if record.get("error") or record.get("warning_code") or record.get("warning"):
         return None
     url = _record_url(record)
     if not url:
@@ -368,7 +414,7 @@ def profile_from_record(record: dict[str, Any], *, snapshot_id: str | None = Non
     return LinkedInProfile(
         linkedin_url=url,
         name=_str(record.get("name")),
-        headline=_str(record.get("headline")) or _str(record.get("position")),
+        headline=_str(record.get("position")),
         title=_str(current.get("title")) or _str(job.get("title")),
         company=(_str(current.get("name")) or _str(record.get("current_company_name"))
                  or _str(job.get("company"))),
@@ -378,6 +424,7 @@ def profile_from_record(record: dict[str, Any], *, snapshot_id: str | None = Non
         snapshot_id=snapshot_id,
         collected_at=_str(record.get("timestamp")) or collected_at,
         source_mode=source_mode,
+        headline_source="dataset:position" if _str(record.get("position")) else None,
     )
 
 
@@ -500,6 +547,7 @@ def write(store: Any, enrichments: Iterable[Enrichment]) -> WriteReport:
         pr = e.profile
         store.merge_node("Person", e.person_id, _clean({
             "identity_confidence": e.identity_confidence, "headline": pr.headline,
+            "headline_source": pr.headline_source,
             "company": pr.company, "provider": PROVIDER, "dataset_id": DATASET_ID,
             "snapshot_id": pr.snapshot_id, "linkedin_source_url": pr.linkedin_url,
             "linkedin_collected_at": pr.collected_at, "linkedin_source_mode": pr.source_mode}))
@@ -541,8 +589,9 @@ def cards(enrichments: Iterable[Enrichment]) -> dict[str, dict[str, Any]]:
         "provider": PROVIDER, "dataset_id": DATASET_ID, "snapshot_id": e.profile.snapshot_id,
         "source_mode": e.profile.source_mode, "source_url": e.profile.linkedin_url,
         "collected_at": e.profile.collected_at,
-        "headline": e.profile.headline, "company": e.profile.company,
-        "identity_confidence": e.identity_confidence,
+        "headline": e.profile.headline, "headline_source": e.profile.headline_source,
+        "company": e.profile.company, "identity_confidence": e.identity_confidence,
+        "url_provider": e.profile.url_provider,
     } for e in enrichments}
 
 
@@ -577,7 +626,7 @@ async def enrich(targets: list[Person], companies: Iterable[Company], store: Any
                  public: Path | None = PUBLIC_CACHE) -> EnrichResult:
     """Saved profiles first (fresh files in ``directory`` over the committed public cache);
     one collection for the absent targets only if more than 3."""
-    pool = {**(load_public(public) if public else {}), **load_pool(directory)}
+    pool = merge_pools(load_public(public) if public else {}, load_pool(directory))
     absent = missing(targets, pool)
     from_files = len(targets) - len(absent)
     collection = None

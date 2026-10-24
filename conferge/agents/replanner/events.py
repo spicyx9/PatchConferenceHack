@@ -113,8 +113,12 @@ def apply_change(state: PlanningState, change: Change, store: GraphStore | None 
             **stamp}))
         if state.conference_id and change.event.conference_relation in {
                 "official", "confirmed_side_event"}:
+            urls = [str(u) for u in [change.event.source_url,
+                                     *(e.source_url for e in change.event.evidence)] if u]
             graph.append(("merge_edge", ("Event", change.event.id, "PART_OF", "Conference",
-                                         state.conference_id), {"source": change.source_mode}))
+                                         state.conference_id), {
+                "source": change.source_mode, "relation": change.event.conference_relation,
+                "evidence_ids": list(dict.fromkeys(urls)) or None}))
     elif change.type == "time_change":
         assert target is not None
         if change.start_at is None or change.end_at is None:

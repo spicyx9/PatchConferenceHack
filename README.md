@@ -143,7 +143,7 @@ Measured numbers (dataset, graph, Bright Data runs, reachability, tests) are kep
 
 ```bash
 git clone https://github.com/spicyx9/PatchConferenceHack.git && cd PatchConferenceHack
-make up        # FalkorDB 6.0.3 in Docker on 127.0.0.1:6379, Browser on :3000
+make up        # FalkorDB 6.0.3 in Docker on 127.0.0.1:6379, Browser v2.6.2 on :3000 (the one bundled in 6.0.3 fails on every query)
 make install   # Python deps with uv
 make demo      # API + UI on http://127.0.0.1:8000, demo data loaded into FalkorDB
 ```
@@ -167,7 +167,7 @@ By default `make demo` makes no Bright Data call at startup: travel comes from l
 Checked against the code on main (2026-10-24) and the wiring audit of 2026-10-24 (read-only audit, not yet merged).
 
 - **Live and working without keys**: official GitHub Universe catalog (RainFocus), Luma, Partiful, Eventbrite and conference-party aggregators (`run_demo.py --mode live`), and the FalkorDB graph itself.
-- **The demo runs on a snapshot** of that public collection captured on 2026-10-24: 207 events, 183 people, 122 companies after deduplication, labelled `fixture` in every API response and in the UI badge, so it works offline on stage.
+- **The demo runs on a snapshot** of that public collection captured on 2026-10-24: 194 events, 183 people, 122 companies after deduplication, labelled `fixture` in every API response and in the UI badge, so it works offline on stage.
 - **Implemented, waiting for a Bright Data key**: SERP discovery, flights, hotels, LinkedIn enrichment. Without `BRIGHTDATA_API_KEY` the client reports "Bright Data key missing", `GET /brightdata` answers `data_source: unknown` with a warning, lodging providers report `missing_credentials`, and flights and stays fall back to fixtures labelled as such.
 - **The traveller profile is a fixture even in live mode**: New York, October 27 to 30, budget $2,500 come from `fixtures/api.json`; the budget block carries `source_mode: fixture` in `GET /travel` and a FIXTURE badge in the UI.
 - **Live people are the speakers of the official catalog only**: no GitHub or LinkedIn enrichment runs in the demo path.

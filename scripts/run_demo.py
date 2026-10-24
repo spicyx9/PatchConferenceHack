@@ -74,8 +74,22 @@ def linkedin_enrichment(args: argparse.Namespace, assembly: Any, goals: list[Any
         from conferge.graph import ranking
 
         ranked = [pid for o in ranking.rank_people(store, "demo-user", goals) for pid in o.person_ids]
+    # LinkedIn URLs found by SERP (make probe-serp_linkedin), read from the committed cache:
+    # applied to those speakers, who are then enriched from the same cache. No call.
+    serp = li.serp_urls(li.load_public())
+    if serp:
+        def with_url(people: list[Any]) -> list[Any]:
+            return [p.model_copy(update={"linkedin_url": serp[p.id]})
+                    if p.id in serp and not p.linkedin_url else p for p in people]
+        assembly.people, assembly.demo.people = with_url(assembly.people), with_url(assembly.demo.people)
+        if store is not None:  # only people of this demo: a MERGE must never create a stub
+            demo_ids = {p.id for p in assembly.people}
+            for pid, url in ((k, v) for k, v in serp.items() if k in demo_ids):
+                store.merge_node("Person", pid, {"linkedin_url": url,
+                                                 "linkedin_url_provider": "brightdata:serp"})
     targets = li.select_targets(ranked, assembly.people, li.fixture_hosts(),
                                 speakers=args.linkedin_speakers, host_count=args.linkedin_hosts)
+    targets += [p for p in assembly.people if p.id in serp and p not in targets]
     known = {p.id for p in assembly.people}
     res = asyncio.run(li.enrich([p for p in targets if p.id in known], assembly.companies, store,
                                 allow_collect=False))
@@ -106,6 +120,14 @@ def port_preflight(host: str, port: int) -> str | None:
         except OSError:
             return f"port {port} is already in use, run `make demo DEMO_PORT={port + 1}`"
     return None
+
+
+def build_app(demo: Any, *, no_graph: bool) -> Any:
+    """The served app. ``--no-graph`` serves without FalkorDB at all: the API must not probe a
+    graph it never loaded (stale or empty), so the ranking is visibly ``degraded_no_graph``."""
+    from conferge.api.app import create_app
+
+    return create_app(data=demo, graph_probe=not no_graph)
 
 
 def main() -> int:
@@ -143,7 +165,6 @@ def main() -> int:
 
     import uvicorn
 
-    from conferge.api.app import create_app
     from conferge.api.logic import parse_goals
     from conferge.graph import GraphBundle, ingest_bundle
     from conferge.integration import pipeline
@@ -152,21 +173,25 @@ def main() -> int:
 
     t0 = time.perf_counter()
     report = pipeline.E2EReport(mode=args.mode, started_at=datetime.now(timezone.utc))
-    slices = asyncio.run(pipeline._collect(args.mode, False, 90.0, None))
+    timings = report.timings
     from conferge.integration import travel_cache
 
-    if args.travel is None:
-        args.travel = "cached" if travel_cache.available() else "fixture"
-    if args.travel == "live":
-        travel = asyncio.run(collect_stays_flights(args.travel_timeout))
-    elif args.travel == "cached":
-        travel = travel_cache.load()
-    else:
-        travel = None
-    usable_slices = pipeline._usable(slices)
-    assembly = assemble(usable_slices, travel)
+    with timings.step("collect"):
+        slices = asyncio.run(pipeline._collect(args.mode, False, 90.0, None))
+        if args.travel is None:
+            args.travel = "cached" if travel_cache.available() else "fixture"
+        if args.travel == "live":
+            travel = asyncio.run(collect_stays_flights(args.travel_timeout))
+        elif args.travel == "cached":
+            travel = travel_cache.load()
+        else:
+            travel = None
+    with timings.step("assemble"):
+        usable_slices = pipeline._usable(slices)
+        assembly = assemble(usable_slices, travel)
     goals = parse_goals(assembly.demo.demo_goal_text)
-    opps = asyncio.run(pipeline._stage_planning(report, assembly, goals))
+    with timings.step("plan"):
+        opps = asyncio.run(pipeline._stage_planning(report, assembly, goals))
     print(f"assembled data_mode={assembly.data_mode}: {len(assembly.events)} events, "
           f"{len(assembly.people)} people, {len(opps)} opportunities "
           f"in {time.perf_counter() - t0:.1f}s")
@@ -202,7 +227,8 @@ def main() -> int:
             lodging=assembly.demo.stays, flights=assembly.demo.flights,
         )
         t1 = time.perf_counter()
-        ingest = ingest_bundle(store, bundle)
+        with timings.step("ingest"):
+            ingest = ingest_bundle(store, bundle)
         print(f"graph {args.graph}: {ingest.nodes} node writes, {ingest.edges} edge writes, "
               f"{len(ingest.skipped_edges)} skipped, in {time.perf_counter() - t1:.2f}s")
         states = {(i["label"], s) for i in store.index_status() for s in [i["status"]]}
@@ -214,7 +240,10 @@ def main() -> int:
         linkedin_enrichment(args, assembly, goals, None, ranked=[
             pid for o in opps for pid in o.person_ids])
 
-    app = create_app(data=assembly.demo)
+    pipeline.record_collection(assembly.demo, slices, timings, report.started_at)
+    app = build_app(assembly.demo, no_graph=args.no_graph)
+    if args.no_graph:
+        print("graph: not loaded (--no-graph); ranking served as degraded_no_graph, banner shown")
     uvicorn.run(app, host=args.host, port=args.port, log_level="warning")
     return 0
 
