@@ -8,6 +8,7 @@ from conferge.agents.antifomo.conflicts import verdicts
 from conferge.agents.antifomo.models import Constraints, Plan
 from conferge.agents.antifomo.optimizer import explain, optimize
 from conferge.agents.antifomo.scoring import build_candidates
+from conferge.agents.antifomo.travel import site_name
 from conferge.core.schemas import AgentContext, AgentResult, Opportunity
 
 _CONSTRAINT_KEYS = set(Constraints.model_fields)
@@ -21,6 +22,7 @@ def constraints_from_context(ctx: AgentContext) -> Constraints:
     """
     raw: dict[str, Any] = {k: v for k, v in ctx.constraints.items() if k in _CONSTRAINT_KEYS}
     raw.setdefault("timezone", ctx.conference.timezone)
+    raw.setdefault("conference_site", site_name(ctx.conference.venue_name))
     return Constraints.model_validate(raw)
 
 
