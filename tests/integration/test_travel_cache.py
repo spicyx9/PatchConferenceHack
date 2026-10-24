@@ -52,7 +52,7 @@ def test_cache_is_served_labelled_cached_with_provenance_and_pipeline_rows(no_ne
     assert sum(r["records"] for r in cached) == 55  # 21 stays + 34 itineraries
     bd = client.get("/api/v1/brightdata").json()["cached"]
     # From the cached records: stays 21 + LinkedIn 15 + Crunchbase 2 dataset rows, 34 itineraries
-    assert bd["web_unlocker"] == 34 and bd["datasets"] == 38 and bd["total"] == 72
+    assert bd["web_unlocker"] == 34 and bd["datasets"] == 40 and bd["total"] == 74
     assert all(t.startswith("2026-10-24") for pair in bd["collected_at"].values() for t in pair)
 
 
@@ -68,7 +68,7 @@ def test_comparison_exposes_cached_alternatives_without_changing_trip(no_network
     demo = assemble(fixture_slices(), travel_cache.load()).demo
     client = TestClient(create_app(data=demo, found=Providers(), graph_probe=False))
     trip_before = client.get("/api/v1/travel").json()["itinerary"]
-    chosen = client.get("/api/v1/flights").json()
+    chosen = client.get("/api/v1/flights?alternatives=false").json()
     alternatives = client.get("/api/v1/flights?alternatives=true").json()
     assert len(alternatives["items"]) > len(chosen["items"])
     assert alternatives["data_source"] == "cached"
@@ -81,3 +81,13 @@ def test_alternatives_do_not_inject_cache_into_fixture_session(no_network: None)
     demo = assemble(fixture_slices(), None).demo
     client = TestClient(create_app(data=demo, found=Providers(), graph_probe=False))
     assert client.get("/api/v1/flights?alternatives=true").json()["items"] == client.get("/api/v1/flights").json()["items"]
+
+
+def test_flights_endpoint_lists_every_cached_itinerary_kept_one_first(no_network: None) -> None:
+    demo = assemble(fixture_slices(), travel_cache.load()).demo
+    client = TestClient(create_app(data=demo, found=Providers(), graph_probe=False))
+    items = client.get("/api/v1/flights").json()["items"]
+    assert len(items) == 34 and items[0]["id"] == demo.flights[0].id
+    assert items[0]["total_price"] == "413" and items[0]["price_status"] == "quoted_total"
+    assert len({i["id"] for i in items}) == 34
+    assert len(client.get("/api/v1/flights", params={"alternatives": "false"}).json()["items"]) == 1

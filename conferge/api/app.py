@@ -410,8 +410,20 @@ def create_app(
         if state.rank_seconds is not None:
             timings["steps"].append({"step": "rank", "seconds": state.rank_seconds,
                                      "note": f"last {state.rank_mode} ranking, measured at request time"})
+        from conferge.core.cost import snapshot as live_snapshot
+        from conferge.integration import brightdata_usage
+
+        requests = {
+            "at_collection_time": [
+                {k: p[k] for k in ("product", "api", "requests", "records", "collected_first",
+                                    "collected_last")}
+                for p in brightdata_usage.cached_products()],
+            "since_start": live_snapshot()["by_api"],
+            "note": "at collection time: requests recorded when the cached records were collected; "
+                    "since start: calls made by this process (0 until Refresh)",
+        }
         return _envelope(state, [], {
-            "headline": HEADLINE, "rows": rows, "totals": totals(rows),
+            "headline": HEADLINE, "rows": rows, "totals": totals(rows), "requests": requests,
             "brightdata_calls": bd.calls(), "reachability": reachability(),
             "timings": timings, "sources_report": state.data.sources_report,
             "note": None if rows else "no collection run in this process (dataset served as loaded)",
@@ -450,10 +462,25 @@ def create_app(
                 if p["collected_first"]:
                     cached["collected_at"][p["product"]] = [p["collected_first"], p["collected_last"]]
         cached["total"] = cached["datasets"] + cached["web_unlocker"] + cached["serp"]
+        from conferge.core.cost import snapshot as live_snapshot
+
+        live = live_snapshot()
+        key_missing = client.not_ready("datasets") == "Bright Data key missing; set BRIGHTDATA_API_KEY"
+        cache_rows = [p for p in summary["products"] if p["source"].startswith("cached")]
+        firsts = [p["collected_first"] for p in cache_rows if p["collected_first"]]
+        lasts = [p["collected_last"] for p in cache_rows if p["collected_last"]]
         return _envelope(state, [], {
             **summary,
             "usage": bd.usage(),
             "cached": cached,
+            # Live counter of this process only; the cache is a separate line, never added in.
+            "live": {"requests": live["requests"], "records": live["records"],
+                     "key_missing": key_missing,
+                     "label": "key missing" if key_missing else None},
+            "cache_summary": {"records": sum(p["records"] for p in cache_rows),
+                              "requests_at_collection_time": sum(p["requests"] for p in cache_rows),
+                              "collected_first": min(firsts, default=None),
+                              "collected_last": max(lasts, default=None)},
             "ready": ready,
             "not_ready_reason": {api: client.not_ready(api) for api in apis},
         }, extra_warnings=notes, mode_override="live" if any(ready.values()) else "unknown")
@@ -609,19 +636,23 @@ def create_app(
         return _envelope(state, ["stays"], {"items": items, "count": len(items)})
 
     @api.get("/flights")
-    def flights(alternatives: bool = False) -> dict[str, Any]:
-        offers = state.data.flights
+    def flights(alternatives: bool = True) -> dict[str, Any]:
+        """The kept itinerary first, then every other cached itinerary (alternatives=false: kept only)."""
+        offers = list(state.data.flights)
         domain = state.data.domains.get("flights")
         if alternatives and domain and domain.source_mode == "cached":
             from conferge.integration import travel_cache
 
             cached = travel_cache.load(flight_alternatives=True)
             if cached and "flights" in cached:
-                offers = cached["flights"].items
+                kept = {o.id for o in offers}
+                offers += [o for o in cached["flights"].items if o.id not in kept]
         from conferge.api.travel_cards import view
 
-        items = [{**view(f), **rt_display(f), "source": source_of(f.evidence)}
-                 for f in offers]
+        kept_ids = {o.id for o in state.data.flights}
+        # kept: the itinerary of the trip (in the graph); the others are cached alternatives.
+        items = [{**view(f), **rt_display(f), "source": source_of(f.evidence),
+                  "kept": f.id in kept_ids} for f in offers]
         return _envelope(state, ["flights"], {"items": items, "count": len(items)})
 
     @api.get("/travel")

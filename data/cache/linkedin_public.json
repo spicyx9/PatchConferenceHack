@@ -23,6 +23,15 @@
       "url_provider": "brightdata:serp"
     },
     {
+      "name": "Carlin Cherry",
+      "company": "GitHub",
+      "linkedin_url": "https://www.linkedin.com/in/carlincherry/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": "sd_mvmxazapjmu7ukixk",
+      "collected_at": "2026-10-24T21:42:20.860Z",
+      "provider": "brightdata:linkedin"
+    },
+    {
       "name": "Camila Maia",
       "company": "Latitude.sh",
       "linkedin_url": "https://www.linkedin.com/in/cmaiacd/",
@@ -95,6 +104,15 @@
       "dataset_id": "gd_l1viktl72bvl7bjuj0",
       "snapshot_id": "sd_mvms2ssrh1bjodbs9",
       "collected_at": "2026-10-24T19:16:57.530Z",
+      "provider": "brightdata:linkedin"
+    },
+    {
+      "name": "Nicholas Liffen",
+      "company": "GitHub",
+      "linkedin_url": "https://www.linkedin.com/in/nickliffen/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": "sd_mvmxazapjmu7ukixk",
+      "collected_at": "2026-10-24T21:41:11.634Z",
       "provider": "brightdata:linkedin"
     },
     {
