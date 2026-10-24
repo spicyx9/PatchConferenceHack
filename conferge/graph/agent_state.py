@@ -7,7 +7,8 @@ Agents coordinate through the graph, not through Python objects:
     (Change {label, scenario_id, from_version, to_version, written_by, at_ms})-[:AFFECTS]->(Event)
 
 ``state`` is ``locked`` (user confirmed) or ``tentative`` for a planned event, and
-``invalidated`` once a later plan drops it. Nothing is ever deleted: an invalidated
+``invalidated`` once a later plan drops it. Replanning never deletes (``POST /reset``, a hard
+demo reset, is the one exception: it wipes the demo user's state). An invalidated
 ``PLANS`` edge keeps the ``plan_version`` it last belonged to, and ``versions`` lists every
 plan version that contained the event. Writes go through ``GraphStore`` MERGE only and are
 idempotent: re-writing the same plan or the same skips changes nothing, not even ``at_ms``.

@@ -19,11 +19,19 @@ Owners: **graph** = FalkorDB session (`conferge/graph`, ranking in `conferge/api
 | 2 | 84dbe8b | 10 passed | F2 |
 | 3 | 4494e77 | 15 passed (journey + shared agent state) | F2 |
 | 4 | a5e6479 | 16 passed (after the (a) fix below) | F4 |
+| 5 | ff8f06a | 16 passed | none (F4 resolved by decision) |
 
 ## Open
 
+_No open finding after the F4 decision._
+
+## Resolved
+
 ### F4 (c, graph/core vs shared agent state): `/reset` deletes the plan history
 
+- **Resolved by decision (user, 2026-10-24)**: `POST /reset` is a hard demo reset and does delete the
+  demo user's `PLANS`, `SKIPS` and `Change`. The "invalidated, never deleted" rule applies only to
+  replanning in normal use (`agent_state.write_plan` / `write_skips` / `write_change`). No code change.
 - **Found in**: run 4, reading #26 (a5e6479) against the shared agent state contract (#25).
 - **Symptom**: `POST /reset` now calls `GraphStore.delete_user_state`, which runs
   `MATCH (c:Change {user_id: $user_id}) DETACH DELETE c` and
@@ -37,8 +45,6 @@ Owners: **graph** = FalkorDB session (`conferge/graph`, ranking in `conferge/api
   `GraphStore.merge_edge` (or `agent_state.write_plan(store, user, [], written_by="reset")` and
   `write_skips(..., [])`, which already do exactly this), and keep `Change` nodes. If a hard wipe is
   wanted for the demo, make it a separate explicit endpoint and say so in the contract.
-
-## Resolved
 
 ### F2 (c): goal edges without `observed_at`
 
