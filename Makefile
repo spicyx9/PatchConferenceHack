@@ -1,4 +1,4 @@
-.PHONY: install lint format test check up down
+.PHONY: install lint format test check up down demo
 
 install:
 	uv sync --group dev
@@ -20,6 +20,10 @@ up:
 
 down:
 	docker compose down
+
+# Demo API + front on http://127.0.0.1:8000, assembled data loaded into FalkorDB.
+demo:
+	uv run python scripts/run_demo.py
 
 # Each window owns scripts/probes/<name>.py; the shared Makefile never changes.
 probe-%:
