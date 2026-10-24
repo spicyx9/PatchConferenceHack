@@ -1,0 +1,494 @@
+{
+ "source_mode": "fixture",
+ "note": "w08 graph fixture. Conference anchor facts come from docs/knowledge/03-demo-scenario.md; every person, company and event marked [FIXTURE] or 'Fixture' is fictional and exists only to exercise graph traversals. No prices, lodging or flights are included.",
+ "user_id": "demo-user",
+ "conference": {
+  "id": "github-universe-2026",
+  "name": "GitHub Universe 2026",
+  "start_date": "2026-10-28",
+  "end_date": "2026-10-29",
+  "city": "San Francisco",
+  "venue_name": "Fort Mason Center",
+  "timezone": "America/Los_Angeles",
+  "official_url": "https://githubuniverse.com/",
+  "latitude": 37.806,
+  "longitude": -122.432,
+  "topics": [
+   "AI agents",
+   "developer tools",
+   "Copilot",
+   "MCP"
+  ],
+  "sponsor_ids": [
+   "c-fx-devtools"
+  ],
+  "evidence": [
+   {
+    "provider": "fixture:w08-graph",
+    "source_mode": "fixture",
+    "collected_at": "2026-10-23T12:00:00Z",
+    "source_url": "https://githubuniverse.com/"
+   }
+  ]
+ },
+ "companies": [
+  {
+   "id": "c-fx-agentlabs",
+   "name": "Fixture AgentLabs (fictional)",
+   "industry": "AI agents",
+   "is_investor": false,
+   "categories": [
+    "startup"
+   ],
+   "evidence": [
+    {
+     "provider": "fixture:w08-graph",
+     "source_mode": "fixture",
+     "collected_at": "2026-10-23T12:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "c-fx-seedfund",
+   "name": "Fixture Seed Fund (fictional)",
+   "industry": "venture capital",
+   "is_investor": true,
+   "categories": [
+    "investor"
+   ],
+   "evidence": [
+    {
+     "provider": "fixture:w08-graph",
+     "source_mode": "fixture",
+     "collected_at": "2026-10-23T12:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "c-fx-devtools",
+   "name": "Fixture DevTools Inc (fictional)",
+   "industry": "developer tools",
+   "is_investor": false,
+   "categories": [
+    "startup"
+   ],
+   "evidence": [
+    {
+     "provider": "fixture:w08-graph",
+     "source_mode": "fixture",
+     "collected_at": "2026-10-23T12:00:00Z"
+    }
+   ]
+  }
+ ],
+ "people": [
+  {
+   "id": "p-fx-alice",
+   "name": "Fixture Speaker Alice",
+   "company_id": "c-fx-agentlabs",
+   "title": "Founder",
+   "role": "founder",
+   "roles": [
+    "founder"
+   ],
+   "topics": [
+    "AI agents"
+   ],
+   "participation": "confirmed_speaker",
+   "event_ids": [
+    "e-fx-talk-agents"
+   ],
+   "bio": "Fictional founder building agent runtimes on the Model Context Protocol.",
+   "evidence": [
+    {
+     "provider": "fixture:w08-graph",
+     "source_mode": "fixture",
+     "collected_at": "2026-10-23T12:00:00Z",
+     "confidence": 1.0
+    }
+   ]
+  },
+  {
+   "id": "p-fx-bob",
+   "name": "Fixture Engineer Bob",
+   "company_id": "c-fx-agentlabs",
+   "title": "Staff Engineer",
+   "role": "engineer",
+   "roles": [
+    "engineer"
+   ],
+   "topics": [
+    "MCP"
+   ],
+   "participation": "relevant_candidate",
+   "evidence": [
+    {
+     "provider": "fixture:w08-graph",
+     "source_mode": "fixture",
+     "collected_at": "2026-10-23T12:00:00Z",
+     "confidence": 0.6
+    }
+   ]
+  },
+  {
+   "id": "p-fx-carol",
+   "name": "Fixture Investor Carol",
+   "company_id": "c-fx-seedfund",
+   "title": "Partner",
+   "role": "investor",
+   "roles": [
+    "investor"
+   ],
+   "topics": [
+    "venture capital"
+   ],
+   "participation": "public_attendee_listing",
+   "event_ids": [
+    "e-fx-agents-night"
+   ],
+   "bio": "Fictional seed investor.",
+   "evidence": [
+    {
+     "provider": "fixture:w08-graph",
+     "source_mode": "fixture",
+     "collected_at": "2026-10-23T12:00:00Z",
+     "source_url": "https://example.org/fixture/agents-night/guests",
+     "confidence": 0.9
+    }
+   ]
+  },
+  {
+   "id": "p-fx-dana",
+   "name": "Fixture PM Dana",
+   "company_id": "c-fx-devtools",
+   "title": "Product Manager",
+   "role": "pm",
+   "roles": [
+    "pm"
+   ],
+   "topics": [
+    "Copilot"
+   ],
+   "participation": "confirmed_speaker",
+   "event_ids": [
+    "e-fx-talk-copilot"
+   ],
+   "bio": "Fictional product manager working on Copilot extensions.",
+   "evidence": [
+    {
+     "provider": "fixture:w08-graph",
+     "source_mode": "fixture",
+     "collected_at": "2026-10-23T12:00:00Z",
+     "confidence": 1.0
+    }
+   ]
+  },
+  {
+   "id": "p-fx-erin",
+   "name": "Fixture Organizer Erin",
+   "company_id": "c-fx-devtools",
+   "title": "Co-founder",
+   "role": "founder",
+   "roles": [
+    "founder"
+   ],
+   "topics": [
+    "developer tools"
+   ],
+   "participation": "confirmed_organizer",
+   "event_ids": [
+    "e-fx-devtools-mixer"
+   ],
+   "bio": "Fictional co-founder shipping AI agents for code review.",
+   "evidence": [
+    {
+     "provider": "fixture:w08-graph",
+     "source_mode": "fixture",
+     "collected_at": "2026-10-23T12:00:00Z",
+     "confidence": 0.9
+    }
+   ]
+  },
+  {
+   "id": "p-fx-frank",
+   "name": "Fixture Founder Frank",
+   "title": "Founder",
+   "role": "founder",
+   "roles": [
+    "founder"
+   ],
+   "topics": [
+    "AI agents",
+    "MCP"
+   ],
+   "participation": "relevant_candidate",
+   "bio": "Fictional solo founder of an agentic testing tool.",
+   "evidence": [
+    {
+     "provider": "fixture:w08-graph",
+     "source_mode": "fixture",
+     "collected_at": "2026-10-23T12:00:00Z",
+     "confidence": 0.5
+    }
+   ]
+  },
+  {
+   "id": "p-fx-gina",
+   "name": "Fixture Investor Gina",
+   "company_id": "c-fx-seedfund",
+   "title": "Principal",
+   "role": "investor",
+   "roles": [
+    "investor"
+   ],
+   "topics": [],
+   "participation": "public_attendee_listing",
+   "event_ids": [
+    "e-fx-agents-night"
+   ],
+   "bio": "Fictional investor whose attendance has no source URL, so no attendance edge may be created.",
+   "evidence": [
+    {
+     "provider": "fixture:w08-graph",
+     "source_mode": "fixture",
+     "collected_at": "2026-10-23T12:00:00Z",
+     "confidence": 0.4
+    }
+   ]
+  }
+ ],
+ "events": [
+  {
+   "id": "e-fx-talk-agents",
+   "conference_id": "github-universe-2026",
+   "title": "[FIXTURE] Building agents with MCP",
+   "event_type": "session",
+   "start_at": "2026-10-28T14:00:00-07:00",
+   "end_at": "2026-10-28T14:40:00-07:00",
+   "timezone": "America/Los_Angeles",
+   "venue": {
+    "name": "Fort Mason Center",
+    "city": "San Francisco",
+    "latitude": 37.806,
+    "longitude": -122.432,
+    "coordinate_precision": "approximate"
+   },
+   "speaker_ids": [
+    "p-fx-alice"
+   ],
+   "topics": [
+    "AI agents",
+    "MCP"
+   ],
+   "status": "scheduled",
+   "conference_relation": "official",
+   "relation_score": 1.0,
+   "relation_evidence": [
+    "fixture: fictional session catalog entry"
+   ],
+   "evidence": [
+    {
+     "provider": "fixture:w08-graph",
+     "source_mode": "fixture",
+     "collected_at": "2026-10-23T12:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "e-fx-talk-copilot",
+   "conference_id": "github-universe-2026",
+   "title": "[FIXTURE] Copilot extensions in practice",
+   "event_type": "session",
+   "start_at": "2026-10-29T11:00:00-07:00",
+   "end_at": "2026-10-29T11:40:00-07:00",
+   "timezone": "America/Los_Angeles",
+   "venue": {
+    "name": "Fort Mason Center",
+    "city": "San Francisco",
+    "latitude": 37.806,
+    "longitude": -122.432,
+    "coordinate_precision": "approximate"
+   },
+   "speaker_ids": [
+    "p-fx-dana"
+   ],
+   "topics": [
+    "Copilot",
+    "developer tools"
+   ],
+   "status": "scheduled",
+   "conference_relation": "official",
+   "relation_score": 1.0,
+   "relation_evidence": [
+    "fixture: fictional session catalog entry"
+   ],
+   "evidence": [
+    {
+     "provider": "fixture:w08-graph",
+     "source_mode": "fixture",
+     "collected_at": "2026-10-23T12:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "e-fx-agents-night",
+   "conference_id": "github-universe-2026",
+   "title": "[FIXTURE] Agents Night (fictional side event)",
+   "event_type": "side_event",
+   "description": "Fictional evening for AI agents founders and seed investors.",
+   "start_at": "2026-10-28T19:00:00-07:00",
+   "end_at": "2026-10-28T22:00:00-07:00",
+   "timezone": "America/Los_Angeles",
+   "venue": {
+    "name": "Fixture Hall Marina",
+    "city": "San Francisco",
+    "latitude": 37.803,
+    "longitude": -122.437,
+    "coordinate_precision": "approximate"
+   },
+   "organizer_ids": [
+    "c-fx-agentlabs"
+   ],
+   "organizer_names": [
+    "Fixture AgentLabs (fictional)"
+   ],
+   "topics": [
+    "AI agents",
+    "venture capital"
+   ],
+   "status": "scheduled",
+   "conference_relation": "confirmed_side_event",
+   "relation_score": 0.9,
+   "relation_evidence": [
+    "fixture: fictional listing names GitHub Universe"
+   ],
+   "evidence": [
+    {
+     "provider": "fixture:w08-graph",
+     "source_mode": "fixture",
+     "collected_at": "2026-10-23T12:00:00Z",
+     "source_url": "https://example.org/fixture/agents-night"
+    }
+   ]
+  },
+  {
+   "id": "e-fx-devtools-mixer",
+   "conference_id": "github-universe-2026",
+   "title": "[FIXTURE] DevTools Mixer (fictional)",
+   "event_type": "party",
+   "start_at": "2026-10-28T20:00:00-07:00",
+   "end_at": "2026-10-28T23:00:00-07:00",
+   "timezone": "America/Los_Angeles",
+   "venue": {
+    "name": "Fixture Loft Cow Hollow",
+    "city": "San Francisco",
+    "latitude": 37.798,
+    "longitude": -122.436,
+    "coordinate_precision": "approximate"
+   },
+   "organizer_ids": [
+    "p-fx-erin"
+   ],
+   "topics": [
+    "developer tools",
+    "Copilot"
+   ],
+   "status": "scheduled",
+   "conference_relation": "candidate",
+   "relation_score": 0.5,
+   "evidence": [
+    {
+     "provider": "fixture:w08-graph",
+     "source_mode": "fixture",
+     "collected_at": "2026-10-23T12:00:00Z",
+     "source_url": "https://example.org/fixture/devtools-mixer"
+    }
+   ]
+  },
+  {
+   "id": "e-fx-oss-breakfast",
+   "conference_id": "github-universe-2026",
+   "title": "[FIXTURE] Open source breakfast (time not published)",
+   "event_type": "meetup",
+   "topics": [
+    "open source"
+   ],
+   "status": "unknown",
+   "conference_relation": "candidate",
+   "relation_score": 0.3,
+   "evidence": [
+    {
+     "provider": "fixture:w08-graph",
+     "source_mode": "fixture",
+     "collected_at": "2026-10-23T12:00:00Z"
+    }
+   ]
+  }
+ ],
+ "goals": [
+  {
+   "id": "g-seed-investors",
+   "description": "Meet seed investors",
+   "priority": 0.45,
+   "topics": [
+    "venture capital",
+    "AI agents"
+   ],
+   "target_roles": [
+    "investor"
+   ]
+  },
+  {
+   "id": "g-agent-founders",
+   "description": "Meet AI agents founders",
+   "priority": 0.35,
+   "topics": [
+    "AI agents",
+    "MCP"
+   ],
+   "target_roles": [
+    "founder"
+   ]
+  },
+  {
+   "id": "g-copilot-pms",
+   "description": "Meet Copilot PMs",
+   "priority": 0.2,
+   "topics": [
+    "Copilot",
+    "developer tools"
+   ],
+   "target_roles": [
+    "pm"
+   ]
+  }
+ ],
+ "opportunities": [
+  {
+   "id": "o-fx-alice-talk",
+   "title": "[FIXTURE] Catch Alice after her MCP talk",
+   "goal_ids": [
+    "g-agent-founders"
+   ],
+   "event_id": "e-fx-talk-agents",
+   "person_ids": [
+    "p-fx-alice"
+   ],
+   "company_ids": [
+    "c-fx-agentlabs"
+   ],
+   "score": 80,
+   "rationale": "Fixture opportunity used to exercise SERVES_GOAL and INVOLVES edges.",
+   "presence": "confirmed",
+   "evidence": [
+    {
+     "provider": "fixture:w08-graph",
+     "source_mode": "fixture",
+     "collected_at": "2026-10-23T12:00:00Z"
+    }
+   ]
+  }
+ ],
+ "lodging": [],
+ "flights": []
+}

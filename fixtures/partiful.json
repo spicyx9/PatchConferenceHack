@@ -1,0 +1,219 @@
+{
+ "source_mode": "fixture",
+ "provider": "partiful",
+ "captured_at": "2026-10-24T06:29:17.108007+00:00",
+ "note": "Captured from live public Partiful Explore SF by scripts/probes/partiful.py --refresh-fixture, sanitized (no guests, no owner ids). Events in the Oct 27-30 window first, then earliest others. FIXTURE: not a live response.",
+ "entries": [
+  {
+   "event": {
+    "id": "h6YYc5rG42JsJ9zHCjMX",
+    "title": "cine cue presents ★:  the craft",
+    "description": "cine cue is a film club with a pool bar debrief 🎱 on a mission to save independent theatre and bring back bar culture 💿 \n\n◈ after transferring to a los angeles high school, sarah finds that her telekinetic gift appeals to a group of three wannabe witches, who happen to be seeking a fourth member for their rituals.\n\n◈ bonnie, rochelle, and nancy, like sarah herself, all have troubled backgrounds, which combined with their nascent powers lead to dangerous consequences. when a minor spell causes a fellow student to lose her hair, the girls grow power-mad.\n\n☆ make sure to buy tickets before they sell out! ☆\n\n-9:00pm: Meet outside Roxie/grab snacks\n-9:15pm: Movie\n-11:00pm: Casements",
+    "startDate": "2026-10-28T04:00:00.000Z",
+    "endDate": "2026-10-28T06:30:00.000Z",
+    "timezone": "America/Los_Angeles",
+    "locationInfo": {
+     "type": "structured",
+     "hasPostCode": true,
+     "mapsInfo": {
+      "name": "Roxie Theater",
+      "addressLines": [
+       "3117 16th St",
+       "San Francisco, CA 94103"
+      ],
+      "approximateLocation": "San Francisco, CA",
+      "appleMapsUrl": "http://maps.apple.com/?address=3117%2016th%20St%2C%20San%20Francisco%2C%20CA%2094103&sll=37.76,-122.42",
+      "googleMapsUrl": "https://www.google.com/maps/search/?api=1&query=3117%2016th%20St%2C%20San%20Francisco%2C%20CA%2094103"
+     },
+     "displayAddressLines": [
+      "3117 16th St",
+      "San Francisco, CA"
+     ],
+     "neighborhood": "Mission Dolores"
+    },
+    "status": "PUBLISHED",
+    "isPublic": true,
+    "goingGuestCount": 109,
+    "interestedGuestCount": 227,
+    "showGuestCount": true
+   },
+   "explore_group": "section:All Things Fall"
+  },
+  {
+   "event": {
+    "id": "YPvjPux7NIFBcz5cqqhj",
+    "title": "Mahjong in the Mission",
+    "description": "Join Mo Pai Mahjong Club for mahjong night! We'll be transforming Society of Thumbs—part art studio, part neighborhood hub—into an open play area. Having grown up in the Mission and Excelsior, I thought it would be fun to pop up in a new neighborhood. Come go offline with me and shuffle some tiles in this creative new third space.\n\nDetails:\n🀄️ Admission includes a dedicated playing seat for 3 hours plus light snacks. You are also welcome to bring outside food.\n🀄️ Please indicate your playing level in the questionnaire to help with assigned seating. We will have competitive tables playing for points, but are also opening it up to beginners. (Visual handouts will be provided.)\n🀄️ If you would like to be seated together, please indicate that in a comment once you RSVP.\n🀄️ All ticket sales are final. We are unable to issue refunds.\n🀄️ Tickets are not sold at the door. Clicking \"Going\" in the RSVP does not guarantee admission. You must purchase a ticket via Venmo.\n🀄️ After making your Venmo payment, make sure you hit “Going\" in Partiful so your ticket is accounted for and we don’t oversell.",
+    "startDate": "2026-10-29T01:00:00.000Z",
+    "endDate": "2026-10-29T04:00:00.000Z",
+    "timezone": "America/Los_Angeles",
+    "locationInfo": {
+     "type": "structured",
+     "hasPostCode": true,
+     "mapsInfo": {
+      "name": "Society of Thumbs",
+      "addressLines": [
+       "1398 Valencia St",
+       "San Francisco, CA 94110"
+      ],
+      "approximateLocation": "San Francisco, CA",
+      "appleMapsUrl": "http://maps.apple.com/?address=1398%20Valencia%20St%2C%20San%20Francisco%2C%20CA%2094110&sll=37.75,-122.42",
+      "googleMapsUrl": "https://www.google.com/maps/search/?api=1&query=1398%20Valencia%20St%2C%20San%20Francisco%2C%20CA%2094110"
+     },
+     "displayAddressLines": [
+      "1398 Valencia St",
+      "San Francisco, CA"
+     ],
+     "neighborhood": "Inner Mission"
+    },
+    "status": "PUBLISHED",
+    "isPublic": true,
+    "goingGuestCount": 30,
+    "interestedGuestCount": 154,
+    "showGuestCount": true,
+    "hostName": "Mo Pai Mahjong Club"
+   },
+   "explore_group": "section:Meet New People!"
+  },
+  {
+   "event": {
+    "id": "1UVqgBpfXFKoI9whbNWI",
+    "title": "Madrone x SFPL: Blind Book Challenge",
+    "description": "🎃📚 Join Madrone Art Bar and the SF Public Library for a fun Halloween-themed art event! 👻🖤\n\n📖 Choose a gift-wrapped mystery, horror, or thriller book and create an original artwork inspired by its first paragraph or page, without knowing anything else about the story. 🎨🍷\n\n🖼️ At the end of the evening, participants will have the opportunity to share their artwork and take their book home. 📚\n\n🎨 All art supplies provided, though you're welcome to bring your own favorite materials.\n\n🕸️ 21+ / 🍕 Outside food welcome!",
+    "startDate": "2026-10-29T01:00:00.000Z",
+    "endDate": "2026-10-29T03:00:00.000Z",
+    "timezone": "America/Los_Angeles",
+    "locationInfo": {
+     "type": "structured",
+     "hasPostCode": true,
+     "mapsInfo": {
+      "name": "Madrone Art Bar",
+      "addressLines": [
+       "500 Divisadero St",
+       "San Francisco, CA 94117"
+      ],
+      "approximateLocation": "San Francisco, CA",
+      "appleMapsUrl": "http://maps.apple.com/?address=500%20Divisadero%20St%2C%20San%20Francisco%2C%20CA%2094117&sll=37.77,-122.44",
+      "googleMapsUrl": "https://www.google.com/maps/search/?api=1&query=500%20Divisadero%20St%2C%20San%20Francisco%2C%20CA%2094117"
+     },
+     "displayAddressLines": [
+      "500 Divisadero St",
+      "San Francisco, CA"
+     ],
+     "neighborhood": "Alamo Square"
+    },
+    "status": "PUBLISHED",
+    "isPublic": true,
+    "goingGuestCount": 50,
+    "interestedGuestCount": 95,
+    "showGuestCount": true
+   },
+   "explore_group": "section:Curated by Jess @beepity.bo0op"
+  },
+  {
+   "event": {
+    "id": "NUukL6vN2S26QvFxFqpj",
+    "title": "OUTRÉ COLLECTIVE FASHION SHOW",
+    "description": "Our event is a fashion show featuring five student designers across the Bay Area who are partnering with Upcyclers.com to create a maximalist vintage archival one-of-a-kind event that is also promoting the importance of sustainability. Enjoy the runway show, mingle with guests, and grab a drink at the bar. A perfect way to spend your Wednesday night <3\n\nFeaturing: Maria, Ava, Malia, Desi, Jolie \nAt the end of the show, browse and shop booths from our featured designers!\n\nEvent details: \nLocation: Minna Gallery \n111 Minna Gallery St, San Francisco, CA \n6-9pm\n\nFashion show starts: 6:30pm. Seats are first come first serve! \nFree admission! Come celebrate local designers and enjoy the show. \n\nMust be 21+",
+    "startDate": "2026-10-29T01:00:00.000Z",
+    "endDate": "2026-10-29T04:00:00.000Z",
+    "timezone": "America/Los_Angeles",
+    "locationInfo": {
+     "type": "structured",
+     "hasPostCode": true,
+     "mapsInfo": {
+      "name": "111 Minna Gallery",
+      "addressLines": [
+       "111 Minna St",
+       "San Francisco, CA 94105"
+      ],
+      "approximateLocation": "San Francisco, CA",
+      "appleMapsUrl": "http://maps.apple.com/?address=111%20Minna%20St%2C%20San%20Francisco%2C%20CA%2094105&sll=37.79,-122.40",
+      "googleMapsUrl": "https://www.google.com/maps/search/?api=1&query=111%20Minna%20St%2C%20San%20Francisco%2C%20CA%2094105"
+     },
+     "displayName": "Minna Gallery",
+     "displayAddressLines": [
+      "111 Minna St",
+      "San Francisco, CA"
+     ],
+     "neighborhood": "South of Market"
+    },
+    "status": "PUBLISHED",
+    "isPublic": true,
+    "goingGuestCount": 145,
+    "interestedGuestCount": 96,
+    "showGuestCount": true,
+    "hostName": ""
+   },
+   "explore_group": "section:Curated by Jess @beepity.bo0op"
+  },
+  {
+   "event": {
+    "id": "VBYdhpdVTRQ6Np46ywS6",
+    "title": "Spooky Wine Bar Crawl",
+    "description": "Join Wine Club SF for a night of good wine, new friends, and exploring San Francisco one wine bar at a time. 🍷\n\nWe’ll hit two local wine bars, with a glass included at each stop. Come solo, bring a friend, meet someone new, and discover a few spots worth coming back to.\n\nExact route will be shared with ticket holders before the crawl.\n\n21+ only. No wine knowledge required—just bring your curiosity + comfortable shoes.",
+    "startDate": "2026-10-29T01:30:00.000Z",
+    "endDate": "2026-10-29T04:30:00.000Z",
+    "timezone": "America/Los_Angeles",
+    "locationInfo": {
+     "type": "structured",
+     "hasPostCode": true,
+     "mapsInfo": {
+      "name": "San Francisco, CA",
+      "addressLines": [
+       "San Francisco, CA"
+      ],
+      "approximateLocation": "San Francisco, California",
+      "appleMapsUrl": "http://maps.apple.com/?q=San%20Francisco%2C%20CA%2C%20San%20Francisco%2C%20CA",
+      "googleMapsUrl": "https://www.google.com/maps/search/?api=1&query=San%20Francisco%2C%20CA%2C%20San%20Francisco%2C%20CA"
+     },
+     "displayAddressLines": [
+      "San Francisco, CA"
+     ],
+     "neighborhood": "Civic Center"
+    },
+    "status": "PUBLISHED",
+    "isPublic": true,
+    "goingGuestCount": 18,
+    "interestedGuestCount": 94,
+    "showGuestCount": true
+   },
+   "explore_group": "section:All Things Fall"
+  },
+  {
+   "event": {
+    "id": "Gt3TRSXGjsyMBmL111cL",
+    "title": "HEARTS TO BLAME TOUR AT THE KNOCKOUT",
+    "description": "Come out for a night of top of the line psych/rock/post punk music, as we celebrate the Los Angeles band, Moon Darling’s  ‘Hearts To Blame’ Tour! 💋\n\nWith support from some of our favorite local acts… The Dead Cassettes and Xuvé ❤️‍🔥\n\nIt’ll be an evening to remember… an opportunity to cure that deep down craving for psychedelic, punk, rock n’ roll, and some disco grooves to break up your work week! 🕺",
+    "startDate": "2026-10-29T03:00:00.000Z",
+    "endDate": null,
+    "timezone": "America/Los_Angeles",
+    "locationInfo": {
+     "type": "structured",
+     "hasPostCode": true,
+     "mapsInfo": {
+      "name": "The Knockout",
+      "addressLines": [
+       "3223 Mission St",
+       "San Francisco, CA 94110"
+      ],
+      "approximateLocation": "San Francisco, CA",
+      "appleMapsUrl": "http://maps.apple.com/?q=3223%20Mission%20St%2C%20San%20Francisco%2C%20CA%2094110&sll=37.75,-122.42",
+      "googleMapsUrl": "https://www.google.com/maps/search/?api=1&query=3223%20Mission%20St%2C%20San%20Francisco%2C%20CA%2094110"
+     },
+     "displayAddressLines": [
+      "3223 Mission St",
+      "San Francisco, CA"
+     ],
+     "neighborhood": "Bernal Heights"
+    },
+    "status": "PUBLISHED",
+    "isPublic": true,
+    "goingGuestCount": 0,
+    "interestedGuestCount": 4,
+    "showGuestCount": true
+   },
+   "explore_group": "feed"
+  }
+ ]
+}
