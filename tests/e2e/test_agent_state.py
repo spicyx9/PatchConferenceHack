@@ -89,6 +89,16 @@ def test_antifomo_reads_plan_from_graph_and_writes_skips(store: GraphStore) -> N
     assert len(agent_state.read_skips(store, USER, active_only=False)) == 2
 
 
+
+def test_agent_edges_carry_the_graph_provenance_contract(store: GraphStore) -> None:
+    publish_plan(store, USER, _plan("e1"), attended=set())
+    publish_skips(store, USER, [{"event_id": "e2", "category": "low_score", "reason": "x"}])
+    publish_replan(store, USER, label="c", scenario_id=None, changed=["e1"], new_plan=_plan("e3"), attended=set())
+    rows = run_read(store, "MATCH ()-[r:PLANS|SKIPS|AFFECTS]->() "
+                           "RETURN type(r), r.source, r.source_mode, r.confidence, r.observed_at, r.verification")
+    assert rows and all(all(v is not None for v in row) for row in rows), rows
+
+
 def test_replanner_reads_plans_and_skips_writes_change_and_new_version(store: GraphStore) -> None:
     publish_plan(store, USER, _plan("e1", "e2"), attended=set())
     publish_skips(store, USER, [{"event_id": "e3", "category": "low_score", "reason": "x"}])
