@@ -48,3 +48,20 @@ def test_dynamic_target_follows_the_plan_after_reset() -> None:
     again = client.post("/api/v1/simulate-change", json={"scenario_id": "top-sold-out"}).json()
     assert first["changed_events"] == again["changed_events"]
     assert again["diff"]["removed"]
+
+
+def test_knock_on_removals_are_explained_as_displaced() -> None:
+    from conferge.api import logic
+    from conferge.api.data import load_fixture
+
+    data = load_fixture()
+    event = data.events[0]
+    before = {"days": [{"day": "d", "items": [
+        {"event_id": event.id, "title": "Changed", "start_at": None, "score": 9, "people": []},
+        {"event_id": "other", "title": "Bumped", "start_at": None, "score": 1, "people": []},
+    ]}]}
+    after = {"days": [{"day": "d", "items": []}]}
+    replan = logic.explain_replan(before, after, [event.id], data)
+    assert [r["removed"]["event_id"] for r in replan] == [event.id, "other"]
+    assert "simulated change" in replan[0]["reason"]
+    assert "simulated" not in replan[1]["reason"] and replan[1]["replacement"] is None

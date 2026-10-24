@@ -566,14 +566,26 @@ def explain_replan(before: dict[str, Any], after: dict[str, Any], changed: list[
     old = {i["event_id"]: (d["day"], i) for d in before["days"] for i in d["items"]}
     new = {i["event_id"]: (d["day"], i) for d in after["days"] for i in d["items"]}
     out = []
-    for event_id in sorted(old.keys() - new.keys()):
+    # Changed events first, then the ones displaced as a knock-on effect.
+    for event_id in sorted(old.keys() - new.keys(), key=lambda k: (k not in changed, k)):
         day, item = old[event_id]
         event = data.event(event_id)
         added = [i for k, (d, i) in new.items() if k not in old and d == day]
         same_slot = [i for i in added if event and (e := data.event(i["event_id"])) and _overlaps(event, e)]
+        if event_id not in changed:
+            by = max(same_slot, key=lambda i: i["score"], default=None)
+            out.append({
+                "removed": {"event_id": event_id, "title": item["title"], "start_at": item["start_at"],
+                            "score": item["score"], "status": event.status if event else "removed"},
+                "replacement": None,
+                "reason": (f"'{item['title']}' (score {item['score']}) is dropped: it overlaps "
+                           f"'{by['title']}' (score {by['score']}), now kept after the change."
+                           if by else f"'{item['title']}' no longer fits the replanned day."),
+            })
+            continue
         replacement = max(same_slot or added, key=lambda i: i["score"], default=None)
         status = event.status if event else "removed"
-        cause = (f"'{item['title']}' is now {status}" + (" (simulated change)" if event_id in changed else ""))
+        cause = f"'{item['title']}' is now {status} (simulated change)"
         if replacement is None:
             reason = f"{cause}; no other scheduled event fits that day, the slot stays free."
         else:
