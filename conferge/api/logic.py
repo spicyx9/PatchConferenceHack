@@ -544,7 +544,9 @@ def travel_view(
                 f"{first['start_at']} to make '{first['title']}'."
             ),
             "reason": f"event score {first['score']} on your arrival day",
+            # Accepting only records a preference: no flight or stay changes.
             "accepted": pid in accepted,
+            "status_label": "Noted as preferred" if pid in accepted else None,
             "books": False,
             "computed_by": FALLBACK,
         })

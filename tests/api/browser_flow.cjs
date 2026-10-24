@@ -419,9 +419,9 @@ function pass(name) {
       await submit('button[data-action="accept"]', "/proposal/accept");
       assert.match(
         await page.locator("#proposals").textContent(),
-        /Suggestion saved/i,
+        /Noted as preferred/i,
       );
-      pass("Travel suggestion is saved without presenting it as a booking");
+      pass("Travel suggestion is noted as preferred without presenting it as a booking");
     }
     await nav("story");
     await page.locator('#tab-story [data-open="goal-dialog"]').first().click();

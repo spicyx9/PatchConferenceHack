@@ -1320,10 +1320,10 @@
               esc(reason) +
               "</p></div>" +
               (p.accepted
-                ? '<span class="badge ok">Suggestion saved</span>'
+                ? '<span class="badge ok">Noted as preferred</span>'
                 : '<button class="small secondary" data-action="accept" data-id="' +
                   esc(p.id) +
-                  '">Save suggestion</button>') +
+                  '">Noted</button>') +
               "</div>"
             );
           })
@@ -4313,7 +4313,7 @@
       withBusy(btn, function () {
         return mutate("/proposal/accept", { proposal_id: id }, "travel").then(
           function () {
-            toast("Suggestion saved. No booking has been made.");
+            toast("Noted as preferred. No flight or stay has changed.");
           },
         );
       });
