@@ -351,6 +351,23 @@ def load_public(path: Path = PUBLIC_CACHE) -> dict[str, LinkedInProfile]:
     return pool
 
 
+def merge_pools(public: dict[str, LinkedInProfile],
+                fresh: dict[str, LinkedInProfile]) -> dict[str, LinkedInProfile]:
+    """Fresh data/probes profiles win, but keep what only the public cache knows: the SERP
+    headline and the provenance of a URL found by SERP."""
+    from dataclasses import replace
+
+    out = {**public, **fresh}
+    for url, pub in public.items():
+        if url in fresh:
+            f = fresh[url]
+            out[url] = replace(
+                f, headline=f.headline or pub.headline,
+                headline_source=f.headline_source or (pub.headline_source if pub.headline else None),
+                person_id=f.person_id or pub.person_id, url_provider=f.url_provider or pub.url_provider)
+    return out
+
+
 def serp_urls(pool: dict[str, LinkedInProfile]) -> dict[str, str]:
     """person_id -> linkedin_url for the URLs found by SERP (no call: read from the cache)."""
     return {p.person_id: url for url, p in pool.items()
@@ -609,7 +626,7 @@ async def enrich(targets: list[Person], companies: Iterable[Company], store: Any
                  public: Path | None = PUBLIC_CACHE) -> EnrichResult:
     """Saved profiles first (fresh files in ``directory`` over the committed public cache);
     one collection for the absent targets only if more than 3."""
-    pool = {**(load_public(public) if public else {}), **load_pool(directory)}
+    pool = merge_pools(load_public(public) if public else {}, load_pool(directory))
     absent = missing(targets, pool)
     from_files = len(targets) - len(absent)
     collection = None

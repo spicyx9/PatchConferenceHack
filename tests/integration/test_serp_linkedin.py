@@ -344,3 +344,16 @@ def test_identity_and_works_at_only_never_attends() -> None:
     assert enrichments[0].identity_confidence == 1.0
     assert {e[2] for e in store.edges} == {"WORKS_AT"}
     assert all("presence_confidence" not in props for *_, props in store.nodes)
+
+
+def test_fresh_probe_profile_keeps_the_serp_fields_of_the_public_cache() -> None:
+    url = "https://www.linkedin.com/in/philipholleran/"
+    public = {url: li.LinkedInProfile(linkedin_url=url, name="Philip Holleran", headline="Technologist",
+                                      headline_source="serp:title", person_id="p-ph",
+                                      url_provider="brightdata:serp", source_mode="cached")}
+    fresh = {url: li.LinkedInProfile(linkedin_url=url, name="Philip Holleran", company="GitHub",
+                                     title="Field CTO", snapshot_id="sd_x", source_mode="cached")}
+    merged = li.merge_pools(public, fresh)[url]
+    assert (merged.headline, merged.headline_source, merged.person_id, merged.url_provider) == (
+        "Technologist", "serp:title", "p-ph", "brightdata:serp")
+    assert merged.title == "Field CTO" and merged.snapshot_id == "sd_x"  # fresh data kept
