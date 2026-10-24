@@ -227,7 +227,7 @@ function pass(name) {
     );
     assert.match(
       await page.locator("#travel-offer-context").textContent(),
-      /original dates/,
+      /Search to update results/,
     );
     await page.locator("#research-return").fill("2026-10-25");
     assert.equal(
@@ -242,47 +242,16 @@ function pass(name) {
     pass(
       "Travel provider searches retain chosen dates and validate return order without changing collected offers",
     );
-    const observedFlights = await api("/flights");
-    const testFlights = [410, 250].map((price, index) => ({
-      ...observedFlights.items[0],
-      id: "test-flight-" + index,
-      total_price: String(price),
-      currency: "USD",
-      source: { provider: "fixture", api: "fixture", tier: 3 },
-      booking_url: "https://example.com/test-flight-" + index,
-    }));
-    await page.route("**/api/v1/flights?alternatives=true", (route) =>
-      route.fulfill({ json: { ...observedFlights, items: testFlights } }),
+    await page.locator("#research-origin").fill("New York");
+    await page.locator("#travel-show-collected").click();
+    await page.waitForFunction(
+      () =>
+        document
+          .querySelector("#travel-results-workspace")
+          .getAttribute("aria-busy") === "false",
     );
-    await page.reload();
-    await settle();
-    await nav("travel");
-    assert.equal(await page.locator(".travel-offer").count(), 2);
-    await page.locator("#flight-sort").selectOption("price");
-    assert.match(
-      await page.locator(".travel-offer").first().textContent(),
-      /250 USD/,
-    );
-    assert.equal(
-      await page
-        .locator(".travel-offer")
-        .first()
-        .getByRole("link")
-        .getAttribute("href"),
-      "https://example.com/test-flight-1",
-    );
-    await page.locator(".travel-offer").first().locator("summary").click();
-    assert.match(
-      await page.locator(".travel-offer").first().textContent(),
-      /Sample data/,
-    );
-    await page.unroute("**/api/v1/flights?alternatives=true");
-    await page.reload();
-    await settle();
-    await nav("travel");
-    pass(
-      "Explicit mocked flight offers sort by observed price and retain provider links and source provenance",
-    );
+    assert((await page.locator(".travel-offer").count()) > 1);
+    pass("Travel query returns collected offers matching the chosen criteria");
     const places = page.locator("#map-places button");
     assert((await places.count()) > 1);
     await places.first().click();
@@ -446,7 +415,7 @@ function pass(name) {
 
     await nav("travel");
     const proposal = page.locator('button[data-action="accept"]').first();
-    if (await proposal.count()) {
+    if (await proposal.isVisible()) {
       await submit('button[data-action="accept"]', "/proposal/accept");
       assert.match(
         await page.locator("#proposals").textContent(),

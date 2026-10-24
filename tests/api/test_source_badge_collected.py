@@ -61,6 +61,6 @@ def test_source_badge_never_empty_and_shows_local_time() -> None:
 
 def test_cards_render_the_mode_badge_outside_details() -> None:
     src = APP.read_text(encoding="utf-8")
-    for card in ('<div class="travel-offer-price">', '<div class="trip-stay-price">'):
+    for card in ('<div class="flight-fare">', '<div class="trip-stay-price">'):
         after = src[src.index(card):src.index(card) + 200]
         assert "sourceBadge(" in after

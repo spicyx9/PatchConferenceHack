@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="/static/travel-v2.css" />
     <link rel="stylesheet" href="/static/connections-v2.css" />
     <link rel="stylesheet" href="/static/refinement-v2.css" />
+    <link rel="stylesheet" href="/static/travel-search-v3.css" />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -482,95 +483,297 @@
           aria-labelledby="travel-title"
           hidden
         >
-          <div class="page-heading">
-            <div>
-              <span class="eyebrow">A LITTLE LESS LOGISTICS</span>
-              <h1 id="travel-title">Your trip to San Francisco.</h1>
-              <p>Compare the journey. Stay close to the conversations.</p>
-            </div>
+          <div class="travel-heading">
+            <p id="travel-context" class="travel-conference">
+              GitHub Universe · San Francisco · Oct 28–29
+            </p>
+            <h1 id="travel-title">Find your flight.</h1>
+          </div>
+          <div
+            class="travel-category"
+            role="tablist"
+            aria-label="Travel search"
+          >
+            <button
+              id="travel-flights-tab"
+              type="button"
+              role="tab"
+              aria-selected="true"
+              aria-controls="flight-results-panel"
+            >
+              <svg class="icon" aria-hidden="true"><use href="#i-plane" /></svg
+              >Flights
+            </button>
+            <button
+              id="travel-stays-tab"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="stay-results-panel"
+            >
+              <svg class="icon" aria-hidden="true"><use href="#i-pin" /></svg
+              >Stays
+            </button>
           </div>
           <form
             id="travel-research-form"
-            class="travel-research"
+            class="travel-search-v3"
             aria-label="Trip research"
           >
-            <label
-              >Flying from<input
-                id="research-origin"
-                type="text"
-                maxlength="80"
-                value="JFK"
-                required
-            /></label>
-            <label
-              >Departure<input id="research-depart" type="date" required
-            /></label>
-            <label
-              >Return<input id="research-return" type="date" required
-            /></label>
-            <div class="research-actions">
-              <a
-                id="research-flights-link"
-                class="primary"
-                target="_blank"
-                rel="noopener noreferrer"
-                >Search flights</a
-              ><a
-                id="research-stays-link"
-                class="secondary"
-                target="_blank"
-                rel="noopener noreferrer"
-                >Find a stay</a
+            <div class="travel-search-options">
+              <label id="flight-type-label"
+                ><span class="sr-only">Trip type</span
+                ><select id="flight-type">
+                  <option value="round_trip">Round trip</option>
+                  <option value="one_way">One way</option>
+                </select></label
+              >
+              <label
+                ><span class="sr-only" id="research-adults-label"
+                  >Travelers</span
+                ><select
+                  id="research-adults"
+                  aria-labelledby="research-adults-label"
+                >
+                  <option value="1">1 adult</option>
+                  <option value="2">2 adults</option>
+                  <option value="3">3 adults</option>
+                  <option value="4">4 adults</option>
+                </select></label
+              >
+              <label id="research-cabin-label"
+                ><span class="sr-only">Cabin</span
+                ><select id="research-cabin">
+                  <option value="economy">Economy</option>
+                  <option value="premium_economy">Premium economy</option>
+                  <option value="business">Business</option>
+                  <option value="first">First</option>
+                </select></label
+              >
+              <label id="research-rooms-label" hidden
+                ><span class="sr-only">Rooms</span
+                ><select id="research-rooms">
+                  <option value="1">1 room</option>
+                  <option value="2">2 rooms</option>
+                  <option value="3">3 rooms</option>
+                </select></label
               >
             </div>
-            <p class="small-text muted">
-              Search opens with a travel provider. Nothing is booked or selected
-              here.
-            </p>
+            <div class="travel-search-fields">
+              <label class="search-origin" id="research-origin-label"
+                ><span>From</span
+                ><input
+                  id="research-origin"
+                  type="text"
+                  placeholder="City or airport"
+                  maxlength="80"
+                  required
+                  list="travel-airports"
+              /></label>
+              <datalist id="travel-airports">
+                <option value="New York"></option>
+                <option value="JFK"></option>
+                <option value="EWR"></option>
+                <option value="LGA"></option>
+                <option value="Paris"></option>
+                <option value="London"></option>
+                <option value="Los Angeles"></option>
+              </datalist>
+              <label class="search-destination"
+                ><span id="research-destination-label">To</span
+                ><input
+                  id="research-destination"
+                  type="text"
+                  value="San Francisco"
+                  required
+                  maxlength="80"
+              /></label>
+              <label class="search-depart"
+                ><span id="research-depart-label">Departure</span
+                ><input id="research-depart" type="date" required
+              /></label>
+              <label class="search-return"
+                ><span id="research-return-label">Return</span
+                ><input id="research-return" type="date" required
+              /></label>
+              <button
+                id="travel-search-button"
+                type="submit"
+                class="travel-search-button"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-search" /></svg
+                ><span>Search</span>
+              </button>
+            </div>
+            <div class="travel-search-foot">
+              <span id="travel-search-hint"
+                >Destination set from your conference.</span
+              ><button
+                type="button"
+                id="travel-local-toggle"
+                class="text-button"
+              >
+                I’m local or already booked
+              </button>
+            </div>
           </form>
-          <p id="travel-offer-context" class="small-text muted"></p>
-          <section
-            class="travel-comparison"
-            aria-labelledby="flight-compare-title"
-          >
-            <div class="section-heading">
-              <h2 id="flight-compare-title">Compare flights.</h2>
-              <label
-                >Show<select id="flight-type">
-                  <option value="round_trip">Round-trip quotes</option>
-                  <option value="all">All itineraries</option>
-                </select></label
+          <div id="travel-local-note" hidden>
+            <h2>You’re ready to explore.</h2>
+            <p>
+              Your conference venues and agenda are on the map below. You can
+              search for travel whenever you need it.
+            </p>
+            <button type="button" id="travel-resume" class="secondary">
+              Search travel
+            </button>
+          </div>
+          <div class="travel-prices-bar">
+            <p
+              id="travel-offer-context"
+              class="travel-result-status"
+              aria-live="polite"
+            ></p>
+            <button
+              type="button"
+              id="travel-show-collected"
+              class="text-button"
+            >
+              Collected offers</button
+            ><button
+              type="button"
+              id="travel-refresh-prices"
+              class="text-button"
+            >
+              Refresh prices
+            </button>
+          </div>
+          <div id="travel-search-feedback" role="status"></div>
+          <div class="travel-results-workspace" id="travel-results-workspace">
+            <aside
+              class="travel-filter-sidebar"
+              aria-label="Filter travel results"
+            >
+              <button
+                type="button"
+                id="travel-mobile-filters"
+                aria-expanded="false"
               >
-              <label
-                >Sort by
-                <select id="flight-sort">
-                  <option value="route">Route</option>
-                  <option value="price">Price within currency</option>
-                </select></label
-              >
-            </div>
-            <div id="flights"></div>
-          </section>
-          <section
-            class="trip-stays-section"
-            aria-labelledby="trip-stays-title"
-          >
-            <div class="section-heading">
-              <div>
-                <span class="eyebrow">CLOSE TO YOUR PLANS</span>
-                <h2 id="trip-stays-title">Find your base.</h2>
+                Filters
+              </button>
+              <div class="travel-filter-title">
+                <h2>Filters</h2>
+                <button
+                  type="button"
+                  id="travel-clear-filters"
+                  class="text-button"
+                >
+                  Reset
+                </button>
               </div>
-              <label
-                >Sort by
-                <select id="stay-sort">
-                  <option value="recommended">Recommended</option>
-                  <option value="distance">Distance to conference</option>
-                  <option value="price">Price within currency</option>
-                </select></label
+              <fieldset id="travel-stop-filters">
+                <legend>Stops</legend>
+                <label
+                  ><input
+                    type="radio"
+                    name="travel-stops"
+                    value="all"
+                    checked
+                  />Any number of stops</label
+                ><label
+                  ><input type="radio" name="travel-stops" value="0" />Nonstop
+                  only</label
+                ><label
+                  ><input type="radio" name="travel-stops" value="1" />Up to 1
+                  stop</label
+                >
+              </fieldset>
+              <fieldset>
+                <legend>Price</legend>
+                <label class="travel-price-filter"
+                  >Maximum total (USD)<input
+                    id="travel-max-price"
+                    type="number"
+                    min="1"
+                    step="1"
+                    placeholder="No limit"
+                /></label>
+              </fieldset>
+              <fieldset id="stay-radius-filter" hidden>
+                <legend>Location</legend>
+                <label class="travel-price-filter"
+                  >Within distance of venue<select id="travel-stay-radius">
+                    <option value="3">3 km</option>
+                    <option value="5" selected>5 km</option>
+                    <option value="10">10 km</option>
+                  </select></label
+                >
+              </fieldset>
+              <p class="travel-filter-note">
+                Your destination is close to the conference. Prices are for the
+                full quoted trip or stay.
+              </p>
+            </aside>
+            <div class="travel-result-column">
+              <section
+                id="flight-results-panel"
+                class="travel-comparison"
+                role="tabpanel"
+                aria-labelledby="travel-flights-tab"
               >
+                <div class="travel-results-header">
+                  <div>
+                    <h2 id="flight-compare-title">Flights to San Francisco</h2>
+                    <span id="flight-result-count"></span>
+                  </div>
+                  <label
+                    >Sort by<select id="flight-sort">
+                      <option value="price">Lowest price</option>
+                      <option value="duration">Shortest duration</option>
+                      <option value="departure">Earliest departure</option>
+                      <option value="route">Airport</option>
+                    </select></label
+                  >
+                </div>
+                <div id="flights"></div>
+              </section>
+              <section
+                id="stay-results-panel"
+                class="trip-stays-section"
+                role="tabpanel"
+                aria-labelledby="travel-stays-tab"
+                hidden
+              >
+                <div class="travel-results-header">
+                  <div>
+                    <h2 id="trip-stays-title">Stay close to your plans</h2>
+                    <span id="stay-result-count"></span>
+                  </div>
+                  <label
+                    >Sort by<select id="stay-sort">
+                      <option value="distance">Closest to conference</option>
+                      <option value="price">Lowest total price</option>
+                      <option value="recommended">Recommended</option>
+                    </select></label
+                  >
+                </div>
+                <div id="stays"></div>
+              </section>
             </div>
-            <div id="stays"></div>
-          </section>
+          </div>
+          <a
+            id="research-flights-link"
+            hidden
+            target="_blank"
+            rel="noopener noreferrer"
+            >Search flights with provider</a
+          ><a
+            id="research-stays-link"
+            hidden
+            target="_blank"
+            rel="noopener noreferrer"
+            >Search stays with provider</a
+          >
           <aside id="budget" aria-label="Trip budget"></aside>
           <section
             class="travel-map-panel panel"
