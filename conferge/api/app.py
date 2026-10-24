@@ -493,9 +493,25 @@ def create_app(
             "plan_version": plan_version, "skips_graph": skips_written,
         }, extra_warnings=notes)
 
+    def _company_card(company: Any, funding: dict[str, Any]) -> dict[str, Any] | None:
+        """Company of a /people card, plus Crunchbase funding from the public cache when known."""
+        if company is None:
+            return None
+        from conferge.people import crunchbase
+
+        card = company.model_dump(mode="json")
+        view = crunchbase.company_view(funding.get(company.id))
+        if view:
+            card["funding"], card["last_round"] = view["funding"], view["last_round"]
+            card["evidence"] = [*card.get("evidence", []), view["evidence"]]
+        return card
+
     @api.get("/people")
     def people(limit: int = Query(10, ge=1, le=100)) -> dict[str, Any]:
+        from conferge.people import crunchbase
+
         opps = state.opportunities()[:limit]
+        funding = crunchbase.load_public_cache(crunchbase.PUBLIC_CACHE)  # read-only, may be {}
         cards = []
         for opp in opps:
             person = state.data.person(opp.person_ids[0]) if opp.person_ids else None
@@ -503,7 +519,7 @@ def create_app(
             cards.append({
                 "opportunity": opp.model_dump(mode="json"),
                 "person": person.model_dump(mode="json") if person else None,
-                "company": company.model_dump(mode="json") if company else None,
+                "company": _company_card(company, funding),
                 "met": bool(person and person.id in state.met),
                 "met_note": state.met.get(person.id) if person else None,
                 "linkedin": state.data.linkedin.get(person.id) if person else None,

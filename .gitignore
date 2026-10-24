@@ -27,6 +27,8 @@ probes/*.html
 probes/*.ndjson
 # Bright Data LinkedIn records (public profiles of real people); data/block_matrix.json stays tracked
 data/probes/linkedin_*.json
+# Bright Data Crunchbase raw rows (make probe-crunchbase); data/cache/crunchbase_public.json stays tracked
+data/probes/crunchbase_*.json
 
 # Worker logs, PIDs, and snapshots (never upload provider responses or secrets)
 /logs/
