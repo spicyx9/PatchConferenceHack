@@ -75,6 +75,7 @@ class DemoState:
         self.skipped: set[str] = set()
         self.accepted: set[str] = set()
         self.scenario_id: str | None = None
+        self.simulated_events: set[str] = set()  # event ids rewritten by /simulate-change
         self.agent_mode: str | None = None
         self.agent_opportunities: list[Opportunity] | None = None
         self.agent_warnings: list[str] = []
@@ -165,7 +166,11 @@ def _envelope(
     status = max((s.status for s in slices), key=lambda s: _STATUS_RANK[s], default="ok")
     if state.rank_mode == DEGRADED_NO_GRAPH and {"people", "events"} & set(domains) and not mode_override:
         data_source, status = DEGRADED_NO_GRAPH, "degraded"
-    warnings = sorted({w for s in slices for w in s.warnings} | set(extra_warnings or []))
+    warnings = {w for s in slices for w in s.warnings} | set(extra_warnings or [])
+    if state.scenario_id:  # every response served while a simulation is in force says so
+        warnings.add(f"simulated change active: scenario {state.scenario_id!r} rewrote "
+                     f"{len(state.simulated_events)} event(s); not an update from the source (POST /reset clears it)")
+    warnings = sorted(warnings)
     collected = max((s.collected_at for s in slices), default=None)
     return {
         "data_source": data_source,
@@ -435,6 +440,7 @@ def create_app(
             item["source_mode"] = logic._mode_of(event.evidence)
             item["attended"] = event.id in state.attended
             item["skipped"] = event.id in state.skipped
+            item["simulated"] = event.id in state.simulated_events
             out.append(item)
         out.sort(key=lambda e: (e["start_at"] is None, e["start_at"] or "", e["id"]))
         return out
@@ -681,6 +687,7 @@ def create_app(
         _publish_plan(before)  # the replanner reads the plan in force from the graph
         changed = logic.apply_scenario(state.data, scenario)
         state.scenario_id = scenario["id"]
+        state.simulated_events.update(changed)
         payload = _plan_payload(publish=False)
         store = state.store()
         if store is not None:
