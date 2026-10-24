@@ -1419,6 +1419,9 @@
     $("travel-stays-tab").setAttribute("aria-selected", String(!flights));
     $("flight-results-panel").hidden = !flights;
     $("stay-results-panel").hidden = flights;
+    $("travel-map-panel").hidden = flights;
+    if (!flights && map)
+      setTimeout(function () { map.invalidateSize(); }, 0);
     $("travel-title").textContent = flights
       ? "Find your flight."
       : "Find a place to stay.";
@@ -3319,6 +3322,7 @@
     $("travel-research-form").hidden = true;
     $("travel-results-workspace").hidden = true;
     $("travel-local-note").hidden = false;
+    $("travel-map-panel").hidden = false;
     $("travel-offer-context").hidden = true;
     if (map)
       setTimeout(function () {
@@ -3329,6 +3333,7 @@
     $("travel-research-form").hidden = false;
     $("travel-results-workspace").hidden = false;
     $("travel-local-note").hidden = true;
+    $("travel-map-panel").hidden = travelSearchKind === "flights";
     $("travel-offer-context").hidden = false;
   };
   function refreshAll() {
