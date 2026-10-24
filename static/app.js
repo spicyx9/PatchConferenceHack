@@ -858,12 +858,18 @@
     var cls = function (v) { return '<span class="reach-' + esc(v) + '">' + esc(v) + "</span>"; };
     box.innerHTML = "<h3>Reachability: plain fetch vs Bright Data</h3>" +
       "<p><b>" + esc(c.reachable_without_brightdata) + " of " + esc(c.n) + " sites reachable without Bright Data, " +
-      esc(c.reachable_with_brightdata) + " of " + esc(c.n) + " with</b> " +
-      '<span class="muted">(run ' + esc(fmtTime(r.run_at)) + ", Web Unlocker zone " + esc(r.zone) + ")</span></p>" +
+      esc(c.reachable_with_brightdata) + " of " + esc(c.n) + " with</b> (Web Unlocker or dataset; Web Unlocker alone " +
+      esc(c.reachable_with_unlocker_only) + " of " + esc(c.n) + ") " +
+      '<span class="muted">(run ' + esc(fmtTime(r.run_at)) + ", datasets read " + esc(fmtTime(r.datasets_read_at || r.run_at)) +
+      ", Web Unlocker zone " + esc(r.zone) + ")</span></p>" +
+      (c.kyc_pending && c.kyc_pending.length ? "<p><b>KYC pending:</b> " + esc(c.kyc_pending.join(", ")) +
+        ' <span class="muted">(refused by Web Unlocker until KYC is approved; then ' +
+        esc(c.reachable_with_brightdata_if_kyc_approved) + " of " + esc(c.n) + " with Bright Data, projection)</span></p>" : "") +
       '<table class="pipeline-table"><thead><tr><th>Site</th><th>httpx default UA</th><th>httpx browser UA</th>' +
-      "<th>Bright Data Unlocker</th></tr></thead><tbody>" + (r.sites || []).map(function (s) {
+      "<th>Bright Data Unlocker</th><th>Bright Data dataset</th></tr></thead><tbody>" + (r.sites || []).map(function (s) {
         return "<tr><td>" + esc(s.site) + "</td><td>" + cls(s.plain_default_ua) + "</td><td>" + cls(s.plain_browser_ua) +
-          '</td><td title="' + esc(s.detail) + '">' + cls(s.brightdata_unlocker) + "</td></tr>";
+          '</td><td title="' + esc(s.detail) + '">' + cls(s.brightdata_unlocker) +
+          '</td><td title="' + esc(s.dataset_detail || "") + '">' + (s.brightdata_dataset === "not_run" ? '<span class="muted">-</span>' : cls(s.brightdata_dataset)) + "</td></tr>";
       }).join("") + "</tbody></table>";
   }
 

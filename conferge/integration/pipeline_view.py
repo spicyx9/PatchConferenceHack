@@ -80,7 +80,7 @@ def build_rows(slices: list[Any], travel: dict[str, Any], travel_fallback: dict[
 
 
 BLOCK_MATRIX = Path(__file__).resolve().parents[2] / "data" / "block_matrix.json"
-_ATTEMPTS = ("plain_default_ua", "plain_browser_ua", "brightdata_unlocker")
+_ATTEMPTS = ("plain_default_ua", "plain_browser_ua", "brightdata_unlocker", "brightdata_dataset")
 
 
 def reachability(path: Path | None = None) -> dict[str, Any] | None:
@@ -90,9 +90,13 @@ def reachability(path: Path | None = None) -> dict[str, Any] | None:
     except (OSError, ValueError):
         return None
     return {
-        "run_at": report["run_at"], "zone": report["zone"], "counts": report["counts"],
-        "sites": [{"site": s["site"], **{k: s["attempts"][k]["class"] for k in _ATTEMPTS},
-                   "detail": s["attempts"]["brightdata_unlocker"]["detail"]} for s in report["sites"]],
+        "run_at": report["run_at"], "datasets_read_at": report.get("datasets_read_at"),
+        "zone": report["zone"], "counts": report["counts"],
+        "sites": [{"site": s["site"],
+                   **{k: s["attempts"].get(k, {}).get("class", "not_run") for k in _ATTEMPTS},
+                   "detail": s["attempts"]["brightdata_unlocker"]["detail"],
+                   "dataset_detail": s["attempts"].get("brightdata_dataset", {}).get("detail")}
+                  for s in report["sites"]],
     }
 
 

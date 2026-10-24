@@ -57,3 +57,15 @@ def test_reachability_reads_the_last_run(tmp_path: Path) -> None:
         assert len(data["sites"]) == raw["counts"]["n"]
         body = TestClient(create_app(graph_probe=False)).get("/api/v1/pipeline").json()
         assert body["reachability"]["counts"] == raw["counts"]
+        counts = raw["counts"]
+        assert counts["reachable_with_unlocker_only"] <= counts["reachable_with_brightdata"]
+        assert counts["reachable_with_brightdata"] <= counts["reachable_with_brightdata_if_kyc_approved"]
+        assert set(counts["kyc_pending"]) == {"Kayak", "Hotels.com", "Expedia", "Marriott"}
+
+
+def test_dataset_cell_without_snapshot_is_not_run() -> None:
+    import asyncio
+
+    bm = _probe_module()
+    cell = asyncio.run(bm.dataset_cell([], None))
+    assert cell["class"] == "not_run"
