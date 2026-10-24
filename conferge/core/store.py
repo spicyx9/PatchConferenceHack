@@ -80,6 +80,24 @@ class GraphStore:
         return [{"label": r[0], "properties": list(r[1]), "types": dict(r[2]), "status": r[7]}
                 for r in rows]
 
+    def delete_user_state(self, user_id: str) -> dict[str, int]:
+        """Forget one user's memory and agent state (an explicit user reset).
+
+        Deletes the user's Meeting nodes (MET / ATTENDED / SKIPPED / CONTACTED, with their
+        MET and INVOLVES edges) and Change nodes (with AFFECTS), and the user's PLANS / SKIPS
+        edges. Conference data, goals and the User node are kept. Parameterised, labels fixed.
+        """
+        counts = {"nodes_deleted": 0, "relationships_deleted": 0}
+        for cypher in (
+            "MATCH (m:Meeting {user_id: $user_id}) DETACH DELETE m",
+            "MATCH (c:Change {user_id: $user_id}) DETACH DELETE c",
+            "MATCH (:User {id: $user_id})-[r:PLANS|SKIPS]->() DELETE r",
+        ):
+            result = self.graph.query(cypher, params={"user_id": user_id})
+            for key in counts:
+                counts[key] += int(getattr(result, key, 0) or 0)
+        return counts
+
     def merge_node(
         self, kind: str, node_id: str, properties: dict[str, Any] | None = None
     ) -> Any:

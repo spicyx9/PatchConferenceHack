@@ -745,7 +745,18 @@ def create_app(
     @api.post("/reset")
     def reset() -> dict[str, Any]:
         state.reset()
-        return _envelope(state, ["events", "people"], _plan_payload(), extra_warnings=_plan_warnings())
+        cleared: dict[str, int] | None = None
+        notes: list[str] = []
+        store = state.store()
+        if store is not None:
+            try:  # the graph memory too: otherwise a reset would not reset the ranking
+                cleared = store.delete_user_state(USER_ID)
+            except Exception as exc:  # noqa: BLE001 - visible: the ranking will still exclude MET people
+                notes.append(f"graph memory kept: FalkorDB delete failed ({type(exc).__name__}); "
+                             "people met earlier stay excluded from the ranking")
+        payload = _plan_payload()
+        payload["graph_memory_cleared"] = cleared
+        return _envelope(state, ["events", "people"], payload, extra_warnings=[*_plan_warnings(), *notes])
 
     @api.post("/proposal/accept")
     def proposal_accept(req: ProposalRequest) -> dict[str, Any]:
