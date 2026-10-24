@@ -9,8 +9,9 @@ made by this process (``conferge.core.cost.snapshot``):
   distinct dataset snapshot, one per record without a snapshot (synchronous scrape), one per
   distinct Web Unlocker page URL, plus recorded runs that returned nothing.
 * ``collected_first`` / ``collected_last``: the records' own ``collected_at``.
-* ``list_price_usd``: dataset records only, at list price; never for Unlocker or SERP rows
-  (34 itineraries extracted from one Unlocker page are one request).
+
+No USD figure: no captured Bright Data response carried a cost (34 itineraries extracted
+from one Unlocker page are one request, and a list price per row would not be a bill).
 """
 
 from __future__ import annotations
@@ -21,7 +22,7 @@ from pathlib import Path
 from typing import Any
 
 from conferge.api.provenance import SITE_NAMES
-from conferge.core.cost import COST_LABEL, dataset_cost
+from conferge.core.cost import COST_NOTE
 from conferge.core.cost import snapshot as live_snapshot
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -38,7 +39,7 @@ _SERP_PROBES = {
 
 def _row(product: str, api: str) -> dict[str, Any]:
     return {"product": product, "api": api, "requests": 0, "records": 0, "source": "cached",
-            "collected_first": None, "collected_last": None, "list_price_usd": None,
+            "collected_first": None, "collected_last": None,
             "_snapshots": set(), "_pages": set()}
 
 
@@ -115,8 +116,6 @@ def cached_products(directory: Path = CACHE_DIR, probes: Path = PROBE_REPORTS) -
     out = []
     for r in rows.values():
         r["requests"] += len(r.pop("_snapshots")) + len(r.pop("_pages"))
-        if r["api"] == "dataset":
-            r["list_price_usd"] = dataset_cost(r["records"])
         out.append(r)
     return sorted(out, key=lambda r: ({"dataset": 0, "unlocker": 1, "serp": 2}.get(r["api"], 3),
                                       r["product"]))
@@ -128,8 +127,7 @@ def live_products() -> list[dict[str, Any]]:
     names = {"datasets": "dataset", "unlocker": "unlocker", "serp": "serp"}
     return [{"product": "This process", "api": names.get(api, api), "requests": v["requests"],
              "records": v["records"], "source": "live", "collected_first": None,
-             "collected_last": None,
-             "list_price_usd": dataset_cost(v["records"]) if api == "datasets" else None}
+             "collected_last": None}
             for api, v in snap["by_api"].items() if v["requests"]]
 
 
@@ -140,11 +138,10 @@ def summary(directory: Path = CACHE_DIR, probes: Path = PROBE_REPORTS) -> dict[s
         slot = by_api.setdefault(p["api"], {"requests": 0, "records": 0})
         slot["requests"] += p["requests"]
         slot["records"] += p["records"]
-    priced = [p["records"] for p in products if p["api"] == "dataset"]
     return {"products": products, "by_api": by_api,
             "requests": sum(p["requests"] for p in products),
             "records": sum(p["records"] for p in products),
-            "list_price_usd": dataset_cost(sum(priced)), "cost_label": COST_LABEL}
+            "cost_usd": None, "cost_note": COST_NOTE}
 
 
 __all__ = ["cached_products", "live_products", "summary"]

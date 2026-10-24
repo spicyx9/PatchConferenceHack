@@ -418,13 +418,12 @@ def create_app(
 
     @api.get("/cost")
     def cost() -> dict[str, Any]:
-        """Bright Data requests and records of this process; list-price estimate, not billed."""
+        """Bright Data requests and records of this process; no USD figure (none ever read)."""
         from conferge.core import cost as bd_cost
 
         snap = bd_cost.snapshot()
         return _envelope(state, [], snap, mode_override="live" if snap["requests"] else "unknown",
-                         extra_warnings=[f"{bd_cost.COST_LABEL}: dataset records only, "
-                                         "Unlocker and SERP requests are not priced"])
+                         extra_warnings=[bd_cost.COST_NOTE])
 
     @api.get("/brightdata")
     def brightdata_usage() -> dict[str, Any]:

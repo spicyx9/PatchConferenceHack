@@ -197,7 +197,7 @@ def test_serp_is_counted_only_when_the_zone_answered(monkeypatch: pytest.MonkeyP
     calls = _fake_fast_flights(monkeypatch, status=200)
     brightdata.reset_usage()
     offers, _ = _search()
-    assert calls == ["zone", "zone"] and brightdata.usage()["serp"] == 2
+    assert calls == ["zone", "zone"] and brightdata.usage()["returned"]["serp"] == 2
     src = source_of(offers[0].evidence)
     assert (src["provider"], src["api"], src["id"]) == ("brightdata", "serp", "serp_api1")
 
@@ -208,7 +208,7 @@ def test_a_failed_zone_call_is_not_counted_and_not_badged(monkeypatch: pytest.Mo
     calls = _fake_fast_flights(monkeypatch, status=401)
     brightdata.reset_usage()
     offers, report = _search()
-    assert brightdata.usage()["serp"] == 0
+    assert brightdata.usage()["returned"]["serp"] == 0
     assert Counter(calls) == {"zone": 2, "direct": 2}  # each page refetched directly
     assert source_of(offers[0].evidence)["provider"] == "fast-flights"
     assert any("bright_data_serp_not_used" in w and "401" in w for w in report.warnings)

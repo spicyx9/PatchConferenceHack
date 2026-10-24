@@ -3548,17 +3548,13 @@
     var table = products.length
       ? '<table class="pipeline-table bd-products"><thead><tr><th>Product</th><th>API</th>' +
         "<th>Requests</th><th>Records</th><th>Collected (records' own time)</th>" +
-        "<th>List price estimate</th></tr></thead><tbody>" +
+        "</tr></thead><tbody>" +
         products
           .map(function (p) {
             return (
               "<tr><td>" + esc(p.product) + "</td><td>" + esc(apiName[p.api] || p.api) +
               "</td><td>" + esc(p.requests) + "</td><td>" + esc(p.records) + "</td><td>" +
-              esc(range(p)) + "</td><td>" +
-              esc(p.list_price_usd !== null && p.list_price_usd !== undefined
-                ? "$" + p.list_price_usd
-                : "not priced") +
-              "</td></tr>"
+              esc(range(p)) + "</td></tr>"
             );
           })
           .join("") +
@@ -3571,10 +3567,11 @@
       "<b>Bright Data: " + esc(res && res.requests != null ? res.requests : 0) +
       " requests, " + esc(res && res.records != null ? res.records : 0) + " records</b>" +
       ' <span class="bd-detail">(a request is one API call; one Web Unlocker page can yield many records). ' +
-      "Estimated cost $" + esc((res && res.list_price_usd) || "0") + ", " +
-      esc((res && res.cost_label) || "list price estimate, not billed") +
-      ", dataset records only." +
-      (u.total ? " This process: " + esc(u.total) + " records returned live." : "") +
+      "Cost: " + esc((res && res.cost_note) || "not read from any Bright Data response") + "." +
+      (u.requests && u.requests.total
+        ? " This process: " + esc(u.requests.total) + " requests, " +
+          esc(u.returned.total) + " rows or pages returned live."
+        : "") +
       (notReady.length
         ? ' <span class="muted">(not configured here: ' + esc(notReady.join(", ")) + ")</span>"
         : "") +
@@ -3630,7 +3627,7 @@
     $("pipeline-table").innerHTML = rows.length
       ? '<table class="pipeline-table"><thead><tr>' +
         "<th>Source</th><th>Provider</th><th>Mode</th><th>Bright Data API</th><th>Records</th>" +
-        "<th>Collected</th><th>Run report</th><th>Est. cost</th></tr></thead><tbody>" +
+        "<th>Collected</th><th>Run report</th></tr></thead><tbody>" +
         rows
           .map(function (r) {
             var outcome =
@@ -3655,12 +3652,6 @@
               esc(r.collected_at ? fmtTime(r.collected_at) : "—") +
               "</td><td>" +
               esc(outcome) +
-              "</td><td>" +
-              esc(
-                r.estimated_cost_usd !== null
-                  ? "$" + r.estimated_cost_usd + " (list price estimate, not billed)"
-                  : "—",
-              ) +
               "</td></tr>"
             );
           })
@@ -3674,10 +3665,9 @@
     $("pipeline-calls").innerHTML =
       "Bright Data records in these runs: " +
       esc(t.brightdata_records || 0) +
-      ", estimated cost $" +
-      esc(t.estimated_cost_usd || "0") +
-      " (list price estimate, not billed: dataset records × 1.5 / 1000; Web Unlocker rows not priced)." +
-      " Bright Data calls in this process: " +
+      ". Cost: " +
+      esc(t.cost_note || "not read from any Bright Data response") +
+      ". Bright Data calls in this process: " +
       (calls.length
         ? calls
             .map(function (c) {
@@ -3713,10 +3703,10 @@
     };
     box.innerHTML =
       "<b>Bright Data, live in this process:</b> " + esc(c.requests) + " requests, " +
-      esc(c.records) + " records, $" + esc(c.usd) +
-      ' <span class="muted">(' + esc(c.cost_label) + ", dataset records only)</span> · " +
+      esc(c.records) + " records · " +
       part("datasets", "datasets") + " · " + part("unlocker", "unlocker") + " · " +
-      part("serp", "serp");
+      part("serp", "serp") +
+      ' <span class="muted">(' + esc(c.cost_note || "cost not read from any Bright Data response") + ")</span>";
   }
 
   function renderTimings(t, overall) {

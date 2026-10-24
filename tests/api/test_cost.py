@@ -1,9 +1,8 @@
-"""Bright Data requests vs records, list-price estimate on dataset rows only (audit gap 2)."""
+"""Bright Data requests vs records, never a USD figure (audit gap 2)."""
 
 from __future__ import annotations
 
 import json
-from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -22,10 +21,9 @@ def _clean_calls():
     brightdata.reset_usage()
 
 
-def test_list_price_constant_and_label() -> None:
-    assert cost.DATASET_USD_PER_1000_RECORDS == Decimal("1.5")
-    assert cost.COST_LABEL == "list price estimate, not billed"
-    assert cost.dataset_cost(1000) == "1.5000"
+def test_cost_module_prices_nothing() -> None:
+    assert cost.COST_NOTE == "cost not read from any Bright Data response"
+    assert not hasattr(cost, "dataset_cost") and not hasattr(cost, "DATASET_USD_PER_1000_RECORDS")
 
 
 def test_snapshot_separates_requests_and_records() -> None:
@@ -37,7 +35,7 @@ def test_snapshot_separates_requests_and_records() -> None:
     assert snap["requests"] == 4 and snap["records"] == 17
     assert snap["by_api"]["datasets"] == {"requests": 2, "records": 15}
     assert snap["by_api"]["unlocker"] == {"requests": 1, "records": 1}
-    assert snap["usd"] == "0.0225"  # 15 dataset records only; Unlocker and SERP not priced
+    assert snap["cost_usd"] is None and "usd" not in {k for k in snap if k != "cost_usd"}
 
 
 def _cache(tmp: Path) -> tuple[Path, Path]:
@@ -68,19 +66,19 @@ def test_products_from_records(tmp_path: Path) -> None:
     cache, probes = _cache(tmp_path)
     by = {(p["product"], p["api"]): p for p in brightdata_usage.cached_products(cache, probes)}
     flights = by[("Google Flights", "unlocker")]
-    assert (flights["requests"], flights["records"], flights["list_price_usd"]) == (1, 34, None)
+    assert (flights["requests"], flights["records"]) == (1, 34) and not {k for k in flights if "usd" in k}
     booking = by[("Booking", "dataset")]
-    assert (booking["requests"], booking["records"], booking["list_price_usd"]) == (1, 3, "0.0045")
+    assert (booking["requests"], booking["records"]) == (1, 3) and not {k for k in booking if "usd" in k}
     assert booking["collected_first"] == "2026-10-24T18:41:14+00:00"
     assert by[("Google Hotels", "dataset")]["requests"] == 1  # recorded run, 0 records
     li = by[("LinkedIn", "dataset")]
     assert (li["requests"], li["records"]) == (2, 3)  # one snapshot + one synchronous scrape
     assert (li["collected_first"], li["collected_last"]) == ("2026-10-24T19:14:00Z", "2026-10-24T20:07:00Z")
     serp = by[("LinkedIn URL search", "serp")]
-    assert (serp["requests"], serp["records"], serp["list_price_usd"]) == (17, 5, None)
+    assert (serp["requests"], serp["records"]) == (17, 5)
     total = brightdata_usage.summary(cache, probes)
     assert total["requests"] == 1 + 1 + 1 + 2 + 17 and total["records"] == 34 + 3 + 3 + 5
-    assert total["list_price_usd"] == "0.0090"  # 6 dataset records; never the 34 Unlocker rows
+    assert total["cost_usd"] is None and total["cost_note"] == cost.COST_NOTE  # never a USD figure
 
 
 def test_brightdata_endpoint_never_uses_report_finish_time(monkeypatch) -> None:
@@ -95,7 +93,7 @@ def test_brightdata_endpoint_never_uses_report_finish_time(monkeypatch) -> None:
         "/api/v1/brightdata").json()
     stamps = [t for pair in body["cached"]["collected_at"].values() for t in pair]
     assert "2026-10-24T20:35:00+00:00" not in stamps
-    assert body["cost_label"] == "list price estimate, not billed"
+    assert body["cost_usd"] is None and body["cost_note"] == cost.COST_NOTE
     assert {"requests", "records", "products"} <= set(body)
 
 
@@ -106,4 +104,4 @@ def test_cost_endpoint_reads_recorded_calls() -> None:
     brightdata.record_call("datasets", rows=9, status="ready", snapshot_id="s_1")
     body = client.get("/api/v1/cost").json()
     assert body["requests"] == 2 and body["records"] == 43
-    assert body["usd"] == "0.0135" and body["estimate"] is True
+    assert body["cost_usd"] is None and "estimate" not in body
