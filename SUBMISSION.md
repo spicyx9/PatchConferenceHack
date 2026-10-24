@@ -4,7 +4,7 @@
 
 This file is the single source of truth for the submission. Every number below was read from the running app
 (`make demo`, git `7a4dbef`, graph loaded fresh) on 2026-10-24 at 20:12 UTC, through its API, except where the line
-says otherwise; the graph and test rows were read again on `df66f45` at 20:20 UTC. `docs/submission/PITCH.md` (stage script) and `slides.html` quote these numbers; change them here first.
+says otherwise; the graph and test rows were read again on `e6c08e4` at 20:45 UTC. `docs/submission/PITCH.md` (stage script) and `slides.html` quote these numbers; change them here first.
 
 ## Problem
 
@@ -45,13 +45,13 @@ Bright Data (datasets, Web Unlocker, SERP)   public endpoints (RainFocus, Luma, 
 | Events in the demo dataset | 207: 161 official sessions (RainFocus), 12 Luma, 6 Partiful, 8 Eventbrite, 20 conferenceparties | `GET /api/v1/events` (`data_source: fixture`, snapshot of the 2026-10-24 public collection) |
 | Collection runs | official 210 records, Luma 12, Partiful 6 (`page_cap`, degraded), Eventbrite 8, conferenceparties 20 | `GET /api/v1/pipeline` rows (RunReports) |
 | People ranked for the goal | 50, computed from FalkorDB traversals | `GET /api/v1/people?limit=100` (`total`) |
-| FalkorDB graph | 711 nodes, 2,238 edges | `redis-cli GRAPH.QUERY conferge_demo "MATCH (n) RETURN count(n)"` and `"MATCH ()-[r]->() RETURN count(r)"` on the graph the app serves, loaded fresh on `df66f45` (`/graph` returns a capped sample, not totals) |
+| FalkorDB graph | 704 nodes, 2,233 edges | `redis-cli GRAPH.QUERY conferge_demo "MATCH (n) RETURN count(n)"` and `"MATCH ()-[r]->() RETURN count(r)"` on a graph created fresh by `make demo` on `e6c08e4` (`/graph` returns a capped sample, not totals) |
 | Stays | 21 records through Bright Data datasets (15 Booking `gd_m4bf7a917zfezv9d5`, 6 Airbnb `gd_ld7ll037kqy322v05`), collected 18:41 UTC, 6 shown | `GET /api/v1/pipeline`, `GET /api/v1/stays` (`data_source: cached`) |
 | Flights | 34 Google Flights itineraries through Bright Data Web Unlocker (`web_unlocker1`), collected 18:18 UTC, 1 shown | `GET /api/v1/pipeline`, `GET /api/v1/flights` (`data_source: cached`) |
 | LinkedIn cards | 9 people cards with a LinkedIn headline and company (10 targets, 9 matched, 1 missing; run `degraded`) | `GET /api/v1/people`, `GET /api/v1/pipeline` |
 | Bright Data records | 64 (30 dataset, 34 Web Unlocker); cost about $0.096, an **estimate** (records x 1.5 / 1000) | `GET /api/v1/pipeline` `totals` |
 | Reachability (block matrix, 21 sites from the code) | 10 of 21 without Bright Data, 12 of 21 with Web Unlocker alone, 14 of 21 with Web Unlocker or dataset | `GET /api/v1/pipeline` `reachability` (`data/block_matrix.json`, run 19:01 UTC, datasets read 19:16 UTC) |
-| Tests | `make check`: 1,175 passed, 25 skipped (32 s); `make e2e`: 16 passed against the real API and FalkorDB | local run, `uv run pytest -q` on `df66f45` at 20:20 UTC, `make e2e` at 20:12 UTC |
+| Tests | `make check`: 1,216 passed, 26 skipped (38 s); `make e2e`: 16 passed against the real API and FalkorDB | local run, `make check` on `e6c08e4` at 20:45 UTC, `make e2e` at 20:12 UTC |
 
 ## What is real, what is fixture, what is projected
 
