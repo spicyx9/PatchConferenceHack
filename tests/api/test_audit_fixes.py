@@ -71,8 +71,11 @@ def _js_function(name: str) -> str:
 
 
 def test_fix5_every_amount_in_the_ui_shows_its_price_status() -> None:
-    assert "leg.price_status" in _js_function("renderFlights")
-    assert "st.price_status" in _js_function("renderStays")
+    from pathlib import Path
+
+    cards = (Path(__file__).resolve().parents[2] / "static" / "travel-cards.js").read_text()
+    assert "flight.price_status" in cards and "stay.price_status" in cards
+    assert "Estimated price" in cards and "Availability needs checking" in cards
     # Research does not subtract unselected offers from a remaining budget.
     assert "b.remaining_usd" not in _js_function("renderTravel")
     assert "spend_price_status" in _js_function("renderRoi")

@@ -1,4 +1,4 @@
-"""Static UI: travel items show their collection channel (source badge) and never compute a flight price."""
+"""Travel cards show price freshness and booking sites; collection channels stay internal."""
 
 from __future__ import annotations
 
@@ -23,16 +23,14 @@ def _body(js: str, name: str) -> str:
     return js[start:nxt if nxt != -1 else len(js)]
 
 
-def test_source_api_badge_helper_is_used_on_stays_and_itinerary() -> None:
+def test_travel_cards_do_not_expose_collection_tools() -> None:
     js = _app_js()
-    helper = _body(js, "sourceApiBadge")
-    assert 'if (!src || typeof src !== "object") return "";' in helper  # degrades when source is absent
-    assert "title=" in helper and "snapshot_id" in helper and "esc(" in helper
-    assert "sourceApiBadge(st.source)" in _body(js, "renderStays")
-    travel = _body(js, "renderFlights")
-    assert travel.count("sourceApiBadge(leg.source)") == 1  # every flight offer retains its source
-    assert "sourceBadge(recordMode(leg)," in travel  # mode badge with collected_at
-    assert "flightPriceText(leg)" in travel
+    for name in ("renderStays", "renderFlights"):
+        body = _body(js, name)
+        assert "travelPriceBadge(" in body
+        assert "sourceApiBadge(" not in body and "sourceBadge(" not in body
+    assert "sourceApiBadge(" not in _body(js, "searchTravel")
+
 
 
 def test_flight_price_falls_back_to_raw_text_without_computing() -> None:

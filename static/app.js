@@ -295,6 +295,17 @@
     );
   }
 
+  function travelPriceBadge(item) {
+    if (recordMode(item) === "fixture")
+      return '<span class="badge fixture">Demo prices</span>';
+    var checkedAt = item.collected_at || (item.source && item.source.collected_at);
+    if (!checkedAt || isNaN(new Date(checkedAt))) return "";
+    var checked = new Intl.DateTimeFormat("en-US", {
+      month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: EVENT_TZ
+    }).format(new Date(checkedAt));
+    return '<span class="badge neutral">Checked ' + esc(checked) + '</span>';
+  }
+
   // Every record says how it was obtained: "Cached · 11:41 AM", "Live · 9:02 AM", "Fixture".
   function sourceBadge(mode, collectedAt) {
     var labels = { live: "Live", cached: "Cached", fixture: "Fixture" };
@@ -1453,25 +1464,11 @@
               timeZone: EVENT_TZ,
             }).format(new Date(res.collected_at))
           : "";
-        var bd =
-          res.items &&
-          res.items.length &&
-          res.items.every(function (item) {
-            return item.source && item.source.provider === "brightdata";
-          });
-        var provenance =
-          res.data_source === "cached"
-            ? "Collected prices"
-            : res.data_source === "live"
-              ? "Freshly collected"
-              : q.mode === "live" ? "Live prices unavailable" : "No matching collection";
+        var priceContext = res.items && res.items.length
+          ? (res.data_source === "fixture" ? "Demo prices" : "Prices checked")
+          : q.mode === "live" ? "Prices unavailable" : "No matching offers";
         $("travel-offer-context").textContent =
-          (bd
-            ? "Bright Data · "
-            : res.items && res.items.length
-              ? (q.kind === "flights" ? "Google Flights · " : "Travel providers · ")
-              : "") +
-          provenance +
+          priceContext +
           (stamp ? " · " + stamp : "") +
           " · " +
           q.adults +
@@ -1480,10 +1477,9 @@
           $("travel-search-feedback").innerHTML =
             "<p>" +
             esc(
-              (res.warnings || [])[0] ||
-                "Live prices are unavailable for these criteria.",
+              "We couldn’t update prices. Try again or check the booking site.",
             ) +
-            '</p><button type="button" class="text-button" id="travel-use-collected">Use collected offers</button>';
+            '</p><button type="button" class="text-button" id="travel-use-collected">Show saved offers</button>';
           $("travel-use-collected").onclick = function () {
             searchTravel("cached");
           };
@@ -1617,16 +1613,13 @@
             var heading = presentDirections.length > 1 && direction(leg) !== lastDirection
               ? '<h3 class="flight-direction">' + directionLabels[direction(leg)] + '</h3>' : '';
             lastDirection = direction(leg);
-            return heading + TravelCards.flight(leg,
-              sourceApiBadge(leg.source) + "<p>Observed price: " + esc(flightPriceText(leg)) +
-              " · Price status: " + esc(leg.price_status || "unknown") + "</p>",
-              sourceBadge(recordMode(leg), leg.collected_at || (leg.source && leg.source.collected_at)));
+            return heading + TravelCards.flight(leg, travelPriceBadge(leg));
           })
           .join("")
       : travelEmpty(
           all.length
             ? "Try fewer filters to see more options."
-            : "No collected offers match these dates, travelers and cabin. Continue your search with the same criteria.",
+            : "No offers match these dates, travelers and cabin. Continue your search with the same criteria.",
           (res && res.fallback_url) || $("research-flights-link").href,
         );
   }
@@ -1668,14 +1661,11 @@
     $("stays").innerHTML = items.length
       ? items
           .map(function (st) {
-            return TravelCards.stay(st,
-              sourceApiBadge(st.source) + '<details class="offer-evidence"><summary>Offer details</summary><p>Price status: ' +
-              esc(st.price_status || "unknown") + " · " + esc(st.availability || "unknown") + "</p></details>",
-              sourceBadge(recordMode(st), st.collected_at || (st.source && st.source.collected_at)));
+            return TravelCards.stay(st, travelPriceBadge(st));
           })
           .join("")
       : travelEmpty(
-          "No collected stays match these dates, guests and rooms. Try different criteria or continue with a travel provider.",
+          "No stays match these dates, guests and rooms. Try different criteria or continue with a travel provider.",
           (s && s.fallback_url) || $("research-stays-link").href,
         );
   }

@@ -84,7 +84,7 @@ async function capture(page, selector, name) {
     if (version === "after") {
       assert(
         (await page.locator("#flights").innerText()).includes(
-          "Return itinerary not collected",
+          "Return times unavailable",
         ),
       );
       assert(
@@ -122,12 +122,8 @@ async function capture(page, selector, name) {
       const link = page.locator("#stays .offer-deal").first();
       assert((await link.getAttribute("href")).includes("booking.com/hotel/"));
       assert.equal(await link.getAttribute("target"), "_blank");
-      await page.locator("#stays details summary").first().click();
-      assert(
-        (await page.locator("#stays details").first().innerText()).includes(
-          "Price status",
-        ),
-      );
+      assert.equal(await page.locator('#stays .stay-source, #stays details, #flights details').count(), 0);
+      assert.doesNotMatch(await page.locator('#tab-travel').innerText(), /Bright Data|Property photo|dataset|Cached/);
       console.log(
         "PASS cached data: route times, unknown return/baggage/photos/stars/taxes, exact source links, local logos, provenance, mobile layout",
       );

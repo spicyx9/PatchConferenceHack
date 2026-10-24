@@ -61,18 +61,21 @@ def test_source_badge_never_empty_and_shows_local_time() -> None:
 
 
 @pytest.mark.skipif(shutil.which("node") is None, reason="node not installed")
-def test_cards_render_the_mode_badge_outside_details() -> None:
+def test_travel_cards_show_price_freshness_without_technical_sources() -> None:
     script = "\n".join([
+        'var EVENT_TZ = "America/Los_Angeles";',
+        "function esc(s) { return String(s); }",
+        _fn("recordMode"), _fn("travelPriceBadge"),
         "var window = {}; var location = {origin: 'https://example.test'};",
         APP.with_name("travel-cards.js").read_text(encoding="utf-8"),
-        "var badge = '<b id=collection-badge>Cached · 11:41 AM</b>';",
-        "var flight = window.TravelCards.flight({slices: []}, '<p>Source</p>', badge);",
+        "var badge = travelPriceBadge({source_mode: 'cached', collected_at: '2026-10-24T18:41:14Z'});",
+        "var flight = window.TravelCards.flight({slices: []}, badge);",
         "var stay = window.TravelCards.stay({check_in: '2026-10-27', check_out: '2026-10-30', "
-        "adults: 1, rooms: 1}, '<details>Source</details>', badge);",
+        "adults: 1, rooms: 1}, badge);",
         "console.log(JSON.stringify([flight, stay]));",
     ])
     result = subprocess.run(["node", "-e", script], capture_output=True, text=True, check=True)
     for rendered, column in zip(json.loads(result.stdout), ("fare-price", "stay-price"), strict=True):
-        assert rendered.index(column) < rendered.index("collection-badge")
-        assert rendered.index("collection-badge") < rendered.index("<details")
-        assert "Cached · 11:41 AM" in rendered
+        assert rendered.index(column) < rendered.index("Checked Oct 24, 11:41 AM")
+        assert "<details" not in rendered and "Bright Data" not in rendered
+        assert "stay-source" not in rendered and "Property photo" not in rendered
