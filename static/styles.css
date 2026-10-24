@@ -3373,3 +3373,4 @@ dialog .eyebrow {
 
 .artwork-credit { position: absolute; right: 6px; bottom: 6px; font-size: 0.65rem; padding: 1px 6px; border-radius: 6px; background: #000a; color: #fff; }
 .event-artwork { position: relative; }
+.hero-image-credit { position: absolute; right: 12px; bottom: 10px; z-index: 2; font-size: 0.7rem; padding: 2px 8px; border-radius: 6px; background: #0009; color: #fff; }

@@ -153,3 +153,10 @@ def test_fix8_threshold_is_a_returned_parameter_and_people_total_is_not_capped()
     assert page["count"] <= 3 and page["total"] >= page["count"]
     assert "p.total" in _js_function("renderPeople")
     assert "roi.opportunity_threshold" in _js_function("renderRoi")
+
+
+def test_fix10_generated_cover_is_labelled_in_the_ui() -> None:
+    from pathlib import Path
+
+    html = (Path(__file__).resolve().parents[2] / "static" / "index.html").read_text()
+    assert "Illustration generated with AI, not a photo of the event" in html
