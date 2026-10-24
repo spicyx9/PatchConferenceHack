@@ -376,6 +376,23 @@ def create_app(
     def plan() -> dict[str, Any]:
         return _envelope(state, ["events", "people"], _plan_payload(), extra_warnings=_plan_warnings())
 
+    @api.post("/pipeline/refresh")
+    async def pipeline_refresh() -> dict[str, Any]:
+        """Data pipeline button: 2 real Bright Data calls (Web Unlocker flights, SERP LinkedIn)."""
+        from conferge.integration.live_refresh import refresh
+
+        speaker = None
+        for opp in state.opportunities()[:5]:
+            person = next((state.data.person(p) for p in opp.person_ids if state.data.person(p)), None)
+            if person is not None:
+                company = state.data.company(person.company_id)
+                speaker = (person.name, company.name if company else None)
+                if company:
+                    break
+        result = await refresh(state.data, speaker)
+        return _envelope(state, ["flights"], {"refresh": result},
+                         extra_warnings=result["errors"])
+
     @api.get("/pipeline")
     def pipeline_view() -> dict[str, Any]:
         """How every source of this demo was collected, from the RunReports of the run."""

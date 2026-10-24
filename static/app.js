@@ -3583,6 +3583,34 @@
       travel;
   }
 
+  function renderRefresh(res) {
+    var r = (res && res.refresh) || {};
+    var head = "Bright Data refresh: requests +" + esc(r.requests || 0) + ", records +" +
+      esc(r.records || 0) + ", " + esc(r.seconds) + " s";
+    $("pipeline-refresh-result").innerHTML =
+      '<div class="refresh-head">' + head + "</div>" +
+      (r.lines || []).map(function (l) { return '<div class="refresh-line">' + esc(l) + "</div>"; }).join("") +
+      (r.errors || []).map(function (e) { return '<div class="refresh-error">' + esc(e) + "</div>"; }).join("");
+  }
+
+  function bdRefresh() {
+    var btn = $("btn-bd-refresh");
+    btn.disabled = true;
+    $("pipeline-refresh-result").innerHTML = '<div class="muted">Calling Bright Data...</div>';
+    api("/pipeline/refresh", { method: "POST" }, null)
+      .then(function (res) {
+        renderRefresh(res);
+        return Promise.all([api("/pipeline", null, null).then(renderPipeline),
+          api("/brightdata", null, null).then(renderBrightData),
+          api("/travel", null, "travel").then(renderTravel)]);
+      })
+      .catch(function (err) {
+        $("pipeline-refresh-result").innerHTML = '<div class="refresh-error">Refresh failed: ' +
+          esc(err && err.message ? err.message : String(err)) + "; cached data kept</div>";
+      })
+      .then(function () { btn.disabled = false; });
+  }
+
   function renderPipeline(res) {
     $("pipeline-headline").textContent = (res && res.headline) || "";
     var rows = (res && res.rows) || [];
@@ -4062,6 +4090,7 @@
         });
       });
     });
+    if ($("btn-bd-refresh")) $("btn-bd-refresh").addEventListener("click", bdRefresh);
     $("btn-simulate").addEventListener("click", function () {
       var id = $("scenario-select").value;
       if (!id) {

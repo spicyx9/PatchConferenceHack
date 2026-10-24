@@ -955,6 +955,11 @@
       <details id="pipeline-panel" class="pipeline-panel">
         <summary>Data pipeline</summary>
         <p id="pipeline-headline" class="pipeline-headline"></p>
+        <div class="pipeline-refresh">
+          <button id="btn-bd-refresh" class="small">Refresh via Bright Data</button>
+          <span class="small-text muted">2 live calls: Web Unlocker (Google Flights) + SERP (LinkedIn), 20 s each, never at startup</span>
+          <div id="pipeline-refresh-result" aria-live="polite"></div>
+        </div>
         <div id="pipeline-table"></div>
         <div id="pipeline-calls" class="small-text muted"></div>
         <div id="pipeline-cost" class="small-text"></div>
