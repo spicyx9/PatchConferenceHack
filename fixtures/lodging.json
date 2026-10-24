@@ -1,0 +1,856 @@
+{
+ "fixture": "lodging",
+ "window": "w05",
+ "source_mode": "fixture",
+ "captured_at": "2026-10-24T16:33:00+00:00",
+ "notice": "FIXTURE, not live. Booking and Google Hotels rows are FICTIONAL (names end with '(fictional fixture)', vendor links on example.com) shaped like the Bright Data catalogue fields, because no BRIGHTDATA_API_KEY was available on 2026-10-24. Airbnb rows are a trimmed real public pyairbnb search capture of 2026-10-24 for the exact stay, replayed as fixture. Never show as live.",
+ "query": {
+  "lat": 37.806,
+  "lng": -122.432,
+  "radius_km": 3.0,
+  "check_in": "2026-10-27",
+  "check_out": "2026-10-30",
+  "adults": 1,
+  "rooms": 1,
+  "currency": "USD",
+  "conference_id": "github-universe-2026"
+ },
+ "records": [
+  {
+   "provider": "booking",
+   "source_id": "fixture-bk-1",
+   "source_url": "https://www.booking.com/hotel/us/fixture-marina-bay-inn.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=1&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+   "fictional": true,
+   "payload": {
+    "search": {
+     "url": "https://www.booking.com/hotel/us/fixture-marina-bay-inn.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=1&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+     "location": "San Francisco",
+     "check_in": "2026-10-27T00:00:00.000Z",
+     "check_out": "2026-10-30T00:00:00.000Z",
+     "adults": 1,
+     "children": 0,
+     "rooms": 1,
+     "id": "fixture-bk-1",
+     "title": "Marina Bay Inn (fictional fixture)",
+     "address": null,
+     "city": "San Francisco",
+     "review_score": 8.4,
+     "review_count": "1,204",
+     "final_price": 912,
+     "original_price": 912,
+     "currency": "USD",
+     "tax_description": "",
+     "free_cancellation": true,
+     "map_coordinates": {
+      "lat": 37.803,
+      "lon": -122.4375
+     },
+     "property_type": "Hotel",
+     "total_listings_found": null
+    },
+    "detail": null,
+    "detail_collected_at": null,
+    "query": {
+     "check_in": "2026-10-27",
+     "check_out": "2026-10-30",
+     "adults": 1,
+     "rooms": 1,
+     "currency": "USD"
+    },
+    "market_context": {
+     "country": "us",
+     "language": "en",
+     "platform": "desktop",
+     "authenticated": false
+    },
+    "dataset_id": "gd_m4bf7a917zfezv9d5"
+   }
+  },
+  {
+   "provider": "booking",
+   "source_id": "fixture-bk-2",
+   "source_url": "https://www.booking.com/hotel/us/fixture-chestnut-street-hotel.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=1&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+   "fictional": true,
+   "payload": {
+    "search": {
+     "url": "https://www.booking.com/hotel/us/fixture-chestnut-street-hotel.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=1&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+     "location": "San Francisco",
+     "check_in": "2026-10-27T00:00:00.000Z",
+     "check_out": "2026-10-30T00:00:00.000Z",
+     "adults": 1,
+     "children": 0,
+     "rooms": 1,
+     "id": "fixture-bk-2",
+     "title": "Chestnut Street Hotel (fictional fixture)",
+     "address": null,
+     "city": "San Francisco",
+     "review_score": 8.9,
+     "review_count": "842",
+     "final_price": 1104,
+     "original_price": 1290,
+     "currency": "USD",
+     "tax_description": "+$162 taxes and fees",
+     "free_cancellation": false,
+     "map_coordinates": {
+      "lat": 37.8009,
+      "lon": -122.4363
+     },
+     "property_type": "Hotel",
+     "total_listings_found": null
+    },
+    "detail": null,
+    "detail_collected_at": null,
+    "query": {
+     "check_in": "2026-10-27",
+     "check_out": "2026-10-30",
+     "adults": 1,
+     "rooms": 1,
+     "currency": "USD"
+    },
+    "market_context": {
+     "country": "us",
+     "language": "en",
+     "platform": "desktop",
+     "authenticated": false
+    },
+    "dataset_id": "gd_m4bf7a917zfezv9d5"
+   }
+  },
+  {
+   "provider": "booking",
+   "source_id": "fixture-bk-3",
+   "source_url": "https://www.booking.com/hotel/us/fixture-lombard-motor-lodge.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=1&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+   "fictional": true,
+   "payload": {
+    "search": {
+     "url": "https://www.booking.com/hotel/us/fixture-lombard-motor-lodge.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=1&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+     "location": "San Francisco",
+     "check_in": "2026-10-27T00:00:00.000Z",
+     "check_out": "2026-10-30T00:00:00.000Z",
+     "adults": 1,
+     "children": 0,
+     "rooms": 1,
+     "id": "fixture-bk-3",
+     "title": "Lombard Motor Lodge (fictional fixture)",
+     "address": null,
+     "city": "San Francisco",
+     "review_score": 7.6,
+     "review_count": "2,310",
+     "final_price": 640,
+     "original_price": 640,
+     "currency": "USD",
+     "tax_description": "",
+     "free_cancellation": null,
+     "map_coordinates": {
+      "lat": 37.7995,
+      "lon": -122.433
+     },
+     "property_type": "Hotel",
+     "total_listings_found": null
+    },
+    "detail": null,
+    "detail_collected_at": null,
+    "query": {
+     "check_in": "2026-10-27",
+     "check_out": "2026-10-30",
+     "adults": 1,
+     "rooms": 1,
+     "currency": "USD"
+    },
+    "market_context": {
+     "country": "us",
+     "language": "en",
+     "platform": "desktop",
+     "authenticated": false
+    },
+    "dataset_id": "gd_m4bf7a917zfezv9d5"
+   }
+  },
+  {
+   "provider": "booking",
+   "source_id": "fixture-bk-4",
+   "source_url": "https://www.booking.com/hotel/us/fixture-fort-mason-guest-house.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=1&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+   "fictional": true,
+   "payload": {
+    "search": {
+     "url": "https://www.booking.com/hotel/us/fixture-fort-mason-guest-house.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=1&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+     "location": "San Francisco",
+     "check_in": "2026-10-27T00:00:00.000Z",
+     "check_out": "2026-10-30T00:00:00.000Z",
+     "adults": 1,
+     "children": 0,
+     "rooms": 1,
+     "id": "fixture-bk-4",
+     "title": "Fort Mason Guest House (fictional fixture)",
+     "address": null,
+     "city": "San Francisco",
+     "review_score": 9.1,
+     "review_count": "377",
+     "final_price": 1488,
+     "original_price": 1488,
+     "currency": "USD",
+     "tax_description": "Includes taxes and fees",
+     "free_cancellation": true,
+     "map_coordinates": {
+      "lat": 37.8045,
+      "lon": -122.4298
+     },
+     "property_type": "Hotel",
+     "total_listings_found": null
+    },
+    "detail": null,
+    "detail_collected_at": null,
+    "query": {
+     "check_in": "2026-10-27",
+     "check_out": "2026-10-30",
+     "adults": 1,
+     "rooms": 1,
+     "currency": "USD"
+    },
+    "market_context": {
+     "country": "us",
+     "language": "en",
+     "platform": "desktop",
+     "authenticated": false
+    },
+    "dataset_id": "gd_m4bf7a917zfezv9d5"
+   }
+  },
+  {
+   "provider": "booking",
+   "source_id": "fixture-bk-5",
+   "source_url": "https://www.booking.com/hotel/us/fixture-cow-hollow-suites.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=1&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+   "fictional": true,
+   "payload": {
+    "search": {
+     "url": "https://www.booking.com/hotel/us/fixture-cow-hollow-suites.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=1&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+     "location": "San Francisco",
+     "check_in": "2026-10-27T00:00:00.000Z",
+     "check_out": "2026-10-30T00:00:00.000Z",
+     "adults": 1,
+     "children": 0,
+     "rooms": 1,
+     "id": "fixture-bk-5",
+     "title": "Cow Hollow Suites (fictional fixture)",
+     "address": null,
+     "city": "San Francisco",
+     "review_score": 8.0,
+     "review_count": "95",
+     "final_price": 0,
+     "original_price": 0,
+     "currency": "USD",
+     "tax_description": "",
+     "free_cancellation": null,
+     "map_coordinates": {
+      "lat": 37.7975,
+      "lon": -122.4365
+     },
+     "property_type": "Hotel",
+     "total_listings_found": null
+    },
+    "detail": null,
+    "detail_collected_at": null,
+    "query": {
+     "check_in": "2026-10-27",
+     "check_out": "2026-10-30",
+     "adults": 1,
+     "rooms": 1,
+     "currency": "USD"
+    },
+    "market_context": {
+     "country": "us",
+     "language": "en",
+     "platform": "desktop",
+     "authenticated": false
+    },
+    "dataset_id": "gd_m4bf7a917zfezv9d5"
+   }
+  },
+  {
+   "provider": "booking",
+   "source_id": "fixture-bk-6",
+   "source_url": "https://www.booking.com/hotel/us/fixture-north-beach-pier-hotel.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=1&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+   "fictional": true,
+   "payload": {
+    "search": {
+     "url": "https://www.booking.com/hotel/us/fixture-north-beach-pier-hotel.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=1&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+     "location": "San Francisco",
+     "check_in": "2026-10-27T00:00:00.000Z",
+     "check_out": "2026-10-30T00:00:00.000Z",
+     "adults": 1,
+     "children": 0,
+     "rooms": 1,
+     "id": "fixture-bk-6",
+     "title": "North Beach Pier Hotel (fictional fixture)",
+     "address": null,
+     "city": "San Francisco",
+     "review_score": 8.6,
+     "review_count": "3,001",
+     "final_price": 1356,
+     "original_price": 1356,
+     "currency": "USD",
+     "tax_description": "",
+     "free_cancellation": null,
+     "map_coordinates": {
+      "lat": 37.8065,
+      "lon": -122.417
+     },
+     "property_type": "Hotel",
+     "total_listings_found": null
+    },
+    "detail": {
+     "listing_id": "fixture-bk-6",
+     "title": "North Beach Pier Hotel (fictional fixture)",
+     "check_in": "2026-10-27",
+     "check_out": "2026-10-30",
+     "availability": [
+      {
+       "room_type": "Queen Room",
+       "available": true
+      }
+     ],
+     "pricing": [
+      {
+       "room_type": "Queen Room",
+       "price": 1402,
+       "currency": "USD",
+       "price_text": "Includes taxes and fees"
+      }
+     ],
+     "coordinates": {
+      "lat": 37.8065,
+      "lon": -122.417
+     }
+    },
+    "detail_collected_at": "2026-10-24T16:33:00+00:00",
+    "query": {
+     "check_in": "2026-10-27",
+     "check_out": "2026-10-30",
+     "adults": 1,
+     "rooms": 1,
+     "currency": "USD"
+    },
+    "market_context": {
+     "country": "us",
+     "language": "en",
+     "platform": "desktop",
+     "authenticated": false
+    },
+    "dataset_id": "gd_m4bf7a917zfezv9d5"
+   }
+  },
+  {
+   "provider": "booking",
+   "source_id": "fixture-bk-7",
+   "source_url": "https://www.booking.com/hotel/us/fixture-pacific-heights-hotel.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=1&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+   "fictional": true,
+   "payload": {
+    "search": {
+     "url": "https://www.booking.com/hotel/us/fixture-pacific-heights-hotel.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=1&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+     "location": "San Francisco",
+     "check_in": "2026-10-27T00:00:00.000Z",
+     "check_out": "2026-10-30T00:00:00.000Z",
+     "adults": 1,
+     "children": 0,
+     "rooms": 1,
+     "id": "fixture-bk-7",
+     "title": "Pacific Heights Hotel (fictional fixture)",
+     "address": null,
+     "city": "San Francisco",
+     "review_score": 8.2,
+     "review_count": "610",
+     "final_price": 990,
+     "original_price": 990,
+     "currency": "USD",
+     "tax_description": "",
+     "free_cancellation": null,
+     "map_coordinates": {
+      "lat": 37.792,
+      "lon": -122.434
+     },
+     "property_type": "Hotel",
+     "total_listings_found": null
+    },
+    "detail": {
+     "listing_id": "fixture-bk-7",
+     "title": "Pacific Heights Hotel (fictional fixture)",
+     "check_in": "2026-10-27",
+     "check_out": "2026-10-30",
+     "availability": "Sold out for your dates",
+     "pricing": []
+    },
+    "detail_collected_at": "2026-10-24T16:33:00+00:00",
+    "query": {
+     "check_in": "2026-10-27",
+     "check_out": "2026-10-30",
+     "adults": 1,
+     "rooms": 1,
+     "currency": "USD"
+    },
+    "market_context": {
+     "country": "us",
+     "language": "en",
+     "platform": "desktop",
+     "authenticated": false
+    },
+    "dataset_id": "gd_m4bf7a917zfezv9d5"
+   }
+  },
+  {
+   "provider": "booking",
+   "source_id": "fixture-bk-8",
+   "source_url": "https://www.booking.com/hotel/us/fixture-van-ness-tower.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=1&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+   "fictional": true,
+   "payload": {
+    "search": {
+     "url": "https://www.booking.com/hotel/us/fixture-van-ness-tower.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=1&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+     "location": "San Francisco",
+     "check_in": "2026-10-27T00:00:00.000Z",
+     "check_out": "2026-10-30T00:00:00.000Z",
+     "adults": 1,
+     "children": 0,
+     "rooms": 1,
+     "id": "fixture-bk-8",
+     "title": "Van Ness Tower Hotel (fictional fixture)",
+     "address": null,
+     "city": "San Francisco",
+     "review_score": 7.9,
+     "review_count": "1,850",
+     "final_price": 1215,
+     "original_price": 1215,
+     "currency": "USD",
+     "tax_description": "",
+     "free_cancellation": null,
+     "map_coordinates": {
+      "lat": 37.799,
+      "lon": -122.424
+     },
+     "property_type": "Hotel",
+     "total_listings_found": null
+    },
+    "detail": null,
+    "detail_collected_at": null,
+    "query": {
+     "check_in": "2026-10-27",
+     "check_out": "2026-10-30",
+     "adults": 1,
+     "rooms": 1,
+     "currency": "USD"
+    },
+    "market_context": {
+     "country": "us",
+     "language": "en",
+     "platform": "desktop",
+     "authenticated": false
+    },
+    "dataset_id": "gd_m4bf7a917zfezv9d5"
+   }
+  },
+  {
+   "provider": "google_hotels",
+   "source_id": "fixture-gh-1",
+   "source_url": "https://www.google.com/travel/hotels/entity/fixture-gh-1",
+   "fictional": true,
+   "payload": {
+    "search": {
+     "url": "https://www.google.com/travel/hotels/entity/fixture-gh-1",
+     "hotel_id": "fixture-gh-1",
+     "hotel_name": "Marina Bay Inn (fictional fixture)",
+     "rating": 4.2,
+     "review_count": "980",
+     "address": null,
+     "check_in_date": "2026-10-27",
+     "check_out_date": "2026-10-30",
+     "guest_number": 1,
+     "booking_options": [
+      {
+       "source": "Fixture OTA A",
+       "total_price": "$905",
+       "link": "https://www.example.com/fixture-ota-a/marina-bay-inn"
+      },
+      {
+       "source": "Fixture OTA B",
+       "price": "$318 per night",
+       "link": "https://www.example.com/fixture-ota-b/marina-bay-inn"
+      }
+     ],
+     "currency": "USD",
+     "lat": 37.8031,
+     "long": -122.4374,
+     "search_term": "hotels near Fort Mason Center San Francisco"
+    },
+    "query": {
+     "check_in": "2026-10-27",
+     "check_out": "2026-10-30",
+     "adults": 1,
+     "rooms": 1,
+     "currency": "USD"
+    },
+    "market_context": {
+     "country": "us",
+     "language": "en",
+     "platform": "desktop",
+     "authenticated": false
+    },
+    "dataset_id": "gd_mg3gjfmg12tc2n5d4d"
+   }
+  },
+  {
+   "provider": "google_hotels",
+   "source_id": "fixture-gh-2",
+   "source_url": "https://www.google.com/travel/hotels/entity/fixture-gh-2",
+   "fictional": true,
+   "payload": {
+    "search": {
+     "url": "https://www.google.com/travel/hotels/entity/fixture-gh-2",
+     "hotel_id": "fixture-gh-2",
+     "hotel_name": "Presidio Gate Hotel (fictional fixture)",
+     "rating": 4.5,
+     "review_count": "412",
+     "address": null,
+     "check_in_date": "2026-10-27",
+     "check_out_date": "2026-10-30",
+     "guest_number": 1,
+     "booking_options": [
+      {
+       "source": "Fixture OTA A",
+       "total_price": "$1,180 total",
+       "link": "https://www.example.com/fixture-ota-a/presidio-gate"
+      }
+     ],
+     "currency": "USD",
+     "lat": 37.7985,
+     "long": -122.447,
+     "search_term": "hotels near Fort Mason Center San Francisco"
+    },
+    "query": {
+     "check_in": "2026-10-27",
+     "check_out": "2026-10-30",
+     "adults": 1,
+     "rooms": 1,
+     "currency": "USD"
+    },
+    "market_context": {
+     "country": "us",
+     "language": "en",
+     "platform": "desktop",
+     "authenticated": false
+    },
+    "dataset_id": "gd_mg3gjfmg12tc2n5d4d"
+   }
+  },
+  {
+   "provider": "google_hotels",
+   "source_id": "fixture-gh-3",
+   "source_url": "https://www.google.com/travel/hotels/entity/fixture-gh-3",
+   "fictional": true,
+   "payload": {
+    "search": {
+     "url": "https://www.google.com/travel/hotels/entity/fixture-gh-3",
+     "hotel_id": "fixture-gh-3",
+     "hotel_name": "Aquatic Park Lodge (fictional fixture)",
+     "rating": 4.0,
+     "review_count": "233",
+     "address": null,
+     "check_in_date": "2026-10-27",
+     "check_out_date": "2026-10-30",
+     "guest_number": 1,
+     "booking_options": [
+      {
+       "source": "Fixture OTA C",
+       "rate_per_night": "$289",
+       "link": "https://www.example.com/fixture-ota-c/aquatic-park"
+      }
+     ],
+     "currency": "USD",
+     "lat": 37.8058,
+     "long": -122.4215,
+     "search_term": "hotels near Fort Mason Center San Francisco"
+    },
+    "query": {
+     "check_in": "2026-10-27",
+     "check_out": "2026-10-30",
+     "adults": 1,
+     "rooms": 1,
+     "currency": "USD"
+    },
+    "market_context": {
+     "country": "us",
+     "language": "en",
+     "platform": "desktop",
+     "authenticated": false
+    },
+    "dataset_id": "gd_mg3gjfmg12tc2n5d4d"
+   }
+  },
+  {
+   "provider": "google_hotels",
+   "source_id": "fixture-gh-4",
+   "source_url": "https://www.google.com/travel/hotels/entity/fixture-gh-4",
+   "fictional": true,
+   "payload": {
+    "search": {
+     "url": "https://www.google.com/travel/hotels/entity/fixture-gh-4",
+     "hotel_id": "fixture-gh-4",
+     "hotel_name": "Russian Hill Boutique (fictional fixture)",
+     "rating": null,
+     "review_count": null,
+     "address": null,
+     "check_in_date": "2026-10-27",
+     "check_out_date": "2026-10-30",
+     "guest_number": 1,
+     "booking_options": [
+      {
+       "source": "Fixture OTA B",
+       "price": "$415"
+      }
+     ],
+     "currency": "USD",
+     "lat": 37.801,
+     "long": -122.4195,
+     "search_term": "hotels near Fort Mason Center San Francisco"
+    },
+    "query": {
+     "check_in": "2026-10-27",
+     "check_out": "2026-10-30",
+     "adults": 1,
+     "rooms": 1,
+     "currency": "USD"
+    },
+    "market_context": {
+     "country": "us",
+     "language": "en",
+     "platform": "desktop",
+     "authenticated": false
+    },
+    "dataset_id": "gd_mg3gjfmg12tc2n5d4d"
+   }
+  },
+  {
+   "provider": "airbnb",
+   "source_id": "1102891445409567406",
+   "source_url": "https://www.airbnb.com/rooms/1102891445409567406?check_in=2026-10-27&check_out=2026-10-30&adults=1&currency=USD",
+   "collected_at": "2026-10-24T16:33:00+00:00",
+   "fictional": false,
+   "payload": {
+    "backend": "pyairbnb",
+    "search": {
+     "room_id": 1102891445409567406,
+     "name": "The Mosser, Deluxe queen",
+     "title": "The Mosser",
+     "price": {
+      "unit": {
+       "qualifier": ""
+      },
+      "total": {
+       "currency_symbol": "",
+       "amount": 0
+      },
+      "break_down": [
+       {
+        "description": "3 nights x $143.65",
+        "amount": 430.95,
+        "currency": "$"
+       }
+      ]
+     },
+     "fee": {
+      "airbnb": {},
+      "cleaning": {}
+     },
+     "rating": {
+      "value": 4.41,
+      "reviewCount": "305"
+     },
+     "badges": [
+      "FEATURED_HOTEL"
+     ],
+     "coordinates": {
+      "latitude": 37.7852,
+      "longitud": -122.4051
+     },
+     "paymentMessages": [
+      {
+       "__typename": "PaymentMessage",
+       "text": "+$64 Airbnb credit",
+       "type": "HOTEL_CREDIT_HIGHLIGHT"
+      }
+     ],
+     "category": "",
+     "kind": "",
+     "type": ""
+    },
+    "price_check": null,
+    "price_checked_at": null,
+    "calendar": null,
+    "calendar_checked_at": null,
+    "query": {
+     "check_in": "2026-10-27",
+     "check_out": "2026-10-30",
+     "adults": 1,
+     "rooms": 1,
+     "currency": "USD"
+    },
+    "market_context": {
+     "country": "us",
+     "language": "en",
+     "platform": "desktop",
+     "authenticated": false
+    }
+   }
+  },
+  {
+   "provider": "airbnb",
+   "source_id": "1681202052912791908",
+   "source_url": "https://www.airbnb.com/rooms/1681202052912791908?check_in=2026-10-27&check_out=2026-10-30&adults=1&currency=USD",
+   "collected_at": "2026-10-24T16:33:00+00:00",
+   "fictional": false,
+   "payload": {
+    "backend": "pyairbnb",
+    "search": {
+     "room_id": 1681202052912791908,
+     "name": "Hotel Zoe Fisherman's Wharf, Deluxe king room",
+     "title": "Hotel Zoe Fisherman's Wharf",
+     "price": {
+      "unit": {
+       "qualifier": ""
+      },
+      "total": {
+       "currency_symbol": "",
+       "amount": 0
+      },
+      "break_down": [
+       {
+        "description": "3 nights x $299.47",
+        "amount": 898.4,
+        "currency": "$"
+       },
+       {
+        "description": "Resort fee",
+        "amount": 123.6,
+        "currency": "$"
+       }
+      ]
+     },
+     "fee": {
+      "airbnb": {},
+      "cleaning": {}
+     },
+     "rating": {
+      "value": 4.64,
+      "reviewCount": "180"
+     },
+     "badges": [
+      "FEATURED_HOTEL"
+     ],
+     "coordinates": {
+      "latitude": 37.8062,
+      "longitud": -122.4142
+     },
+     "paymentMessages": [
+      {
+       "__typename": "PaymentMessage",
+       "text": "+$134 Airbnb credit",
+       "type": "HOTEL_CREDIT_HIGHLIGHT"
+      }
+     ],
+     "category": "",
+     "kind": "",
+     "type": ""
+    },
+    "price_check": null,
+    "price_checked_at": null,
+    "calendar": null,
+    "calendar_checked_at": null,
+    "query": {
+     "check_in": "2026-10-27",
+     "check_out": "2026-10-30",
+     "adults": 1,
+     "rooms": 1,
+     "currency": "USD"
+    },
+    "market_context": {
+     "country": "us",
+     "language": "en",
+     "platform": "desktop",
+     "authenticated": false
+    }
+   }
+  },
+  {
+   "provider": "airbnb",
+   "source_id": "4464347",
+   "source_url": "https://www.airbnb.com/rooms/4464347?check_in=2026-10-27&check_out=2026-10-30&adults=1&currency=USD",
+   "collected_at": "2026-10-24T16:33:00+00:00",
+   "fictional": false,
+   "payload": {
+    "backend": "pyairbnb",
+    "search": {
+     "room_id": 4464347,
+     "name": "Female 4 Bed Dormitory at Social SF Hostel",
+     "title": "Shared room in North Beach",
+     "price": {
+      "unit": {
+       "qualifier": "for 3 nights",
+       "curency_symbol": "$",
+       "amount": 147.0
+      },
+      "total": {
+       "currency_symbol": "",
+       "amount": 0
+      },
+      "break_down": [
+       {
+        "description": "3 nights x $49.00",
+        "amount": 147.0,
+        "currency": "$"
+       }
+      ]
+     },
+     "fee": {
+      "airbnb": {},
+      "cleaning": {}
+     },
+     "rating": {
+      "value": 4.77,
+      "reviewCount": "1413"
+     },
+     "badges": [
+      "SUPERHOST"
+     ],
+     "coordinates": {
+      "latitude": 37.7982,
+      "longitud": -122.4052
+     },
+     "paymentMessages": [
+      {
+       "__typename": "PaymentMessage",
+       "text": "Free cancellation",
+       "type": "FREE_CANCELLATION_HIGHLIGHT"
+      }
+     ],
+     "category": "",
+     "kind": "",
+     "type": ""
+    },
+    "price_check": null,
+    "price_checked_at": null,
+    "calendar": null,
+    "calendar_checked_at": null,
+    "query": {
+     "check_in": "2026-10-27",
+     "check_out": "2026-10-30",
+     "adults": 1,
+     "rooms": 1,
+     "currency": "USD"
+    },
+    "market_context": {
+     "country": "us",
+     "language": "en",
+     "platform": "desktop",
+     "authenticated": false
+    }
+   }
+  }
+ ]
+}
