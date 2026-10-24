@@ -5,6 +5,30 @@ Setup for that run: `main` at 7a4dbef, LinkedIn cache files present in `data/pro
 started on a freshly reset graph, then **Reset session** clicked in the UI. If any figure on the
 day differs, say the figure on screen, not the one written here.
 
+## Before the demo: make predemo
+
+Five minutes before going on stage, from `~/PatchConferenceHack`:
+
+```
+FALKORDB_PORT=6380 make predemo
+```
+
+It checks FalkorDB answers `GRAPH.LIST` (exit 2 with a clear message otherwise), stops any server
+already listening on `DEMO_PORT` (default 8000), starts `make demo DEMO_ARGS=--reset-graph` in the
+background (log: `logs/predemo-demo.log`), waits for `/health`, then prints one OK/FAIL line per check:
+
+| Check | Expected |
+|---|---|
+| FalkorDB graph `conferge_demo` | at least 600 nodes and 2,000 edges |
+| Bright Data stays in `/pipeline` | 21 (`PREDEMO_STAYS_BD`) |
+| Bright Data flights, Web Unlocker, in `/pipeline` | 34 (`PREDEMO_FLIGHTS_BD`) |
+| LinkedIn cards in `/people` | at least 9 (`PREDEMO_LINKEDIN_MIN`) |
+| Top 3 people | Ryan Hecht, Camila Maia, Nick Liffen (`PREDEMO_TOP3`, comma separated) |
+| `/antifomo`, called after plan, people and pipeline like the page | under 2 s |
+
+Exit code 0 means every line is OK and the server stays up at the printed URL; any FAIL gives a
+non-zero exit. Then continue with step 3 below (browser, Reset session).
+
 ## Before the demo
 
 1. **Start the demo on a clean graph** from the demo checkout (`~/PatchConferenceHack`):
