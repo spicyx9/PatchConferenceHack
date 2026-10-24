@@ -1757,7 +1757,8 @@
       " | confidence " +
       esc(orUnknown(e.confidence)) +
       " | observed at " +
-      esc(orUnknown(e.observed_at))
+      esc(orUnknown(e.observed_at)) +
+      (e.rationale ? '<br><span class="muted">' + esc(e.rationale) + "</span>" : "")
     );
   }
 
@@ -2702,7 +2703,9 @@
                 return entry.id === opportunity.event_id;
               },
             );
-            var evidence = opportunity.evidence || person.evidence || [];
+            var evidence = (opportunity.evidence && opportunity.evidence.length
+              ? opportunity.evidence : person.evidence) || [];
+            var whyEdges = (card.why && card.why.edges) || [];
             var sources = evidence
               .map(function (entry) {
                 var link = safeUrl(entry.source_url);
@@ -2717,6 +2720,14 @@
                     : esc(entry.provider)) +
                   " " +
                   sourceModeBadge(entry.source_mode) +
+                  whyEdges
+                    .filter(function (w) {
+                      return entry.source_url && (w.evidence_ids || []).indexOf(entry.source_url) >= 0;
+                    })
+                    .map(function (w) {
+                      return '<br><span class="muted">' + esc(w.rationale) + "</span>";
+                    })
+                    .join("") +
                   "</li>"
                 );
               })

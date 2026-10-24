@@ -9,6 +9,8 @@ from __future__ import annotations
 import re
 from typing import Any, Protocol
 
+from conferge.core.edge_rationale import annotate
+
 _ALLOWED_NODE_LABELS = frozenset({
     "Conference", "Event", "Person", "Company", "Goal", "Opportunity", "Venue",
     "Topic", "Lodging", "FlightOffer", "Session", "Meeting",
@@ -120,13 +122,21 @@ class GraphStore:
             raise ValueError(f"unsupported graph relation: {relation}")
         if not from_id or not to_id:
             raise ValueError("edge endpoints must not be empty")
-        set_clause, prop_params = self._properties(properties or {}, "r")
+        # Every edge gets a rule-based rationale and at least one evidence id (refused
+        # otherwise); evidence ids accumulate across MERGEs, so corroboration never drops one.
+        props = annotate(relation, from_kind, from_id, properties or {})
+        ids = props.pop("evidence_ids")
+        set_clause, prop_params = self._properties(props, "r")
+        set_clause = (set_clause or " SET") + (", " if set_clause else " ") + (
+            "r.evidence_ids = CASE WHEN r.evidence_ids IS NULL THEN $evidence_ids "
+            "ELSE r.evidence_ids + [x IN $evidence_ids WHERE NOT x IN r.evidence_ids] END")
         cypher = (
             f"MATCH (a:{from_kind} {{id: $from_id}}), (b:{to_kind} {{id: $to_id}}) "
             f"MERGE (a)-[r:{relation}]->(b){set_clause} RETURN a.id, b.id"
         )
         return self.graph.query(
-            cypher, params={"from_id": from_id, "to_id": to_id, **prop_params}
+            cypher, params={"from_id": from_id, "to_id": to_id, "evidence_ids": ids,
+                            **prop_params}
         )
 
 
