@@ -22,6 +22,7 @@ from typing import Any, Literal
 from conferge.core.schemas import Lodging, SourceEvidence, SourceRecord, Venue
 from conferge.lodging._common import now_utc, quantize
 from conferge.lodging.models import LodgingQuery
+from conferge.lodging.card_details import LodgingWithCard, from_record
 
 QuoteKind = Literal["verified", "dated_total", "from_price", "none"]
 VERIFY_TTL = timedelta(minutes=30)
@@ -83,8 +84,10 @@ def stay_matches(
 
 
 def evidence_for(record: SourceRecord, confidence: float | None = None) -> SourceEvidence:
+    provider = ("brightdata_airbnb" if record.provider == "airbnb"
+                and record.payload.get("backend") == "brightdata" else record.provider)
     return SourceEvidence(
-        provider=record.provider, source_mode=record.source_mode, source_url=record.source_url,
+        provider=provider, source_mode=record.source_mode, source_url=record.source_url,
         collected_at=record.collected_at, raw_ref=record.request_id,
         source_record_id=record.source_id, confidence=confidence,
     )
@@ -121,6 +124,7 @@ def build_lodging(
         sink.append(f"{record.provider}:{record.source_id}: stay mismatch ({'; '.join(problems)}); "
                     "price dropped")
         quote = PriceQuote(currency=quote.currency)
+        free_cancellation = None
         availability = "unknown" if availability == "verified_available" else availability
     if quote.currency and quote.currency != query.currency:
         sink.append(f"{record.provider}:{record.source_id}: currency {quote.currency} != "
@@ -141,7 +145,8 @@ def build_lodging(
         nightly = quantize(quote.nightly_rate)
     else:
         nightly = None
-    return Lodging(
+    return LodgingWithCard(
+        card_details=from_record(record, rate_facts=ok),
         id=f"{record.provider}:{record.source_id}",
         name=name,
         provider=record.provider,

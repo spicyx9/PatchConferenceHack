@@ -1614,101 +1614,13 @@
     $("flights").innerHTML = items.length
       ? items
           .map(function (leg) {
-            var segments = ((leg.slices || [])[0] || {}).segments || [],
-              first = segments[0] || {},
-              last = segments[segments.length - 1] || first,
-              minutes = flightMinutes(leg),
-              carrier = first.marketing_carrier || "Airline";
-            var airline =
-              {
-                UA: "United",
-                B6: "JetBlue",
-                AA: "American",
-                DL: "Delta",
-                F9: "Frontier",
-                AS: "Alaska",
-              }[carrier] || carrier;
-            var link = safeUrl(leg.booking_url),
-              duration =
-                minutes == null
-                  ? "Duration unavailable"
-                  : Math.floor(minutes / 60) +
-                    "h " +
-                    (minutes % 60 ? (minutes % 60) + "m" : ""),
-              date = first.departure_at
-                ? shortDate(first.departure_at.slice(0, 10))
-                : "Date unavailable";
-            var heading =
-              presentDirections.length > 1 && direction(leg) !== lastDirection
-                ? '<h3 class="flight-direction">' +
-                  directionLabels[direction(leg)] +
-                  "</h3>"
-                : "";
+            var heading = presentDirections.length > 1 && direction(leg) !== lastDirection
+              ? '<h3 class="flight-direction">' + directionLabels[direction(leg)] + '</h3>' : '';
             lastDirection = direction(leg);
-            return (
-              heading +
-              '<article class="travel-offer"><div class="flight-journey"><span class="airline-mark" aria-hidden="true">' +
-              esc(carrier) +
-              '</span><div class="flight-time"><strong>' +
-              esc(first.departure_at ? first.departure_at.slice(11, 16) : "—") +
-              "</strong><span>" +
-              esc(first.origin_iata || "Origin") +
-              '</span></div><div class="flight-duration"><span>' +
-              esc(duration) +
-              '</span><i aria-hidden="true"></i><small>' +
-              esc(
-                segments.length === 1
-                  ? "Nonstop"
-                  : segments.length -
-                      1 +
-                      (segments.length === 2 ? " stop" : " stops"),
-              ) +
-              '</small></div><div class="flight-time arrival"><strong>' +
-              esc(last.arrival_at ? last.arrival_at.slice(11, 16) : "—") +
-              "</strong><span>" +
-              esc(last.destination_iata || "Destination") +
-              '</span></div></div><div class="flight-caption"><b>' +
-              esc(airline) +
-              "</b> · " +
-              esc(date) +
-              ' · Local airport times</div><div class="flight-fare">' +
-              sourceBadge(
-                recordMode(leg),
-                leg.collected_at || (leg.source && leg.source.collected_at),
-              ) +
-              '<strong>' +
-              esc(travelMoney(leg.total_price, leg.currency)) +
-              "</strong><span>" +
-              esc(
-                leg.price_label ||
-                  (leg.trip_type === "round_trip" ? "round trip" : "one way"),
-              ) +
-              "</span>" +
-              (link
-                ? '<a href="' +
-                  esc(link) +
-                  '" target="_blank" rel="noopener noreferrer">View deal</a>'
-                : "") +
-              "</div><details><summary>Flight details</summary><p>" +
-              esc(flightPriceText(leg)) +
-              "</p>" +
-              sourceApiBadge(leg.source) +
-              "<p>Price status: " +
-              esc(leg.price_status || "unknown") +
-              "</p>" +
-              (leg.return_slice_collected === false
-                ? "<p>Return flight details were not collected. Confirm both legs with the provider.</p>"
-                : "") +
-              "<p>Checked bag: " +
-              esc(
-                leg.checked_bags_included == null
-                  ? "Not provided"
-                  : leg.checked_bags_included
-                    ? "Included"
-                    : "Not included",
-              ) +
-              "</p></details></article>"
-            );
+            return heading + TravelCards.flight(leg,
+              sourceApiBadge(leg.source) + "<p>Observed price: " + esc(flightPriceText(leg)) +
+              " · Price status: " + esc(leg.price_status || "unknown") + "</p>",
+              sourceBadge(recordMode(leg), leg.collected_at || (leg.source && leg.source.collected_at)));
           })
           .join("")
       : travelEmpty(
@@ -1756,64 +1668,10 @@
     $("stays").innerHTML = items.length
       ? items
           .map(function (st) {
-            var link = safeUrl(st.booking_url);
-            var distance =
-              st.distance_to_venue_m == null
-                ? ""
-                : (st.distance_to_venue_m / 1000).toFixed(1) +
-                  " km from the conference" +
-                  (st.distance_is_straight_line_estimate
-                    ? " · straight-line estimate"
-                    : "");
-            return (
-              '<article class="trip-stay"><div><h3>' +
-              esc(st.name) +
-              "</h3><p>" +
-              esc(distance || "Check the location before booking") +
-              '</p><p class="small-text">' +
-              esc(shortDate(st.check_in)) +
-              " – " +
-              esc(shortDate(st.check_out)) +
-              '</p></div><div class="trip-stay-price">' +
-              sourceBadge(
-                recordMode(st),
-                st.collected_at || (st.source && st.source.collected_at),
-              ) +
-              "<strong>" +
-              esc(
-                st.total_price == null
-                  ? "Price unavailable"
-                  : travelMoney(st.total_price, st.currency),
-              ) +
-              '</strong><span class="muted small-text">' +
-              esc(
-                st.price_status === "verified_bookable"
-                  ? "Verified for these dates"
-                  : "Availability needs checking",
-              ) +
-              "</span>" +
-              (link
-                ? '<a class="secondary" href="' +
-                  esc(link) +
-                  '" target="_blank" rel="noopener noreferrer">View stay</a>'
-                : "") +
-              // Provenance on the card itself (Bright Data dataset Booking / Airbnb, fallback...).
-              '</div><div class="stay-source">' + sourceApiBadge(st.source) + "</div>" +
-              "<details><summary>Offer details</summary>" +
-              "<p>" +
-              esc(
-                [
-                  st.availability,
-                  st.price_status,
-                  st.collected_at || (st.source && st.source.collected_at)
-                    ? "Collected " + fmtTime(st.collected_at || st.source.collected_at)
-                    : null,
-                ]
-                  .filter(Boolean)
-                  .join(" · "),
-              ) +
-              "</p></details></article>"
-            );
+            return TravelCards.stay(st,
+              sourceApiBadge(st.source) + '<details class="offer-evidence"><summary>Offer details</summary><p>Price status: ' +
+              esc(st.price_status || "unknown") + " · " + esc(st.availability || "unknown") + "</p></details>",
+              sourceBadge(recordMode(st), st.collected_at || (st.source && st.source.collected_at)));
           })
           .join("")
       : travelEmpty(

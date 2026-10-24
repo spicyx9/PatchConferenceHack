@@ -250,7 +250,7 @@ function pass(name) {
           .querySelector("#travel-results-workspace")
           .getAttribute("aria-busy") === "false",
     );
-    assert((await page.locator(".travel-offer").count()) > 1);
+    assert((await page.locator(".fare-card").count()) > 1);
     pass("Travel query returns collected offers matching the chosen criteria");
     const places = page.locator("#map-places button");
     assert((await places.count()) > 1);

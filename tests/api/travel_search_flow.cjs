@@ -69,7 +69,7 @@ const pass = (name) => {
   const flights = await search();
   assert.equal(flights.items.length, 34, "Actual cached NYC–SF alternatives");
   assert.equal(
-    await page.locator("#flights .travel-offer").count(),
+    await page.locator("#flights .fare-card").count(),
     flights.items.length,
   );
   pass("Search criteria return 34 collected flight alternatives");
@@ -103,7 +103,7 @@ const pass = (name) => {
   await page.route("**/api/v1/travel/search", mockLive);
   await search("#travel-search-button");
   assert.equal(liveRequest.mode, "live");
-  assert.equal(await page.locator("#flights .travel-offer").count(), 0);
+  assert.equal(await page.locator("#flights .fare-card").count(), 0);
   assert.match(
     await page.locator("#travel-search-feedback").innerText(),
     /Test provider unavailable/,
@@ -111,13 +111,13 @@ const pass = (name) => {
   await page.unroute("**/api/v1/travel/search", mockLive);
   const restored = await search("#travel-use-collected");
   assert.equal(restored.items.length, 34);
-  assert.equal(await page.locator("#flights .travel-offer").count(), 34);
+  assert.equal(await page.locator("#flights .fare-card").count(), 34);
   pass(
     "Search requests live prices; explicit provider failure clears cards; collected action restores actual cache",
   );
   await page.locator("#flight-sort").selectOption("price");
   const prices = await page
-    .locator("#flights .flight-fare > strong")
+    .locator("#flights .fare-price > strong")
     .allTextContents();
   const numeric = prices.map((x) => Number(x.replace(/[^0-9.]/g, "")));
   assert.deepEqual(
@@ -130,32 +130,32 @@ const pass = (name) => {
     (x) => x.slices[0].segments.length === 1,
   );
   assert.equal(
-    await page.locator("#flights .travel-offer").count(),
+    await page.locator("#flights .fare-card").count(),
     nonstop.length,
   );
   const stopText = await page
-    .locator("#flights .flight-duration small")
+    .locator("#flights .fare-route span:last-child")
     .allTextContents();
   assert(stopText.every((x) => x === "Nonstop"));
   pass("Nonstop filter agrees with source segments");
   await page.locator("#travel-clear-filters").click();
   await page.locator("#research-origin").fill("Paris");
   assert.equal(
-    await page.locator("#flights .travel-offer").count(),
+    await page.locator("#flights .fare-card").count(),
     0,
     "Editing query clears stale cards",
   );
   await page.locator("#travel-max-price").fill("1000");
   await page.locator('input[name="travel-stops"][value="0"]').check();
   assert.equal(
-    await page.locator("#flights .travel-offer").count(),
+    await page.locator("#flights .fare-card").count(),
     0,
     "Filters cannot resurrect stale origin results",
   );
   await page.locator("#travel-clear-filters").click();
   const paris = await search();
   assert.equal(paris.items.length, 0);
-  assert.equal(await page.locator("#flights .travel-offer").count(), 0);
+  assert.equal(await page.locator("#flights .fare-card").count(), 0);
   assert.match(
     await page.locator("#flights").innerText(),
     /No.*offers|No.*match/i,
@@ -173,7 +173,7 @@ const pass = (name) => {
     0,
     "Collected round trip cannot satisfy a one-way request",
   );
-  assert.equal(await page.locator("#flights .travel-offer").count(), 0);
+  assert.equal(await page.locator("#flights .fare-card").count(), 0);
   await page.locator("#flight-type").selectOption("round_trip");
   pass("One-way criteria do not reuse round-trip quotes");
   await page.locator("#travel-stays-tab").click();

@@ -647,9 +647,11 @@ def create_app(
             if cached and "flights" in cached:
                 kept = {o.id for o in offers}
                 offers += [o for o in cached["flights"].items if o.id not in kept]
+        from conferge.api.travel_cards import view
+
         kept_ids = {o.id for o in state.data.flights}
         # kept: the itinerary of the trip (in the graph); the others are cached alternatives.
-        items = [{**f.model_dump(mode="json"), **rt_display(f), "source": source_of(f.evidence),
+        items = [{**view(f), **rt_display(f), "source": source_of(f.evidence),
                   "kept": f.id in kept_ids} for f in offers]
         return _envelope(state, ["flights"], {"items": items, "count": len(items)})
 

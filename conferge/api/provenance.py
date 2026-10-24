@@ -18,6 +18,8 @@ Contract (consumed by the UI, key names are frozen)::
 Airbnb: both backends share the provider name ``airbnb``. The Bright Data backend sets
 ``request_id`` (-> ``raw_ref``) to the dataset snapshot id; pyairbnb sets it to None. So an
 ``airbnb`` evidence with a raw_ref is Bright Data, without one it is pyairbnb.
+New records explicitly use ``brightdata_airbnb`` as the evidence provider: synchronous
+Bright Data collections have no snapshot id and must not be labelled pyairbnb.
 
 fast-flights may run through the Bright Data SERP transport, but nothing in its evidence
 says so; it is always reported as the fallback.
@@ -90,8 +92,8 @@ def _source_of(evidence: Sequence[SourceEvidence] | None) -> dict[str, Any]:
         return _out("fixture", "fixture", "Fixture")
     if provider in ("booking", "google_hotels"):
         return _dataset(provider, raw)
-    if provider == "airbnb":
-        if raw:
+    if provider in {"airbnb", "brightdata_airbnb"}:
+        if raw or provider == "brightdata_airbnb":
             return _dataset("airbnb", raw)
         return _out("pyairbnb", "fallback", "Fallback pyairbnb", site="airbnb")
     if provider in ("unlocker", "brightdata_unlocker_google_flights"):

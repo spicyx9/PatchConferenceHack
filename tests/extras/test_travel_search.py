@@ -1,5 +1,6 @@
 """Travel research must never substitute another trip or relabel fixtures."""
 from copy import deepcopy
+from datetime import datetime
 from urllib.parse import parse_qs, urlparse
 
 from fastapi import FastAPI
@@ -53,6 +54,19 @@ def test_stay_occupancy_dates_proximity_and_budget_are_exact():
     for changed in ({"adults": 1}, {"adults": 3}, {"rooms": 2},
                     {"depart": "2026-10-26"}, {"destination": "Paris"}):
         assert not search_cached(query(kind="stays", **changed))["items"]
+
+
+def test_search_preserves_hotel_photos_and_their_separate_provenance():
+    result = search_cached(query(kind="stays", adults=2, radius_km=50))
+    hotels = [i for i in result["items"] if i["id"].startswith("booking:")]
+    assert len(hotels) == 15
+    for item in hotels:
+        card = item["card_details"]
+        assert card["image_urls"] and card["image_source_url"]
+        assert card["image_collected_at"]
+        assert datetime.fromisoformat(item["collected_at"]) == datetime.fromisoformat(
+            item["evidence"][0]["collected_at"])
+        assert item["source"]["provider"] == "brightdata"
 
 
 def test_search_endpoint_does_not_mutate_conference_selection():

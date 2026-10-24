@@ -31,7 +31,7 @@ def test_source_api_badge_helper_is_used_on_stays_and_itinerary() -> None:
     assert "sourceApiBadge(st.source)" in _body(js, "renderStays")
     travel = _body(js, "renderFlights")
     assert travel.count("sourceApiBadge(leg.source)") == 1  # every flight offer retains its source
-    assert "sourceBadge(\n                recordMode(leg)," in travel  # mode badge with collected_at
+    assert "sourceBadge(recordMode(leg)," in travel  # mode badge with collected_at
     assert "flightPriceText(leg)" in travel
 
 

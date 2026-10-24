@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 import shutil
 import subprocess
@@ -59,8 +60,19 @@ def test_source_badge_never_empty_and_shows_local_time() -> None:
     assert flight_mode == "cached"  # flight offers carry the mode in their evidence only
 
 
+@pytest.mark.skipif(shutil.which("node") is None, reason="node not installed")
 def test_cards_render_the_mode_badge_outside_details() -> None:
-    src = APP.read_text(encoding="utf-8")
-    for card in ('<div class="flight-fare">', '<div class="trip-stay-price">'):
-        after = src[src.index(card):src.index(card) + 200]
-        assert "sourceBadge(" in after
+    script = "\n".join([
+        "var window = {}; var location = {origin: 'https://example.test'};",
+        APP.with_name("travel-cards.js").read_text(encoding="utf-8"),
+        "var badge = '<b id=collection-badge>Cached · 11:41 AM</b>';",
+        "var flight = window.TravelCards.flight({slices: []}, '<p>Source</p>', badge);",
+        "var stay = window.TravelCards.stay({check_in: '2026-10-27', check_out: '2026-10-30', "
+        "adults: 1, rooms: 1}, '<details>Source</details>', badge);",
+        "console.log(JSON.stringify([flight, stay]));",
+    ])
+    result = subprocess.run(["node", "-e", script], capture_output=True, text=True, check=True)
+    for rendered, column in zip(json.loads(result.stdout), ("fare-price", "stay-price"), strict=True):
+        assert rendered.index(column) < rendered.index("collection-badge")
+        assert rendered.index("collection-badge") < rendered.index("<details")
+        assert "Cached · 11:41 AM" in rendered

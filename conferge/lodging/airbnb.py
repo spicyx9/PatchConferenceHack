@@ -375,8 +375,15 @@ class BrightDataAirbnbBackend:
             msg = f"{marker}: {exc}" if marker != "error" else str(exc)
             return DiscoveryResult(items=[], errors=[msg], run_report=report(
                 PROVIDER, started, status="failed", termination=termination, errors=[msg]))
-        warnings = list(got.warnings)
-        rows = [r for r in got.rows if r.get("property_id") not in (None, "")]
+        from conferge.lodging.detail_candidates import hydrate
+
+        hydrated, detail_warnings, detail_partial, detail_calls = await hydrate(
+            got.rows, client=self.client, dataset=DATASET_AIRBNB, site="airbnb",
+            limit=q.limit, country=q.country, poll_interval=self.poll_interval,
+            max_wait=self.max_wait, url_for=lambda pid: room_url(pid, q),
+        )
+        warnings = [*got.warnings, *detail_warnings]
+        rows = [r for r in hydrated if r.get("property_id") not in (None, "")]
         if len(rows) < len(got.rows):
             warnings.append(f"brightdata: {len(got.rows) - len(rows)} row(s) without "
                             "property_id excluded")
@@ -390,17 +397,22 @@ class BrightDataAirbnbBackend:
         collected = self.clock()
         items = []
         for pid, row in kept:
+            from conferge.lodging.card_details import compact
+
             slim = {k: v for k, v in row.items() if k not in _BD_HEAVY}
             items.append(SourceRecord(
                 provider=PROVIDER, source_id=pid, source_mode="live", collected_at=collected,
-                source_url=room_url(pid, q), request_id=got.snapshot_id,
+                source_url=room_url(pid, q), request_id=row.get("_detail_snapshot_id", got.snapshot_id),
                 content_hash=content_hash(row),
-                payload=_payload(self.name, slim, q, dataset=DATASET_AIRBNB, location=q.location),
+                payload={**_payload(self.name, slim, q, dataset=DATASET_AIRBNB, location=q.location),
+                         "card_details": compact(row)},
             ))
-        status = "degraded" if got.error_rows else "ok"
+        capped = len(got.rows) >= q.limit
+        status = "degraded" if got.error_rows or detail_partial or capped else "ok"
         return DiscoveryResult(items=items, run_report=report(
-            PROVIDER, started, status=status, termination="exhausted", fetched=len(rows),
-            unique=len({str(r["property_id"]) for r in rows}), warnings=warnings,
+            PROVIDER, started, status=status, termination="page_cap" if capped else "exhausted",
+            fetched=max(len(got.rows), len(rows)),
+            unique=len({str(r["property_id"]) for r in rows}), pages=1 + detail_calls, warnings=warnings,
             finished_at=self.clock()))
 
     async def enrich(
@@ -726,8 +738,9 @@ def _brightdata_lodging(record: SourceRecord, query: LodgingQuery, row: dict[str
         lng=parse_float(row.get("long")),
         coordinate_precision="exact" if row.get("is_exact_location") is True else "approximate",
         city=row.get("location") if isinstance(row.get("location"), str) else None,
-        free_cancellation=True if "free cancellation" in str(
-            row.get("cancellation_policy") or "").lower() else None,
+        # A general policy description is not proof that this exact rate is cancellable.
+        free_cancellation=row.get("free_cancellation") if dates_echoed
+        and isinstance(row.get("free_cancellation"), bool) else None,
         rating=value, rating_scale=RATING_SCALE,
         rating_count=parse_int(row.get("property_number_of_reviews")) if value else None,
         booking_url=room_url(record.source_id, query),
