@@ -953,7 +953,7 @@
               placeholder="Describe who you want to meet or what you need help with…" />
             <button type="submit" id="connection-submit">Find people <span aria-hidden="true">↗</span></button>
           </form>
-          <div class="panel" id="graph-gaps">
+          <div class="panel" id="graph-gaps" hidden>
             <span class="eyebrow">GAPS IN THE EVIDENCE</span>
             <h2>No path in our graph</h2>
             <p>No recorded path found, and that's the answer: the graph has no evidence linking this goal to anyone at the conference. It does not prove the person or event is absent.</p>
@@ -994,7 +994,7 @@
               <div class="connection-sidebar-head"><h2 id="connection-results-title">People</h2>
                 <button type="button" id="connection-clear" hidden>All connections</button></div>
               <p id="connection-summary" role="status" aria-live="polite"></p>
-              <p id="connection-summary-source" class="small-text muted"></p>
+              <p hidden id="connection-summary-source" class="small-text muted"></p>
               <div id="connection-results"></div>
               <div id="graph-detail" class="graph-detail" role="status" aria-live="polite"></div>
             </aside>
@@ -1074,8 +1074,8 @@
           </section>
         </section>
         <footer class="footer"><span>Conferge</span>
-          <a class="text-button" href="/api/v1/how-it-works?format=text" target="_blank" rel="noopener">How scoring works</a>
-          <button type="button" class="text-button" data-open="sources-dialog">Sources and how it works</button>
+          <a hidden class="text-button" href="/api/v1/how-it-works?format=text" target="_blank" rel="noopener">How scoring works</a>
+          <button hidden type="button" class="text-button" data-open="sources-dialog">Sources and how it works</button>
         </footer>
       </main>
     </div>
