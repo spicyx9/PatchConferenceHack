@@ -14,6 +14,7 @@ from collections import deque
 from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from conferge.api.data import DemoData
 from conferge.core.schemas import Event, Goal, Opportunity, Person, SourceEvidence
@@ -169,8 +170,44 @@ def event_scores(
     return scores
 
 
-def _local_day(event: Event) -> date | None:
-    return event.start_at.date() if event.start_at else None
+def _local_day(event: Event, tz: str) -> date | None:
+    return event.start_at.astimezone(ZoneInfo(tz)).date() if event.start_at else None
+
+
+# Planning window in the conference's local time: nothing starts between 00:00 and 06:00.
+_NIGHT_END_HOUR = 6
+_ONLINE = re.compile(r"\b(online|virtual|livestream|zoom)\b", re.IGNORECASE)
+
+
+def _is_online(event: Event) -> bool:
+    v = event.venue
+    return v is not None and any(_ONLINE.search(x or "") for x in (v.name, v.address, v.city))
+
+
+def off_hours_reason(event: Event, tz: str) -> tuple[str, str] | None:
+    """``(code, detail)`` when an in-person event cannot be attended from the conference city.
+
+    The source values are left untouched: this only reads ``start_at`` (aware)
+    and the event's own ``timezone``. Online events are always kept.
+    """
+    if not event.start_at or _is_online(event):
+        return None
+    local = event.start_at.astimezone(ZoneInfo(tz))
+    origin = event.timezone or tz
+    if local.hour < _NIGHT_END_HOUR:
+        where = f" in person in {origin}" if origin != tz else ""
+        return ("outside_hours", f"starts {local:%H:%M} {tz}{where} "
+                f"({event.start_at.astimezone(ZoneInfo(origin)):%H:%M} local); outside 06:00-24:00")
+    if origin != tz:
+        return "other_timezone", f"in person in another timezone ({origin}), not in the conference city"
+    return None
+
+
+def in_trip(data: DemoData, event: Event) -> bool:
+    """Event day (conference local time) falls within the user's stay, when known."""
+    first, last = data.user.get("depart_date"), data.user.get("return_date")
+    day = str(_local_day(event, data.conference.timezone))
+    return (not first or day >= str(first)) and (not last or day <= str(last))
 
 
 def build_plan(
@@ -190,17 +227,13 @@ def build_plan(
     attended = attended or set()
     scores = event_scores(data, goals, opportunities)
     opp_by_person = {pid: o for o in opportunities for pid in o.person_ids}
-    # Only the days the user is in town (user depart_date..return_date, when known).
-    first, last = data.user.get("depart_date"), data.user.get("return_date")
-
-    def in_trip(e: Event) -> bool:
-        day = str(_local_day(e))
-        return (not first or day >= str(first)) and (not last or day <= str(last))
-
+    # Only the days the user is in town, and only events attendable from the conference city.
+    tz = data.conference.timezone
+    off_hours = {e.id: why for e in data.events if (why := off_hours_reason(e, tz))}
     available = [
         e for e in data.events
         if e.start_at and e.status not in {"cancelled", "sold_out"} and e.id not in skipped
-        and in_trip(e)
+        and in_trip(data, e) and e.id not in off_hours
     ]
     excluded = [
         {"event_id": e.id, "title": e.title, "reason": e.status if e.status in {"cancelled", "sold_out"} else "skipped"}
@@ -210,12 +243,17 @@ def build_plan(
         {"event_id": e.id, "title": e.title, "reason": "outside_trip"}
         for e in data.events
         if e.start_at and e.status not in {"cancelled", "sold_out"} and e.id not in skipped
-        and not in_trip(e)
+        and not in_trip(data, e)
+    ] + [
+        {"event_id": e.id, "title": e.title, "reason": off_hours[e.id][0], "detail": off_hours[e.id][1]}
+        for e in data.events
+        if e.id in off_hours and e.status not in {"cancelled", "sold_out"} and e.id not in skipped
+        and in_trip(data, e)
     ]
     unscheduled = [{"event_id": e.id, "title": e.title} for e in data.events if not e.start_at]
     days: dict[str, list[Event]] = {}
     for event in available:
-        days.setdefault(str(_local_day(event)), []).append(event)
+        days.setdefault(str(_local_day(event, tz)), []).append(event)
 
     plan_days = []
     conflicts = []
@@ -562,24 +600,37 @@ def roi_view(
     }
 
 
-_SKIP_CATEGORY = {"time_conflict": "conflit horaire", "travel": "trajet trop long",
-                  "low_score": "score faible"}
+_SKIP_CATEGORY = {"outside_hours": "hors plage horaire", "other_timezone": "autre fuseau, en presentiel",
+                  "time_conflict": "conflit horaire", "travel": "trajet trop long", "low_score": "score faible"}
 
 
-def antifomo_skips(decisions: list[dict[str, Any]], data: DemoData, limit: int = 3,
+def antifomo_skips(decisions: list[dict[str, Any]], data: DemoData, limit: int = 4,
                    planned: set[str] | None = None) -> list[dict[str, Any]]:
     """The anti-FOMO agent's most tempting rejections, with a category and what skipping gains.
 
-    One per category first (time conflict, travel, low score), then by utility, so the demo
-    shows the different reasons instead of three variations of the same one. Events kept by
-    the displayed plan (``planned``) are left out so the two views never contradict.
+    One per category first (outside hours, time conflict, travel, low score), then by utility,
+    so the demo shows the different reasons instead of variations of the same one. Events kept
+    by the displayed plan (``planned``) are left out so the two views never contradict.
     """
     kept = {d["event_id"]: d for d in decisions if d.get("type") == "plan_item"}
     out = []
+    tz = data.conference.timezone
+    for event in data.events:
+        off = off_hours_reason(event, tz)
+        if off is None or not in_trip(data, event) or event.status in {"cancelled", "sold_out"}:
+            continue
+        out.append({
+            "event_id": event.id, "title": event.title, "utility": 0.0,
+            "start_at": event.start_at.isoformat() if event.start_at else None,
+            "timezone": event.timezone, "category": off[0], "category_label": _SKIP_CATEGORY[off[0]],
+            "reason": off[1], "gain": "no night slot or trip abroad in the plan",
+            "blocking_event_id": None,
+        })
+    seen = {s["event_id"] for s in out}
     for r in decisions:
         if r.get("type") != "rejected" or r.get("code") not in {"conflict", "low_utility", "day_full"}:
             continue
-        if planned and r["event_id"] in planned:
+        if (planned and r["event_id"] in planned) or r["event_id"] in seen:
             continue
         event, block_item = data.event(r["event_id"]), kept.get(r.get("blocking_event_id") or "")
         block = data.event(block_item["event_id"]) if block_item else None
@@ -605,7 +656,7 @@ def antifomo_skips(decisions: list[dict[str, Any]], data: DemoData, limit: int =
         out.append({
             "event_id": r["event_id"], "title": r["title"], "utility": utility,
             "start_at": event.start_at.isoformat() if event and event.start_at else None,
-            "category": category, "category_label": _SKIP_CATEGORY[category],
+            "timezone": event.timezone if event else None, "category": category, "category_label": _SKIP_CATEGORY[category],
             "reason": r["reason"], "gain": gain,
             "blocking_event_id": block_item["event_id"] if block_item else None,
         })

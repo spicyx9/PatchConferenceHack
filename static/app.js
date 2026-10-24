@@ -59,6 +59,11 @@
     return '<span class="badge ' + cls + '">' + esc(s.toUpperCase()) + "</span>";
   }
 
+  // Events held in another timezone keep their own clock time, labelled with that zone.
+  function zoneLabel(tz) {
+    return tz && tz !== EVENT_TZ ? " (" + tz + ")" : "";
+  }
+
   function fmtTime(iso, tz) {
     if (!iso) return "heure unknown";
     var d = new Date(iso);
@@ -67,7 +72,7 @@
       return new Intl.DateTimeFormat("fr-FR", {
         timeZone: tz || EVENT_TZ, weekday: "short", day: "2-digit", month: "short",
         hour: "2-digit", minute: "2-digit"
-      }).format(d);
+      }).format(d) + zoneLabel(tz);
     } catch (e) {
       return iso;
     }
@@ -80,7 +85,7 @@
     try {
       return new Intl.DateTimeFormat("fr-FR", {
         timeZone: tz || EVENT_TZ, hour: "2-digit", minute: "2-digit"
-      }).format(d);
+      }).format(d) + zoneLabel(tz);
     } catch (e) {
       return iso;
     }
@@ -249,7 +254,8 @@
 
     var excluded = (plan && plan.plan && plan.plan.excluded) || [];
     $("excluded").innerHTML = excluded.length ? excluded.map(function (x) {
-      return "<li>" + esc(x.title) + ' <span class="badge failed">' + esc(x.reason) + "</span></li>";
+      return "<li>" + esc(x.title) + ' <span class="badge failed">' + esc(x.reason) + "</span>" +
+        (x.detail ? ' <span class="muted small-text">' + esc(x.detail) + "</span>" : "") + "</li>";
     }).join("") : '<li class="muted">Aucun.</li>';
   }
 
@@ -639,7 +645,7 @@
     var days = ((plan && plan.plan && plan.plan.days) || []).filter(function (d) { return (d.items || []).length; });
     $("story-plan").innerHTML = days.map(function (d) {
       return '<div class="story-plan-day"><h3>' + esc(fmtDay(d.day)) + "</h3><ul>" + d.items.slice(0, 4).map(function (i) {
-        return "<li><b>" + esc(fmtHour(i.start_at, EVENT_TZ)) + "</b> " + esc(i.title) + "</li>";
+        return "<li><b>" + esc(fmtHour(i.start_at, i.timezone)) + "</b> " + esc(i.title) + "</li>";
       }).join("") + (d.items.length > 4 ? '<li class="muted">+ ' + (d.items.length - 4) + " autres</li>" : "") + "</ul></div>";
     }).join("") || '<p class="muted">Plan vide.</p>';
     if (typeof L === "undefined") return;
@@ -671,7 +677,7 @@
     var skips = (res && res.skips) || [];
     $("story-antifomo").innerHTML = skips.map(function (s) {
       return '<div class="skip"><div class="cat">' + esc(s.category_label) + "</div>" +
-        "<div><b>On saute :</b> " + esc(s.title) + " " + '<span class="muted">(' + esc(fmtTime(s.start_at)) + ")</span></div>" +
+        "<div><b>On saute :</b> " + esc(s.title) + " " + '<span class="muted">(' + esc(fmtTime(s.start_at, s.timezone)) + ")</span></div>" +
         '<div class="muted">' + esc(s.reason) + "</div>" +
         '<div class="gain">On y gagne : ' + esc(s.gain) + "</div></div>";
     }).join("") || '<p class="muted">Aucun evenement ecarte' + (res && res.computed_by ? "" : " (agent anti-FOMO indisponible)") + ".</p>";

@@ -58,7 +58,7 @@ def test_antifomo_endpoint_calls_the_agent() -> None:
     body = client.get("/api/v1/antifomo").json()
     assert body["computed_by"] == "antifomo"
     planned = {i["event_id"] for d in client.get("/api/v1/plan").json()["plan"]["days"] for i in d["items"]}
-    assert len(body["skips"]) <= 3
+    assert len(body["skips"]) <= 4
     for skip in body["skips"]:
         assert skip["event_id"] not in planned
         assert skip["category_label"] and skip["reason"] and skip["gain"]
@@ -73,3 +73,35 @@ def test_plan_keeps_only_trip_days() -> None:
     planned = {i["event_id"] for d in plan["days"] for i in d["items"]}
     assert "late" not in planned and "keep" in planned
     assert {"event_id": "late", "title": "LATE", "reason": "outside_trip"} in plan["excluded"]
+
+
+def test_in_person_event_abroad_at_night_is_skipped_as_outside_hours() -> None:
+    # Eventbrite Singapore event: 18:00 +08:00 is 03:00 in San Francisco; the source value stays as is.
+    data = _data()
+    sgt = timezone(timedelta(hours=8))
+    data.events.append(Event(
+        id="sg", title="SG", timezone="Asia/Singapore", venue=Venue(name="Kingston International College"),
+        start_at=datetime(2026, 10, 28, 18, 0, tzinfo=sgt), end_at=datetime(2026, 10, 28, 21, 0, tzinfo=sgt)))
+    plan = logic.build_plan(data, [], [])
+    assert "sg" not in {i["event_id"] for d in plan["days"] for i in d["items"]}
+    excluded = next(x for x in plan["excluded"] if x["event_id"] == "sg")
+    assert excluded["reason"] == "outside_hours"
+    assert "03:00 America/Los_Angeles in person in Asia/Singapore (18:00 local)" in excluded["detail"]
+    assert data.events[-1].start_at == datetime(2026, 10, 28, 18, 0, tzinfo=sgt)
+    skips = logic.antifomo_skips(_decisions(), data, planned={"planned"})
+    assert skips[0]["event_id"] == "sg" and skips[0]["category_label"] == "hors plage horaire"
+    assert skips[0]["timezone"] == "Asia/Singapore"
+
+
+def test_online_or_daytime_events_are_kept_and_abroad_daytime_is_other_timezone() -> None:
+    tz = "America/Los_Angeles"
+    pdt = timezone(timedelta(hours=-7))
+    night = datetime(2026, 10, 28, 3, 0, tzinfo=pdt)
+    online = Event(id="o", title="O", start_at=night, venue=Venue(name="Online"))
+    assert logic.off_hours_reason(online, tz) is None
+    local_night = Event(id="n", title="N", start_at=night, timezone=tz)
+    assert logic.off_hours_reason(local_night, tz)[0] == "outside_hours"  # type: ignore[index]
+    day_abroad = Event(id="p", title="P", timezone="Europe/Paris",
+                       start_at=datetime(2026, 10, 28, 18, 0, tzinfo=timezone(timedelta(hours=1))))
+    assert logic.off_hours_reason(day_abroad, tz)[0] == "other_timezone"  # type: ignore[index]
+    assert logic.off_hours_reason(Event(id="d", title="D", start_at=night.replace(hour=9), timezone=tz), tz) is None
