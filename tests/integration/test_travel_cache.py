@@ -14,7 +14,7 @@ from conferge.integration.sources import fixture_slices
 def test_committed_cache_holds_normalized_bright_data_records_only() -> None:
     import json
 
-    for domain, name in travel_cache.FILES.items():
+    for name in travel_cache.FILES.values():
         text = (travel_cache.CACHE_DIR / name).read_text(encoding="utf-8")
         assert "<html" not in text.lower() and "linkedin" not in text.lower()
         doc = json.loads(text)
