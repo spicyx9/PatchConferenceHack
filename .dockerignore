@@ -1,0 +1,16 @@
+.git
+.venv
+**/__pycache__
+.env
+.env.*
+logs
+raw/*
+!raw/connection-photos/
+docs
+tests
+tmp
+output
+.claude
+.codex
+.pytest_cache
+.ruff_cache
