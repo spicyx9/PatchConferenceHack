@@ -175,6 +175,16 @@ def in_trip(data: DemoData, event: Event) -> bool:
     return (not first or day >= str(first)) and (not last or day <= str(last))
 
 
+_NOT_PLANNABLE_STATUSES = ("cancelled", "sold_out", "postponed")
+
+
+def not_plannable(event: Event) -> str | None:
+    """Why an event can never enter the plan (its status, or ``unrelated`` to the conference)."""
+    if event.status in _NOT_PLANNABLE_STATUSES:
+        return event.status
+    return "unrelated" if event.conference_relation == "unrelated" else None
+
+
 def build_plan(
     data: DemoData,
     goals: list[Goal],
@@ -204,28 +214,28 @@ def build_plan(
     off_hours = {e.id: why for e in data.events if (why := off_hours_reason(e, tz))}
     available = [
         e for e in data.events
-        if e.start_at and e.status not in {"cancelled", "sold_out"} and e.id not in skipped
+        if e.start_at and not not_plannable(e) and e.id not in skipped
         and in_trip(data, e) and e.id not in off_hours and e.end_at
     ]
     excluded = [
-        {"event_id": e.id, "title": e.title, "reason": e.status if e.status in {"cancelled", "sold_out"} else "skipped"}
+        {"event_id": e.id, "title": e.title, "reason": not_plannable(e) or "skipped"}
         for e in data.events
-        if e.status in {"cancelled", "sold_out"} or e.id in skipped
+        if not_plannable(e) or e.id in skipped
     ] + [
         {"event_id": e.id, "title": e.title, "reason": "outside_trip"}
         for e in data.events
-        if e.start_at and e.status not in {"cancelled", "sold_out"} and e.id not in skipped
+        if e.start_at and not not_plannable(e) and e.id not in skipped
         and not in_trip(data, e)
     ] + [
         {"event_id": e.id, "title": e.title, "reason": off_hours[e.id][0], "detail": off_hours[e.id][1]}
         for e in data.events
-        if e.id in off_hours and e.status not in {"cancelled", "sold_out"} and e.id not in skipped
+        if e.id in off_hours and not not_plannable(e) and e.id not in skipped
         and in_trip(data, e)
     ] + [
         {"event_id": e.id, "title": e.title, "reason": "no_end_time",
          "detail": "no end time in the source: cannot check overlap or travel, not scheduled"}
         for e in data.events
-        if e.start_at and not e.end_at and e.status not in {"cancelled", "sold_out"}
+        if e.start_at and not e.end_at and not not_plannable(e)
         and e.id not in skipped and in_trip(data, e) and e.id not in off_hours
     ]
     constraints = Constraints(timezone=tz, conference_site=site_name(data.conference.venue_name))
@@ -726,7 +736,7 @@ def antifomo_skips(decisions: list[dict[str, Any]], data: DemoData, limit: int =
     tz = data.conference.timezone
     for event in data.events:
         off = off_hours_reason(event, tz)
-        if off is None or not in_trip(data, event) or event.status in {"cancelled", "sold_out"}:
+        if off is None or not in_trip(data, event) or not_plannable(event):
             continue
         out.append({
             "event_id": event.id, "title": event.title, "utility": 0.0,
