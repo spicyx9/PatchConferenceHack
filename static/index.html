@@ -37,6 +37,7 @@
     <link rel="stylesheet" href="/static/travel-v2.css" />
     <link rel="stylesheet" href="/static/refinement-v2.css" />
     <link rel="stylesheet" href="/static/travel-search-v3.css" />
+    <link rel="stylesheet" href="/static/travel-search-controls.css" />
     <link rel="stylesheet" href="/static/travel-cards.css" />
   </head>
   <body>
@@ -541,74 +542,90 @@
                   <option value="one_way">One way</option>
                 </select></label
               >
-              <label
-                ><span class="sr-only" id="research-adults-label"
-                  >Travelers</span
-                ><select
-                  id="research-adults"
-                  aria-labelledby="research-adults-label"
-                >
-                  <option value="1">1 adult</option>
-                  <option value="2">2 adults</option>
-                  <option value="3">3 adults</option>
-                  <option value="4">4 adults</option>
-                </select></label
-              >
-              <label id="research-cabin-label"
-                ><span class="sr-only">Cabin</span
-                ><select id="research-cabin">
-                  <option value="economy">Economy</option>
-                  <option value="premium_economy">Premium economy</option>
-                  <option value="business">Business</option>
-                  <option value="first">First</option>
-                </select></label
-              >
-              <label id="research-rooms-label" hidden
-                ><span class="sr-only">Rooms</span
-                ><select id="research-rooms">
-                  <option value="1">1 room</option>
-                  <option value="2">2 rooms</option>
-                  <option value="3">3 rooms</option>
-                </select></label
-              >
             </div>
             <div class="travel-search-fields">
-              <label class="search-origin" id="research-origin-label"
-                ><span>From</span
-                ><input
-                  id="research-origin"
-                  type="text"
-                  placeholder="City or airport"
-                  maxlength="80"
-                  required
-                  list="travel-airports"
-              /></label>
-              <datalist id="travel-airports">
-                <option value="New York"></option>
-                <option value="JFK"></option>
-                <option value="EWR"></option>
-                <option value="LGA"></option>
-                <option value="Paris"></option>
-                <option value="London"></option>
-                <option value="Los Angeles"></option>
-              </datalist>
-              <label class="search-destination"
-                ><span id="research-destination-label">To</span
-                ><input
-                  id="research-destination"
-                  type="text"
-                  value="San Francisco"
-                  required
-                  maxlength="80"
-              /></label>
-              <label class="search-depart"
-                ><span id="research-depart-label">Departure</span
-                ><input id="research-depart" type="date" required
-              /></label>
-              <label class="search-return"
-                ><span id="research-return-label">Return</span
-                ><input id="research-return" type="date" required
-              /></label>
+              <div class="travel-route-fields">
+                <label class="search-origin" id="research-origin-label"
+                  ><span>From</span
+                  ><input
+                    id="research-origin"
+                    type="text"
+                    placeholder="City or airport"
+                    maxlength="80"
+                    required
+                    autocomplete="off"
+                /></label>
+                <button
+                  id="travel-swap-route"
+                  type="button"
+                  aria-label="Swap origin and destination"
+                >
+                  ⇄
+                </button>
+                <label class="search-destination"
+                  ><span id="research-destination-label">To</span
+                  ><input
+                    id="research-destination"
+                    type="text"
+                    value="San Francisco"
+                    autocomplete="off"
+                    required
+                    maxlength="80"
+                /></label>
+              </div>
+              <div class="travel-date-fields">
+                <label class="search-depart"
+                  ><span id="research-depart-label">Departure</span
+                  ><input id="research-depart" type="date" required
+                /></label>
+                <label class="search-return"
+                  ><span id="research-return-label">Return</span
+                  ><input id="research-return" type="date" required
+                /></label>
+              </div>
+              <div class="travel-party-field" aria-label="Travelers and rooms">
+                <label
+                  ><span class="sr-only" id="research-adults-label"
+                    >Travelers</span
+                  ><select
+                    id="research-adults"
+                    aria-labelledby="research-adults-label"
+                  >
+                    <option value="1">1 adult</option>
+                    <option value="2">2 adults</option>
+                    <option value="3">3 adults</option>
+                    <option value="4">4 adults</option>
+                    <option value="5">5 adults</option>
+                    <option value="6">6 adults</option>
+                    <option value="7">7 adults</option>
+                    <option value="8">8 adults</option>
+                    <option value="9">9 adults</option>
+                  </select></label
+                >
+                <label id="research-cabin-label"
+                  ><span class="sr-only">Cabin</span
+                  ><select id="research-cabin">
+                    <option value="economy">Economy</option>
+                    <option value="premium_economy">Premium economy</option>
+                    <option value="business">Business</option>
+                    <option value="first">First</option>
+                  </select></label
+                >
+                <label id="research-rooms-label" hidden
+                  ><span class="sr-only">Rooms</span
+                  ><select id="research-rooms">
+                    <option value="1">1 room</option>
+                    <option value="2">2 rooms</option>
+                    <option value="3">3 rooms</option>
+                    <option value="4">4 rooms</option>
+                    <option value="5">5 rooms</option>
+                    <option value="6">6 rooms</option>
+                    <option value="7">7 rooms</option>
+                    <option value="8">8 rooms</option>
+                    <option value="9">9 rooms</option>
+                  </select></label
+                >
+              </div>
               <button
                 id="travel-search-button"
                 type="submit"
@@ -665,11 +682,13 @@
           <div class="travel-results-workspace" id="travel-results-workspace">
             <aside
               class="travel-filter-sidebar"
+              id="travel-filters"
               aria-label="Filter travel results"
             >
               <button
                 type="button"
                 id="travel-mobile-filters"
+                aria-controls="travel-filters"
                 aria-expanded="false"
               >
                 Filters
@@ -748,6 +767,25 @@
                     </select></label
                   >
                 </div>
+                <div
+                  class="travel-sort-shortcuts"
+                  aria-label="Quick flight sorting"
+                >
+                  <button
+                    type="button"
+                    data-travel-sort="price"
+                    aria-pressed="true"
+                  >
+                    Cheapest
+                  </button>
+                  <button
+                    type="button"
+                    data-travel-sort="duration"
+                    aria-pressed="false"
+                  >
+                    Shortest flight
+                  </button>
+                </div>
                 <div id="flights"></div>
               </section>
               <section
@@ -759,7 +797,7 @@
               >
                 <div class="travel-results-header">
                   <div>
-                    <h2 id="trip-stays-title">Stay close to your plans</h2>
+                    <h2 id="trip-stays-title" tabindex="-1">Stay close to your plans</h2>
                     <span id="stay-result-count"></span>
                   </div>
                   <label
@@ -769,6 +807,26 @@
                       <option value="recommended">Recommended</option>
                     </select></label
                   >
+                </div>
+                <div
+                  class="travel-sort-shortcuts"
+                  aria-label="Quick stay sorting"
+                >
+                  <button
+                    type="button"
+                    data-stay-sort="distance"
+                    aria-pressed="true"
+                  >
+                    Closest to venue
+                  </button>
+                  <button
+                    type="button"
+                    data-stay-sort="price"
+                    aria-pressed="false"
+                  >
+                    Lowest price
+                  </button>
+                  <button type="button" id="travel-show-map">Show map</button>
                 </div>
                 <div id="stays"></div>
               </section>
@@ -795,9 +853,12 @@
             <div class="travel-map-heading">
               <div>
                 <span class="eyebrow">GET TO KNOW THE NEIGHBORHOOD</span>
-                <h2 id="travel-map-title">Your places in the city.</h2>
+                <h2 id="travel-map-title" tabindex="-1">Your places in the city.</h2>
                 <p id="travel-map-count" class="muted">Loading places…</p>
               </div>
+              <button id="travel-back-results" type="button" class="secondary" hidden>
+                Back to stays
+              </button>
               <button id="travel-map-fit" type="button" class="secondary">
                 Fit places
               </button>
@@ -1212,6 +1273,7 @@
     <script src="/static/galaxy3d.js"></script>
     <script src="/static/connections.js"></script>
     <script src="/static/app.js"></script>
+    <script src="/static/travel-search-controls.js"></script>
     <script src="/static/event-detail.js" defer></script>
   </body>
 </html>
