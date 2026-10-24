@@ -29,11 +29,11 @@ def _dotenv(path: Path) -> dict[str, str]:
     return values
 
 
-def env_value(name: str, default: str | None = None, *, path: Path = ENV_PATH) -> str | None:
+def env_value(name: str, default: str | None = None, *, path: Path | None = None) -> str | None:
     """Value of ``name`` from the environment, else from ``.env``, else ``default``."""
     if name in os.environ:
         return os.environ[name]
-    return _dotenv(path).get(name, default)
+    return _dotenv(path or ENV_PATH).get(name, default)
 
 
 def falkordb_address() -> tuple[str, int]:

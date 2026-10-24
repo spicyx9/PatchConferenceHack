@@ -124,7 +124,7 @@ class GraphIngestor:
 
     def _topics(self, from_kind: str, from_id: str, topics: Iterable[str], *, kind: str,
                 evidence: list[SourceEvidence], verification: str,
-                source: str | None = None) -> None:
+                source: str | None = None, observed_at: str | None = None) -> None:
         for name in dict.fromkeys(t.strip() for t in topics if t and t.strip()):
             tid = topic_id(name)
             if not tid.removeprefix("topic:"):
@@ -132,7 +132,8 @@ class GraphIngestor:
             if not self.has("Topic", tid):
                 self.write_node("Topic", tid, {"name": name, "source": source}, evidence)
             self.write_edge(from_kind, from_id, "ABOUT", "Topic", tid, evidence=evidence,
-                            verification=verification, kind=kind, source=source)
+                            verification=verification, kind=kind, source=source,
+                            **({"observed_at": observed_at} if observed_at else {}))
 
     def _venue(self, venue: Venue | None, evidence: list[SourceEvidence]) -> str | None:
         if venue is None:
@@ -306,14 +307,18 @@ class GraphIngestor:
 
     def ingest_goals(self, user_id: str, goals: Iterable[Goal]) -> None:
         for goal in goals:
+            # observed_at = when the user stated the goal; None for configured goals (never
+            # the ingest time, per the graph contract).
+            stated = goal.stated_at.isoformat() if goal.stated_at else None
             self.write_node("Goal", goal.id, {
                 "source": "user", "user_id": user_id, "description": goal.description,
                 "name": goal.description,
                 "priority": goal.priority, "tags": goal.tags, "topics": goal.topics,
                 "target_roles": goal.target_roles, "target_count": goal.target_count,
+                "observed_at": stated,
             })
             self._topics("Goal", goal.id, goal.topics, kind="targets", evidence=[],
-                         verification="user_goal", source="user")
+                         verification="user_goal", source="user", observed_at=stated)
 
     def ingest_opportunities(self, opportunities: Iterable[Opportunity]) -> None:
         for opp in opportunities:

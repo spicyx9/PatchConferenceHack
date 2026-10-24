@@ -99,7 +99,7 @@ class DemoState:
             from conferge.graph import ranking
             from conferge.graph.ingest import GraphIngestor
 
-            ids = tuple(g.id for g in self.goals)
+            ids = tuple((g.id, g.stated_at) for g in self.goals)
             if self._synced_goals != ids:  # goals live in the graph, written through GraphStore
                 GraphIngestor(store, default_mode="live").ingest_goals(USER_ID, self.goals)
                 self._synced_goals = ids
@@ -290,6 +290,8 @@ def create_app(
         goals = logic.parse_goals(req.text)
         if not goals:
             raise HTTPException(422, "no goal recognised; mention investors, founders, PMs or engineers")
+        stated = datetime.now(timezone.utc)
+        goals = [g.model_copy(update={"stated_at": stated}) for g in goals]
         state.goal_text, state.goals = req.text, goals
         state.agent_mode, state.agent_opportunities, state.agent_warnings = None, None, []
         state.invalidate()
@@ -701,7 +703,16 @@ def create_app(
     @api.post("/reset")
     def reset() -> dict[str, Any]:
         state.reset()
-        return _envelope(state, ["events", "people"], _plan_payload(), extra_warnings=_plan_warnings())
+        cleared: dict[str, int] | None = None
+        store = state.store()
+        if store is not None:
+            try:  # the graph memory too: otherwise a reset would not reset the ranking
+                cleared = store.delete_user_state(USER_ID)
+            except Exception as exc:  # noqa: BLE001 - visible, the process state is reset anyway
+                state.rank_warnings = [f"graph memory not cleared: {type(exc).__name__}"]
+        payload = _plan_payload()
+        payload["graph_memory_cleared"] = cleared
+        return _envelope(state, ["events", "people"], payload, extra_warnings=_plan_warnings())
 
     @api.post("/proposal/accept")
     def proposal_accept(req: ProposalRequest) -> dict[str, Any]:

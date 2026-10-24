@@ -14,7 +14,7 @@ def test_from_env_reads_dotenv(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
     env.write_text("BRIGHTDATA_API_KEY=k\nBRIGHTDATA_SERP_ZONE=serp_z\n", encoding="utf-8")
     for name in ("BRIGHTDATA_API_KEY", "BRIGHTDATA_SERP_ZONE", "BRIGHTDATA_UNLOCKER_ZONE"):
         monkeypatch.delenv(name, raising=False)
-    monkeypatch.setattr(settings.env_value, "__kwdefaults__", {"path": env})
+    monkeypatch.setattr(settings, "ENV_PATH", env)
     client = BrightDataClient.from_env()
     assert client.not_ready("serp") is None
     assert client.not_ready("web_unlocker") == "BRIGHTDATA_UNLOCKER_ZONE not configured"
