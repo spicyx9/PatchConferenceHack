@@ -1,0 +1,623 @@
+{
+ "run_at": "2026-10-24T19:01:24+00:00",
+ "zone": "web_unlocker1",
+ "timeout_s": 20.0,
+ "sites": [
+  {
+   "site": "githubuniverse.com",
+   "connector": "conferge/events/official/normalize.py",
+   "url": "https://githubuniverse.com/",
+   "bright_data": "Web Unlocker target",
+   "marker": "Fort Mason",
+   "marker_desc": "venue name 'Fort Mason'",
+   "attempts": {
+    "plain_default_ua": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 0.5
+    },
+    "plain_browser_ua": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 0.5
+    },
+    "brightdata_unlocker": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 17.1
+    }
+   }
+  },
+  {
+   "site": "RainFocus session catalog",
+   "connector": "conferge/events/official/rainfocus.py",
+   "url": "https://reg.githubuniverse.com/flow/github/universe26/attendee-portal/page/sessioncatalog",
+   "bright_data": "",
+   "marker": "Levi Strauss",
+   "marker_desc": "session '17 agents, one SDLC: How Levi Strauss...'",
+   "attempts": {
+    "plain_default_ua": {
+     "class": "shell_js",
+     "http_status": 200,
+     "detail": "HTTP 200, marker absent",
+     "duration_s": 0.9
+    },
+    "plain_browser_ua": {
+     "class": "shell_js",
+     "http_status": 200,
+     "detail": "HTTP 200, marker absent",
+     "duration_s": 1.0
+    },
+    "brightdata_unlocker": {
+     "class": "shell_js",
+     "http_status": 200,
+     "detail": "HTTP 200, marker absent",
+     "duration_s": 2.9
+    }
+   }
+  },
+  {
+   "site": "Luma event page",
+   "connector": "conferge/events/luma/source.py",
+   "url": "https://luma.com/x7lmea3h",
+   "bright_data": "",
+   "marker": "Agentic Hacking Challenge",
+   "marker_desc": "event 'Breakfast & Agentic Hacking Challenge'",
+   "attempts": {
+    "plain_default_ua": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 0.6
+    },
+    "plain_browser_ua": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 0.5
+    },
+    "brightdata_unlocker": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 4.0
+    }
+   }
+  },
+  {
+   "site": "Luma discover API",
+   "connector": "conferge/events/luma/source.py",
+   "url": "https://api2.luma.com/discover/get-paginated-events?latitude=37.806&longitude=-122.432&pagination_limit=20",
+   "bright_data": "",
+   "marker": "\"api_id\":\\s?\"evt-",
+   "marker_desc": "an event id (evt-...) in the JSON",
+   "attempts": {
+    "plain_default_ua": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 0.8
+    },
+    "plain_browser_ua": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 0.8
+    },
+    "brightdata_unlocker": {
+     "class": "error",
+     "http_status": null,
+     "detail": "timeout 20s",
+     "duration_s": 20.0
+    }
+   }
+  },
+  {
+   "site": "Partiful event page",
+   "connector": "conferge/events/partiful/source.py",
+   "url": "https://partiful.com/e/h6YYc5rG42JsJ9zHCjMX",
+   "bright_data": "",
+   "marker": "cine cue",
+   "marker_desc": "event 'cine cue presents'",
+   "attempts": {
+    "plain_default_ua": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 0.6
+    },
+    "plain_browser_ua": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 0.8
+    },
+    "brightdata_unlocker": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 13.3
+    }
+   }
+  },
+  {
+   "site": "Eventbrite event page",
+   "connector": "conferge/events/eventbrite/source.py",
+   "url": "https://www.eventbrite.com/e/ai-security-securing-the-age-of-autonomous-ai-tickets-2003316175609",
+   "bright_data": "",
+   "marker": "(?i)securing the age of autonomous ai",
+   "marker_desc": "event 'AI Security: Securing the Age of Autonomous AI'",
+   "attempts": {
+    "plain_default_ua": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 0.5
+    },
+    "plain_browser_ua": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 0.5
+    },
+    "brightdata_unlocker": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 3.1
+    }
+   }
+  },
+  {
+   "site": "conferenceparties.com",
+   "connector": "conferge/events/aggregators/conferenceparties.py",
+   "url": "https://conferenceparties.com/github26/",
+   "bright_data": "",
+   "marker": "Ship It Afterparty",
+   "marker_desc": "event 'Ship It Afterparty'",
+   "attempts": {
+    "plain_default_ua": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 0.5
+    },
+    "plain_browser_ua": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 0.5
+    },
+    "brightdata_unlocker": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 2.6
+    }
+   }
+  },
+  {
+   "site": "Facebook Events",
+   "connector": "conferge/events/discovery/facebook.py",
+   "url": "https://www.facebook.com/events/search/?q=github%20universe%20san%20francisco",
+   "bright_data": "dataset gd_m14sd0to1jz48ppm51",
+   "marker": "facebook\\.com\\\\?/events\\\\?/\\d{8,}|\\\"/events/\\d{8,}",
+   "marker_desc": "a link to an event page (/events/<id>)",
+   "attempts": {
+    "plain_default_ua": {
+     "class": "shell_js",
+     "http_status": 200,
+     "detail": "HTTP 200, marker absent",
+     "duration_s": 0.8
+    },
+    "plain_browser_ua": {
+     "class": "error",
+     "http_status": 400,
+     "detail": "HTTP 400",
+     "duration_s": 0.5
+    },
+    "brightdata_unlocker": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 17.0
+    }
+   }
+  },
+  {
+   "site": "Google Search (SERP)",
+   "connector": "conferge/events/discovery/serp.py",
+   "url": "https://www.google.com/search?q=github+universe+2026+side+events&gl=us",
+   "bright_data": "SERP zone",
+   "marker": "githubuniverse\\.com",
+   "marker_desc": "result linking githubuniverse.com",
+   "attempts": {
+    "plain_default_ua": {
+     "class": "shell_js",
+     "http_status": 200,
+     "detail": "HTTP 200, marker absent",
+     "duration_s": 0.4
+    },
+    "plain_browser_ua": {
+     "class": "shell_js",
+     "http_status": 200,
+     "detail": "HTTP 200, marker absent",
+     "duration_s": 0.4
+    },
+    "brightdata_unlocker": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 14.2
+    }
+   }
+  },
+  {
+   "site": "LinkedIn public profile",
+   "connector": "conferge/people/linkedin.py",
+   "url": "https://www.linkedin.com/in/pamela-s-fox/",
+   "bright_data": "dataset gd_l1viktl72bvl7bjuj0",
+   "marker": "Pamela Fox",
+   "marker_desc": "person 'Pamela Fox'",
+   "attempts": {
+    "plain_default_ua": {
+     "class": "blocked",
+     "http_status": 999,
+     "detail": "HTTP 999",
+     "duration_s": 0.5
+    },
+    "plain_browser_ua": {
+     "class": "blocked",
+     "http_status": 999,
+     "detail": "HTTP 999",
+     "duration_s": 0.8
+    },
+    "brightdata_unlocker": {
+     "class": "error",
+     "http_status": null,
+     "detail": "timeout 20s",
+     "duration_s": 20.0
+    }
+   }
+  },
+  {
+   "site": "GitHub API",
+   "connector": "conferge/people/enrich.py",
+   "url": "https://api.github.com/users/pamelafox",
+   "bright_data": "",
+   "marker": "Pamela Fox",
+   "marker_desc": "person 'Pamela Fox'",
+   "attempts": {
+    "plain_default_ua": {
+     "class": "blocked",
+     "http_status": 403,
+     "detail": "HTTP 403",
+     "duration_s": 0.5
+    },
+    "plain_browser_ua": {
+     "class": "blocked",
+     "http_status": 403,
+     "detail": "HTTP 403",
+     "duration_s": 0.4
+    },
+    "brightdata_unlocker": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 2.9
+    }
+   }
+  },
+  {
+   "site": "Booking",
+   "connector": "conferge/lodging/booking.py",
+   "url": "https://www.booking.com/searchresults.html?ss=San+Francisco&checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&selected_currency=USD",
+   "bright_data": "dataset gd_m4bf7a917zfezv9d5",
+   "marker": "(?:US\\$|\\$)\\s?\\d{2,4}(?:[.,]\\d{2})?",
+   "marker_desc": "a nightly price",
+   "attempts": {
+    "plain_default_ua": {
+     "class": "blocked",
+     "http_status": 202,
+     "detail": "HTTP 202 bot challenge (empty body to solve in JavaScript)",
+     "duration_s": 1.5
+    },
+    "plain_browser_ua": {
+     "class": "blocked",
+     "http_status": 202,
+     "detail": "HTTP 202 bot challenge (empty body to solve in JavaScript)",
+     "duration_s": 0.8
+    },
+    "brightdata_unlocker": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 13.4
+    }
+   }
+  },
+  {
+   "site": "Google Hotels",
+   "connector": "conferge/lodging/google_hotels.py",
+   "url": "https://www.google.com/travel/search?q=hotels%20in%20San%20Francisco&hl=en&gl=us&curr=USD",
+   "bright_data": "dataset gd_mg3gjfmg12tc2n5d4d",
+   "marker": "(?:US\\$|\\$)\\s?\\d{2,4}(?:[.,]\\d{2})?",
+   "marker_desc": "a nightly price",
+   "attempts": {
+    "plain_default_ua": {
+     "class": "shell_js",
+     "http_status": 200,
+     "detail": "HTTP 200, marker absent",
+     "duration_s": 1.0
+    },
+    "plain_browser_ua": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 2.9
+    },
+    "brightdata_unlocker": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 18.7
+    }
+   }
+  },
+  {
+   "site": "Airbnb",
+   "connector": "conferge/lodging/airbnb.py",
+   "url": "https://www.airbnb.com/s/San-Francisco--CA/homes?checkin=2026-10-27&checkout=2026-10-30&adults=2",
+   "bright_data": "dataset gd_ld7ll037kqy322v05",
+   "marker": "(?:US\\$|\\$)\\s?\\d{2,4}(?:[.,]\\d{2})?",
+   "marker_desc": "a price",
+   "attempts": {
+    "plain_default_ua": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 1.6
+    },
+    "plain_browser_ua": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 1.9
+    },
+    "brightdata_unlocker": {
+     "class": "shell_js",
+     "http_status": 200,
+     "detail": "HTTP 200, marker absent",
+     "duration_s": 3.4
+    }
+   }
+  },
+  {
+   "site": "Kayak",
+   "connector": "conferge/lodging/unlocker.py",
+   "url": "https://www.kayak.com/hotels/San-Francisco,CA-c13852/2026-10-27/2026-10-30/2adults",
+   "bright_data": "Web Unlocker (kayak)",
+   "marker": "(?:US\\$|\\$)\\s?\\d{2,4}(?:[.,]\\d{2})?",
+   "marker_desc": "a nightly price",
+   "attempts": {
+    "plain_default_ua": {
+     "class": "shell_js",
+     "http_status": 200,
+     "detail": "HTTP 200, marker absent",
+     "duration_s": 1.5
+    },
+    "plain_browser_ua": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 0.9
+    },
+    "brightdata_unlocker": {
+     "class": "blocked",
+     "http_status": null,
+     "detail": "Bright Data: Web Unlocker refused Residential Failed (bad_endpoint) (KYC required for this site)",
+     "duration_s": 2.8
+    }
+   }
+  },
+  {
+   "site": "Hotels.com",
+   "connector": "conferge/lodging/unlocker.py",
+   "url": "https://www.hotels.com/Hotel-Search?destination=San%20Francisco%2C%20California&startDate=2026-10-27&endDate=2026-10-30&adults=2&rooms=1",
+   "bright_data": "Web Unlocker (hotels_com)",
+   "marker": "(?:US\\$|\\$)\\s?\\d{2,4}(?:[.,]\\d{2})?",
+   "marker_desc": "a nightly price",
+   "attempts": {
+    "plain_default_ua": {
+     "class": "blocked",
+     "http_status": 429,
+     "detail": "HTTP 429",
+     "duration_s": 0.9
+    },
+    "plain_browser_ua": {
+     "class": "blocked",
+     "http_status": 429,
+     "detail": "HTTP 429",
+     "duration_s": 0.5
+    },
+    "brightdata_unlocker": {
+     "class": "blocked",
+     "http_status": null,
+     "detail": "Bright Data: Web Unlocker refused Residential Failed (bad_endpoint) (KYC required for this site)",
+     "duration_s": 4.8
+    }
+   }
+  },
+  {
+   "site": "Expedia",
+   "connector": "conferge/lodging/unlocker.py",
+   "url": "https://www.expedia.com/Hotel-Search?destination=San%20Francisco%2C%20California&startDate=2026-10-27&endDate=2026-10-30&adults=2&rooms=1",
+   "bright_data": "Web Unlocker (expedia)",
+   "marker": "(?:US\\$|\\$)\\s?\\d{2,4}(?:[.,]\\d{2})?",
+   "marker_desc": "a nightly price",
+   "attempts": {
+    "plain_default_ua": {
+     "class": "blocked",
+     "http_status": 429,
+     "detail": "HTTP 429",
+     "duration_s": 0.7
+    },
+    "plain_browser_ua": {
+     "class": "blocked",
+     "http_status": 429,
+     "detail": "HTTP 429",
+     "duration_s": 0.5
+    },
+    "brightdata_unlocker": {
+     "class": "blocked",
+     "http_status": null,
+     "detail": "Bright Data: Web Unlocker refused Residential Failed (bad_endpoint) (KYC required for this site)",
+     "duration_s": 1.3
+    }
+   }
+  },
+  {
+   "site": "Marriott",
+   "connector": "conferge/lodging/unlocker.py",
+   "url": "https://www.marriott.com/search/findHotels.mi?destinationAddress.destination=San%20Francisco%2C%20CA&fromDate=10%2F27%2F2026&toDate=10%2F30%2F2026&numberOfRooms=1&numberOfAdults=2",
+   "bright_data": "Web Unlocker (marriott)",
+   "marker": "(?:US\\$|\\$)\\s?\\d{2,4}(?:[.,]\\d{2})?",
+   "marker_desc": "a nightly price",
+   "attempts": {
+    "plain_default_ua": {
+     "class": "blocked",
+     "http_status": 403,
+     "detail": "HTTP 403",
+     "duration_s": 0.5
+    },
+    "plain_browser_ua": {
+     "class": "blocked",
+     "http_status": 403,
+     "detail": "HTTP 403",
+     "duration_s": 0.4
+    },
+    "brightdata_unlocker": {
+     "class": "blocked",
+     "http_status": null,
+     "detail": "Bright Data: Web Unlocker refused Residential Failed (bad_endpoint) (KYC required for this site)",
+     "duration_s": 2.8
+    }
+   }
+  },
+  {
+   "site": "Hilton",
+   "connector": "conferge/lodging/unlocker.py",
+   "url": "https://www.hilton.com/en/search/?query=San%20Francisco%2C%20CA&arrivalDate=2026-10-27&departureDate=2026-10-30&numRooms=1&numAdults=2",
+   "bright_data": "Web Unlocker (hilton)",
+   "marker": "(?:US\\$|\\$)\\s?\\d{2,4}(?:[.,]\\d{2})?",
+   "marker_desc": "a nightly price",
+   "attempts": {
+    "plain_default_ua": {
+     "class": "blocked",
+     "http_status": 403,
+     "detail": "HTTP 403",
+     "duration_s": 0.7
+    },
+    "plain_browser_ua": {
+     "class": "blocked",
+     "http_status": 403,
+     "detail": "HTTP 403",
+     "duration_s": 0.5
+    },
+    "brightdata_unlocker": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 16.4
+    }
+   }
+  },
+  {
+   "site": "Google Flights",
+   "connector": "conferge/flights/unlocker_provider.py, conferge/flights/brightdata_provider.py",
+   "url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+   "bright_data": "Web Unlocker + dataset gd_mhng7wen1rw0a3gvpf",
+   "marker": "(?:US\\$|\\$)\\s?\\d{2,4}(?:[.,]\\d{2})?",
+   "marker_desc": "a fare",
+   "attempts": {
+    "plain_default_ua": {
+     "class": "shell_js",
+     "http_status": 200,
+     "detail": "HTTP 200, marker absent",
+     "duration_s": 1.3
+    },
+    "plain_browser_ua": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 1.8
+    },
+    "brightdata_unlocker": {
+     "class": "ok",
+     "http_status": 200,
+     "detail": "marker found",
+     "duration_s": 8.2
+    }
+   }
+  },
+  {
+   "site": "SerpApi Google Flights",
+   "connector": "conferge/flights/serpapi_provider.py",
+   "url": "https://serpapi.com/search.json?engine=google_flights&departure_id=JFK&arrival_id=SFO&outbound_date=2026-10-27&return_date=2026-10-30&currency=USD",
+   "bright_data": "",
+   "marker": "\"best_flights\"|\"other_flights\"",
+   "marker_desc": "flight results in the JSON (API key required)",
+   "attempts": {
+    "plain_default_ua": {
+     "class": "blocked",
+     "http_status": 401,
+     "detail": "HTTP 401",
+     "duration_s": 0.5
+    },
+    "plain_browser_ua": {
+     "class": "blocked",
+     "http_status": 401,
+     "detail": "HTTP 401",
+     "duration_s": 0.5
+    },
+    "brightdata_unlocker": {
+     "class": "blocked",
+     "http_status": null,
+     "detail": "Bright Data: Web Unlocker refused Residential Failed (bad_endpoint) (KYC required for this site)",
+     "duration_s": 4.8
+    }
+   }
+  }
+ ],
+ "not_called": [
+  {
+   "site": "X (x.com)",
+   "where": "conferge/events/discovery/router.py, conferge/events/official/sessionize.py",
+   "why": "only used to classify social URLs, no connector fetches it"
+  },
+  {
+   "site": "Crunchbase",
+   "where": "-",
+   "why": "no connector references it"
+  },
+  {
+   "site": "Google Maps",
+   "where": "-",
+   "why": "no connector references it"
+  },
+  {
+   "site": "Sessionize",
+   "where": "conferge/events/official/sessionize.py",
+   "why": "needs an endpoint id; GitHub Universe 2026 publishes none, so no real page to test"
+  }
+ ],
+ "counts": {
+  "n": 21,
+  "reachable_without_brightdata": 10,
+  "reachable_with_brightdata": 12,
+  "reachable_any_path": 15
+ }
+}

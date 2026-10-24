@@ -330,12 +330,12 @@ def create_app(
     def pipeline_view() -> dict[str, Any]:
         """How every source of this demo was collected, from the RunReports of the run."""
         from conferge.core import brightdata as bd
-        from conferge.integration.pipeline_view import HEADLINE, totals
+        from conferge.integration.pipeline_view import HEADLINE, reachability, totals
 
         rows = state.data.pipeline
         return _envelope(state, [], {
             "headline": HEADLINE, "rows": rows, "totals": totals(rows),
-            "brightdata_calls": bd.calls(),
+            "brightdata_calls": bd.calls(), "reachability": reachability(),
             "note": None if rows else "no collection run in this process (dataset served as loaded)",
         }, mode_override="live" if any(r["kind"] != "fallback" for r in rows) else "fixture")
 

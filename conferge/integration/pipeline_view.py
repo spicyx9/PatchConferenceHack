@@ -8,8 +8,10 @@ Nothing here is a constant: a source that did not run has no row.
 
 from __future__ import annotations
 
+import json
 import re
 from decimal import Decimal
+from pathlib import Path
 from typing import Any
 
 from conferge.core.schemas import RunReport
@@ -75,6 +77,23 @@ def build_rows(slices: list[Any], travel: dict[str, Any], travel_fallback: dict[
                          "reason": "live results unusable; labelled fixture shown",
                          "estimated_cost_usd": None, "estimate_basis": None})
     return rows
+
+
+BLOCK_MATRIX = Path(__file__).resolve().parents[2] / "data" / "block_matrix.json"
+_ATTEMPTS = ("plain_default_ua", "plain_browser_ua", "brightdata_unlocker")
+
+
+def reachability(path: Path | None = None) -> dict[str, Any] | None:
+    """Last block-matrix run (``scripts/probes/block_matrix.py``), or None if never run."""
+    try:
+        report = json.loads((path or BLOCK_MATRIX).read_text())
+    except (OSError, ValueError):
+        return None
+    return {
+        "run_at": report["run_at"], "zone": report["zone"], "counts": report["counts"],
+        "sites": [{"site": s["site"], **{k: s["attempts"][k]["class"] for k in _ATTEMPTS},
+                   "detail": s["attempts"]["brightdata_unlocker"]["detail"]} for s in report["sites"]],
+    }
 
 
 def totals(rows: list[dict[str, Any]]) -> dict[str, Any]:
