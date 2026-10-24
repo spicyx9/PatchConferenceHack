@@ -16,7 +16,7 @@ test:
 check: lint test
 
 up:
-	docker compose up -d falkordb
+	docker compose up -d
 
 down:
 	docker compose down

@@ -13,7 +13,7 @@ One laptop, wifi optional, charger plugged in. Tick in order. If a line fails tw
 
 - [ ] `curl -s -X POST http://127.0.0.1:8000/api/v1/reset` so no meeting or simulation from rehearsal remains.
 - [ ] Browser tab 1: http://127.0.0.1:8000, **Demo** tab, scrolled to the top. The goal text is in the box. Header badge reads `fixture` (or `live` only if the live run worked at rehearsal), collection date shown.
-- [ ] Browser tab 2: http://127.0.0.1:3000, graph `conferge_demo` selected, the path query from `PITCH.md` pasted with the real person id, run once so the result is cached and the layout is stable.
+- [ ] Browser tab 2: http://127.0.0.1:3000 opens on a login form: keep the defaults (localhost, 6379, no user) and press Log in, then Skip Tutorial. Graph `conferge_demo` selected (Select Graph, left panel), the path query from `PITCH.md` pasted with the real person id, run once so the result is cached and the layout is stable. The header must read Browser v2.6.2 (served by `make up`): the Browser bundled in the 6.0.3 image fails every query with `ERR invalid graph version`.
 - [ ] Browser tab 3: `docs/submission/slides.html` on slide 1, full screen (press F or the browser's full screen), arrow keys tested.
 - [ ] Tab order left to right: slides, Conferge, FalkorDB Browser. The Driver knows the shortcut to move between tabs.
 

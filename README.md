@@ -149,7 +149,7 @@ Fort Mason Center, San Francisco, October 28 and 29. Fictional traveller from Ne
 
 ```bash
 git clone https://github.com/spicyx9/PatchConferenceHack.git && cd PatchConferenceHack
-make up        # FalkorDB 6.0.3 in Docker on 127.0.0.1:6379, Browser on :3000
+make up        # FalkorDB 6.0.3 in Docker on 127.0.0.1:6379, Browser v2.6.2 on :3000 (the one bundled in 6.0.3 fails on every query)
 make install   # Python deps with uv
 make demo      # API + UI on http://127.0.0.1:8000, demo data loaded into FalkorDB
 ```
