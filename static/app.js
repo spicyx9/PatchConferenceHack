@@ -339,6 +339,55 @@
     }).format(d);
   }
 
+  // Every amount shown carries the price_status of what it is made of (audit fix 5).
+  function priceStatusText(statuses) {
+    var list = (Array.isArray(statuses) ? statuses : [statuses]).filter(
+      function (x) {
+        return x != null;
+      },
+    );
+    return list.length
+      ? " (price " + list.join(", ") + ")"
+      : " (price status unknown)";
+  }
+
+  // What the draft is based on, and its warnings, under every draft (audit fix 2).
+  function followupFacts(draft) {
+    var labels = {
+      goal: "Goal",
+      event: "Met at",
+      person_event: "Where they speak or host",
+      company: "Company",
+      shared_topic: "Shared topic",
+      note: "Your note",
+      path: "Graph path",
+    };
+    var b = draft.based_on || {};
+    var facts = Object.keys(labels)
+      .filter(function (k) {
+        return b[k];
+      })
+      .map(function (k) {
+        return "<li><b>" + esc(labels[k]) + ":</b> " + esc(b[k]) + "</li>";
+      })
+      .join("");
+    var warns = (draft.warnings || [])
+      .map(function (w) {
+        return '<li class="warn">' + esc(w) + "</li>";
+      })
+      .join("");
+    return (
+      (facts
+        ? '<p class="small-text muted">Based on</p><ul class="small-text followup-facts">' +
+          facts +
+          "</ul>"
+        : "") +
+      (warns
+        ? '<ul class="small-text followup-warnings">' + warns + "</ul>"
+        : "")
+    );
+  }
+
   function fmtUsd(value) {
     if (value === null || value === undefined) return "Not provided";
     var n = Number(value);
@@ -771,10 +820,18 @@
       ) +
       roiTile("Meetings recorded", roi.meetings) +
       roiTile("Qualified contacts", roi.qualified_contacts) +
-      roiTile("Opportunities scoring 30+", roi.opportunities);
+      roiTile(
+        "Opportunities scoring " +
+          (roi.opportunity_threshold == null
+            ? "?"
+            : roi.opportunity_threshold) +
+          "+",
+        roi.opportunities,
+      );
     $("roi-note").textContent =
       "Indicative budget: " +
       fmtUsd(roi.budget_usd) +
+      (roi.budget_source ? " (" + roi.budget_source + ")" : "") +
       (roi.spend_note ? " · " + roi.spend_note : "");
     [
       ["roi-spend", roi.spend_usd == null ? null : fmtUsd(roi.spend_usd)],
@@ -786,8 +843,19 @@
       element.textContent = pair[1] == null ? "Not provided" : String(pair[1]);
       element.classList.toggle("unknown", pair[1] == null);
     });
+    if (roi.opportunity_threshold != null)
+      $("roi-opportunities-label").textContent =
+        "Opportunities scoring " + roi.opportunity_threshold + "+";
+    var spendStatus = roi.spend_price_status || {};
     $("roi-spend-note").textContent =
-      roi.spend_usd == null ? "Prices are not available yet." : "";
+      (roi.spend_usd == null ? "Prices are not available yet." : "") +
+      priceStatusText(
+        [].concat(
+          spendStatus.flights || [],
+          spendStatus.lodging == null ? [] : [spendStatus.lodging],
+        ),
+      ) +
+      (roi.spend_basis ? " · " + roi.spend_basis : "");
     $("stat-met").textContent = roi.meetings == null ? "—" : roi.meetings;
   }
 
@@ -1163,8 +1231,13 @@
           .join("")
       : '<p class="muted">No timing suggestions for your current agenda.</p>';
     var b = t.budget || {};
-    $("budget").textContent =
-      b.budget_usd == null ? "" : "Your budget · " + fmtUsd(b.budget_usd);
+    $("budget").title = b.budget_source || "";
+    $("budget").innerHTML =
+      b.budget_usd == null
+        ? ""
+        : esc("Your budget · " + fmtUsd(b.budget_usd)) +
+          " " +
+          sourceModeBadge(b.source_mode);
   }
 
   function updateResearchLinks() {
@@ -1206,6 +1279,13 @@
         !offer.booking_url
       );
     });
+    items = items.filter(function (offer) {
+      return (
+        $("flight-type").value === "all" ||
+        offer.trip_type === "round_trip" ||
+        offer.return_slice_collected === false
+      );
+    });
     var sort = $("flight-sort").value;
     items.sort(function (a, b) {
       if (sort === "price" && a.currency === b.currency)
@@ -1242,7 +1322,14 @@
                 [
                   first.marketing_carrier,
                   first.departure_at
-                    ? fmtTime(first.departure_at)
+                    ? shortDate(first.departure_at.slice(0, 10)) +
+                      " · " +
+                      first.departure_at.slice(11, 16) +
+                      " (UTC" +
+                      (first.departure_at.endsWith("Z")
+                        ? "+00:00"
+                        : first.departure_at.slice(-6)) +
+                      ")"
                     : "Time to be confirmed",
                   segments.length
                     ? segments.length === 1
@@ -1270,6 +1357,8 @@
                   ? fmtTime(leg.collected_at)
                   : "date unavailable",
               ) +
+              "</p><p>Price status: " +
+              esc(leg.price_status || "unknown") +
               "</p></details></article>"
             );
           })
@@ -1362,8 +1451,19 @@
     return planned ? "#353b49" : "#8f98a8";
   }
 
+  function routeKindLabel(polylines) {
+    var kinds = {};
+    (polylines || []).forEach(function (p) {
+      if (p && p.kind) kinds[p.kind] = true;
+    });
+    if (kinds.straight_line_order_of_visits)
+      return "Straight lines, not routes";
+    return Object.keys(kinds).join(", ");
+  }
+
   function renderMap(m) {
     lastMapData = m;
+    $("map-kind").textContent = routeKindLabel(m && m.polylines);
     var events = (lastEvents || envelopes.events || {}).items || [],
       byId = {};
     events.forEach(function (event) {
@@ -2460,6 +2560,15 @@
         esc(cover) +
         '" alt="Artwork for ' +
         esc(event.title) +
+        '" title="' +
+        esc(
+          "Luma capture" +
+            (event.cover_captured_at
+              ? " taken " +
+                shortDate(String(event.cover_captured_at).slice(0, 10))
+              : "") +
+            "; live events have no artwork yet",
+        ) +
         '" loading="lazy" referrerpolicy="no-referrer"></div>'
       );
     var value = String(event.id || event.title || "event"),
@@ -2581,7 +2690,7 @@
         ).includes(needle)
       );
     });
-    $("stat-people").textContent = all.length;
+    $("stat-people").textContent = p && p.total != null ? p.total : all.length; // all ranked people, not the page shown
     $("people-result-count").textContent =
       items.length + (items.length === 1 ? " person" : " people");
     $("people-cards").innerHTML = items.length
@@ -2798,6 +2907,9 @@
       if (!$("travel-research-form").reportValidity()) event.preventDefault();
     };
   });
+  $("flight-type").onchange = function () {
+    renderFlights(envelopes.flights);
+  };
   $("flight-sort").onchange = function () {
     renderFlights(envelopes.flights);
   };
@@ -2830,7 +2942,7 @@
       settle(api("/travel", null, "travel"), "travel", renderTravel, errors),
       settle(api("/stays", null, "stays"), "stays", renderStays, errors),
       settle(
-        api("/flights", null, "flights"),
+        api("/flights?alternatives=true", null, "flights"),
         "flights",
         renderFlights,
         errors,
@@ -3346,9 +3458,33 @@
         (ready[api] ? "" : ' <span class="muted">(not configured)</span>')
       );
     }
+    var c = (res && res.cached) || {};
+    var stamps = Object.keys(c.collected_at || {})
+      .map(function (k) {
+        return c.collected_at[k];
+      })
+      .sort();
+    var cachedLine = c.total
+      ? '<div class="bd-travel">From the Bright Data cache: ' +
+        esc(c.total) +
+        " records (datasets " +
+        esc(c.datasets || 0) +
+        ", Web Unlocker " +
+        esc(c.web_unlocker || 0) +
+        "), collected " +
+        esc(
+          stamps.length
+            ? fmtTime(stamps[0]) +
+                (stamps.length > 1
+                  ? " to " + fmtTime(stamps[stamps.length - 1])
+                  : "")
+            : "unknown",
+        ) +
+        "</div>"
+      : "";
     $("bd-counter").innerHTML =
       "<b>Records collected through Bright Data: " +
-      esc(u.total || 0) +
+      esc((u.total || 0) + (c.total || 0)) +
       "</b>" +
       ' <span class="bd-detail">' +
       part("datasets", "datasets") +
@@ -3357,6 +3493,7 @@
       " | " +
       part("serp", "SERP API") +
       "</span>" +
+      cachedLine +
       travel;
   }
 
@@ -3646,7 +3783,9 @@
             (next.due_at
               ? " · " + esc(shortDate(String(next.due_at).slice(0, 10)))
               : "") +
-            '</p><button class="secondary" data-action="copy-followup" data-id="' +
+            "</p>" +
+            followupFacts(draft) +
+            '<button class="secondary" data-action="copy-followup" data-id="' +
             esc(id) +
             '">Copy draft</button>';
         });

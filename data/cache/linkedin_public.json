@@ -1,0 +1,85 @@
+{
+  "profiles": [
+    {
+      "name": "Annamalai Chockalingam",
+      "company": "NVIDIA",
+      "linkedin_url": "https://www.linkedin.com/in/achocka/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": null,
+      "collected_at": "2026-10-24T20:07:29.828Z",
+      "provider": "brightdata:linkedin"
+    },
+    {
+      "name": "Camila Maia",
+      "company": "Latitude.sh",
+      "linkedin_url": "https://www.linkedin.com/in/cmaiacd/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": "sd_mvms2ssrh1bjodbs9",
+      "collected_at": "2026-10-24T19:14:49.187Z",
+      "provider": "brightdata:linkedin"
+    },
+    {
+      "name": "Dylan McCarthy",
+      "company": "Versent",
+      "linkedin_url": "https://www.linkedin.com/in/dylan-mccarthy-181199ab/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": null,
+      "collected_at": "2026-10-24T20:07:22.101Z",
+      "provider": "brightdata:linkedin"
+    },
+    {
+      "name": "Erin Mikail 🏄🏼‍♀️ Staples",
+      "company": "Tiger Data (creators of TimescaleDB)",
+      "linkedin_url": "https://www.linkedin.com/in/erinmikail/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": null,
+      "collected_at": "2026-10-24T20:07:23.606Z",
+      "provider": "brightdata:linkedin"
+    },
+    {
+      "name": "Mina Tawadrous",
+      "company": "SiriusXM",
+      "linkedin_url": "https://www.linkedin.com/in/mina-tawadrous/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": "sd_mvms2ssrh1bjodbs9",
+      "collected_at": "2026-10-24T19:16:57.530Z",
+      "provider": "brightdata:linkedin"
+    },
+    {
+      "name": "N. Jenny Hwang",
+      "company": "GitHub",
+      "linkedin_url": "https://www.linkedin.com/in/njennyhwang/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": "sd_mvms2ssrh1bjodbs9",
+      "collected_at": "2026-10-24T19:16:17.584Z",
+      "provider": "brightdata:linkedin"
+    },
+    {
+      "name": "Pierre Tempel",
+      "company": "GitHub",
+      "linkedin_url": "https://www.linkedin.com/in/pierre-tempel/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": "sd_mvms2ssrh1bjodbs9",
+      "collected_at": "2026-10-24T19:15:38.802Z",
+      "provider": "brightdata:linkedin"
+    },
+    {
+      "name": "Ryan Hecht",
+      "company": "GitHub",
+      "linkedin_url": "https://www.linkedin.com/in/ryanahecht/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": "sd_mvms2ssrh1bjodbs9",
+      "collected_at": "2026-10-24T19:16:06.865Z",
+      "provider": "brightdata:linkedin"
+    },
+    {
+      "name": "Tim Rogers",
+      "company": "GitHub",
+      "linkedin_url": "https://www.linkedin.com/in/timrogers1/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": "sd_mvms2ssrh1bjodbs9",
+      "collected_at": "2026-10-24T19:16:10.842Z",
+      "provider": "brightdata:linkedin"
+    }
+  ]
+}

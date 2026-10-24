@@ -38,9 +38,11 @@ def fixture_event(**fields: object) -> Event:
 def test_public_fixture_artwork_requires_exact_nested_id(tmp_path: Path) -> None:
     covers = artwork.load_fixture_covers(write_fixture(tmp_path / "luma.json"))
     assert covers == {"luma:evt-public": COVER}
-    assert artwork.event_artwork(fixture_event(), covers) == {
+    art = artwork.event_artwork(fixture_event(), covers)
+    assert {k: art[k] for k in ("cover_url", "cover_source_mode")} == {
         "cover_url": COVER, "cover_source_mode": "fixture",
     }
+    assert set(art) <= {"cover_url", "cover_source_mode", "cover_captured_at"}
     assert artwork.event_artwork(fixture_event(id="luma:wrong-outer-id"), covers) == {}
 
 

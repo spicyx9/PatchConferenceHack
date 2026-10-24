@@ -80,7 +80,7 @@ def load_fixture(path: Path | str = FIXTURE_PATH) -> DemoData:
     }
     return DemoData(
         conference=Conference.model_validate(raw["conference"]),
-        user=dict(raw["user"]),
+        user={**raw["user"], "source_mode": "fixture"},
         demo_goal_text=raw["demo_goal_text"],
         events=[Event.model_validate(e) for e in raw["events"]],
         people=[Person.model_validate(p) for p in raw["people"]],

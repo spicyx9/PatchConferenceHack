@@ -251,7 +251,7 @@ function pass(name) {
       source: { provider: "fixture", api: "fixture", tier: 3 },
       booking_url: "https://example.com/test-flight-" + index,
     }));
-    await page.route("**/api/v1/flights", (route) =>
+    await page.route("**/api/v1/flights?alternatives=true", (route) =>
       route.fulfill({ json: { ...observedFlights, items: testFlights } }),
     );
     await page.reload();
@@ -276,7 +276,7 @@ function pass(name) {
       await page.locator(".travel-offer").first().textContent(),
       /Sample data/,
     );
-    await page.unroute("**/api/v1/flights");
+    await page.unroute("**/api/v1/flights?alternatives=true");
     await page.reload();
     await settle();
     await nav("travel");

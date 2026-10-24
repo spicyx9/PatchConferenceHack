@@ -66,6 +66,38 @@ class DemoState:
         self.providers = found
         self.graph_probe = graph_probe
         self.reset()
+        self.restore_memory()
+
+    def restore_memory(self) -> int:
+        """Meetings already recorded in FalkorDB survive an API restart (they live in the graph).
+
+        Reads the user's MET Meeting nodes (person, note, time); nothing is written. Returns how
+        many were restored; 0 without a graph. ``POST /reset`` deletes them on purpose.
+        """
+        store = self.store()
+        if store is None:
+            return 0
+        try:
+            from conferge.graph.queries import run_read
+
+            rows = run_read(store, "MATCH (m:Meeting {user_id: $user_id, kind: 'MET'})-[:MET]->(p:Person) "
+                                   "RETURN p.id, m.note, m.at ORDER BY m.at", {"user_id": USER_ID})
+        except Exception:  # noqa: BLE001 - no graph memory: the process starts empty, as before
+            return 0
+        for row in rows:
+            if not isinstance(row, (list, tuple)) or len(row) != 3:
+                continue  # not a Meeting row: nothing to restore
+            person_id, note, at = row
+            if not isinstance(person_id, str) or self.data.person(person_id) is None:
+                continue
+            self.met[person_id] = note or ""
+            if at:
+                try:
+                    self.met_at[person_id] = datetime.fromisoformat(str(at))
+                except ValueError:
+                    pass
+        self.invalidate()
+        return len(self.met)
 
     def reset(self) -> None:
         self.data = copy.deepcopy(self.pristine)
@@ -357,8 +389,16 @@ def create_app(
         # "live" only when at least one Bright Data API can actually be called from this
         # process; without a key nothing here is live, so the label says "unknown".
         notes = [] if any(ready.values()) else ["Bright Data not configured: no API ready in this process"]
+        cached: dict[str, Any] = {"datasets": 0, "web_unlocker": 0, "serp": 0, "collected_at": {}}
+        api_key = {"dataset": "datasets", "unlocker": "web_unlocker", "serp": "serp"}
+        for r in state.data.pipeline:
+            if r.get("cached") and r["kind"] == "brightdata" and r["brightdata_api"] in api_key:
+                cached[api_key[r["brightdata_api"]]] += r["records"] or 0
+                cached["collected_at"][r["provider"]] = r["collected_at"]
+        cached["total"] = cached["datasets"] + cached["web_unlocker"] + cached["serp"]
         return _envelope(state, [], {
             "usage": bd.usage(),
+            "cached": cached,
             "ready": ready,
             "not_ready_reason": {api: client.not_ready(api) for api in apis},
         }, extra_warnings=notes, mode_override="live" if any(ready.values()) else "unknown")
@@ -440,7 +480,8 @@ def create_app(
                 "met_note": state.met.get(person.id) if person else None,
                 "linkedin": state.data.linkedin.get(person.id) if person else None,
             })
-        return _envelope(state, ["people", "companies"], {"items": cards, "count": len(cards)},
+        return _envelope(state, ["people", "companies"], {"items": cards, "count": len(cards),
+                                                               "total": len(state.opportunities())},
                          extra_warnings=_plan_warnings())
 
     def _events_view(event_type: str | None, day: str | None, min_score: float | None) -> list[dict[str, Any]]:
@@ -487,9 +528,17 @@ def create_app(
         return _envelope(state, ["stays"], {"items": items, "count": len(items)})
 
     @api.get("/flights")
-    def flights() -> dict[str, Any]:
+    def flights(alternatives: bool = False) -> dict[str, Any]:
+        offers = state.data.flights
+        domain = state.data.domains.get("flights")
+        if alternatives and domain and domain.source_mode == "cached":
+            from conferge.integration import travel_cache
+
+            cached = travel_cache.load(flight_alternatives=True)
+            if cached and "flights" in cached:
+                offers = cached["flights"].items
         items = [{**f.model_dump(mode="json"), **rt_display(f), "source": source_of(f.evidence)}
-                 for f in state.data.flights]
+                 for f in offers]
         return _envelope(state, ["flights"], {"items": items, "count": len(items)})
 
     @api.get("/travel")
@@ -642,10 +691,13 @@ def create_app(
         if found.id not in state.met:
             raise HTTPException(409, f"{person!r} not met yet: record the meeting first")
         opp = next((o for o in state.opportunities() if found.id in o.person_ids), None)
-        event = next((e for e in (state.data.event(i) for i in found.event_ids) if e is not None), None)
+        person_events = [e for e in (state.data.event(i) for i in found.event_ids) if e is not None]
+        # Where they met is known only if the user attended one of the person's events.
+        met_event = next((e for e in person_events if e.id in state.attended), None)
         draft = draft_followup(
             found, conference=state.data.conference, goal=best_goal(found, state.goals),
-            event=event, company=state.data.company(found.company_id),
+            event=met_event, person_event=person_events[0] if person_events else None,
+            company=state.data.company(found.company_id),
             note=state.met.get(found.id) or None,
             path_text=opp.rationale if opp else None, met_at=state.met_at.get(found.id),
         )

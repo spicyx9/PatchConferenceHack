@@ -106,12 +106,19 @@ def draft_followup(
     conference: Conference,
     goal: Goal | None,
     event: Event | None = None,
+    person_event: Event | None = None,
     company: Company | None = None,
     note: str | None = None,
     path_text: str | None = None,
     met_at: datetime | None = None,
 ) -> FollowUpDraft:
-    """Build the draft from the meeting facts. Pure and deterministic."""
+    """Build the draft from the meeting facts. Pure and deterministic.
+
+    ``event`` is where the user met the person, and only when that is known (the user marked
+    it attended and the person is listed there); otherwise the draft says the conference.
+    ``person_event`` is where the person speaks or hosts: context in ``based_on``, never
+    written as the place of the meeting.
+    """
     when = met_at or datetime.now(timezone.utc)
     if when.tzinfo is None:
         raise ValueError("met_at must be timezone-aware")
@@ -144,6 +151,7 @@ def draft_followup(
     based_on: dict[str, Any] = {
         "goal": goal.description if goal else None,
         "event": event.title if event else None,
+        "person_event": person_event.title if person_event else None,
         "company": company.name if company else None,
         "shared_topic": topic,
         "note": note_clean or None,

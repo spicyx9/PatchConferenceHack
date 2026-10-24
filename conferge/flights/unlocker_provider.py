@@ -212,39 +212,50 @@ class GoogleFlightsUnlockerProvider:
             rows, collected_at, url = await asyncio.shield(self._pages[key])
         except Exception as exc:  # noqa: BLE001 - refusal, timeout, transport: visible failure
             return [], self._report(started, "failed", errors=[f"{type(exc).__name__}: {exc}"[:200]])
-        offers, warnings = [], []
-        for row in rows:
-            segs = row.get("segments") or []
-            if not segs or segs[0]["origin"] != origin or segs[-1]["destination"] != destination:
-                continue
-            evidence = [SourceEvidence(provider=PROVIDER, source_mode="live", source_url=url,
-                                       collected_at=collected_at,
-                                       raw_ref=f"unlocker:{self.client.unlocker_zone}:google_flights")]
-            raw = RawOffer(
-                provider=PROVIDER, trip_type="one_way",
-                slices=[RawSlice(segments=[RawSegment(
-                    origin=s["origin"], destination=s["destination"],
-                    departure=s["departure_local"], arrival=s["arrival_local"],
-                    marketing_carrier=s["carrier"], flight_number=s["flight_number"],
-                ) for s in segs])],
-                price=None, booking_url=url, booking_url_type="google_flights_search",
-                evidence=evidence,
-                warnings=["outbound_only: Google lists the return after an outbound is chosen"],
-            )
-            try:
-                offer = build_offer(raw, collected_at)
-            except NormalizationError as exc:
-                warnings.append(f"normalization_failed: {exc}")
-                continue
-            if row.get("price"):
-                scope = "round trip total" if row.get("price_scope") == "round_trip_total" else "scope unknown"
-                offer = offer.model_copy(update={
-                    "raw_price_text": f"{row['price']} {row.get('currency') or ''} {scope}".strip(),
-                    "warnings": [*offer.warnings, "round_trip_total_not_split: observed price "
-                                 "kept in raw_price_text, not as a one-way total_price"],
-                })
-            offers.append(offer)
+        offers, warnings = offers_from_rows(rows, url, collected_at, self.client.unlocker_zone,
+                                            origin=origin, destination=destination)
         status = "ok" if offers else "failed"
         return offers, self._report(started, status, fetched=len(offers),
                                     errors=[] if offers else [f"no itinerary {origin}-{destination}"],
                                     warnings=warnings)
+
+
+def offers_from_rows(rows: list[dict], url: str, collected_at: datetime, zone: str | None, *,
+                     origin: str | None = None, destination: str | None = None,
+                     ) -> tuple[list[FlightOffer], list[str]]:
+    """Parsed Google Flights rows -> outbound offers; the round-trip total stays verbatim."""
+    offers: list[FlightOffer] = []
+    warnings: list[str] = []
+    for row in rows:
+        segs = row.get("segments") or []
+        if not segs or (origin and segs[0]["origin"] != origin) or (
+                destination and segs[-1]["destination"] != destination):
+            continue
+        evidence = [SourceEvidence(provider=PROVIDER, source_mode="live", source_url=url,
+                                   collected_at=collected_at,
+                                   raw_ref=f"unlocker:{zone}:google_flights")]
+        raw = RawOffer(
+            provider=PROVIDER, trip_type="one_way",
+            slices=[RawSlice(segments=[RawSegment(
+                origin=s["origin"], destination=s["destination"],
+                departure=s["departure_local"], arrival=s["arrival_local"],
+                marketing_carrier=s["carrier"], flight_number=s["flight_number"],
+            ) for s in segs])],
+            price=None, booking_url=url, booking_url_type="google_flights_search",
+            evidence=evidence,
+            warnings=["outbound_only: Google lists the return after an outbound is chosen"],
+        )
+        try:
+            offer = build_offer(raw, collected_at)
+        except NormalizationError as exc:
+            warnings.append(f"normalization_failed: {exc}")
+            continue
+        if row.get("price"):
+            scope = "round trip total" if row.get("price_scope") == "round_trip_total" else "scope unknown"
+            offer = offer.model_copy(update={
+                "raw_price_text": f"{row['price']} {row.get('currency') or ''} {scope}".strip(),
+                "warnings": [*offer.warnings, "round_trip_total_not_split: observed price "
+                             "kept in raw_price_text, not as a one-way total_price"],
+            })
+        offers.append(offer)
+    return offers, warnings

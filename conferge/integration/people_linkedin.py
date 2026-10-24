@@ -49,6 +49,10 @@ NEW_COLLECTION_MIN_MISSING = 4  # a new collection only when more than 3 targets
 ROOT = Path(__file__).resolve().parents[2]
 PEOPLE_FIXTURE = ROOT / "fixtures" / "people.json"
 PROBE_DIR = ROOT / "data" / "probes"
+# Committed, public fields only, for name-matched speakers: what a fresh clone shows.
+PUBLIC_CACHE = ROOT / "data" / "cache" / "linkedin_public.json"
+PUBLIC_FIELDS = ("name", "headline", "company", "linkedin_url", "dataset_id", "snapshot_id",
+                 "collected_at", "provider")
 POOL_MAX_AGE = timedelta(hours=24)
 _COMPANY_SUFFIXES = {"inc", "llc", "ltd", "corp", "corporation", "co", "company", "gmbh", "sas",
                      "sa", "plc", "limited", "incorporated"}
@@ -288,6 +292,43 @@ def load_pool(directory: Path = PROBE_DIR, *, now: datetime | None = None,
                                           collected_at=body["collected_at"], source_mode="cached")
             if profile and profile.linkedin_url not in pool:
                 pool[profile.linkedin_url] = profile
+    return pool
+
+
+def write_public(enrichments: Iterable[Enrichment], path: Path = PUBLIC_CACHE) -> Path:
+    """Public LinkedIn fields of the name-matched profiles, nothing else (no about, location,
+    followers or raw record). ``headline`` only when the profile has one."""
+    entries = []
+    for e in sorted(enrichments, key=lambda e: e.profile.linkedin_url):
+        p = e.profile
+        entry = {"name": p.name, "headline": p.headline, "company": p.company,
+                 "linkedin_url": p.linkedin_url, "dataset_id": DATASET_ID,
+                 "snapshot_id": p.snapshot_id, "collected_at": p.collected_at, "provider": PROVIDER}
+        if not entry["headline"]:
+            del entry["headline"]
+        entries.append(entry)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps({"profiles": entries}, indent=2, ensure_ascii=False) + "\n",
+                    encoding="utf-8")
+    return path
+
+
+def load_public(path: Path = PUBLIC_CACHE) -> dict[str, LinkedInProfile]:
+    """canonical linkedin_url -> committed public profile, labelled ``cached`` (no age limit:
+    each entry keeps its own collected_at)."""
+    try:
+        body = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    pool: dict[str, LinkedInProfile] = {}
+    for entry in body.get("profiles", []):
+        url = _canon(_str(entry.get("linkedin_url")))
+        if not url:
+            continue
+        pool[url] = LinkedInProfile(
+            linkedin_url=url, name=_str(entry.get("name")), headline=_str(entry.get("headline")),
+            company=_str(entry.get("company")), snapshot_id=_str(entry.get("snapshot_id")),
+            collected_at=_str(entry.get("collected_at")), source_mode="cached")
     return pool
 
 
@@ -532,9 +573,11 @@ class EnrichResult:
 
 
 async def enrich(targets: list[Person], companies: Iterable[Company], store: Any | None, *,
-                 allow_collect: bool, directory: Path = PROBE_DIR) -> EnrichResult:
-    """Saved profiles first; one collection for the absent targets only if more than 3."""
-    pool = load_pool(directory)
+                 allow_collect: bool, directory: Path = PROBE_DIR,
+                 public: Path | None = PUBLIC_CACHE) -> EnrichResult:
+    """Saved profiles first (fresh files in ``directory`` over the committed public cache);
+    one collection for the absent targets only if more than 3."""
+    pool = {**(load_public(public) if public else {}), **load_pool(directory)}
     absent = missing(targets, pool)
     from_files = len(targets) - len(absent)
     collection = None
