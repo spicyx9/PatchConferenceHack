@@ -18,7 +18,7 @@ owned_ok() { # $1 pr number, $2 owned prefixes csv
 }
 while true; do
   cd "$ROOT"; git fetch origin --quiet 2>/dev/null
-  ACTIVE=0; ROWS=""; MERGED_WAVE1=0
+  ACTIVE=0; ROWS=""; MERGED_WAVE1=0; MERGED_WAVE2=0
   while IFS='|' read -r ID SLUG TOOL OWNED; do
     [[ -z "$ID" || "$ID" == \#* ]] && continue
     STATE="queued"; PR=""; CI=""; NOTE=""
@@ -28,7 +28,7 @@ while true; do
     if [[ -n "$PRN" ]]; then
       PR="#$PRN"; STATE="pr_open"
       CHK="$(gh pr checks "$PRN" --json state --jq '[.[].state] | unique | join(",")' 2>/dev/null)"; CI="${CHK:-pending}"
-      if [[ "$CI" == "SUCCESS" ]]; then
+      if [[ "$CI" == "SUCCESS" ]] && ! alive "$ID"; then
         if owned_ok "$PRN" "$OWNED"; then
           if gh pr merge "$PRN" --squash --delete-branch=false >> "$LOGS/watch.log" 2>&1; then STATE="merged"; touch "$LOGS/w${ID}.merged"; NOTE="merged $(date -u +%H:%M)"; else NOTE="merge failed, see watch.log"; fi
         else NOTE="CI green but files out of scope: needs integrator"; fi
@@ -41,19 +41,40 @@ while true; do
     [[ -f "$LOGS/w${ID}.merged" ]] && STATE="merged"
     [[ "$STATE" == "running" || "$STATE" == "pr_open" ]] && ACTIVE=$((ACTIVE+1))
     case " 01 02 03 08 12 13 " in *" $ID "*) [[ "$STATE" == "merged" ]] && MERGED_WAVE1=$((MERGED_WAVE1+1)) ;; esac
+    case " 04 09 10 11 " in *" $ID "*) [[ "$STATE" == "merged" ]] && MERGED_WAVE2=$((MERGED_WAVE2+1)) ;; esac
     ROWS+="| w${ID} | ${SLUG} | ${TOOL} | ${STATE} | ${LAST} | ${PR:--} | ${CI:--} | ${NOTE:--} |\n"
   done < <(grep -v '^#' "$CONF")
   # wave 2 when slots free and at least 3 of wave 1 merged
-  if [[ ! -f "$WAVE2_STARTED" && $ACTIVE -le $((MAX_ACTIVE-2)) && $MERGED_WAVE1 -ge 3 ]]; then
-    bash "$ROOT/scripts/ops/launch_wave.sh" 2 >> "$LOGS/watch.log" 2>&1; touch "$WAVE2_STARTED"
+  if [[ ! -f "$WAVE2_STARTED" && $ACTIVE -le $((MAX_ACTIVE-4)) && $MERGED_WAVE1 -ge 3 ]]; then
+    if bash "$ROOT/scripts/ops/launch_wave.sh" 2 >> "$LOGS/watch.log" 2>&1; then
+      touch "$WAVE2_STARTED"
+      ACTIVE=$((ACTIVE+4))
+    else
+      echo "$(date -u +%FT%TZ) wave2 launch incomplete; retry manually, see logs" >> "$LOGS/watch.log"
+    fi
+  fi
+  # w15 is automatically launched once both fixture waves are merged.
+  if [[ $MERGED_WAVE1 -eq 6 && $MERGED_WAVE2 -eq 4 && ! -f "$LOGS/w15.pid" ]]; then
+    bash "$ROOT/scripts/ops/launch_worker.sh" 15 integration claude >> "$LOGS/watch.log" 2>&1 || true
   fi
   {
-    echo "# STATUS (auto, $(date -u +%FT%TZ)) active=${ACTIVE} wave1_merged=${MERGED_WAVE1}/6"
+    echo "# STATUS (auto, $(date -u +%FT%TZ)) active=${ACTIVE} wave1_merged=${MERGED_WAVE1}/6 wave2_merged=${MERGED_WAVE2}/4"
+    echo
+    echo "## Morning summary"
+    echo "- Wave 1: $MERGED_WAVE1/6 merged; wave 2: $MERGED_WAVE2/4 merged."
+    echo "- w15 integration: $([[ -f "$LOGS/w15.merged" ]] && echo merged || [[ -f "$LOGS/w15.pid" ]] && echo started || echo pending)."
+    echo "- Pending live credentials and probes: w05 lodging, w06 flights, w07 people and w04 Bright Data live."
+    echo "- Morning checklist: verify GitHub CI and PRs, inspect fixture labels, configure Bright Data and OpenAI keys locally, test real FalkorDB traversal, rehearse the 3-minute scenario."
+    echo
     echo "| window | slug | tool | state | last commit | PR | CI | note |"
     echo "|---|---|---|---|---|---|---|---|"
     printf "%b" "$ROWS"
     echo; echo "Logs: logs/wNN.log, logs/watch.log. Relaunch a worker: bash scripts/ops/launch_worker.sh NN slug. Launch wave 3 (needs keys in .env of each worktree): bash scripts/ops/launch_wave.sh 3"
   } > "$ROOT/STATUS.md"
   cd "$ROOT" && git add STATUS.md >/dev/null 2>&1 && git commit -qm "status: auto $(date -u +%H:%M)" >/dev/null 2>&1 && git pull --rebase --quiet origin main >/dev/null 2>&1 && git push --quiet origin main >/dev/null 2>&1
+  if [[ -f "$LOGS/w15.merged" ]]; then
+    echo "$(date -u +%FT%TZ) integration merged; watchdog finished" >> "$LOGS/watch.log"
+    break
+  fi
   sleep "$INTERVAL"
 done

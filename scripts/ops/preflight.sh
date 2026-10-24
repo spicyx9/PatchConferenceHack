@@ -8,6 +8,9 @@ chk command -v gh
 chk gh auth status
 chk command -v uv
 chk command -v docker
+chk docker info
+chk bash -c '[[ "$(git -C "$0" branch --show-current)" == "main" ]]' "$ROOT"
+chk bash -c '[[ -z "$(git -C "$0" status --porcelain)" ]]' "$ROOT"
 chk git -C "$ROOT" diff --quiet
 chk test -f .claude/settings.json
 chk test -f scripts/ops/workers.conf

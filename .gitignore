@@ -25,3 +25,6 @@ raw/
 probes/*.json
 probes/*.html
 probes/*.ndjson
+
+# Worker logs, PIDs, and snapshots (never upload provider responses or secrets)
+/logs/

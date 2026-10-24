@@ -9,7 +9,19 @@ case "${1:-}" in
   3) IDS="05 06 07" ;;
   *) IDS="$*" ;;
 esac
+active_count() {
+  local count=0 pidfile
+  for pidfile in "${ROOT}"/logs/w*.pid; do
+    [[ -f "$pidfile" ]] || continue
+    kill -0 "$(cat "$pidfile")" 2>/dev/null && count=$((count+1))
+  done
+  echo "$count"
+}
 for ID in $IDS; do
+  if [[ $(active_count) -ge 6 ]]; then
+    echo "Worker limit reached (6). Not launching remaining workers." >&2
+    exit 1
+  fi
   LINE="$(grep -E "^${ID}\|" "$CONF")"
   SLUG="$(echo "$LINE" | cut -d'|' -f2)"; TOOL="$(echo "$LINE" | cut -d'|' -f3)"
   bash "${ROOT}/scripts/ops/launch_worker.sh" "$ID" "$SLUG" "$TOOL"
