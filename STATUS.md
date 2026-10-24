@@ -1,4 +1,4 @@
-# STATUS (auto, 2026-10-24T16:42:00Z) active=2 wave1_merged=6/6 wave2_merged=4/4
+# STATUS (auto, 2026-10-24T16:52:23Z) active=0 wave1_merged=6/6 wave2_merged=4/4
 
 ## Morning summary
 - Wave 1: 6/6 merged (6/6 finished); wave 2: 4/4 merged (4/4 finished).
@@ -12,9 +12,9 @@
 | w02 | eventbrite-aggregators | claude | merged | - | - | - | - |
 | w03 | official | claude | merged | b161748 10 hours ago | - | - | - |
 | w04 | discovery | claude | merged | 459702a 9 hours ago | - | - | - |
-| w05 | lodging | claude | running | - | - | - | - |
-| w06 | flights | claude | running | cb127c2 11 seconds ago | - | - | - |
-| w07 | people | claude | merged | 4d4fa32 7 minutes ago | #12 | SUCCESS | merged 16:41 |
+| w05 | lodging | claude | merged | dd7128c 9 minutes ago | #14 | SUCCESS | merged 16:52 |
+| w06 | flights | claude | merged | cb127c2 11 minutes ago | #13 | SUCCESS | merged 16:52 |
+| w07 | people | claude | merged | 4d4fa32 17 minutes ago | - | - | - |
 | w08 | graph | claude | merged | 101e871 10 hours ago | - | - | - |
 | w09 | planner | claude | merged | 25a7b3c 9 hours ago | - | - | - |
 | w10 | antifomo | claude | merged | 8df341d 9 hours ago | - | - | - |
