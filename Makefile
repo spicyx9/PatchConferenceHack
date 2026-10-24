@@ -1,4 +1,10 @@
 .PHONY: predemo install lint format test check up down demo e2e
+SHELL := /bin/bash
+
+# FalkorDB port for every target (up, demo, predemo, e2e): one variable, one default.
+# Order: make ... FALKORDB_PORT=N, then the environment, then FALKORDB_PORT in .env, then 6379.
+FALKORDB_PORT ?= $(or $(shell grep -E '^FALKORDB_PORT=[0-9]+' .env 2>/dev/null | tail -n1 | cut -d= -f2),6379)
+export FALKORDB_PORT
 
 install:
 	uv sync --group dev
@@ -15,7 +21,12 @@ test:
 
 check: lint test
 
+# Fails in under 5 s when the port is taken by anything but this project's FalkorDB.
 up:
+	@if [[ -z "$$(docker compose ps -q --status running falkordb 2>/dev/null)" ]] && \
+	   (exec 3<>/dev/tcp/127.0.0.1/$(FALKORDB_PORT)) 2>/dev/null; then \
+	  echo "Port $(FALKORDB_PORT) busy: run make up FALKORDB_PORT=6402 && make demo FALKORDB_PORT=6402"; \
+	  exit 1; fi
 	docker compose up -d
 
 down:
@@ -32,9 +43,9 @@ demo:
 predemo:
 	DEMO_PORT=$(DEMO_PORT) bash scripts/predemo.sh
 
-# Full journey against the real API process and FalkorDB (FALKORDB_PORT, default 6380).
+# Full journey against the real API process and FalkorDB (FALKORDB_PORT, see the top).
 e2e:
-	CONFERGE_E2E=1 FALKORDB_PORT=$${FALKORDB_PORT:-6380} uv run pytest -v -rA -p no:cacheprovider tests/e2e
+	CONFERGE_E2E=1 uv run pytest -v -rA -p no:cacheprovider tests/e2e
 
 # Each window owns scripts/probes/<name>.py; the shared Makefile never changes.
 probe-%:
