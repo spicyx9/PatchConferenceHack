@@ -25,7 +25,7 @@ owned_ok() { # $1 pr number, $2 owned prefixes csv
 }
 while true; do
   cd "$ROOT"; git fetch origin --quiet 2>/dev/null
-  ACTIVE=0; ROWS=""; MERGED_WAVE1=0; MERGED_WAVE2=0; DONE_WAVE1=0; DONE_WAVE2=0
+  ACTIVE=0; ROWS=""; MERGED_WAVE1=0; MERGED_WAVE2=0; DONE_WAVE1=0; DONE_WAVE2=0; TOTAL=0; DONE_ALL=0
   while IFS='|' read -r ID SLUG TOOL OWNED; do
     [[ -z "$ID" || "$ID" == \#* ]] && continue
     STATE="queued"; PR=""; CI=""; NOTE=""
@@ -59,7 +59,9 @@ while true; do
     [[ "$STATE" == "running" || "$STATE" == "pr_open" ]] && ACTIVE=$((ACTIVE+1))
     case " 01 02 03 08 12 13 " in *" $ID "*) [[ "$STATE" == "merged" ]] && MERGED_WAVE1=$((MERGED_WAVE1+1)) ;; esac
     case " 04 09 10 11 " in *" $ID "*) [[ "$STATE" == "merged" ]] && MERGED_WAVE2=$((MERGED_WAVE2+1)) ;; esac
+    TOTAL=$((TOTAL+1))
     if [[ "$STATE" == "merged" || "$STATE" == "failed" ]]; then
+      DONE_ALL=$((DONE_ALL+1))
       case " 01 02 03 08 12 13 " in *" $ID "*) DONE_WAVE1=$((DONE_WAVE1+1)) ;; esac
       case " 04 09 10 11 " in *" $ID "*) DONE_WAVE2=$((DONE_WAVE2+1)) ;; esac
     fi
@@ -84,7 +86,7 @@ while true; do
     echo
     echo "## Morning summary"
     echo "- Wave 1: $MERGED_WAVE1/6 merged ($DONE_WAVE1/6 finished); wave 2: $MERGED_WAVE2/4 merged ($DONE_WAVE2/4 finished)."
-    echo "- w15 integration: $([[ -f "$LOGS/w15.merged" ]] && echo merged || [[ -f "$LOGS/w15.pid" ]] && echo started || echo pending)."
+    echo "- w15 integration: $(if [[ -f "$LOGS/w15.merged" ]]; then echo merged; elif [[ -f "$LOGS/w15.pid" ]]; then echo started; else echo pending; fi)."
     echo "- Pending live credentials and probes: w05 lodging, w06 flights, w07 people and w04 Bright Data live."
     echo "- Morning checklist: verify GitHub CI and PRs, inspect fixture labels, configure Bright Data and OpenAI keys locally, test real FalkorDB traversal, rehearse the 3-minute scenario."
     echo
@@ -96,8 +98,10 @@ while true; do
   if ! (cd "$ROOT" && git add STATUS.md >/dev/null 2>&1 && git commit -qm "status: auto $(date -u +%H:%M)" >/dev/null 2>&1 && git pull --rebase --quiet origin main >/dev/null 2>&1 && git push --quiet origin main >/dev/null 2>&1); then
     echo "$(date -u +%FT%TZ) WARNING: STATUS.md could not be committed/pushed; check local git state" >> "$LOGS/watch.log"
   fi
-  if [[ -f "$LOGS/w15.merged" ]]; then
-    echo "$(date -u +%FT%TZ) integration merged; watchdog finished" >> "$LOGS/watch.log"
+  # Stop only when integration is merged and every configured worker is merged or failed
+  # (wave 3 can still be running after w15 merged).
+  if [[ -f "$LOGS/w15.merged" && $DONE_ALL -eq $TOTAL ]]; then
+    echo "$(date -u +%FT%TZ) integration merged and all workers done; watchdog finished" >> "$LOGS/watch.log"
     break
   fi
   sleep "$INTERVAL"
