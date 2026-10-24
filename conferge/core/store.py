@@ -19,6 +19,15 @@ _ALLOWED_EDGES = frozenset({
     "EVIDENCED_BY", "MET", "LED_TO", "CONNECTED_TO", "EXHIBITS_AT",
 })
 _PROP_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+# DDL only (FalkorDB 6.x): range index on id for every allowed label, full-text for search.
+# Labels cannot be query parameters, hence the allowlist above.
+INDEX_STATEMENTS = tuple(
+    f"CREATE INDEX FOR (n:{label}) ON (n.id)" for label in sorted(_ALLOWED_NODE_LABELS)
+) + (
+    "CREATE FULLTEXT INDEX FOR (p:Person) ON (p.name, p.bio)",
+    "CREATE FULLTEXT INDEX FOR (e:Event) ON (e.title)",
+)
+_INDEXED_GRAPHS: set[str] = set()
 
 
 class GraphQuery(Protocol):
@@ -44,6 +53,28 @@ class GraphStore:
             assignments.append(f"{alias}.{key} = ${param_name}")
             params[param_name] = value
         return (" SET " + ", ".join(assignments) if assignments else ""), params
+
+    def ensure_indexes(self, *, force: bool = False) -> list[str]:
+        """Create the indexes once per graph name; an existing index is not an error."""
+        key = str(getattr(self.graph, "name", id(self.graph)))
+        if key in _INDEXED_GRAPHS and not force:
+            return []
+        errors = []
+        for statement in INDEX_STATEMENTS:
+            try:
+                self.graph.query(statement)
+            except Exception as exc:  # noqa: BLE001 - "already indexed" on a second run
+                if "already indexed" not in str(exc):
+                    errors.append(f"{statement}: {exc}")
+        if not errors:
+            _INDEXED_GRAPHS.add(key)
+        return errors
+
+    def index_status(self) -> list[dict[str, Any]]:
+        """CALL db.indexes(): label, properties, types, status (OPERATIONAL when ready)."""
+        rows = self.graph.query("CALL db.indexes()").result_set
+        return [{"label": r[0], "properties": list(r[1]), "types": dict(r[2]), "status": r[7]}
+                for r in rows]
 
     def merge_node(
         self, kind: str, node_id: str, properties: dict[str, Any] | None = None
@@ -88,4 +119,6 @@ def connect_graph():  # type: ignore[no-untyped-def]
     if env_value("FALKORDB_PASSWORD"):
         args["password"] = env_value("FALKORDB_PASSWORD")
     db = FalkorDB(**args)
-    return GraphStore(db.select_graph(env_value("FALKORDB_GRAPH", "conferge") or "conferge"))
+    store = GraphStore(db.select_graph(env_value("FALKORDB_GRAPH", "conferge") or "conferge"))
+    store.ensure_indexes()
+    return store

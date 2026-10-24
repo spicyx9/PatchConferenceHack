@@ -61,6 +61,7 @@ def main() -> int:
         except Exception:  # noqa: BLE001 - absent graph
             pass
         store = connect_graph()
+        index_errors = store.ensure_indexes(force=True)  # the graph was just deleted
         bundle = GraphBundle(
             source_mode="live" if assembly.data_mode == "live" else "fixture",
             note=f"scripts/run_demo.py, data_mode={assembly.data_mode}",
@@ -73,6 +74,9 @@ def main() -> int:
         ingest = ingest_bundle(store, bundle)
         print(f"graph {args.graph}: {ingest.nodes} node writes, {ingest.edges} edge writes, "
               f"{len(ingest.skipped_edges)} skipped, in {time.perf_counter() - t1:.2f}s")
+        states = {(i["label"], s) for i in store.index_status() for s in [i["status"]]}
+        print(f"indexes: {len(states)} labels, status {sorted({s for _, s in states})}"
+              + (f", errors: {index_errors}" if index_errors else ""))
 
     app = create_app(data=assembly.demo)
     uvicorn.run(app, host=args.host, port=args.port, log_level="warning")

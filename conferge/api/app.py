@@ -239,6 +239,30 @@ def create_app(
     def plan() -> dict[str, Any]:
         return _envelope(state, ["events", "people"], _plan_payload(), extra_warnings=_plan_warnings())
 
+    @api.get("/search")
+    def search(q: str = Query(..., min_length=2, max_length=100),
+               limit: int = Query(10, ge=1, le=50)) -> dict[str, Any]:
+        store = state.store()
+        if store is not None:
+            try:
+                from conferge.graph import queries as graph_queries
+
+                found = graph_queries.search(store, q, limit)
+                return _envelope(state, ["people", "events"], {**found, "backend": "falkordb"},
+                                 extra_warnings=["full-text search in FalkorDB (Person name/bio, Event title)"])
+            except Exception:  # noqa: BLE001 - fall back to the API dataset, visibly
+                pass
+        needle = q.casefold()
+        people = [{"id": p.id, "name": p.name, "title": p.title, "score": None}
+                  for p in state.data.people
+                  if needle in f"{p.name} {p.bio or ''}".casefold()][:limit]
+        events = [{"id": e.id, "title": e.title,
+                   "start_at": e.start_at.isoformat() if e.start_at else None, "score": None}
+                  for e in state.data.events if needle in e.title.casefold()][:limit]
+        return _envelope(state, ["people", "events"],
+                         {"people": people, "events": events, "backend": logic.FALLBACK},
+                         extra_warnings=["FalkorDB not reachable: substring search on the API dataset"])
+
     @api.get("/antifomo")
     async def antifomo() -> dict[str, Any]:
         agent = state.providers.agents.get("antifomo")

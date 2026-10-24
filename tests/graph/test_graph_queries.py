@@ -294,3 +294,11 @@ def test_path_user_to_person_tries_signatures_in_order():
 
 def test_path_user_to_person_without_match_is_empty():
     assert q.path_user_to_person(FakeGraph([]), "demo-user", "p-x") == {"rows": [], "paths": []}
+
+
+def test_search_prefix_terms_and_strips_query_syntax():
+    graph = FakeGraph([(q.Q_SEARCH_PEOPLE, [["p-alice", "Alice", "Founder", 2.0]])])
+    result = q.search(graph, "ali* (agents)|")
+    assert result["people"] == [{"id": "p-alice", "name": "Alice", "title": "Founder", "score": 2.0}]
+    assert graph.calls[0][1] == {"q": "ali* agents*", "limit": 10}
+    assert q.search(graph, "%%") == {"people": [], "events": []}

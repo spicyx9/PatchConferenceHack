@@ -10,6 +10,7 @@ ready for cytoscape and for ``conferge.graph.explain.path_to_text``.
 from __future__ import annotations
 
 import math
+import re
 from collections import defaultdict
 from typing import Any
 
@@ -142,6 +143,15 @@ Q_UI_EDGES = (
     "RETURN a.id, type(r), b.id, properties(r)"
 )
 Q_NODE_COUNTS = "MATCH (n) RETURN labels(n)[0], count(n)"
+# -- full-text search (indexes from GraphStore.ensure_indexes) ---------------------
+Q_SEARCH_PEOPLE = (
+    "CALL db.idx.fulltext.queryNodes('Person', $q) YIELD node, score "
+    "RETURN node.id, node.name, node.title, score ORDER BY score DESC LIMIT $limit"
+)
+Q_SEARCH_EVENTS = (
+    "CALL db.idx.fulltext.queryNodes('Event', $q) YIELD node, score "
+    "RETURN node.id, node.title, node.start_at, score ORDER BY score DESC LIMIT $limit"
+)
 Q_EDGE_COUNTS = "MATCH ()-[r]->() RETURN type(r), count(r)"
 
 READ_QUERIES = {name: value for name, value in globals().items() if name.startswith("Q_")}
@@ -347,6 +357,23 @@ def path_user_to_person(target: GraphStore | GraphQuery, user_id: str, person_id
             paths.append(path)
         return {"rows": rows, "paths": paths}
     return {"rows": [], "paths": []}
+
+
+_FULLTEXT_SPECIAL = re.compile(r"[^\w\s]+", re.UNICODE)
+
+
+def search(target: GraphStore | GraphQuery, text: str, limit: int = 10) -> dict[str, list[dict[str, Any]]]:
+    """Full-text search on Person(name, bio) and Event(title); words are prefix-matched."""
+    words = _FULLTEXT_SPECIAL.sub(" ", text).split()
+    if not words:
+        return {"people": [], "events": []}
+    query = " ".join(f"{w}*" for w in words)
+    params = {"q": query, "limit": limit}
+    people = [{"id": r[0], "name": r[1], "title": r[2], "score": r[3]}
+              for r in run_read(target, Q_SEARCH_PEOPLE, params)]
+    events = [{"id": r[0], "title": r[1], "start_at": r[2], "score": r[3]}
+              for r in run_read(target, Q_SEARCH_EVENTS, params)]
+    return {"people": people, "events": events}
 
 
 def people_met_before(target: GraphStore | GraphQuery, user_id: str) -> GraphResult:

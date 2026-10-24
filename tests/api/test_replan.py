@@ -65,3 +65,9 @@ def test_knock_on_removals_are_explained_as_displaced() -> None:
     assert [r["removed"]["event_id"] for r in replan] == [event.id, "other"]
     assert "simulated change" in replan[0]["reason"]
     assert "simulated" not in replan[1]["reason"] and replan[1]["replacement"] is None
+
+
+def test_search_falls_back_to_api_dataset_without_falkordb() -> None:
+    body = _client().get("/api/v1/search", params={"q": "founders"}).json()
+    assert body["backend"] == "api-fallback"
+    assert body["events"] or body["people"]
