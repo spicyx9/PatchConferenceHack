@@ -1,4 +1,4 @@
-.PHONY: install lint format test check up down demo e2e
+.PHONY: predemo install lint format test check up down demo e2e
 
 install:
 	uv sync --group dev
@@ -27,6 +27,10 @@ DEMO_PORT ?= 8000
 DEMO_ARGS ?=
 demo:
 	uv run python scripts/run_demo.py --port $(DEMO_PORT) $(DEMO_ARGS)
+
+# 5 minutes before the demo: FalkorDB check, fresh demo on a reset graph, OK/FAIL table.
+predemo:
+	DEMO_PORT=$(DEMO_PORT) bash scripts/predemo.sh
 
 # Full journey against the real API process and FalkorDB (FALKORDB_PORT, default 6380).
 e2e:
