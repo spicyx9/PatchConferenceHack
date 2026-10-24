@@ -252,15 +252,7 @@ function pass(name) {
     );
     assert((await page.locator(".fare-card").count()) > 1);
     pass("Travel query returns collected offers matching the chosen criteria");
-    const places = page.locator("#map-places button");
-    assert((await places.count()) > 1);
-    await places.first().click();
-    assert.match(
-      await page.locator("#travel-place-detail").textContent(),
-      /conference/i,
-    );
-    await page.locator("#travel-map-scope").selectOption("nearby");
-    assert((await places.count()) > 1);
+    assert.equal(await page.locator("#travel-map-panel, #travel-show-map").count(), 0);
     await nav("graph");
     const choices = page.locator("#connection-choices button");
     await choices.nth(1).click();
@@ -270,7 +262,7 @@ function pass(name) {
         .length > 0,
     );
     pass(
-      "Quiet discovery, illustrated people, synchronized map selection, and actionable connections",
+      "Quiet discovery, illustrated people, focused travel search, and actionable connections",
     );
 
     for (const width of [1440, 390]) {

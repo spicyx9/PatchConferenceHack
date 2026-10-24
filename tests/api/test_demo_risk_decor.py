@@ -56,10 +56,11 @@ def test_map_routes_are_declared_straight_lines() -> None:
     assert {p["kind"] for p in body["polylines"]} == {"straight_line_order_of_visits"}
 
 
-def test_ui_shows_the_decor_labels() -> None:
+def test_ui_preserves_decor_labels_without_the_removed_travel_map() -> None:
     js = open("static/app.js", encoding="utf-8").read()
     html = open("static/index.html", encoding="utf-8").read()
-    assert "Straight lines, not routes" in js
     assert "sourceModeBadge(b.source_mode)" in js
     assert ">Noted</button>" in js and ">Noted as preferred</span>" in js and ">Accept</button>" not in js
-    assert 'id="map-kind"' in html
+    assert 'id="map-kind"' not in html
+    assert 'id="travel-map-panel"' not in html
+    assert 'id="story-map"' in html

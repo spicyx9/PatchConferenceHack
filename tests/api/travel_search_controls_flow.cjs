@@ -185,20 +185,7 @@ assert(["127.0.0.1", "localhost"].includes(new URL(base).hostname));
   await page.locator("#research-adults").click();
   await page.locator("#travel-title").click();
   assert.equal(await popup.isVisible(), false);
-  await page.locator("#travel-show-map").click();
-  assert.equal(
-    await page
-      .locator("#travel-map-title")
-      .evaluate((el) => el === document.activeElement),
-    true,
-  );
-  await page.locator("#travel-back-results").click();
-  assert.equal(
-    await page
-      .locator("#trip-stays-title")
-      .evaluate((el) => el === document.activeElement),
-    true,
-  );
+  assert.equal(await page.locator("#travel-show-map, #travel-back-results").count(),0);
   await page.getByRole("link", { name: "Travel", exact: true }).click();
   await page.locator("#travel-flights-tab").click();
   await settled();
@@ -228,7 +215,7 @@ assert(["127.0.0.1", "localhost"].includes(new URL(base).hostname));
     "false",
   );
   console.log(
-    "PASS outside dismissal, map access and synchronized sort shortcuts",
+    "PASS outside dismissal and synchronized sort shortcuts",
   );
   for (const width of [320, 390, 768, 930, 1440]) {
     await page.setViewportSize({ width, height: 844 });

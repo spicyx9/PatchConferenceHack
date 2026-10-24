@@ -191,25 +191,8 @@ const pass = (name) => {
     stays.items.every((x) => x.total_price != null),
     "Real stay totals",
   );
-  const mappedStays = stays.items.filter(
-    (x) =>
-      typeof x.venue?.latitude === "number" &&
-      typeof x.venue?.longitude === "number",
-  );
-  assert(mappedStays.length > 0, "Collected hotels have source coordinates");
-  for (const stay of mappedStays) {
-    const marker = page
-      .locator("[data-travel-place]")
-      .filter({ hasText: stay.name });
-    assert.equal(
-      await marker.count(),
-      1,
-      "Actual hotel appears in synchronized map list: " + stay.name,
-    );
-  }
-  pass(
-    "Stays return actual priced offers for matching two-adult occupancy and map the hotels",
-  );
+  assert.equal(await page.locator("#travel-show-map").count(), 0);
+  pass("Stays return actual priced offers without a duplicate map action");
   let collectionPolls = 0;
   const pendingStay = async (route) => route.fulfill({
     status: 202, contentType: "application/json",
@@ -240,16 +223,7 @@ const pass = (name) => {
     "No reuse of two-adult price for one adult",
   );
   assert.equal(await page.locator("#stays .trip-stay").count(), 0);
-  for (const stay of mappedStays)
-    assert.equal(
-      await page
-        .locator("[data-travel-place]")
-        .filter({ hasText: stay.name })
-        .count(),
-      0,
-      "Stale hotel removed from map",
-    );
-  pass("Occupancy mismatch clears stay quotes and their map options");
+  pass("Occupancy mismatch clears stay quotes");
   await page.locator("#research-return").fill("2026-10-26");
   assert.equal(
     await page
@@ -263,10 +237,11 @@ const pass = (name) => {
   assert(await page.locator("#travel-research-form").isHidden());
   assert(await page.locator("#travel-results-workspace").isHidden());
   assert(await page.locator("#travel-local-note").isVisible());
-  assert(await page.locator("#travel-map-title").isVisible());
+  assert.equal(await page.locator("#travel-map-panel").count(), 0);
+  assert.doesNotMatch(await page.locator("#travel-local-note").innerText(), /map/i);
   await page.locator("#travel-resume").click();
   assert(await page.locator("#travel-research-form").isVisible());
-  pass("Local or already-booked path retains map and can resume search");
+  pass("Local or already-booked path can resume search without promising a removed map");
   const axePath = process.env.AXE_PATH || "/tmp/conferge-axe.min.js";
   if (fs.existsSync(axePath)) {
     await page.addScriptTag({ path: axePath });

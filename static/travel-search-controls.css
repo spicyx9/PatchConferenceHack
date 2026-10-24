@@ -188,9 +188,6 @@
   color: #282320;
   border-color: #84786c;
 }
-#tab-travel #travel-show-map {
-  margin-left: auto;
-}
 #tab-travel .travel-search-popover {
   position: absolute;
   z-index: 40;

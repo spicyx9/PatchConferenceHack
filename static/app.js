@@ -48,10 +48,7 @@
   };
 
   var envelopes = {}; // latest envelope per endpoint key
-  var map = null;
-  var mapLayer = null;
   var cy = null;
-  var lastMapData = null;
 
   // Helpers
 
@@ -1419,9 +1416,6 @@
     $("travel-stays-tab").setAttribute("aria-selected", String(!flights));
     $("flight-results-panel").hidden = !flights;
     $("stay-results-panel").hidden = flights;
-    $("travel-map-panel").hidden = flights;
-    if (!flights && map)
-      setTimeout(function () { map.invalidateSize(); }, 0);
     $("travel-title").textContent = flights
       ? "Find your flight."
       : "Find a place to stay.";
@@ -1666,7 +1660,6 @@
     items = items.filter(function (st) {
       return st.total_price == null || Number(st.total_price) <= max;
     });
-    if (s && s.query && lastMapData) renderMap(lastMapData);
     $("trip-stays-title").textContent =
       "Stays in " +
       ((s && s.query && s.query.destination) ||
@@ -1698,321 +1691,6 @@
           "No stays match these dates, guests and rooms. Try different criteria or continue with a travel provider.",
           (s && s.fallback_url) || $("research-stays-link").href,
         );
-  }
-
-  var travelMapState = { day: "all", scope: "planned", selected: null };
-  function markerColor(kind, planned) {
-    if (kind === "conference") return "#7c5cc4";
-    if (kind === "stay") return "#58778b";
-    return planned ? "#353b49" : "#8f98a8";
-  }
-
-  function routeKindLabel(polylines) {
-    var kinds = {};
-    (polylines || []).forEach(function (p) {
-      if (p && p.kind) kinds[p.kind] = true;
-    });
-    if (kinds.straight_line_order_of_visits)
-      return "Straight lines, not routes";
-    return Object.keys(kinds).join(", ");
-  }
-
-  function renderMap(m) {
-    lastMapData = m;
-    $("map-kind").textContent = routeKindLabel(m && m.polylines);
-    var events = (lastEvents || envelopes.events || {}).items || [],
-      byId = {};
-    events.forEach(function (event) {
-      byId[event.id] = event;
-    });
-    var mapPlaces = ((m && m.markers) || []).slice();
-    if (travelSearchResults.stays) {
-      mapPlaces = mapPlaces.filter(function (place) {
-        return place.kind !== "stay";
-      });
-      travelSearchResults.stays.items.forEach(function (stay) {
-        var venue = stay.venue || {};
-        if (
-          typeof venue.latitude === "number" &&
-          typeof venue.longitude === "number"
-        )
-          mapPlaces.push({
-            id: stay.id,
-            kind: "stay",
-            label: stay.name,
-            lat: venue.latitude,
-            lng: venue.longitude,
-            precision: venue.coordinate_precision,
-          });
-      });
-    }
-    var markers = mapPlaces.filter(function (place) {
-      return (
-        typeof place.lat === "number" &&
-        typeof place.lng === "number" &&
-        !isPlaceholderStay(place.label)
-      );
-    });
-    var anchor = markers.find(function (place) {
-      return place.kind === "conference";
-    });
-    var local = markers.filter(function (place) {
-      return (
-        !anchor ||
-        (Math.abs(place.lat - anchor.lat) < 0.7 &&
-          Math.abs(place.lng - anchor.lng) < 0.9)
-      );
-    });
-    function eventDay(place) {
-      var event = byId[place.id];
-      return event && event.start_at
-        ? new Intl.DateTimeFormat("en-CA", {
-            timeZone: EVENT_TZ,
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-          }).format(new Date(event.start_at))
-        : null;
-    }
-    var days = [];
-    local.forEach(function (place) {
-      var day = eventDay(place);
-      if (day && days.indexOf(day) === -1) days.push(day);
-    });
-    days.sort();
-    var daySelect = $("travel-map-day"),
-      scopeSelect = $("travel-map-scope");
-    daySelect.innerHTML =
-      '<option value="all">All days</option>' +
-      days
-        .map(function (day) {
-          return (
-            '<option value="' +
-            esc(day) +
-            '">' +
-            esc(shortDate(day)) +
-            "</option>"
-          );
-        })
-        .join("");
-    if (travelMapState.day !== "all" && days.indexOf(travelMapState.day) === -1)
-      travelMapState.day = "all";
-    daySelect.value = travelMapState.day;
-    scopeSelect.value = travelMapState.scope;
-    daySelect.onchange = function () {
-      travelMapState.day = this.value;
-      travelMapState.selected = null;
-      renderMap(lastMapData);
-    };
-    scopeSelect.onchange = function () {
-      travelMapState.scope = this.value;
-      travelMapState.selected = null;
-      renderMap(lastMapData);
-    };
-    var candidates = local.filter(function (place) {
-      return (
-        place.kind === "conference" ||
-        ((place.kind === "stay" ||
-          travelMapState.scope === "nearby" ||
-          place.planned) &&
-          (place.kind === "stay" ||
-            travelMapState.day === "all" ||
-            eventDay(place) === travelMapState.day))
-      );
-    });
-    candidates.sort(function (a, b) {
-      if (a.kind === "conference") return -1;
-      if (b.kind === "conference") return 1;
-      if (a.planned !== b.planned) return a.planned ? -1 : 1;
-      return ((byId[a.id] || {}).start_at || "z").localeCompare(
-        (byId[b.id] || {}).start_at || "z",
-      );
-    });
-    var cap =
-        travelSearchKind === "stays"
-          ? 50
-          : travelMapState.scope === "nearby"
-            ? 30
-            : 13,
-      visible = candidates.slice(0, cap);
-    if (
-      !visible.some(function (place) {
-        return place.id === travelMapState.selected;
-      })
-    )
-      travelMapState.selected = (visible[1] || visible[0] || {}).id || null;
-    $("travel-map-count").textContent =
-      visible.length +
-      " places" +
-      (candidates.length > cap
-        ? " · first " + (cap - 1) + " events shown"
-        : "");
-    $("travel-map-note").textContent =
-      travelMapState.day === "all"
-        ? "Choose a day to see your visits in order. Locations may be approximate."
-        : "The dotted line shows visit order, not walking or driving directions.";
-    var leafletMarkers = {},
-      bounds = [],
-      selected = null;
-    function showSelection(id, center) {
-      travelMapState.selected = id;
-      selected = visible.find(function (place) {
-        return place.id === id;
-      });
-      if (!selected) return;
-      var event = byId[id];
-      $("travel-place-detail").innerHTML =
-        '<span class="eyebrow">' +
-        esc(
-          selected.kind === "conference"
-            ? "CONFERENCE"
-            : selected.kind === "stay"
-              ? "STAY OPTION"
-              : selected.planned
-                ? "IN YOUR AGENDA"
-                : "NEARBY EVENT",
-        ) +
-        "</span><h3>" +
-        esc(selected.label) +
-        "</h3><p>" +
-        esc(
-          event
-            ? fmtTime(event.start_at, event.timezone)
-            : selected.kind === "stay"
-              ? "A place to stay · check the offer for your dates"
-              : "Your conference venue",
-        ) +
-        '</p><p class="small-text muted">' +
-        esc(
-          selected.precision === "exact"
-            ? "Venue location"
-            : "Approximate location · confirm before you go",
-        ) +
-        "</p>" +
-        (event
-          ? '<button class="text-button" data-action="event" data-id="' +
-            esc(id) +
-            '">View event details</button>'
-          : "");
-      $("map-places")
-        .querySelectorAll("[data-travel-place]")
-        .forEach(function (button) {
-          var active = button.getAttribute("data-travel-place") === id;
-          button.setAttribute("aria-pressed", String(active));
-        });
-      Object.keys(leafletMarkers).forEach(function (key) {
-        var marker = leafletMarkers[key];
-        marker.setZIndexOffset(key === id ? 1000 : 0);
-        var element = marker.getElement();
-        if (element) element.classList.toggle("is-selected", key === id);
-      });
-      if (center && map && leafletMarkers[id])
-        map.flyTo([selected.lat, selected.lng], Math.max(map.getZoom(), 14), {
-          duration: 0.4,
-          animate: !window.matchMedia("(prefers-reduced-motion: reduce)")
-            .matches,
-        });
-    }
-    $("map-places").innerHTML = visible.length
-      ? visible
-          .map(function (place, index) {
-            var event = byId[place.id];
-            return (
-              '<button type="button" class="travel-place-row" data-travel-place="' +
-              esc(place.id) +
-              '" aria-pressed="false"><span class="travel-place-number' +
-              (place.kind === "conference" ? " is-conference" : "") +
-              '">' +
-              (place.kind === "conference" ? "C" : index) +
-              "</span><span><strong>" +
-              esc(place.label) +
-              "</strong><small>" +
-              esc(
-                event
-                  ? shortDate(eventDay(place)) +
-                      " · " +
-                      fmtHour(event.start_at, event.timezone)
-                  : place.kind === "stay"
-                    ? "Stay option"
-                    : "Conference venue",
-              ) +
-              "</small></span></button>"
-            );
-          })
-          .join("")
-      : '<p class="travel-map-empty">No locations for this selection. Try nearby events or another day.</p>';
-    $("map-places")
-      .querySelectorAll("[data-travel-place]")
-      .forEach(function (button) {
-        button.onclick = function () {
-          showSelection(this.getAttribute("data-travel-place"), true);
-        };
-      });
-    var el = $("map");
-    if (typeof L === "undefined") {
-      el.innerHTML =
-        '<div class="map-fallback"><h3>The map could not load.</h3><p>Select a place in the list to explore its details.</p></div>';
-      showSelection(travelMapState.selected, false);
-      $("travel-map-fit").disabled = true;
-      return;
-    }
-    $("travel-map-fit").disabled = false;
-    if (!map) {
-      map = L.map(el, { scrollWheelZoom: false, zoomControl: true }).setView(
-        anchor ? [anchor.lat, anchor.lng] : [37.79, -122.42],
-        13,
-      );
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution: "&copy; OpenStreetMap contributors",
-      }).addTo(map);
-    }
-    if (mapLayer) mapLayer.remove();
-    mapLayer = L.layerGroup().addTo(map);
-    visible.forEach(function (place, index) {
-      bounds.push([place.lat, place.lng]);
-      var marker = L.marker([place.lat, place.lng], {
-        icon: L.divIcon({
-          className:
-            "travel-map-marker" +
-            (place.kind === "conference" ? " is-conference" : ""),
-          html:
-            "<span>" + (place.kind === "conference" ? "C" : index) + "</span>",
-          iconSize: [32, 36],
-          iconAnchor: [16, 36],
-        }),
-        title: place.label,
-        keyboard: true,
-      }).addTo(mapLayer);
-      marker.on("click", function () {
-        showSelection(place.id, true);
-      });
-      leafletMarkers[place.id] = marker;
-    });
-    if (travelMapState.day !== "all") {
-      var route = visible
-        .filter(function (place) {
-          return place.kind === "event" && place.planned;
-        })
-        .map(function (place) {
-          return [place.lat, place.lng];
-        });
-      if (route.length > 1)
-        L.polyline(route, {
-          color: "#74628f",
-          weight: 2,
-          opacity: 0.65,
-          dashArray: "4 7",
-          interactive: false,
-        }).addTo(mapLayer);
-    }
-    function fitPlaces() {
-      if (bounds.length)
-        map.fitBounds(bounds, { padding: [46, 46], maxZoom: 14 });
-    }
-    $("travel-map-fit").onclick = fitPlaces;
-    fitPlaces();
-    showSelection(travelMapState.selected, false);
   }
 
   function renderLegend(types) {
@@ -3322,18 +3000,12 @@
     $("travel-research-form").hidden = true;
     $("travel-results-workspace").hidden = true;
     $("travel-local-note").hidden = false;
-    $("travel-map-panel").hidden = false;
     $("travel-offer-context").hidden = true;
-    if (map)
-      setTimeout(function () {
-        map.invalidateSize();
-      }, 0);
   };
   $("travel-resume").onclick = function () {
     $("travel-research-form").hidden = false;
     $("travel-results-workspace").hidden = false;
     $("travel-local-note").hidden = true;
-    $("travel-map-panel").hidden = travelSearchKind === "flights";
     $("travel-offer-context").hidden = false;
   };
   function refreshAll() {
@@ -3367,7 +3039,9 @@
         renderFlights,
         errors,
       ),
-      settle(api("/travel/map", null, "map"), "map", renderMap, errors),
+      settle(api("/travel/map", null, "map"), "map", function (data) {
+        if (envelopes.plan) renderStoryPlan(envelopes.plan, data);
+      }, errors),
       settle(api("/graph", null, "graph"), "connections", renderGraph, errors),
       settle(api("/graph/gaps", null, null), "graph gaps", renderGraphGaps, errors),
       settle(
@@ -3409,7 +3083,6 @@
           searchTravel("cached");
         }
         if (envelopes.people) renderPeople(envelopes.people);
-        if (lastMapData) renderMap(lastMapData);
         if (selectedConnectionId)
           renderConnectionSelection(selectedConnectionId);
         return settle(
@@ -4275,11 +3948,6 @@
     if (name === "story" && storyMap)
       setTimeout(function () {
         storyMap.invalidateSize();
-      }, 50);
-    if (name === "travel" && map)
-      setTimeout(function () {
-        map.invalidateSize();
-        if (lastMapData) renderMap(lastMapData);
       }, 50);
     if (name === "graph" && cy)
       setTimeout(function () {
