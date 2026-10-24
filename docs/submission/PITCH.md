@@ -74,7 +74,7 @@ What the FalkorDB judge should have seen by 2:40: a multi-hop query, the path sh
 
 ### What the Bright Data judge should have seen
 
-What `make demo` shows today (see `SUBMISSION.md`, "What is real"): events and people are the October 24 public snapshot, labelled **Sample data**; stays, flights and the LinkedIn cards came through Bright Data earlier today (datasets and Web Unlocker) and are served from the cache of those runs, labelled **Cached**, with their collection time. Say it that way: "collected through Bright Data this afternoon, stored in the graph, nothing fetched while you watch". Point at the **Data pipeline** table (records per run, Bright Data API, collection time) and at its reachability rows (sites reachable with and without Bright Data). Say the KYC figure only as a projection.
+What `make demo` shows today (see `SUBMISSION.md`, "What is real"): events and people are the October 24 public snapshot, labelled **Sample data**; stays, flights and the LinkedIn cards came through Bright Data earlier today (datasets and Web Unlocker) and are served from the cache of those runs, labelled **Cached**, with their collection time. Say it that way: "collected through Bright Data this afternoon, stored in the graph, nothing fetched while you watch". Point at the **Data pipeline** table (records per run, Bright Data API, collection time) and at its reachability rows (sites reachable with and without Bright Data). Say the KYC figure only as a projection. Name only what returned records: the Booking, Airbnb and LinkedIn datasets and Web Unlocker. The Google Flights dataset and the Google Hotels dataset are implemented, no record received yet: never present them as used.
 
 ## Backup when the laptop is in trouble
 

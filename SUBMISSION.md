@@ -34,8 +34,8 @@ Bright Data (datasets, Web Unlocker, SERP)   public endpoints (RainFocus, Luma, 
                       FastAPI  ->  one-page UI (Data pipeline panel shows every run)
 ```
 
-- **Bright Data collects** what a plain request cannot reach: hotels and Airbnb through datasets, Google Flights through Web Unlocker, LinkedIn profiles through a dataset, SERP for long-tail discovery.
-- **Bright Data products used**: SERP API, Web Unlocker, Datasets (Booking, Airbnb, LinkedIn, Crunchbase).
+- **Bright Data collects** what a plain request cannot reach: Booking and Airbnb stays through datasets, the Google Flights page through Web Unlocker, LinkedIn and Crunchbase profiles through datasets (their URLs found with the SERP API), venues through the Google Maps dataset. The Google Flights dataset, the Google Hotels dataset and SERP event discovery are implemented, no record received yet.
+- **Bright Data products used** (records received): SERP API, Web Unlocker, Datasets (Booking, Airbnb, LinkedIn, Crunchbase, Google Maps).
 - **FalkorDB stores the relationships**: goal, topic, event, person, company, venue; the "why this person" answer is a real path query, and the user's meetings live in the same graph.
 - **Agents never fetch the web at query time**: all reasoning runs on the stored, deduplicated, provenance-tagged graph.
 
@@ -59,6 +59,7 @@ Bright Data (datasets, Web Unlocker, SERP)   public endpoints (RainFocus, Luma, 
 
 - **Real, collected through Bright Data**: the stays, flight itineraries, LinkedIn profiles and Crunchbase rows above, served from the cache of those runs (`data_source: cached`) with their collection time; nothing is fetched at query time.
 - **Fixture**: the events and people are a snapshot of the public collection of 2026-10-24 (RainFocus, Luma, Partiful, Eventbrite, conferenceparties), labelled `fixture` in every response and in the UI badge, so the demo runs offline on stage. The traveller (New York, October 27 to 30, budget $2,500) is the demo persona from `fixtures/api.json`, labelled as such in the UI.
+- **Implemented, no record received yet**: Google Flights dataset `gd_mhng7wen1rw0a3gvpf` (3 snapshots still `running` after 396 s on 2026-10-24), Google Hotels dataset `gd_mg3gjfmg12tc2n5d4d` (0 records, provider `no_peers` at 18:12 UTC), SERP discovery, Facebook Events. Their record mapping has never met a real row; the demo keeps `--travel cached`.
 - **Simulated**: the sold-out change; every later response carries a warning until Reset.
 - **Projected, not measured**: the reachability once the account KYC is approved (see the table); Kayak, Hotels.com, Expedia and Marriott are refused by Web Unlocker until then.
 - **Never invented**: no price, attendance or guest list. A public speaker is never presented as a confirmed side-event attendee, a missing price stays `unknown` with its `price_status`, and a follow-up draft never claims where you met someone unless you marked that event attended.

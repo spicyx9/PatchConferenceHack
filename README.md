@@ -24,9 +24,11 @@ Most attendees go home with a few business cards and the feeling they were in th
 
 ```
   Public sources                      Bright Data (when a key is set)
-  RainFocus catalog, Luma,            SERP discovery, Web Unlocker,
-  Partiful, Eventbrite,               datasets: Google Flights, Booking,
-  conference-party aggregators        LinkedIn, Facebook Events
+  RainFocus catalog, Luma,            Web Unlocker (Google Flights page), SERP
+  Partiful, Eventbrite,               (LinkedIn, Crunchbase URLs), datasets:
+  conference-party aggregators        Booking, Airbnb, LinkedIn, Crunchbase,
+                                      Google Maps (Google Flights, Google Hotels,
+                                      Facebook Events: implemented, no record yet)
             |                                   |
             +-----------------+-----------------+
                               v
@@ -159,7 +161,7 @@ By default `make demo` makes no Bright Data call at startup: travel comes from l
 ## Tracks
 
 - **FalkorDB**: the graph of record, written only through `GraphStore` MERGE methods, queried for explainable goal to person paths, conflicts, replanning impact and meeting memory.
-- **Bright Data**: SERP discovery, Web Unlocker, Google Flights, Booking and LinkedIn datasets are implemented behind one client (`conferge/core/brightdata.py`); without a key they report `missing_credentials` instead of inventing data.
+- **Bright Data**: one client (`conferge/core/brightdata.py`) behind every connector; without a key they report `missing_credentials` instead of inventing data. Records received on 2026-10-24: Booking and Airbnb datasets (21 stays), Web Unlocker (34 Google Flights itineraries from one page), LinkedIn dataset (15 profiles, 6 of them found by SERP), Crunchbase and Google Maps datasets. Implemented, no record received yet: Google Flights dataset (snapshots still `running` after 396 s), Google Hotels dataset (0 records, provider `no_peers` at 18:12 UTC), SERP event discovery, Facebook Events.
 - **Qodo**: installed on the repository as the GitHub app `qodo-code-review[bot]`; it posted a PR summary on pull requests 6 and 7 and its full review on pull request 6 failed on Qodo's side. No Qodo finding has been acted on yet.
 
 ## Honesty: live vs fixture today
@@ -167,8 +169,9 @@ By default `make demo` makes no Bright Data call at startup: travel comes from l
 Checked against the code on main (2026-10-24) and the wiring audit of 2026-10-24 (read-only audit, not yet merged).
 
 - **Live and working without keys**: official GitHub Universe catalog (RainFocus), Luma, Partiful, Eventbrite and conference-party aggregators (`run_demo.py --mode live`), and the FalkorDB graph itself.
-- **The demo runs on a snapshot** of that public collection captured on 2026-10-24, labelled `fixture` in every API response and in the UI badge, so it works offline on stage. Stays, flights, LinkedIn and Crunchbase come from the Bright Data cache of the same day, labelled `cached`.
-- **Implemented, waiting for a Bright Data key**: SERP discovery, flights, hotels, LinkedIn enrichment. Without `BRIGHTDATA_API_KEY` the client reports "Bright Data key missing", `GET /brightdata` answers `data_source: unknown` with a warning, lodging providers report `missing_credentials`, and flights and stays fall back to fixtures labelled as such.
+- **The demo runs on a snapshot** of that public collection captured on 2026-10-24, labelled `fixture` in every API response and in the UI badge, so it works offline on stage.
+- **Collected through Bright Data on 2026-10-24 and served from `data/cache/`** (labelled `cached`, with the collection time on every card): 21 stays (Booking and Airbnb datasets), 34 Google Flights itineraries (Web Unlocker, one page, the round-trip total shown on the page, return slice not collected), 15 LinkedIn profiles, Crunchbase funding rows.
+- **Implemented, no record received yet**: Google Flights dataset, Google Hotels dataset, SERP event discovery, Facebook Events. Without `BRIGHTDATA_API_KEY` the client reports "Bright Data key missing", `GET /brightdata` answers `data_source: unknown` with a warning, lodging providers report `missing_credentials`, and flights and stays fall back to fixtures labelled as such.
 - **The traveller profile is a fixture even in live mode**: New York, October 27 to 30, budget $2,500 come from `fixtures/api.json`; the budget block carries `source_mode: fixture` in `GET /travel` and a FIXTURE badge in the UI.
 - **People are the speakers of the official catalog**: LinkedIn profiles and Crunchbase funding are read from the Bright Data cache at startup, never fetched at query time.
 - **Ground travel is not in the demo**: BART, OSRM and walking connectors exist with a probe (`make probe-travel`) but the demo API does not call them; the map draws straight lines in visit order and says so.
