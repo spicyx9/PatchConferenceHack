@@ -57,7 +57,7 @@ def image_format(body: bytes) -> tuple[str, str] | None:
     return None
 
 
-async def enrich() -> None:
+async def enrich(names: set[str] | None = None) -> None:
     CACHE.mkdir(parents=True, exist_ok=True)
     records = dict(manifest())
     store = connect_graph()
@@ -65,7 +65,7 @@ async def enrich() -> None:
         directory = (await local.get('http://127.0.0.1:8000/api/v1/connections')).json()['items']
     allowed = {p['id'] for p in directory}
     rows = store.graph.query('MATCH (p:Person) WHERE p.linkedin_url IS NOT NULL RETURN p.id, p.name, p.linkedin_url').result_set
-    targets = [(pid, name, url) for pid, name, url in rows if pid in allowed and pid not in records
+    targets = [(pid, name, url) for pid, name, url in rows if pid in allowed and pid not in records and (names is None or name in names)
                and urlparse(url).hostname in ('www.linkedin.com', 'linkedin.com') and urlparse(url).path.startswith('/in/')]
     print(f'Enrichment: {len(targets)} linked profiles; {len(records)} cached photos', flush=True)
     semaphore = asyncio.Semaphore(8)
@@ -114,4 +114,9 @@ async def enrich() -> None:
 
 
 if __name__ == '__main__':
-    asyncio.run(enrich())
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--name', action='append', help='Limit to an exact name; repeat for multiple people')
+    args = parser.parse_args()
+    asyncio.run(enrich(set(args.name) if args.name else None))

@@ -44,3 +44,9 @@ FalkorDB receives photo location/provenance through GraphStore. Existing cached 
 skipped on reruns. Missing or inaccessible photos retain initials. Images are displayed in
 the sidebar and focused 3D views, with separate live photo provenance from fixture profiles.
 The photo cache is local data and is not included in a Git-based deployment.
+
+Local enrichment on 2026-10-24 processed 165 linked directory profiles and retried three
+provider errors once. Final result: 77 photos cached, 88 linked profiles without a usable
+photo, and 18 directory members without a linked profile. Use repeated `--name` arguments
+for targeted retries. The complete offline suite passed with credentials excluded from
+settings (1,114 passed, 22 skipped); the real image endpoint and browser were also checked.
