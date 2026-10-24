@@ -1,21 +1,39 @@
 {
   "profiles": [
     {
-      "name": "Carlin Cherry",
-      "company": "GitHub",
-      "linkedin_url": "https://www.linkedin.com/in/carlincherry/",
+      "name": "Annamalai Chockalingam",
+      "company": "NVIDIA",
+      "linkedin_url": "https://www.linkedin.com/in/achocka/",
       "dataset_id": "gd_l1viktl72bvl7bjuj0",
-      "snapshot_id": "sd_mvms2ssrh1bjodbs9",
-      "collected_at": "2026-10-24T19:18:16.620Z",
+      "snapshot_id": null,
+      "collected_at": "2026-10-24T20:07:29.828Z",
       "provider": "brightdata:linkedin"
     },
     {
-      "name": "Jon Janego",
-      "company": null,
-      "linkedin_url": "https://www.linkedin.com/in/jonjanego/",
+      "name": "Camila Maia",
+      "company": "Latitude.sh",
+      "linkedin_url": "https://www.linkedin.com/in/cmaiacd/",
       "dataset_id": "gd_l1viktl72bvl7bjuj0",
       "snapshot_id": "sd_mvms2ssrh1bjodbs9",
-      "collected_at": "2026-10-24T19:15:06.538Z",
+      "collected_at": "2026-10-24T19:14:49.187Z",
+      "provider": "brightdata:linkedin"
+    },
+    {
+      "name": "Dylan McCarthy",
+      "company": "Versent",
+      "linkedin_url": "https://www.linkedin.com/in/dylan-mccarthy-181199ab/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": null,
+      "collected_at": "2026-10-24T20:07:22.101Z",
+      "provider": "brightdata:linkedin"
+    },
+    {
+      "name": "Erin Mikail 🏄🏼‍♀️ Staples",
+      "company": "Tiger Data (creators of TimescaleDB)",
+      "linkedin_url": "https://www.linkedin.com/in/erinmikail/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": null,
+      "collected_at": "2026-10-24T20:07:23.606Z",
       "provider": "brightdata:linkedin"
     },
     {
@@ -43,15 +61,6 @@
       "dataset_id": "gd_l1viktl72bvl7bjuj0",
       "snapshot_id": "sd_mvms2ssrh1bjodbs9",
       "collected_at": "2026-10-24T19:15:38.802Z",
-      "provider": "brightdata:linkedin"
-    },
-    {
-      "name": "Ron Efroni",
-      "company": "NixOS Foundation",
-      "linkedin_url": "https://www.linkedin.com/in/ronefroni/",
-      "dataset_id": "gd_l1viktl72bvl7bjuj0",
-      "snapshot_id": "sd_mvms2ssrh1bjodbs9",
-      "collected_at": "2026-10-24T19:16:02.276Z",
       "provider": "brightdata:linkedin"
     },
     {
