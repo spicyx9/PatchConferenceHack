@@ -5,7 +5,13 @@ do not exist in the assembled graph. This launcher assembles events/people/compa
 or live public sources), runs the planner agents, loads that bundle into FalkorDB through
 GraphStore, and serves the API on the same ``DemoData`` so API and graph ids match.
 
-Run: ``uv run python scripts/run_demo.py [--mode fixture|live] [--graph conferge_demo] [--port 8000]``
+Stays and flights are searched live by default (w05 lodging, w06 flights; 90 s each).
+A domain that fails or returns nothing falls back to the API fixture, labelled ``fixture``.
+``pyairbnb`` and ``fast-flights`` are not project dependencies: when missing, the script
+re-runs itself once through ``uv run --with pyairbnb --with fast-flights`` (ephemeral).
+``--travel fixture`` skips the live travel searches.
+
+Run: ``uv run python scripts/run_demo.py [--mode fixture|live] [--travel live|fixture] [--graph conferge_demo] [--port 8000]``
 FalkorDB address: FALKORDB_HOST / FALKORDB_PORT from the env or .env (default 127.0.0.1:6379).
 """
 
@@ -13,13 +19,31 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import importlib.util
 import os
+import subprocess
 import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+CHILD_FLAG = "CONFERGE_DEMO_TRAVEL_CHILD"
+TRAVEL_PACKAGES = {"pyairbnb": "pyairbnb", "fast_flights": "fast-flights"}
+
+
+def _maybe_reexec_with_travel_packages() -> None:
+    missing = [pkg for mod, pkg in TRAVEL_PACKAGES.items() if importlib.util.find_spec(mod) is None]
+    if not missing or os.environ.get(CHILD_FLAG):
+        return
+    cmd = ["uv", "run", *(arg for pkg in missing for arg in ("--with", pkg)),
+           "python", str(Path(__file__).resolve()), *sys.argv[1:]]
+    try:
+        code = subprocess.call(cmd, env={**os.environ, CHILD_FLAG: "1"}, cwd=ROOT)
+    except OSError:
+        return  # no uv: run without them, the live searches fail visibly and fall back
+    raise SystemExit(code)
 
 
 def main() -> int:
@@ -29,7 +53,11 @@ def main() -> int:
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument("--no-graph", action="store_true", help="serve without loading FalkorDB")
+    parser.add_argument("--travel", choices=["live", "fixture"], default="live",
+                        help="stays/flights: live search with fixture fallback, or fixture only")
     args = parser.parse_args()
+    if args.travel == "live":
+        _maybe_reexec_with_travel_packages()
     os.environ["FALKORDB_GRAPH"] = args.graph  # the API reads the same graph it was loaded into
 
     import uvicorn
@@ -39,11 +67,13 @@ def main() -> int:
     from conferge.graph import GraphBundle, ingest_bundle
     from conferge.integration import pipeline
     from conferge.integration.assemble import assemble
+    from conferge.integration.stays_flights import collect_stays_flights
 
     t0 = time.perf_counter()
     report = pipeline.E2EReport(mode=args.mode, started_at=datetime.now(timezone.utc))
     slices = asyncio.run(pipeline._collect(args.mode, False, 90.0, None))
-    assembly = assemble(pipeline._usable(slices))
+    travel = asyncio.run(collect_stays_flights(90.0)) if args.travel == "live" else None
+    assembly = assemble(pipeline._usable(slices), travel)
     goals = parse_goals(assembly.demo.demo_goal_text)
     opps = asyncio.run(pipeline._stage_planning(report, assembly, goals))
     print(f"assembled data_mode={assembly.data_mode}: {len(assembly.events)} events, "
@@ -51,6 +81,12 @@ def main() -> int:
           f"in {time.perf_counter() - t0:.1f}s")
     for s in slices:
         print(f"  source {s.name}: {s.source_mode}/{s.status} {s.count}")
+    for name in ("stays", "flights"):
+        d = assembly.demo.domains[name]
+        print(f"  {name}: {d.source_mode}/{d.status} {len(getattr(assembly.demo, name))} "
+              f"collected_at={d.collected_at.isoformat()}")
+        for w in d.warnings:
+            print(f"    - {w}")
 
     if not args.no_graph:
         from conferge.core.store import connect_graph

@@ -445,7 +445,8 @@ def travel_view(
             first, last = sl.segments[0], sl.segments[-1]
             legs.append({
                 "kind": "flight", "offer_id": flight.id,
-                "date": user["depart_date"] if index == 0 else user["return_date"],
+                "date": (first.departure_at.date().isoformat() if first.departure_at
+                         else user["depart_date"] if index == 0 else user["return_date"]),
                 "from": first.origin_iata, "to": last.destination_iata,
                 "departure_at": first.departure_at.isoformat() if first.departure_at else None,
                 "arrival_at": last.arrival_at.isoformat() if last.arrival_at else None,
@@ -477,7 +478,7 @@ def travel_view(
             "computed_by": FALLBACK,
         })
     budget = Decimal(str(user["budget_usd"]))
-    flight_total = _sum_known([f.total_price for f in data.flights[:1]])
+    flight_total = _sum_known([f.total_price for f in _trip_flights(data.flights)])
     stay_total = _sum_known([s.total_price for s in data.stays[:1]])
     return {
         "itinerary": legs,
@@ -492,6 +493,16 @@ def travel_view(
             "note": "null means the price was not collected; nothing is estimated",
         },
     }
+
+
+def _trip_flights(flights: list[Any]) -> list[Any]:
+    """The offers one trip pays for: a round trip, or the first outbound + first return one-way."""
+    if not flights or flights[0].trip_type != "one_way":
+        return flights[:1]
+    landed = flights[0].slices[0].segments[-1].destination_iata
+    back = next((f for f in flights[1:] if f.trip_type == "one_way"
+                 and f.slices[0].segments[0].origin_iata == landed), None)
+    return [flights[0], back] if back else flights[:1]
 
 
 def _sum_known(values: list[Any]) -> str | None:

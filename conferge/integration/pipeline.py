@@ -20,6 +20,7 @@ from conferge.integration.assemble import Assembly, assemble
 from conferge.integration.components import ComponentStatus, inventory
 from conferge.integration.memgraph import MemoryGraph
 from conferge.integration.sources import SourceSlice, fixture_slices, live_slices
+from conferge.integration.stays_flights import collect_stays_flights
 
 Outcome = Literal["pass", "warn", "fail", "skip"]
 
@@ -369,7 +370,8 @@ async def run_e2e(mode: Literal["fixture", "live"] = "fixture", *,
     report = E2EReport(mode=mode, started_at=datetime.now(timezone.utc))
     _stage_inventory(report)
     _stage_sources(report, await _collect(mode, fallback_fixture, timeout, sources))
-    assembly = assemble(_usable(report.slices))
+    travel = await collect_stays_flights(timeout) if mode == "live" else None
+    assembly = assemble(_usable(report.slices), travel)
     report.data_mode = assembly.data_mode
     _stage_checks(report, assembly)
     goals = parse_goals(assembly.demo.demo_goal_text)

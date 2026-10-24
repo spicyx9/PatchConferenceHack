@@ -63,8 +63,9 @@ def render_markdown(report: E2EReport, *, title: str = "Probe: integration (wind
         "## Labels",
         "",
         "- `fixture` rows come from each window's explicit, labelled loader; never shown as live.",
-        "- Lodging and flights: windows 05/06 not merged, the API fixture (fictional, labelled) "
-        "is used and the domain is reported `fixture/degraded`.",
+        "- Lodging and flights: live w05/w06 searches in live mode; when one fails or returns "
+        "nothing, the API fixture (fictional, labelled) is used and the domain is reported "
+        "`fixture/degraded`.",
         "- A failed live source stays `failed` with zero records unless `--fallback-fixture` "
         "was passed; the replacement slice is then listed separately as `fixture`.",
         "",
