@@ -653,7 +653,7 @@
       ) +
       roiTile("Meetings recorded", roi.meetings) +
       roiTile("Qualified contacts", roi.qualified_contacts) +
-      roiTile("Opportunities scoring 30+", roi.opportunities);
+      roiTile("Opportunities scoring " + (roi.opportunity_threshold == null ? "?" : roi.opportunity_threshold) + "+", roi.opportunities);
     $("roi-note").textContent =
       "Indicative budget: " +
       fmtUsd(roi.budget_usd) +
@@ -664,6 +664,8 @@
       element.textContent = pair[1] == null ? "Not provided" : String(pair[1]);
       element.classList.toggle("unknown", pair[1] == null);
     });
+    if (roi.opportunity_threshold != null)
+      $("roi-opportunities-label").textContent = "Opportunities scoring " + roi.opportunity_threshold + "+";
     var spendStatus = roi.spend_price_status || {};
     $("roi-spend-note").textContent = (roi.spend_usd == null ? "Prices are not available yet." : "") +
       priceStatusText([].concat(spendStatus.flights || [], spendStatus.lodging == null ? [] : [spendStatus.lodging])) +
@@ -1767,7 +1769,7 @@
         ).indexOf(needle) >= 0
       );
     });
-    $("stat-people").textContent = all.length;
+    $("stat-people").textContent = p && p.total != null ? p.total : all.length;  // all ranked people, not the page shown
     $("people-result-count").textContent =
       items.length + " suggestion" + (items.length !== 1 ? "s" : "");
     $("people-cards").innerHTML = items.length

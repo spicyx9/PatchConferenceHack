@@ -139,3 +139,17 @@ def test_fix7_artwork_is_labelled_as_a_dated_capture() -> None:
             assert art["cover_source_mode"] == "fixture" and art["cover_captured_at"] == captured
     art_js = _js_function("eventArtwork")
     assert "cover_captured_at" in art_js and "Luma capture" in art_js
+
+
+def test_fix8_threshold_is_a_returned_parameter_and_people_total_is_not_capped() -> None:
+    from fastapi.testclient import TestClient
+
+    from conferge.api.app import create_app
+
+    roi = logic.roi_view(load_fixture(), [], [], {})
+    assert roi["opportunity_threshold"] == logic.OPPORTUNITY_THRESHOLD
+    client = TestClient(create_app(found=providers.Providers(), graph_probe=False))
+    page = client.get("/api/v1/people", params={"limit": 3}).json()
+    assert page["count"] <= 3 and page["total"] >= page["count"]
+    assert "p.total" in _js_function("renderPeople")
+    assert "roi.opportunity_threshold" in _js_function("renderRoi")

@@ -443,6 +443,9 @@ def stays_view(data: DemoData) -> list[dict[str, Any]]:
     return out
 
 
+# Display threshold for "opportunities" in the ROI panel: a parameter, returned with the count.
+OPPORTUNITY_THRESHOLD = 30
+
 # The budget is the demo persona's configuration (fixtures/api.json user), never typed by the user.
 BUDGET_SOURCE = "demo persona assumption (fixtures/api.json), not entered by you"
 
@@ -588,7 +591,8 @@ def roi_view(
                                "lodging": travel["budget"]["lodging_price_status"]},
         "meetings": len(met),
         "qualified_contacts": len(qualified),
-        "opportunities": sum(1 for o in opportunities if o.score >= 30),
+        "opportunities": sum(1 for o in opportunities if o.score >= OPPORTUNITY_THRESHOLD),
+        "opportunity_threshold": OPPORTUNITY_THRESHOLD,
         "budget_usd": travel["budget"]["budget_usd"],
         "budget_source": travel["budget"]["budget_source"],
     }

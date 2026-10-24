@@ -472,7 +472,8 @@ def create_app(
                 "met_note": state.met.get(person.id) if person else None,
                 "linkedin": state.data.linkedin.get(person.id) if person else None,
             })
-        return _envelope(state, ["people", "companies"], {"items": cards, "count": len(cards)},
+        return _envelope(state, ["people", "companies"], {"items": cards, "count": len(cards),
+                                                               "total": len(state.opportunities())},
                          extra_warnings=_plan_warnings())
 
     def _events_view(event_type: str | None, day: str | None, min_score: float | None) -> list[dict[str, Any]]:
