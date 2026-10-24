@@ -47,3 +47,9 @@ offer_id, dedup_key, trip_type, query (origins, destinations, departure_date, re
 - HaroldLeo/google-flights-mcp : modèle hybride fast-flights + SerpApi, client SerpApi avec booking_token.
 - punitarani/fli MIT : alternative aéroports multiples.
 - Écartés : ScrapingBee (tutoriel), Duffel starter (données test), scrapers Kayak anciens.
+
+## Compléments (avant vague 3)
+
+- Contrat Bright Data Google Flights : le schéma machine-readable de `discover_by=input_filters` ne garantit que `url`. Chaîne obligatoire : filters → URLs → `collect_by_url` (`gd_mhng7wen1rw0a3gvpf`) → `pricing` + `providers` + `legs`. Tout prix renvoyé directement par discovery est une optimisation, pas un contrat.
+- Ordre des secours (remplace l'ordre des points 2 et 3 de "Décisions") : secours n°1 = SerpApi `engine=google_flights` avec `no_cache=true` (sinon cache 1 h), `departure_token` pour le retour, `booking_token` seulement à la sélection d'une offre ; fast-flights en troisième position (dev, cross-check). Amadeus Self-Service fermé le 17 juillet 2026 : ne jamais l'utiliser.
+- Heures : pour chaque segment, heure locale avec offset + UTC.

@@ -46,3 +46,18 @@ id, name, title, company (CompanyRef), linkedin_url, github_url, x_handle, bio, 
 ## Résultats recherche 6
 
 (à compléter)
+
+## Compléments (avant vague 3)
+
+### LinkedIn via Bright Data : couverture réelle
+
+Depuis le 13 novembre 2025, Experience/Position/Education de LinkedIn Profiles sont remplis à environ 2 % ; `current_company.industry` n'est pas supporté. S'appuyer sur `current_company`, `about`, `city`, posts, et LinkedIn Companies (`gd_l1vikfnt1wgvvqz95w`). Proxycurl fermé le 4 juillet 2025.
+
+### Trois scores séparés, jamais confondus (remplace le seuil unique `match_confidence` 0.7)
+
+- `presence_confidence` : checked_in 1.0, announced_speaker 0.85, registered 0.8, declared 0.65, possible 0.3, relationship_only 0.05.
+- `identity_confidence` : nom seul plafonné à 0.40 ; lien automatique si >= 0.85 ; revue entre 0.60 et 0.85.
+- `relevance_score`.
+- `score_final = relevance × presence × identity × meetability`.
+- Toute raison de classement cite un `source_id`.
+- Dédup : RapidFuzz + clés fortes (URL LinkedIn, login GitHub, handle X, id Luma/Partiful) ; fusions réversibles via `appearances` immuables.

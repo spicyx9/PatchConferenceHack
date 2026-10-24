@@ -41,3 +41,18 @@ Pas de scraper préconstruit Luma, Partiful ou Meetup : connecteurs maison (JSON
 ## Pages produit et docs
 
 https://docs.brightdata.com/products/scrapers/google/send-first-request, https://docs.brightdata.com/api-reference/scrapers/search-engines-apis/google-flights-discover-by-input-filters, https://docs.brightdata.com/products/serp-api/query-parameters/google, https://docs.brightdata.com/products/mcp-server/tools, https://github.com/brightdata/brightdata-mcp, https://github.com/brightdata/sdk-python, https://github.com/brightdata/skills
+
+## Limites et IDs complémentaires (avant vague 3)
+
+- Limites : moins de 20 inputs par requête synchrone ; 25 réponses 429 en 5 min bloquent l'IP ; snapshots conservés 30 jours ; 5 000 crédits gratuits partagés au niveau du compte (pas par produit).
+- IDs complémentaires (à confirmer avec get_scraper_details) :
+
+| Dataset | ID |
+|---|---|
+| LinkedIn discover by name | gd_m8d03he47z8nwb5xc (tester aussi gd_l1viktl72bvl7bjuj0 avec `discover_by=name`) |
+| LinkedIn posts | gd_lyy3tktm25m4avu764 |
+| X profiles | gd_lwxmeb2u1cniijd7t4 |
+| X posts | gd_lwxkxvnf1cynvib9co |
+| Crunchbase | gd_l1vijqt9jfj7olije |
+| Google Maps | gd_m8ebnr0q2qlklc02fz |
+| Facebook Events | gd_m14sd0to1jz48ppm51 |
