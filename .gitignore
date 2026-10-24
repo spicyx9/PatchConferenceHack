@@ -25,6 +25,15 @@ raw/
 probes/*.json
 probes/*.html
 probes/*.ndjson
+# Bright Data LinkedIn records (public profiles of real people); data/block_matrix.json stays tracked
+data/probes/linkedin_*.json
 
 # Worker logs, PIDs, and snapshots (never upload provider responses or secrets)
 /logs/
+
+# Bright Data dataset snapshots (scripts/probes/flights_collect.py): scraped bodies, never committed
+data/snapshots/
+
+# Local drafts: never committed
+*.draft
+*.draft.md

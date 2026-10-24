@@ -71,3 +71,22 @@ def test_met_drops_person_and_survives_restart(graph_env) -> None:  # type: igno
     restarted = _restarted_top()  # new Python process, nothing shared but FalkorDB
     assert restarted["mode"] != "degraded_no_graph"
     assert restarted["ids"] == after
+
+
+def test_reset_clears_met_in_falkordb(graph_env) -> None:  # type: ignore[no-untyped-def]
+    from conferge.api.app import create_app
+    from conferge.api.providers import Providers
+    from conferge.api.logic import parse_goals
+    from conferge.core.store import connect_graph
+    from conferge.graph import people_for_goal
+
+    client = TestClient(create_app(found=Providers()))
+    top = client.get("/api/v1/people?limit=5").json()["items"][0]["person"]["id"]
+    client.post("/api/v1/met", json={"person_id": top})
+    store = connect_graph()
+    goal_ids = [g.id for g in parse_goals(client.get("/api/v1/conference").json()["demo_goal_text"])]
+    found = lambda: {r["person_id"] for g in goal_ids for r in people_for_goal(store, "demo-user", g, 50)["rows"]}  # noqa: E731
+    assert top not in found()  # MET excludes them in the graph query
+    cleared = client.post("/api/v1/reset").json()["graph_memory_cleared"]
+    assert cleared["nodes_deleted"] >= 1
+    assert top in found()  # reset removed the Meeting from FalkorDB

@@ -52,3 +52,15 @@ def test_agent_state_labels_and_edges_are_allowed() -> None:
         store.merge_edge(frm, "a", rel, to, "b", {"written_by": "x"})
     assert sum("MERGE" in q for q in calls) == 5
     assert "CREATE INDEX FOR (n:User) ON (n.id)" in INDEX_STATEMENTS
+
+
+def test_delete_user_state_is_parameterised_and_counts() -> None:
+    graph = Mock()
+    graph.query.return_value = SimpleNamespace(nodes_deleted=2, relationships_deleted=3)
+    counts = GraphStore(graph).delete_user_state("demo-user")
+    assert counts == {"nodes_deleted": 6, "relationships_deleted": 9}
+    sent = [c.args[0] for c in graph.query.call_args_list]
+    assert sent == ["MATCH (m:Meeting {user_id: $user_id}) DETACH DELETE m",
+                    "MATCH (c:Change {user_id: $user_id}) DETACH DELETE c",
+                    "MATCH (:User {id: $user_id})-[r:PLANS|SKIPS]->() DELETE r"]
+    assert all(c.kwargs["params"] == {"user_id": "demo-user"} for c in graph.query.call_args_list)

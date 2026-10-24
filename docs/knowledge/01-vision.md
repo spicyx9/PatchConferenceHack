@@ -6,7 +6,7 @@ Nom provisoire. Hackathon Patch the Conference, 24 octobre 2026.
 
 Un agent qui maximise les opportunités professionnelles d'un déplacement. Le voyage n'est qu'un moyen d'atteindre cet objectif.
 
-Notre objectif n'est pas simplement d'aider quelqu'un à assister à une conférence. C'est de lui permettre d'en tirer le maximum de valeur. "Don't just attend conferences. Be in the right place, with the right people, at the right time."
+Notre objectif n'est pas simplement d'aider quelqu'un à assister à une conférence. C'est de lui permettre d'en tirer le maximum de valeur. "Plan a conference trip in minutes and maximize the professional opportunities you get out of it."
 
 Nous ne construisons pas un concurrent de Booking, Luma ou LinkedIn. Nous construisons la couche d'intelligence qui connecte ces plateformes autour d'un objectif personnel. À terme, l'utilisateur pourrait ne même plus choisir sa conférence : il indiquerait son objectif, ses disponibilités et son budget, et Conferge identifierait où se déplacer.
 
@@ -18,9 +18,9 @@ Nous ne construisons pas un concurrent de Booking, Luma ou LinkedIn. Nous constr
 4. Networking Agent : intervenants, organisateurs, participants accessibles, enrichis via LinkedIn et sources publiques, classés selon les objectifs, avec explication, en distinguant présence confirmée et présence potentielle.
 5. Opportunity Graph (FalkorDB) : relie personnes, entreprises, sujets, talks, événements, lieux, objectifs. Révèle les relations indirectes. Chaque recommandation est justifiée par une chaîne de relations vérifiables.
 6. Planning Agent : arbitre selon pertinence des personnes, sujets, coût, horaires, déplacements, disponibilités. Reverse Planning : on part des objectifs pour décider où aller. Anti-FOMO : recommande quand plusieurs événements se chevauchent et explique ce qu'on gagne ou manque.
-7. Pendant et après : Live Replanning, notes après rencontre, Follow-up Agent (messages personnalisés, relances à valider), Conference ROI (dépenses, rencontres, contacts qualifiés, opportunités).
+7. Pendant la conférence : Live Replanning et notes après rencontre (mémoire dans le graphe).
 
-## Les 7 fonctionnalités, par priorité
+## Les 5 fonctionnalités, par priorité
 
 | Fonctionnalité | Fonctionnement | Priorité |
 |---|---|---|
@@ -29,8 +29,6 @@ Nous ne construisons pas un concurrent de Booking, Luma ou LinkedIn. Nous constr
 | Smart Networking | Identifier qui rencontrer, pourquoi, où cette personne pourrait être présente et comment l'approcher | Essentielle |
 | Anti-FOMO Agent | Comparer deux événements simultanés et recommander celui qui offre le plus de valeur selon les objectifs | Forte |
 | Live Replanning | Recalculer le programme lorsqu'un événement apparaît, change d'horaire ou devient complet | Forte |
-| Follow-up Agent | Mémoriser les rencontres, générer les messages de suivi et préparer les prochaines actions | Forte |
-| Conference ROI | Mesurer les dépenses, les rencontres, les contacts qualifiés et les opportunités commerciales générées | Secondaire |
 
 Transversal : mémoire entre sessions (arêtes MET, ATTENDED, SKIPPED, CONTACTED persistées, qui modifient les classements suivants) et chaque recommandation affiche son chemin dans le graphe.
 
@@ -55,7 +53,6 @@ FalkorDB ne sert pas à afficher un joli graphique : les connexions dans le grap
 | Recherche vols / hôtels | Comparaison simple | Recherche approfondie |
 | Réservations et inscriptions | Liens ou préparation | Intégrations avec validation |
 | Live Replanning | Démonstration simple (bouton simuler un changement) | Mise à jour continue |
-| Conference ROI et relances | Prototype éventuel | Complet |
 
 ## Décisions figées
 

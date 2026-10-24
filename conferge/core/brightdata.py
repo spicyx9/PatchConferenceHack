@@ -19,15 +19,51 @@ from pydantic import BaseModel, ConfigDict, Field
 
 logger = logging.getLogger(__name__)
 _RETRY_STATUSES = {429, 500, 502, 503, 504}
+# /datasets/v3/scrape holds the connection up to ~60 s before answering 202 + snapshot_id.
+SYNC_TIMEOUT = 75.0
 
 BrightDataApi = Literal["datasets", "web_unlocker", "serp"]
 # Process-wide count of what Bright Data actually returned (successful responses only):
 # dataset rows, Web Unlocker pages, SERP result pages. Shown on the demo home screen.
 _USAGE: dict[str, int] = {"datasets": 0, "web_unlocker": 0, "serp": 0}
+# Every Bright Data call that got an answer: api, dataset_id, snapshot_id, rows, status, at.
+_CALLS: list[dict[str, Any]] = []
+
+
+def parse_body(response: httpx.Response) -> Any:
+    """JSON body, or a list of rows when Bright Data answers JSON Lines (application/jsonl)."""
+    ctype = response.headers.get("content-type", "")
+    text = response.text
+    if "jsonl" in ctype or "ndjson" in ctype:
+        return [json.loads(line) for line in text.splitlines() if line.strip()]
+    try:
+        return json.loads(text) if text.strip() else None
+    except json.JSONDecodeError:
+        try:
+            return [json.loads(line) for line in text.splitlines() if line.strip()]
+        except json.JSONDecodeError as exc:
+            raise BrightDataError("Bright Data response is neither JSON nor JSON Lines") from exc
 
 
 def record_usage(api: BrightDataApi, count: int = 1) -> None:
     _USAGE[api] = _USAGE.get(api, 0) + max(count, 0)
+
+
+def record_call(api: BrightDataApi, *, rows: int, status: str, dataset_id: str | None = None,
+                snapshot_id: str | None = None) -> None:
+    _CALLS.append({"api": api, "dataset_id": dataset_id, "snapshot_id": snapshot_id,
+                   "rows": rows, "status": status,
+                   "at": datetime.now(timezone.utc).isoformat()})
+
+
+def _data_rows(payload: Any) -> int:
+    """Rows that are records: Bright Data returns failed inputs as rows with an ``error`` key."""
+    rows = payload if isinstance(payload, list) else [payload]
+    return sum(1 for r in rows if isinstance(r, dict) and r and "error" not in r)
+
+
+def calls() -> list[dict[str, Any]]:
+    return [dict(c) for c in _CALLS]
 
 
 def usage() -> dict[str, int]:
@@ -37,6 +73,7 @@ def usage() -> dict[str, int]:
 def reset_usage() -> None:
     for key in _USAGE:
         _USAGE[key] = 0
+    _CALLS.clear()
 
 
 class BrightDataError(RuntimeError):
@@ -67,7 +104,7 @@ class BrightDataClient:
         self.serp_zone = serp_zone
         self.unlocker_zone = unlocker_zone
         self._client = client or httpx.AsyncClient(
-            base_url="https://api.brightdata.com", timeout=30.0
+            base_url="https://api.brightdata.com", timeout=SYNC_TIMEOUT
         )
         self._owns_client = client is None
         self.retries = retries
@@ -105,7 +142,7 @@ class BrightDataClient:
 
     async def _request(
         self, method: str, path: str, *, params: dict[str, Any] | None = None,
-        payload: Any = None,
+        payload: Any = None, timeout: float | None = None, retry_network: bool = True,
     ) -> httpx.Response:
         if not self._api_key:
             raise BrightDataError("Bright Data key missing; set BRIGHTDATA_API_KEY")
@@ -115,6 +152,7 @@ class BrightDataClient:
                 response = await self._client.request(
                     method, path, params=params, json=payload,
                     headers={"Authorization": f"Bearer {self._api_key}"},
+                    **({"timeout": timeout} if timeout is not None else {}),
                 )
                 if response.status_code in _RETRY_STATUSES and attempt < self.retries:
                     await asyncio.sleep(min(2 ** attempt, 4))
@@ -125,8 +163,9 @@ class BrightDataClient:
                     )
                 return response
             except (httpx.RequestError, httpx.TimeoutException) as exc:
-                if attempt == self.retries:
-                    raise BrightDataError(f"Bright Data {path}: network error") from exc
+                if attempt == self.retries or not retry_network:
+                    kind = "timeout" if isinstance(exc, httpx.TimeoutException) else "network error"
+                    raise BrightDataError(f"Bright Data {path}: {kind}") from exc
                 await asyncio.sleep(min(2 ** attempt, 4))
         raise BrightDataError(f"Bright Data {path}: exhausted retries")
 
@@ -149,18 +188,25 @@ class BrightDataClient:
     ) -> CollectionOutput:
         if not inputs:
             raise ValueError("dataset inputs cannot be empty")
+        # The synchronous endpoint holds the connection up to about a minute, then answers 202
+        # with a snapshot_id (client timeout SYNC_TIMEOUT); never resend on a network timeout
+        # (each resend would start a new, billed collection).
         response = await self._request(
             "POST", "/datasets/v3/scrape",
             params=self._dataset_params(dataset_id, method, limit_per_input),
-            payload={"input": inputs},
+            payload={"input": inputs}, retry_network=False,
         )
-        payload = response.json()
+        payload = parse_body(response)
         if response.status_code == 202:
             snapshot_id = payload.get("snapshot_id") if isinstance(payload, dict) else None
             if not snapshot_id:
                 raise BrightDataError("Bright Data returned HTTP 202 without snapshot_id")
+            record_call("datasets", rows=0, status="running", dataset_id=dataset_id,
+                        snapshot_id=str(snapshot_id))
             return CollectionOutput(status="running", source_mode="live", snapshot_id=snapshot_id)
-        record_usage("datasets", len(payload) if isinstance(payload, list) else 1)
+        rows = _data_rows(payload)
+        record_usage("datasets", rows)
+        record_call("datasets", rows=rows, status="ready", dataset_id=dataset_id)
         return CollectionOutput(status="ready", source_mode="live", data=payload)
 
     async def trigger_dataset(
@@ -174,14 +220,14 @@ class BrightDataClient:
             params=self._dataset_params(dataset_id, method, limit_per_input),
             payload=inputs,
         )
-        payload = response.json()
+        payload = parse_body(response)
         if not isinstance(payload, dict) or not payload.get("snapshot_id"):
             raise BrightDataError("Bright Data trigger did not return snapshot_id")
         return str(payload["snapshot_id"])
 
     async def snapshot_progress(self, snapshot_id: str) -> dict[str, Any]:
         response = await self._request("GET", f"/datasets/v3/progress/{snapshot_id}")
-        data = response.json()
+        data = parse_body(response)
         if not isinstance(data, dict):
             raise BrightDataError("Bright Data progress response is not an object")
         return data
@@ -190,14 +236,16 @@ class BrightDataClient:
         response = await self._request(
             "GET", f"/datasets/v3/snapshot/{snapshot_id}", params={"format": "json"}
         )
-        data = response.json()
+        data = parse_body(response)
         if response.status_code == 202 or (
             isinstance(data, dict) and data.get("status") in {"starting", "running", "building"}
         ):
             return CollectionOutput(status="running", source_mode="live", snapshot_id=snapshot_id)
         if isinstance(data, dict) and data.get("status") in {"failed", "canceled"}:
             raise BrightDataError("Bright Data snapshot failed")
-        record_usage("datasets", len(data) if isinstance(data, list) else 1)
+        rows = _data_rows(data)
+        record_usage("datasets", rows)
+        record_call("datasets", rows=rows, status="ready", snapshot_id=snapshot_id)
         return CollectionOutput(
             status="ready", source_mode="live", snapshot_id=snapshot_id, data=data
         )
@@ -210,6 +258,7 @@ class BrightDataClient:
             "POST", "/request", payload={"zone": self.serp_zone, "url": url, "format": "raw"}
         )
         record_usage("serp")
+        record_call("serp", rows=1, status="ready")
         return response.text
 
     async def unlock(self, url: str) -> str:
@@ -221,8 +270,15 @@ class BrightDataClient:
             "POST", "/request",
             payload={"zone": self.unlocker_zone, "url": url, "format": "raw"},
         )
+        text = response.text
+        if len(text) < 2000 and text.lstrip().startswith("Residential Failed"):
+            # Bright Data answers its own refusal (e.g. KYC required) with HTTP 200.
+            reason = text.split(":", 1)[0].strip()
+            kyc = " (KYC required for this site)" if "kyc" in text.lower() else ""
+            raise BrightDataError(f"Web Unlocker refused {reason}{kyc}")
         record_usage("web_unlocker")
-        return response.text
+        record_call("web_unlocker", rows=1, status="ready")
+        return text
 
     @staticmethod
     def load_fixture(path: str | Path, *, explicit_opt_in: bool = False) -> CollectionOutput:

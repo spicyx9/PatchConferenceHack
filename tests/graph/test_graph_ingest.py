@@ -280,6 +280,22 @@ def test_record_memory_rejects_naive_and_met_non_person():
     graph.query.assert_not_called()
 
 
+def test_goal_edges_carry_stated_at_as_observed_at():
+    from conferge.core.schemas import Goal
+
+    graph = Mock()
+    ing = GraphIngestor(GraphStore(graph), default_mode="live")
+    ing.ingest_goals("demo-user", [
+        Goal(id="g-stated", description="Meet founders", topics=["AI agents"], stated_at=AT),
+        Goal(id="g-config", description="Meet PMs", topics=["Copilot"]),
+    ])
+    about = {e["from"]: e for e in _edges(_writes(graph), "ABOUT")}
+    assert about["g-stated"]["props"]["observed_at"] == AT.isoformat()
+    assert "observed_at" not in about["g-config"]["props"]  # never the ingest time
+    goal = next(n for n in _nodes(_writes(graph), "Goal") if n["id"] == "g-stated")
+    assert goal["props"]["observed_at"] == AT.isoformat()
+
+
 def test_record_memory_occurrences_are_distinct_and_timestamped():
     graph = Mock()
     store = GraphStore(graph)
