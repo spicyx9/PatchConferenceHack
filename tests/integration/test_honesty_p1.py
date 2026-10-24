@@ -99,3 +99,49 @@ def test_brightdata_and_pipeline_data_source_follow_the_records(monkeypatch) -> 
     rows = [{"kind": "brightdata", "records": 9, "cached": True}]
     assert _pipeline_mode(rows) == "cached"
     assert _pipeline_mode([{"kind": "fallback", "records": 5}]) == "fixture"
+
+
+# -- 5. simulated Change nodes and demo goals are not live -------------------------------
+
+class _Recorder:
+    def __init__(self) -> None:
+        self.nodes: list[tuple[str, str, dict]] = []
+        self.edges: list[tuple] = []
+        self.graph = self
+
+    def merge_node(self, kind: str, node_id: str, props: dict | None = None) -> None:
+        self.nodes.append((kind, node_id, props or {}))
+
+    def merge_edge(self, *args: object) -> None:
+        self.edges.append(args)
+
+    def query(self, *_: object, **__: object) -> object:
+        raise RuntimeError("no graph reads in this test")
+
+
+def test_simulated_change_is_simulated_not_live() -> None:
+    from conferge.graph import agent_state
+
+    store = _Recorder()
+    agent_state.write_change(store, "demo-user", label="sold out", scenario_id="w15-simulated-sold-out",
+                             event_ids=["e1"], from_version=1, written_by="replanner", at_ms=1)
+    ((_, _, props),) = [n for n in store.nodes if n[0] == "Change"]
+    assert props["source_mode"] == "simulated"
+    assert all(e[-1]["source_mode"] == "simulated" for e in store.edges)
+
+
+def test_demo_goals_are_fixture_typed_goals_are_live(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    from conferge.api import providers
+
+    store = _Recorder()
+    monkeypatch.setattr(providers, "connect_store", lambda *a, **k: store)
+    client = TestClient(create_app(data=load_fixture(), found=Providers()))
+    client.get("/api/v1/people?limit=3")  # graph ranking syncs the goals, then degrades here
+    demo = [p for k, _, p in store.nodes if k == "Goal"]
+    assert demo and {p["source_mode"] for p in demo} == {"fixture"}
+    store.nodes.clear()
+    client.post("/api/v1/goal", json={"text": "I want to meet engineers working on security",
+                                      "user_id": "demo-user"})
+    client.get("/api/v1/people?limit=3")
+    typed = [p for k, _, p in store.nodes if k == "Goal"]
+    assert typed and {p["source_mode"] for p in typed} == {"live"}

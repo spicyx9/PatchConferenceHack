@@ -143,7 +143,10 @@ class DemoState:
 
             ids = tuple((g.id, g.stated_at) for g in self.goals)
             if self._synced_goals != ids:  # goals live in the graph, written through GraphStore
-                GraphIngestor(store, default_mode="live").ingest_goals(USER_ID, self.goals)
+                # The demo persona's goals are fixture data; only goals the user typed are live.
+                demo = {g.id for g in logic.parse_goals(self.data.demo_goal_text)}
+                mode = "fixture" if {g.id for g in self.goals} == demo else "live"
+                GraphIngestor(store, default_mode=mode).ingest_goals(USER_ID, self.goals)
                 self._synced_goals = ids
             known = {p.id for p in self.data.people}
             people = [o for o in ranking.rank_people(store, USER_ID, self.goals)
