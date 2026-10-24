@@ -44,3 +44,7 @@ data/snapshots/
 
 # Refresh button: raw SERP answers (scraped bodies, never committed)
 data/probes/refresh_serp_*.json
+
+# Local artifact rendering and draft output (final brief is under docs/demo)
+/tmp/
+/output/
