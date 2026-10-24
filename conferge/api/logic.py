@@ -467,10 +467,8 @@ def travel_view(
                 "arrival_at": last.arrival_at.isoformat() if last.arrival_at else None,
                 "carrier": first.marketing_carrier, "price_status": flight.price_status,
                 "total_price": flight.total_price, "currency": flight.currency,
-                "price_label": None,
-                **({k: v for k, v in rt_display(flight).items()
-                    if k in {"price_status", "total_price", "currency", "price_label",
-                             "return_slice_collected"}}),
+                "price_label": rt_display(flight).get("price_label"),
+                "return_slice_collected": flight.return_slice_collected,
                 "source_mode": _mode_of(flight.evidence),
                 "source": source_of(flight.evidence),
             })
@@ -514,7 +512,7 @@ def travel_view(
             "budget_source": BUDGET_SOURCE,
             "source_mode": user.get("source_mode", "fixture"),
             "flights_usd": flight_total, "lodging_usd": stay_total,
-            "flights_price_status": [rt_display(f).get("price_status", f.price_status) for f in trip],
+            "flights_price_status": [f.price_status for f in trip],
             "lodging_price_status": stay.price_status if stay else None,
             "lodging_stay": {"id": stay.id, "name": stay.name} if stay else None,
             "spend_basis": ("flights of the itinerary + the stay it shows "

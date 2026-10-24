@@ -87,6 +87,21 @@ def _segment(raw: Any) -> RawSegment:
     )
 
 
+
+def _record_statuses(integration: Any) -> list[int]:
+    """Wrap the integration's HTTP client so every Bright Data answer status is recorded."""
+    statuses: list[int] = []
+    client = integration.client
+
+    class _Recording:
+        def post(self, *args: Any, **kwargs: Any) -> Any:
+            response = client.post(*args, **kwargs)
+            statuses.append(int(getattr(response, "status_code", 0)))
+            return response
+
+    integration.client = _Recording()
+    return statuses
+
 class FastFlightsProvider:
     def __init__(self, *, clock: Callable[[], datetime] = _now) -> None:
         self.clock = clock
@@ -102,7 +117,9 @@ class FastFlightsProvider:
         )
 
     async def _one_way(self, origin: str, destination: str, day: date, adults: int,
-                       cabin: str, failures: list[str]) -> tuple[list[Any], str]:
+                       cabin: str, failures: list[str]) -> tuple[list[Any], str, str | None]:
+        """Items, search URL, and ``brightdata:serp:<zone>`` when Bright Data answered 200 for
+        this page and flights were read from it (None when fetched directly)."""
         from fast_flights import FlightQuery, Passengers, create_query, get_flights
 
         query = create_query(
@@ -115,19 +132,24 @@ class FastFlightsProvider:
         if key and zone:
             from fast_flights.integrations import BrightData
 
+            integration = BrightData(api_key=key, zone=zone)
+            statuses = _record_statuses(integration)  # fast-flights returns the body whatever the status
             try:
-                result = await asyncio.to_thread(
-                    get_flights, query, integration=BrightData(api_key=key, zone=zone))
-                record_usage("serp")  # one Google Flights page through the Bright Data SERP zone
-                return list(result or []), query.url()
+                result = list(await asyncio.to_thread(get_flights, query, integration=integration)
+                              or [])
+                if result and statuses and all(s == 200 for s in statuses):
+                    record_usage("serp")  # counted only when the zone really served the page
+                    return result, query.url(), f"brightdata:serp:{zone}"
+                failures.append("bright_data_serp_not_used: zone answered "
+                                f"{statuses or 'nothing'} with {len(result)} flights; fetched directly")
             except Exception as exc:  # noqa: BLE001 - the SERP transport failed: go direct
                 failures.append(f"bright_data_serp_transport_failed: "
-                                               f"{type(exc).__name__}; fetched directly")
+                                f"{type(exc).__name__} (HTTP {statuses or 'none'}); fetched directly")
         result = await asyncio.to_thread(get_flights, query)
-        return list(result or []), query.url()
+        return list(result or []), query.url(), None
 
     def _offers(self, items: list[Any], search_url: str, collected_at: datetime,
-                warnings: list[str]) -> list[FlightOffer]:
+                warnings: list[str], raw_ref: str | None = None) -> list[FlightOffer]:
         offers: dict[str, FlightOffer] = {}
         for item in items:
             segments = [_segment(s) for s in (_get(item, "flights") or [])]
@@ -145,7 +167,8 @@ class FastFlightsProvider:
                 price=_get(item, "price"), currency="USD", price_scope="unknown",
                 booking_url=search_url, booking_url_type="google_flights_search",
                 evidence=[SourceEvidence(provider=PROVIDER, source_mode="live",
-                                         source_url=search_url, collected_at=collected_at)],
+                                         source_url=search_url, collected_at=collected_at,
+                                         raw_ref=raw_ref)],
             )
             try:
                 offer = build_offer(raw, collected_at)
@@ -184,9 +207,9 @@ class FastFlightsProvider:
                 key = env_value("BRIGHTDATA_API_KEY")
                 errors.append(message.replace(key, "***") if key else message)
                 continue
-            items, url = result
+            items, url, via = result
             fetched += len(items)
-            found = self._offers(items, url, collected_at, warnings)
+            found = self._offers(items, url, collected_at, warnings, raw_ref=via)
             if not found:
                 errors.append(f"{direction}: zero offers")
             offers.extend(found)

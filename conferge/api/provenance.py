@@ -92,6 +92,10 @@ def source_of(evidence: Sequence[SourceEvidence] | None) -> dict[str, Any]:
     if provider == "brightdata_google_flights":
         return _dataset("google_flights", raw)
     if provider == "fast_flights_google_flights":
+        if raw and raw.startswith("brightdata:serp:"):  # the page really came through the zone
+            zone = raw.split(":", 2)[2]
+            return _out("brightdata", "serp", f"Bright Data SERP API {zone} (Google Flights, "
+                        "fast-flights parser)", id=zone, site="google_flights")
         return _out("fast-flights", "fallback", "Fallback fast-flights", site="google_flights")
     if provider == "google_flights_fli":
         return _out("fli", "fallback", "Fallback fli (Google Flights)", site="google_flights")

@@ -23,6 +23,7 @@ from urllib.parse import parse_qs, quote, urlparse
 
 from conferge.core.brightdata import BrightDataClient
 from conferge.core.schemas import FlightOffer, RunReport, SourceEvidence
+from conferge.flights.round_trip_total import as_stored
 from conferge.flights.normalize import (
     NormalizationError,
     RawOffer,
@@ -255,9 +256,8 @@ def offers_from_rows(rows: list[dict], url: str, collected_at: datetime, zone: s
         if row.get("price"):
             scope = "round trip total" if row.get("price_scope") == "round_trip_total" else "scope unknown"
             offer = offer.model_copy(update={
-                "raw_price_text": f"{row['price']} {row.get('currency') or ''} {scope}".strip(),
-                "warnings": [*offer.warnings, "round_trip_total_not_split: observed price "
-                             "kept in raw_price_text, not as a one-way total_price"],
-            })
+                "raw_price_text": f"{row['price']} {row.get('currency') or ''} {scope}".strip()})
+            # A round-trip total is stored as shown: round_trip, quoted_total, return not collected.
+            offer = as_stored(offer)
         offers.append(offer)
     return offers, warnings

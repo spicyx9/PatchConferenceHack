@@ -22,7 +22,7 @@
    "record": {
     "id": "fo-ea56555c5a06583d",
     "dedup_key": "itin-215d1e049160ee41",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -55,11 +55,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "413",
     "raw_price_text": "413 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -70,7 +71,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -100,7 +101,7 @@
    "record": {
     "id": "fo-fb6bbbacd40a891d",
     "dedup_key": "itin-5aad2b3559cce5d5",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -121,11 +122,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "716",
     "raw_price_text": "716 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -136,7 +138,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -166,7 +168,7 @@
    "record": {
     "id": "fo-a09bcf7a93845699",
     "dedup_key": "itin-a587aa8337b4ce9f",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -187,11 +189,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "753",
     "raw_price_text": "753 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -202,7 +205,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -232,7 +235,7 @@
    "record": {
     "id": "fo-6f871d6811a6ad5e",
     "dedup_key": "itin-7377bb7da8db85f7",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -253,11 +256,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "753",
     "raw_price_text": "753 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -268,7 +272,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -298,7 +302,7 @@
    "record": {
     "id": "fo-cd69f30ee39fc758",
     "dedup_key": "itin-93792c9291a60649",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -319,11 +323,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "764",
     "raw_price_text": "764 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -334,7 +339,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -364,7 +369,7 @@
    "record": {
     "id": "fo-aafc4ceb9d10a0ac",
     "dedup_key": "itin-2d08f8814f66f009",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -397,11 +402,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "587",
     "raw_price_text": "587 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -412,7 +418,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -442,7 +448,7 @@
    "record": {
     "id": "fo-891f0c5419cd5e86",
     "dedup_key": "itin-4de27e36cb0ef295",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -475,11 +481,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "667",
     "raw_price_text": "667 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -490,7 +497,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -520,7 +527,7 @@
    "record": {
     "id": "fo-7bcea647e7d0903f",
     "dedup_key": "itin-651a48a5d2f2d29e",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -553,11 +560,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "678",
     "raw_price_text": "678 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -568,7 +576,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -598,7 +606,7 @@
    "record": {
     "id": "fo-bb8ffb85bcf040ab",
     "dedup_key": "itin-092d00f1214db6b7",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -619,11 +627,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "716",
     "raw_price_text": "716 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -634,7 +643,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -664,7 +673,7 @@
    "record": {
     "id": "fo-7a10c41a324313c3",
     "dedup_key": "itin-1538621049f530c6",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -685,11 +694,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "716",
     "raw_price_text": "716 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -700,7 +710,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -730,7 +740,7 @@
    "record": {
     "id": "fo-ee93545143d0c0f6",
     "dedup_key": "itin-aa4567500ea59b32",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -751,11 +761,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "716",
     "raw_price_text": "716 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -766,7 +777,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -796,7 +807,7 @@
    "record": {
     "id": "fo-19225b97f25bd855",
     "dedup_key": "itin-928460ccc0da4876",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -817,11 +828,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "716",
     "raw_price_text": "716 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -832,7 +844,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -862,7 +874,7 @@
    "record": {
     "id": "fo-d0434909168e8b7a",
     "dedup_key": "itin-333fdb51851d8497",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -883,11 +895,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "753",
     "raw_price_text": "753 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -898,7 +911,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -928,7 +941,7 @@
    "record": {
     "id": "fo-9b5900a17eb38ae4",
     "dedup_key": "itin-b206d34cf8027a43",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -949,11 +962,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "753",
     "raw_price_text": "753 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -964,7 +978,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -994,7 +1008,7 @@
    "record": {
     "id": "fo-3cacb21cf6b9dd0d",
     "dedup_key": "itin-3aff13cdd06eeb9b",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -1015,11 +1029,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "753",
     "raw_price_text": "753 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -1030,7 +1045,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -1060,7 +1075,7 @@
    "record": {
     "id": "fo-f4c2a60c50a38ebf",
     "dedup_key": "itin-1d2e0fe2d790d005",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -1081,11 +1096,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "753",
     "raw_price_text": "753 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -1096,7 +1112,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -1126,7 +1142,7 @@
    "record": {
     "id": "fo-3e66aa4f4b005a79",
     "dedup_key": "itin-38829d5e2bfd36ca",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -1147,11 +1163,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "753",
     "raw_price_text": "753 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -1162,7 +1179,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -1192,7 +1209,7 @@
    "record": {
     "id": "fo-528d2b4ae5597aac",
     "dedup_key": "itin-328e40a3e3b573df",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -1213,11 +1230,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "753",
     "raw_price_text": "753 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -1228,7 +1246,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -1258,7 +1276,7 @@
    "record": {
     "id": "fo-ff4831fb3ed76b71",
     "dedup_key": "itin-a75ed41392b0c96c",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -1279,11 +1297,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "764",
     "raw_price_text": "764 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -1294,7 +1313,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -1324,7 +1343,7 @@
    "record": {
     "id": "fo-999affd29c6444d1",
     "dedup_key": "itin-1fe222bd423126d6",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -1345,11 +1364,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "764",
     "raw_price_text": "764 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -1360,7 +1380,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -1390,7 +1410,7 @@
    "record": {
     "id": "fo-a37940a5dc489af5",
     "dedup_key": "itin-fb816ec275df45ca",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -1411,11 +1431,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "764",
     "raw_price_text": "764 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -1426,7 +1447,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -1456,7 +1477,7 @@
    "record": {
     "id": "fo-ee5936a1b00a6152",
     "dedup_key": "itin-08245f09ff7db699",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -1477,11 +1498,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "764",
     "raw_price_text": "764 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -1492,7 +1514,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -1522,7 +1544,7 @@
    "record": {
     "id": "fo-9213adbd1ce60f7f",
     "dedup_key": "itin-4683e1bb97af19f2",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -1543,11 +1565,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "773",
     "raw_price_text": "773 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -1558,7 +1581,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -1588,7 +1611,7 @@
    "record": {
     "id": "fo-f02c3f04adc8ba27",
     "dedup_key": "itin-7175a117e18e0fcd",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -1609,11 +1632,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "773",
     "raw_price_text": "773 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -1624,7 +1648,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -1654,7 +1678,7 @@
    "record": {
     "id": "fo-a15b17773a8b34be",
     "dedup_key": "itin-6fe038a1f6e13248",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -1675,11 +1699,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "773",
     "raw_price_text": "773 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -1690,7 +1715,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -1720,7 +1745,7 @@
    "record": {
     "id": "fo-131a0b4e77e3bd93",
     "dedup_key": "itin-feb93eb0c904b7b6",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -1741,11 +1766,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "773",
     "raw_price_text": "773 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -1756,7 +1782,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -1786,7 +1812,7 @@
    "record": {
     "id": "fo-ff2fcedd824fb2e2",
     "dedup_key": "itin-43647a6c81cd779d",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -1807,11 +1833,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "773",
     "raw_price_text": "773 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -1822,7 +1849,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -1852,7 +1879,7 @@
    "record": {
     "id": "fo-b236874ca5509d23",
     "dedup_key": "itin-3629b3ace38c1486",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -1873,11 +1900,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "773",
     "raw_price_text": "773 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -1888,7 +1916,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -1918,7 +1946,7 @@
    "record": {
     "id": "fo-dba184bf13bc440a",
     "dedup_key": "itin-922492f8ab3b83bb",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -1939,11 +1967,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "773",
     "raw_price_text": "773 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -1954,7 +1983,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -1984,7 +2013,7 @@
    "record": {
     "id": "fo-229c9f7421e51b2c",
     "dedup_key": "itin-6c2f6ddea4f6d4c8",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -2005,11 +2034,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "773",
     "raw_price_text": "773 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -2020,7 +2050,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -2050,7 +2080,7 @@
    "record": {
     "id": "fo-d482eb28c90b1276",
     "dedup_key": "itin-1cae437bcaa4e693",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -2071,11 +2101,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "773",
     "raw_price_text": "773 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -2086,7 +2117,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -2116,7 +2147,7 @@
    "record": {
     "id": "fo-b39881336562044c",
     "dedup_key": "itin-2edbff52835140ad",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -2137,11 +2168,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "773",
     "raw_price_text": "773 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -2152,7 +2184,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -2182,7 +2214,7 @@
    "record": {
     "id": "fo-23646d5c916b81c3",
     "dedup_key": "itin-9356096f34f1225a",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -2203,11 +2235,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "773",
     "raw_price_text": "773 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -2218,7 +2251,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {
@@ -2248,7 +2281,7 @@
    "record": {
     "id": "fo-3967c237ce930a15",
     "dedup_key": "itin-11706064c6a17a78",
-    "trip_type": "one_way",
+    "trip_type": "round_trip",
     "slices": [
      {
       "segments": [
@@ -2269,11 +2302,12 @@
       "self_transfer": null
      }
     ],
-    "total_price": null,
+    "total_price": "841",
     "raw_price_text": "841 USD round trip total",
     "price_scope": "unknown",
-    "currency": null,
-    "price_status": "unknown",
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "return_slice_collected": false,
     "collected_at": "2026-10-24T18:18:14Z",
     "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
     "booking_url_type": "google_flights_search",
@@ -2284,7 +2318,7 @@
      "outbound_only: Google lists the return after an outbound is chosen",
      "price_missing",
      "baggage_unverified: price may exclude bags and card fees",
-     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+     "round_trip_total_quoted: the page shows the round-trip total; the return slice was not collected"
     ],
     "evidence": [
      {

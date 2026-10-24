@@ -378,6 +378,8 @@ class GraphIngestor:
                 "departure_at": first.departure_at, "stops": offer.slices[0].stops,
                 "total_price": offer.total_price, "currency": offer.currency,
                 "price_scope": offer.price_scope, "price_status": offer.price_status,
+                "raw_price_text": offer.raw_price_text,
+                "return_slice_collected": offer.return_slice_collected,
                 "collected_at": offer.collected_at, "booking_url": offer.booking_url,
                 "warnings": offer.warnings,
             }, offer.evidence)

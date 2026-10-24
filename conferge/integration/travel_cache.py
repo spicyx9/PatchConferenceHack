@@ -18,7 +18,7 @@ from typing import Any
 
 from conferge.api.provenance import source_of
 from conferge.core.schemas import FlightOffer, Lodging, RunReport
-from conferge.flights.round_trip_total import display as rt_display
+from conferge.flights.round_trip_total import as_stored
 from conferge.integration.stays_flights import LiveDomain, dedupe_flights, pick_flights, pick_stays
 
 CACHE_DIR = Path(__file__).resolve().parents[2] / "data" / "cache"
@@ -37,9 +37,7 @@ def provenance(item: Any) -> dict[str, Any]:
             "site": src["site"], "snapshot_id": src["snapshot_id"], "label": src["label"],
             "source_url": str(ev.source_url) if ev and ev.source_url else None,
             "collected_at": ev.collected_at.isoformat() if ev and ev.collected_at else None,
-            # As displayed: a Web Unlocker round-trip total shows as quoted_total (round_trip_total).
-            "price_status": rt_display(item).get("price_status", item.price_status)
-            if isinstance(item, FlightOffer) else item.price_status}
+            "price_status": item.price_status}
 
 
 def build(domain: str, items: list[Any], *, sources: list[str], generated_at: datetime,
@@ -96,6 +94,8 @@ def load(directory: Path = CACHE_DIR, *, flight_alternatives: bool = False) -> d
             continue
         doc = json.loads(path.read_text(encoding="utf-8"))
         items = [_cached(_MODELS[domain].model_validate(r["record"])) for r in doc["records"]]
+        if domain == "flights":  # a record saved before quoted_total existed, read as stored now
+            items = [as_stored(i) for i in items]
         picked = (pick_stays(items) if domain == "stays" else
                   dedupe_flights(items) if flight_alternatives else pick_flights(items))
         labels = Counter(r["provenance"]["label"] for r in doc["records"])

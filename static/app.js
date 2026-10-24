@@ -158,13 +158,21 @@
     unlocker: "Web Unlocker",
     serp: "SERP API",
   };
+  var SITE_LABELS = {
+    booking: "Booking",
+    airbnb: "Airbnb",
+    google_hotels: "Google Hotels",
+    google_flights: "Google Flights",
+    linkedin: "LinkedIn",
+  };
 
   function sourceApiText(src) {
     var prov = src.provider || "unknown";
     if (prov === "fixture" || src.api === "fixture") return "Sample data";
     if (prov === "brightdata")
       return (
-        "Bright Data · " + (BD_API_LABELS[src.api] || src.api || "unknown")
+        "Bright Data · " + (BD_API_LABELS[src.api] || src.api || "unknown") +
+        (SITE_LABELS[src.site] ? " · " + SITE_LABELS[src.site] : "")
       );
     if (src.api === "fallback")
       return "Fallback " + (PROVIDER_LABELS[prov] || prov);
@@ -1420,8 +1428,9 @@
                   esc(link) +
                   '" target="_blank" rel="noopener noreferrer">View stay</a>'
                 : "") +
-              "</div><details><summary>Offer details</summary>" +
-              sourceApiBadge(st.source) +
+              // Provenance on the card itself (Bright Data dataset Booking / Airbnb, fallback...).
+              '</div><div class="stay-source">' + sourceApiBadge(st.source) + "</div>" +
+              "<details><summary>Offer details</summary>" +
               "<p>" +
               esc(
                 [
