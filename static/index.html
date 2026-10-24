@@ -1,10 +1,31 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" prefix="og: https://ogp.me/ns#">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#1f2926" />
     <title>Conferge — make the right connections</title>
+    <meta name="description" content="Find the right people, explore your connections, and plan your conference with Conferge." />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Conferge" />
+    <meta property="og:title" content="Conferge — Find your next connection" />
+    <meta property="og:description" content="Explore your network with AI and discover the people you want to meet." />
+    <meta property="og:url" content="https://conferge-fx6pnv.spwt.app/" />
+    <meta property="og:image" content="https://conferge-fx6pnv.spwt.app/static/social/conferge-network-v1.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Conferge's galaxy of people and professional connections" />
+    <meta property="og:video" content="https://conferge-fx6pnv.spwt.app/static/social/conferge-network-v1.mp4" />
+    <meta property="og:video:secure_url" content="https://conferge-fx6pnv.spwt.app/static/social/conferge-network-v1.mp4" />
+    <meta property="og:video:type" content="video/mp4" />
+    <meta property="og:video:width" content="1200" />
+    <meta property="og:video:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Conferge — Find your next connection" />
+    <meta name="twitter:description" content="Explore your network with AI and discover the people you want to meet." />
+    <meta name="twitter:image" content="https://conferge-fx6pnv.spwt.app/static/social/conferge-network-v1.jpg" />
+
     <link rel="icon" type="image/svg+xml" href="/static/mark.svg" />
     <link
       rel="stylesheet"
@@ -14,7 +35,6 @@
     <link rel="stylesheet" href="/static/styles.css" />
     <link rel="stylesheet" href="/static/agenda-v2.css" />
     <link rel="stylesheet" href="/static/travel-v2.css" />
-    <link rel="stylesheet" href="/static/connections-v2.css" />
     <link rel="stylesheet" href="/static/refinement-v2.css" />
     <link rel="stylesheet" href="/static/travel-search-v3.css" />
     <link rel="stylesheet" href="/static/travel-cards.css" />
@@ -134,13 +154,7 @@
           >
         </nav>
         <div class="header-tools">
-          <button
-            class="text-button"
-            data-open="sources-dialog"
-            aria-label="Sources and how it works"
-          >
-            <svg class="icon"><use href="#i-info" /></svg></button
-          ><button class="replan-button" data-open="simulation-dialog">
+          <button class="replan-button" data-open="simulation-dialog">
             <span>Replan</span></button
           ><button
             class="profile-avatar"
@@ -347,9 +361,7 @@
                   ><span class="stat-label">conversations saved</span>
                 </div>
               </div>
-              <button class="sources-link" data-open="sources-dialog">
-                <svg class="icon"><use href="#i-info" /></svg>Sources & details
-              </button>
+
             </aside>
           </div>
         </section>
@@ -839,84 +851,87 @@
 
         <section
           id="tab-graph"
-          class="tab-panel connections-page"
+          class="tab-panel"
           aria-labelledby="connections-title"
           hidden
         >
-          <div class="page-heading">
-            <div>
-              <span class="eyebrow">MAKE THE INTRODUCTION COUNT</span>
-              <h1 id="connections-title">Your next connection.</h1>
-              <p>A person to know. A reason to connect. A place to start.</p>
-            </div>
+          <div class="page-heading connections-heading">
+            <div><h1 id="connections-title">Connections<span class="title-dot">.</span></h1>
+              <p id="connections-count">Loading people…</p></div>
           </div>
-          <section
-            class="connection-shortlist"
-            aria-labelledby="connection-shortlist-title"
-          >
-            <div class="section-heading">
-              <h2 id="connection-shortlist-title">Start with someone</h2>
-              <span class="muted small-text">Matched to your priorities</span>
-            </div>
-            <div
-              id="connection-choices"
-              class="connection-choices"
-              aria-label="Suggested people"
-            ></div>
-          <div class="panel" id="graph-gaps">
-            <span class="eyebrow">GAPS IN THE EVIDENCE</span>
-            <h2>No path in our graph</h2>
-            <p>No recorded path found, and that's the answer: the graph has no evidence linking this goal to anyone at the conference. It does not prove the person or event is absent.</p>
-            <div id="graph-gaps-body" class="muted">Loading…</div>
+          <div class="connection-filters" role="group" aria-label="Filter connections">
+            <div class="connection-filter"><span id="filter-company-label">Company</span>
+              <details class="filter-menu" id="filter-company">
+                <summary aria-labelledby="filter-company-label filter-company-value"><span id="filter-company-value">All companies</span><span aria-hidden="true">⌄</span></summary>
+                <div class="filter-popover"><input type="search" aria-label="Search company options" placeholder="Search options…" autocomplete="off" />
+                  <div class="filter-options" id="filter-company-options"></div><p class="filter-no-options" hidden>No matching options</p></div>
+              </details></div>
+            <div class="connection-filter"><span id="filter-role-label">Role</span>
+              <details class="filter-menu" id="filter-role">
+                <summary aria-labelledby="filter-role-label filter-role-value"><span id="filter-role-value">All roles</span><span aria-hidden="true">⌄</span></summary>
+                <div class="filter-popover"><input type="search" aria-label="Search role options" placeholder="Search options…" autocomplete="off" />
+                  <div class="filter-options" id="filter-role-options"></div><p class="filter-no-options" hidden>No matching options</p></div>
+              </details></div>
+            <div class="connection-filter"><span id="filter-topic-label">Profile / session topic</span>
+              <details class="filter-menu" id="filter-topic">
+                <summary aria-labelledby="filter-topic-label filter-topic-value"><span id="filter-topic-value">All topics</span><span aria-hidden="true">⌄</span></summary>
+                <div class="filter-popover"><input type="search" aria-label="Search profile / session topic options" placeholder="Search options…" autocomplete="off" />
+                  <div class="filter-options" id="filter-topic-options"></div><p class="filter-no-options" hidden>No matching options</p></div>
+              </details></div>
+            <div class="filter-feedback"><span id="filter-count" role="status" aria-live="polite"></span>
+              <button type="button" id="filter-reset" hidden>Reset filters</button></div>
           </div>
+          <div class="connection-chat">
+          <div class="connection-chat-heading">
+            <label class="connection-query-label" for="connection-query">Ask about your connections</label>
+            <button type="button" id="connection-reset" aria-label="Reset network and show all people">↺ Reset network</button>
+          </div>
+          <form id="connection-search" class="connection-search">
+            <span class="search-spark" aria-hidden="true">✳</span>
+            <input id="connection-query" maxlength="1000" minlength="2" required autocomplete="off"
+              placeholder="Describe who you want to meet or what you need help with…" />
+            <button type="submit" id="connection-submit">Find people <span aria-hidden="true">↗</span></button>
+          </form>
+          <section class="connection-examples" aria-labelledby="connection-examples-title">
+            <div class="connection-examples-heading">
+              <div><h2 id="connection-examples-title">Try an example</h2></div>
+            </div>
+            <div class="connection-prompt-grid">
+              <button type="button" data-connection-query="Who works on AI agents?">
+                <span>Who works on AI agents?</span><span class="prompt-arrow" aria-hidden="true">↗</span>
+              </button>
+              <button type="button" data-connection-query="Who can help me build developer tools?">
+                <span>Who can help me build developer tools?</span><span class="prompt-arrow" aria-hidden="true">↗</span>
+              </button>
+              <button type="button" data-connection-query="Who works on security for open source projects?">
+                <span>Who works on security for open source projects?</span><span class="prompt-arrow" aria-hidden="true">↗</span>
+              </button>
+            </div>
           </section>
-          <div
-            id="connection-selected"
-            class="connection-selected"
-            aria-live="polite"
-          >
-            <p class="muted">Finding your next connection…</p>
           </div>
-          <details class="connection-evidence panel">
-            <summary>Why this suggestion? View the sources</summary>
-            <div id="connection-source-notes"></div>
-            <div
-              id="graph-detail"
-              class="graph-detail"
-              role="status"
-              aria-live="polite"
-            >
-              Select a person to see their source-backed context.
+          <div class="connection-workspace">
+            <div class="network-pane">
+              <div class="network-toolbar"><span>3D network <span id="network-count"></span></span>
+                <div><button type="button" id="network-orbit" aria-pressed="true">Pause orbit</button>
+                <button type="button" id="network-all" hidden>↗ All connections</button>
+                <button type="button" id="network-fit" aria-label="Fit graph">Fit</button>
+                  <button type="button" id="network-zoom-in" aria-label="Zoom in">+</button>
+                  <button type="button" id="network-zoom-out" aria-label="Zoom out">−</button></div>
+              </div>
+              <div id="graph" class="graph" role="region" aria-label="Connections network"></div>
+              <div class="galaxy-hint">Drag to rotate · Scroll to zoom · Click a person</div>
+              <div id="graph-legend" class="legend"></div>
+              <p id="graph-focus-summary" class="sr-only"></p>
             </div>
-          </details>
-          <details
-            id="connection-map-details"
-            class="connection-map-details panel"
-          >
-            <summary>Explore the relationship map</summary>
-            <p class="small-text muted">
-              Follow the recorded relationships behind this suggestion.
-            </p>
-            <div id="graph-legend" class="legend"></div>
-            <div
-              id="graph"
-              role="region"
-              class="graph"
-              aria-label="Relationship map; a text alternative is available below"
-            ></div>
-            <details class="graph-text">
-              <summary>Read all relationships and evidence</summary>
-              <div id="graph-fallback"></div>
-            </details>
-            <details class="connection-system-details">
-              <summary>Planning details</summary>
-              <p class="small-text">
-                Engine: <span id="graph-backend">Loading…</span> · Plan version
-                <span id="agents-plan-version">—</span>
-              </p>
-              <div id="agents-state"></div>
-            </details>
-          </details>
+            <aside class="connection-sidebar" aria-label="People and connection details">
+              <div class="connection-sidebar-head"><h2 id="connection-results-title">People</h2>
+                <button type="button" id="connection-clear" hidden>All connections</button></div>
+              <p id="connection-summary" role="status" aria-live="polite"></p>
+              <div id="connection-results"></div>
+              <div id="graph-detail" class="graph-detail" role="status" aria-live="polite"></div>
+            </aside>
+          </div>
+          <div hidden><div id="graph-fallback"></div><span id="agents-plan-version"></span><div id="agents-state"></div></div>
         </section>
 
         <section
@@ -990,14 +1005,7 @@
             </div>
           </section>
         </section>
-        <footer class="footer">
-          <span>Your next conversation starts here.</span
-          ><a href="#dashboard" data-nav="dashboard">View your progress</a
-          ><button class="text-button" data-open="sources-dialog">
-            Sources and details
-          </button
-          ><a class="text-button" href="/api/v1/how-it-works?format=text" target="_blank" rel="noopener">How scoring works</a>
-        </footer>
+        <footer class="footer"><span>Conferge</span></footer>
       </main>
     </div>
 
@@ -1191,6 +1199,8 @@
     ></script>
     <script src="https://unpkg.com/cytoscape@3.30.2/dist/cytoscape.min.js"></script>
     <script src="/static/travel-cards.js"></script>
+    <script src="/static/galaxy3d.js"></script>
+    <script src="/static/connections.js"></script>
     <script src="/static/app.js"></script>
     <script src="/static/event-detail.js" defer></script>
   </body>

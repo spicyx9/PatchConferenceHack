@@ -2289,6 +2289,7 @@
   }
 
   function loadConnectionChoices() {
+    if (window.Connections) return window.Connections.render();
     var current =
       (lastPeople && lastPeople.items) ||
       (envelopes.people && envelopes.people.items);
@@ -2489,6 +2490,7 @@
   }
 
   function renderGraph(g) {
+    if (window.Connections) return window.Connections.render();
     pathRequest++;
     loadConnectionChoices();
     var details = $("connection-map-details");
@@ -2744,6 +2746,7 @@
   }
 
   function highlightPath(personId) {
+    if (window.Connections) return window.Connections.focus(personId);
     renderConnectionSelection(personId);
     var request = ++pathRequest;
     $("graph-detail").textContent = "Loading connections and evidence…";

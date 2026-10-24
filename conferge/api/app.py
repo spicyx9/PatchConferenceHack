@@ -8,6 +8,7 @@ reported as live. Run with ``uv run uvicorn conferge.api.app:app``.
 from __future__ import annotations
 
 import copy
+import os
 import platform
 import subprocess
 import time
@@ -15,6 +16,7 @@ from datetime import datetime, timezone
 from importlib import metadata
 from pathlib import Path
 from typing import Any, Literal
+from urllib.parse import urlencode
 
 from fastapi import APIRouter, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -255,8 +257,13 @@ def create_app(
     graph_probe: bool = True,
 ) -> FastAPI:
     """Build the app. Inject ``data`` (live envelopes) or ``found`` providers in tests."""
+    data = data or load_fixture()
+    if os.getenv("CONFERGE_NETWORK_ROSTER") == "1":
+        from conferge.api.network_roster import extend
+
+        data = extend(data)
     state = DemoState(
-        data or load_fixture(), found if found is not None else providers.discover_providers(),
+        data, found if found is not None else providers.discover_providers(),
         graph_probe,
     )
     app = FastAPI(title="Conferge demo API", version="0.1.0")
@@ -607,6 +614,15 @@ def create_app(
             if min_score is not None and score < min_score:
                 continue
             item = event.model_dump(mode="json")
+            # Cached Maps evidence includes a verified place ID; expose a resolvable
+            # source link without changing the original evidence or collection time.
+            for evidence in item["evidence"]:
+                if (evidence["provider"] == "brightdata:google_maps" and not evidence["source_url"]
+                        and evidence["source_record_id"] and event.venue):
+                    evidence["source_url"] = "https://www.google.com/maps/search/?" + urlencode({
+                        "api": "1", "query": event.venue.name,
+                        "query_place_id": evidence["source_record_id"],
+                    })
             item["score"] = score
             item["source_mode"] = logic._mode_of(event.evidence)
             item["attended"] = event.id in state.attended
@@ -1006,6 +1022,9 @@ def create_app(
         return _envelope(state, ["flights", "stays", "people"], view)
 
     app.include_router(api)
+    from conferge.api.connections import router as connections_router
+
+    app.include_router(connections_router(state))
     app.include_router(calendar_router)
     app.include_router(travel_search_router)
 
