@@ -16,6 +16,7 @@ from datetime import datetime, timezone
 from importlib import metadata
 from pathlib import Path
 from typing import Any, Literal
+from urllib.parse import urlencode
 
 from fastapi import APIRouter, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -613,6 +614,15 @@ def create_app(
             if min_score is not None and score < min_score:
                 continue
             item = event.model_dump(mode="json")
+            # Cached Maps evidence includes a verified place ID; expose a resolvable
+            # source link without changing the original evidence or collection time.
+            for evidence in item["evidence"]:
+                if (evidence["provider"] == "brightdata:google_maps" and not evidence["source_url"]
+                        and evidence["source_record_id"] and event.venue):
+                    evidence["source_url"] = "https://www.google.com/maps/search/?" + urlencode({
+                        "api": "1", "query": event.venue.name,
+                        "query_place_id": evidence["source_record_id"],
+                    })
             item["score"] = score
             item["source_mode"] = logic._mode_of(event.evidence)
             item["attended"] = event.id in state.attended
