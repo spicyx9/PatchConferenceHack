@@ -79,7 +79,10 @@
 
   // Observed price only: total_price as given, else the raw scraped text, else "unknown". Never computed.
   function flightPriceText(f) {
-    if (f.total_price !== null && f.total_price !== undefined) return f.total_price + " " + (f.currency || "");
+    if (f.total_price !== null && f.total_price !== undefined) {
+      return f.total_price + " " + (f.currency || "") + (f.price_label ? " (" + f.price_label + ")" : "") +
+        (f.return_slice_collected === false ? ", retour non collecte" : "");
+    }
     if (f.raw_price_text) return "prix observ\u00e9: " + f.raw_price_text;
     return "unknown";
   }

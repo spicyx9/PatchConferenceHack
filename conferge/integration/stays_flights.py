@@ -32,6 +32,7 @@ from typing import Any
 
 from conferge.api.provenance import source_of
 from conferge.core.schemas import FlightOffer, Lodging, RunStatus
+from conferge.flights.round_trip_total import is_round_trip, trip_price
 from conferge.lodging.dedupe import normalize_name
 
 DEPART, RETURN = date(2026, 10, 27), date(2026, 10, 30)
@@ -130,7 +131,8 @@ def flight_key(offer: FlightOffer) -> tuple[Any, ...]:
 def dedupe_flights(offers: Iterable[FlightOffer]) -> list[FlightOffer]:
     """One offer per ``flight_key``, the lowest tier (then cheapest) winning."""
     def rank(o: FlightOffer) -> tuple[Any, ...]:
-        price = Decimal(o.total_price) if o.total_price is not None else Decimal("Infinity")
+        price = trip_price(o)
+        price = price if price is not None else Decimal("Infinity")
         return (_tier(o), price, o.id)
 
     best: dict[tuple[Any, ...], FlightOffer] = {}
@@ -141,7 +143,7 @@ def dedupe_flights(offers: Iterable[FlightOffer]) -> list[FlightOffer]:
 
 def _trip(priced: list[FlightOffer]) -> tuple[FlightOffer | None, FlightOffer | None,
                                               FlightOffer | None]:
-    round_trip = next((o for o in priced if o.trip_type == "round_trip"), None)
+    round_trip = next((o for o in priced if is_round_trip(o)), None)
     out = next((o for o in priced if o.trip_type == "one_way" and _departs(o) == DEPART
                 and o.slices[0].segments[-1].destination_iata == ARRIVAL_AIRPORT), None)
     back = next((o for o in priced if o.trip_type == "one_way" and _departs(o) == RETURN
@@ -153,8 +155,10 @@ def pick_flights(offers: list[FlightOffer]) -> list[FlightOffer]:
     """Within the best source tier able to supply a whole trip: the cheapest priced round
     trip, else the cheapest outbound into SFO + cheapest return from SFO. If no single tier
     covers the trip, each leg comes from the best tier that has it."""
-    priced = sorted((o for o in dedupe_flights(offers) if o.total_price is not None),
-                    key=lambda o: (Decimal(o.total_price), o.id))  # type: ignore[arg-type]
+    # A round-trip total observed on the Google Flights page (Web Unlocker) counts as a
+    # priced round trip: the total as shown, never split (see flights.round_trip_total).
+    priced = sorted((o for o in dedupe_flights(offers) if trip_price(o) is not None),
+                    key=lambda o: (trip_price(o), o.id))
     for tier in sorted({_tier(o) for o in priced}):
         round_trip, out, back = _trip([o for o in priced if _tier(o) == tier])
         if round_trip:
@@ -177,7 +181,10 @@ async def _flights(timeout: float) -> LiveDomain:
     warnings = [f"{len(env.items)} offers collected, {len(picked)} kept for the itinerary",
                 f"flights sources collected: {source_counts(env.items)}",
                 f"flights sources kept: {source_counts(picked)}"]
-    if picked and all(o.trip_type == "one_way" for o in picked):
+    if any(o.raw_price_text and o.total_price is None for o in picked):
+        warnings.append("round trip total observed on the Google Flights page (Bright Data "
+                        "Web Unlocker), shown as is; the return slice was not collected")
+    elif picked and all(o.trip_type == "one_way" for o in picked):
         warnings.append("trip total is two separately observed one-way fares, not a round-trip quote")
     errors = list(env.errors)
     if env.items and not picked:
