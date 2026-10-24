@@ -154,7 +154,11 @@ make install   # Python deps with uv
 make demo      # API + UI on http://127.0.0.1:8000, demo data loaded into FalkorDB
 ```
 
-No `.env` is needed for the demo. **Port 6379 already taken** (a local Redis, for example): run `FALKORDB_PORT=6380 make up` and `FALKORDB_PORT=6380 make demo` (or put `FALKORDB_PORT=6380` in `.env`); `make demo` stops with "port 6379 is a plain Redis, set FALKORDB_PORT to the FalkorDB port" when it finds a Redis without the FalkorDB module.
+No `.env` is needed for the demo. Ports:
+- If 6379 is already taken by a local Redis, run `FALKORDB_PORT=6380 make up` and `FALKORDB_PORT=6380 make demo` (or put `FALKORDB_PORT=6380` in `.env`). When `make demo` finds a Redis without the FalkorDB module, it stops with "port 6379 is a plain Redis, set FALKORDB_PORT to the FalkorDB port".
+- If 8000 is taken, run `make demo DEMO_PORT=8001`. `make demo` checks this before loading anything.
+
+By default `make demo` makes no Bright Data call at startup: travel comes from labelled fixtures and LinkedIn from cached probe files. `make demo DEMO_ARGS="--travel live"` adds the live stays and flights searches. With a key, these took 2 to 3 min on 2026-10-24, because each Bright Data source is capped at 120 s.
 
 `uv run python scripts/run_demo.py --mode live` collects from the public sources instead of the snapshot. Copy `.env.example` to `.env` and set `BRIGHTDATA_API_KEY` (plus `BRIGHTDATA_UNLOCKER_ZONE` and `BRIGHTDATA_SERP_ZONE`) to enable the Bright Data connectors.
 
