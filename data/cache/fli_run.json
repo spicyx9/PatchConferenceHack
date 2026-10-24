@@ -1,0 +1,16 @@
+{
+ "provider": "google_flights_fli",
+ "run_at": "2026-10-24T20:17:28.685858+00:00",
+ "status": "failed",
+ "records": 0,
+ "errors": [
+  "Google answered without flight data (RPC error 13: request rejected)"
+ ],
+ "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20JFK%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+ "google_flights": {
+  "dataset": "pending",
+  "dataset_detail": "no snapshot in snapshots/",
+  "unlocker": 34,
+  "fli": 0
+ }
+}

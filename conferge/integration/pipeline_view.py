@@ -77,11 +77,33 @@ def build_rows(slices: list[Any], travel: dict[str, Any], travel_fallback: dict[
                          "status": "fixture", "termination": None,
                          "reason": "live results unusable; labelled fixture shown",
                          "estimated_cost_usd": None, "estimate_basis": None})
+    rows.extend(fli_rows())  # Google Flights secondary source, as of the last fli probe
     return rows
 
 
 BLOCK_MATRIX = Path(__file__).resolve().parents[2] / "data" / "block_matrix.json"
 _ATTEMPTS = ("plain_default_ua", "plain_browser_ua", "brightdata_unlocker", "brightdata_dataset")
+
+
+FLI_RUN = Path(__file__).resolve().parents[2] / "data" / "cache" / "fli_run.json"
+
+
+def fli_rows(path: Path = FLI_RUN) -> list[dict[str, Any]]:
+    """Google Flights sources as of the last fli probe run (scripts/probes/flights_fli.py)."""
+    try:
+        run = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+    gf = run.get("google_flights") or {}
+    reason = None if run["status"] == "ok" else "; ".join(run.get("errors") or []) or None
+    summary = (f"Google Flights: Bright Data dataset {gf.get('dataset')}, Web Unlocker "
+               f"{gf.get('unlocker')}, fli {gf.get('fli')}")
+    return [{"source": "flights", "provider": run["provider"], "kind": "direct",
+             "brightdata_api": None, "records": run.get("records", 0),
+             "collected_at": run.get("run_at"), "status": run["status"],
+             "termination": "exhausted" if run["status"] == "ok" else "error",
+             "reason": f"{summary}" + (f" ({reason})" if reason else ""),
+             "estimated_cost_usd": None, "estimate_basis": None}]
 
 
 def reachability(path: Path | None = None) -> dict[str, Any] | None:

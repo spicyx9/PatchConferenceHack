@@ -16,6 +16,7 @@ dependencies = [
   "falkordb==1.8.0",
   "pyairbnb==2.2.2",
   "fast-flights==3.1.0",
+  "flights==0.9.0",
 ]
 
 [dependency-groups]
