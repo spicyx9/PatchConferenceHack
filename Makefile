@@ -27,7 +27,7 @@ demo:
 
 # Full journey against the real API process and FalkorDB (FALKORDB_PORT, default 6380).
 e2e:
-	CONFERGE_E2E=1 FALKORDB_PORT=$${FALKORDB_PORT:-6380} uv run pytest -v -p no:cacheprovider tests/e2e
+	CONFERGE_E2E=1 FALKORDB_PORT=$${FALKORDB_PORT:-6380} uv run pytest -v -rA -p no:cacheprovider tests/e2e
 
 # Each window owns scripts/probes/<name>.py; the shared Makefile never changes.
 probe-%:

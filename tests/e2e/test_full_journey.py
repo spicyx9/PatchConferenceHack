@@ -154,7 +154,10 @@ def no_placeholders(value: Any, path: str = "$") -> None:
 
 def ranking(api: Api) -> list[str]:
     body = envelope(api.call("GET", "/people?limit=100"))
-    return [c["person"]["id"] for c in body["items"] if c.get("person")]
+    ids = [c["person"]["id"] for c in body["items"] if c.get("person")]
+    agent = [w for w in body["warnings"] if "agent" in w or "planner" in w]
+    print(f"ranking on :{api.port}: {len(ids)} people, top3 {ids[:3]}, agent warnings {agent}")
+    return ids
 
 
 def test_01_reset(api: Api) -> None:
