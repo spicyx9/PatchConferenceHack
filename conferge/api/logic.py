@@ -17,6 +17,7 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 from conferge.api.data import DemoData
+from conferge.api.provenance import source_of
 from conferge.core.schemas import Event, Goal, Opportunity, Person, SourceEvidence
 
 FALLBACK = "api-fallback"
@@ -473,6 +474,7 @@ def stays_view(data: DemoData) -> list[dict[str, Any]]:
         item["distance_to_venue_m"] = distance
         item["distance_is_straight_line_estimate"] = computed
         item["source_mode"] = _mode_of(stay.evidence)
+        item["source"] = source_of(stay.evidence)
         out.append(item)
     return out
 
@@ -494,6 +496,7 @@ def travel_view(
                 "arrival_at": last.arrival_at.isoformat() if last.arrival_at else None,
                 "carrier": first.marketing_carrier, "price_status": flight.price_status,
                 "source_mode": _mode_of(flight.evidence),
+                "source": source_of(flight.evidence),
             })
     stays = stays_view(data)
     if stays:
@@ -501,6 +504,7 @@ def travel_view(
             "kind": "stay", "stay_id": stays[0]["id"], "name": stays[0]["name"],
             "check_in": stays[0]["check_in"], "check_out": stays[0]["check_out"],
             "price_status": stays[0]["price_status"], "source_mode": stays[0]["source_mode"],
+            "source": stays[0]["source"],
         })
     proposals = []
     arrival_day = user["depart_date"]

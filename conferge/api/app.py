@@ -23,6 +23,7 @@ from pydantic import BaseModel, Field
 
 from conferge.api import logic, providers
 from conferge.api.data import DemoData, load_fixture
+from conferge.api.provenance import source_of
 from conferge.core.schemas import AgentContext, Goal, Opportunity
 
 STATIC_DIR = Path(__file__).resolve().parents[2] / "static"
@@ -456,7 +457,8 @@ def create_app(
 
     @api.get("/flights")
     def flights() -> dict[str, Any]:
-        items = [f.model_dump(mode="json") for f in state.data.flights]
+        items = [{**f.model_dump(mode="json"), "source": source_of(f.evidence)}
+                 for f in state.data.flights]
         return _envelope(state, ["flights"], {"items": items, "count": len(items)})
 
     @api.get("/travel")
