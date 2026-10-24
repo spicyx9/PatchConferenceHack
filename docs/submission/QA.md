@@ -41,8 +41,9 @@ collected, and every item in `/api/v1/flights` says so.
 
 ### 6. Why 2 adults?
 The stay search uses the trip brief's `ADULTS` (`conferge/integration/stays_flights.py:41`).
-Flights are searched for one adult in economy (`conferge/flights/unlocker_provider.py:206`), so
-stay and flight prices do not cover the same party.
+Flights are searched for one adult in economy (`conferge/flights/unlocker_provider.py:206`), and
+the screen says so beside every trip total ("Stay quoted for 2 adults · flight for 1 adult",
+`occupancy_note` in `/api/v1/travel` and `/api/v1/roi`).
 
 ### 7. Why did Nick Liffen disappear after "I met"?
 `people_for_goal` excludes people the user has already MET or CONTACTED, read from Meeting
