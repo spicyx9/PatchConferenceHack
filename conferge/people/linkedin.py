@@ -21,7 +21,6 @@ import asyncio
 import html
 import json
 import math
-import os
 import re
 from collections.abc import Awaitable, Callable, Iterable
 from dataclasses import dataclass
@@ -313,10 +312,13 @@ class LinkedInDatasets:
 
     @classmethod
     def from_env(cls) -> LinkedInDatasets:
+        """Env or .env overrides; profile and company default to the documented dataset ids."""
+        from conferge.core.settings import env_value
+
         return cls(
-            profile=os.getenv("BRIGHTDATA_LINKEDIN_PROFILE_DATASET") or None,
-            company=os.getenv("BRIGHTDATA_LINKEDIN_COMPANY_DATASET") or None,
-            posts=os.getenv("BRIGHTDATA_LINKEDIN_POSTS_DATASET") or None,
+            profile=env_value("BRIGHTDATA_LINKEDIN_PROFILE_DATASET") or "gd_l1viktl72bvl7bjuj0",
+            company=env_value("BRIGHTDATA_LINKEDIN_COMPANY_DATASET") or "gd_l1vikfnt1wgvvqz95w",
+            posts=env_value("BRIGHTDATA_LINKEDIN_POSTS_DATASET") or None,
         )
 
 

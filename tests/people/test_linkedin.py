@@ -248,8 +248,8 @@ async def test_missing_dataset_id_raises(monkeypatch):
     monkeypatch.delenv("BRIGHTDATA_LINKEDIN_POSTS_DATASET", raising=False)
     bd, http = _bd(lambda req: httpx.Response(500))
     async with http:
-        with pytest.raises(LinkedInUnavailable, match="^missing_credentials:"):
-            await fetch_profile(bd, "https://www.linkedin.com/in/a/")
+        # Profiles default to the documented dataset gd_l1viktl72bvl7bjuj0; posts have none.
+        assert LinkedInDatasets.from_env().profile == "gd_l1viktl72bvl7bjuj0"
         with pytest.raises(LinkedInUnavailable, match="^missing_credentials:"):
             await fetch_posts(bd, "https://www.linkedin.com/in/a/")
 

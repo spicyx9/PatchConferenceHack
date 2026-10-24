@@ -71,3 +71,18 @@ def test_search_falls_back_to_api_dataset_without_falkordb() -> None:
     body = _client().get("/api/v1/search", params={"q": "founders"}).json()
     assert body["backend"] == "api-fallback"
     assert body["events"] or body["people"]
+
+
+def test_brightdata_counter_reports_usage_and_config_without_the_key(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    from conferge.core import brightdata
+
+    monkeypatch.setattr(brightdata.BrightDataClient, "from_env", classmethod(
+        lambda cls: cls("secret-value", serp_zone=None, unlocker_zone="z")))
+    brightdata.reset_usage()
+    brightdata.record_usage("datasets", 7)
+    brightdata.record_usage("web_unlocker")
+    body = _client().get("/api/v1/brightdata").json()
+    assert body["usage"] == {"datasets": 7, "web_unlocker": 1, "serp": 0, "total": 8}
+    assert body["ready"] == {"datasets": True, "web_unlocker": True, "serp": False}
+    assert "secret-value" not in str(body)
+    brightdata.reset_usage()

@@ -734,7 +734,20 @@
       esc(storyTop.name) + "</button>";
   }
 
+  function renderBrightData(res) {
+    var u = (res && res.usage) || {}, ready = (res && res.ready) || {};
+    function part(api, label) {
+      return esc(label) + " " + esc(u[api] || 0) + (ready[api] ? "" : ' <span class="muted">(not configured)</span>');
+    }
+    $("bd-counter").innerHTML = "<b>Records collected via Bright Data: " + esc(u.total || 0) + "</b>" +
+      ' <span class="bd-detail">' + part("datasets", "datasets") + " | " + part("web_unlocker", "Web Unlocker") +
+      " | " + part("serp", "SERP API") + "</span>";
+  }
+
   function loadStory() {
+    api("/brightdata", null, "brightdata").then(renderBrightData).catch(function () {
+      $("bd-counter").textContent = "Records collected via Bright Data: unavailable";
+    });
     return Promise.all([api("/plan", null, "plan"), api("/travel/map", null, "map"), api("/people?limit=3", null, "people")])
       .then(function (r) {
         renderStoryGoal(r[0]);

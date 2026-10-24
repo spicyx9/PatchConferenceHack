@@ -9,7 +9,6 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Literal
@@ -20,6 +19,24 @@ from pydantic import BaseModel, ConfigDict, Field
 
 logger = logging.getLogger(__name__)
 _RETRY_STATUSES = {429, 500, 502, 503, 504}
+
+BrightDataApi = Literal["datasets", "web_unlocker", "serp"]
+# Process-wide count of what Bright Data actually returned (successful responses only):
+# dataset rows, Web Unlocker pages, SERP result pages. Shown on the demo home screen.
+_USAGE: dict[str, int] = {"datasets": 0, "web_unlocker": 0, "serp": 0}
+
+
+def record_usage(api: BrightDataApi, count: int = 1) -> None:
+    _USAGE[api] = _USAGE.get(api, 0) + max(count, 0)
+
+
+def usage() -> dict[str, int]:
+    return {**_USAGE, "total": sum(_USAGE.values())}
+
+
+def reset_usage() -> None:
+    for key in _USAGE:
+        _USAGE[key] = 0
 
 
 class BrightDataError(RuntimeError):
@@ -57,11 +74,24 @@ class BrightDataClient:
 
     @classmethod
     def from_env(cls) -> BrightDataClient:
+        """Key and zones from the process env, else the repo-root .env (conferge.core.settings)."""
+        from conferge.core.settings import env_value
+
         return cls(
-            api_key=os.getenv("BRIGHTDATA_API_KEY") or None,
-            serp_zone=os.getenv("BRIGHTDATA_SERP_ZONE") or None,
-            unlocker_zone=os.getenv("BRIGHTDATA_UNLOCKER_ZONE") or None,
+            api_key=env_value("BRIGHTDATA_API_KEY") or None,
+            serp_zone=env_value("BRIGHTDATA_SERP_ZONE") or None,
+            unlocker_zone=env_value("BRIGHTDATA_UNLOCKER_ZONE") or None,
         )
+
+    def not_ready(self, api: BrightDataApi) -> str | None:
+        """Why ``api`` cannot be used right now (callers then take their fallback), or None."""
+        if not self._api_key:
+            return "Bright Data key missing; set BRIGHTDATA_API_KEY"
+        if api == "serp" and not self.serp_zone:
+            return "BRIGHTDATA_SERP_ZONE not configured"
+        if api == "web_unlocker" and not self.unlocker_zone:
+            return "BRIGHTDATA_UNLOCKER_ZONE not configured"
+        return None
 
     async def __aenter__(self) -> BrightDataClient:
         return self
@@ -130,6 +160,7 @@ class BrightDataClient:
             if not snapshot_id:
                 raise BrightDataError("Bright Data returned HTTP 202 without snapshot_id")
             return CollectionOutput(status="running", source_mode="live", snapshot_id=snapshot_id)
+        record_usage("datasets", len(payload) if isinstance(payload, list) else 1)
         return CollectionOutput(status="ready", source_mode="live", data=payload)
 
     async def trigger_dataset(
@@ -166,6 +197,7 @@ class BrightDataClient:
             return CollectionOutput(status="running", source_mode="live", snapshot_id=snapshot_id)
         if isinstance(data, dict) and data.get("status") in {"failed", "canceled"}:
             raise BrightDataError("Bright Data snapshot failed")
+        record_usage("datasets", len(data) if isinstance(data, list) else 1)
         return CollectionOutput(
             status="ready", source_mode="live", snapshot_id=snapshot_id, data=data
         )
@@ -177,6 +209,7 @@ class BrightDataClient:
         response = await self._request(
             "POST", "/request", payload={"zone": self.serp_zone, "url": url, "format": "raw"}
         )
+        record_usage("serp")
         return response.text
 
     async def unlock(self, url: str) -> str:
@@ -188,6 +221,7 @@ class BrightDataClient:
             "POST", "/request",
             payload={"zone": self.unlocker_zone, "url": url, "format": "raw"},
         )
+        record_usage("web_unlocker")
         return response.text
 
     @staticmethod

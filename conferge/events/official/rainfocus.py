@@ -21,9 +21,11 @@ import logging
 import re
 from dataclasses import dataclass, field
 from typing import Any, Literal
+from urllib.parse import urlencode, urlsplit
 
 import httpx
 
+from conferge.core.brightdata import BrightDataClient, BrightDataError
 from conferge.core.schemas import Termination
 
 logger = logging.getLogger(__name__)
@@ -122,11 +124,18 @@ class RainFocusClient:
         page_size: int = 50,
         max_pages: int = 40,
         delay_s: float = 0.3,
+        brightdata: BrightDataClient | None = None,
     ) -> None:
         self._client = client or httpx.AsyncClient(
             timeout=30.0, headers={"User-Agent": USER_AGENT}, follow_redirects=True
         )
         self._owns_client = client is None
+        # githubuniverse.com pages go through Bright Data Web Unlocker when key + zone are set;
+        # direct GET otherwise or on any Unlocker error. The api/search POST (custom widget
+        # headers) stays direct: Unlocker POST with those headers is not verified.
+        self._bd = brightdata
+        self.transport: dict[str, int] = {"brightdata:web_unlocker": 0, "direct": 0}
+        self._notes: list[str] = []
         self.portal_base = portal_base
         self.api_base = api_base
         self.workflow_token = workflow_token
@@ -137,6 +146,32 @@ class RainFocusClient:
     async def aclose(self) -> None:
         if self._owns_client:
             await self._client.aclose()
+        if self._bd is not None:
+            await self._bd.aclose()
+
+    def drain_notes(self) -> list[str]:
+        notes, self._notes = list(dict.fromkeys(self._notes)), []
+        return notes
+
+    async def _unlocked_json(self, url: str, params: dict[str, Any] | None) -> dict[str, Any] | None:
+        """Portal GET through Web Unlocker; None means "use the direct GET" (reason noted)."""
+        if self._bd is None or not (urlsplit(url).hostname or "").endswith("githubuniverse.com"):
+            return None
+        reason = self._bd.not_ready("web_unlocker")
+        if reason:
+            self._notes.append(f"{reason}: direct GET for githubuniverse.com")
+            return None
+        full = url + ("?" + urlencode(params) if params else "")
+        try:
+            data = json.loads(await self._bd.unlock(full))
+        except (BrightDataError, ValueError) as exc:
+            self._notes.append(f"Web Unlocker failed ({exc}); direct GET fallback")
+            return None
+        if not isinstance(data, dict):
+            self._notes.append("Web Unlocker returned non-object JSON; direct GET fallback")
+            return None
+        self.transport["brightdata:web_unlocker"] += 1
+        return data
 
     async def __aenter__(self) -> RainFocusClient:
         return self
@@ -145,6 +180,11 @@ class RainFocusClient:
         await self.aclose()
 
     async def _json(self, method: str, url: str, **kwargs: Any) -> dict[str, Any]:
+        if method == "GET":
+            unlocked = await self._unlocked_json(url, kwargs.get("params"))
+            if unlocked is not None:
+                return unlocked
+        self.transport["direct"] += 1
         try:
             response = await self._client.request(method, url, **kwargs)
         except (httpx.RequestError, httpx.TimeoutException) as exc:
@@ -190,7 +230,9 @@ class RainFocusClient:
         except RainFocusError as exc:
             run.termination = exc.termination
             run.errors.append(str(exc))
+            run.warnings.extend(self.drain_notes())
             return run
+        run.warnings.extend(self.drain_notes())
         headers = {
             "rfWidgetId": config.widget_id,
             "rfApiProfileId": config.api_profile_token,

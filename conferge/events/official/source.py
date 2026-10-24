@@ -17,6 +17,7 @@ from typing import Any
 
 import httpx
 
+from conferge.core.brightdata import BrightDataClient
 from conferge.core.schemas import (
     Company,
     Conference,
@@ -84,6 +85,12 @@ class OfficialCollection:
         return self.events.status
 
 
+def _brightdata_or_none() -> BrightDataClient | None:
+    """Shared Bright Data client when a key is set; Web Unlocker readiness is checked per call."""
+    client = BrightDataClient.from_env()
+    return client if client.not_ready("datasets") is None else None
+
+
 class OfficialConferenceSource:
     """Implements conferge.core.contracts.Source for the official Universe catalog."""
 
@@ -95,7 +102,7 @@ class OfficialConferenceSource:
         *,
         http_client: httpx.AsyncClient | None = None,
     ) -> None:
-        self._client = client or RainFocusClient(http_client)
+        self._client = client or RainFocusClient(http_client, brightdata=_brightdata_or_none())
         self._owns_client = client is None
 
     async def aclose(self) -> None:
@@ -126,6 +133,13 @@ class OfficialConferenceSource:
         started = datetime.now(timezone.utc)
         runs = [await self._client.search(kind, limit=limit) for kind in kinds]
         return runs, started, datetime.now(timezone.utc)
+
+    def _transport_note(self) -> list[str]:
+        transport = getattr(self._client, "transport", None)
+        if not isinstance(transport, dict):
+            return []
+        return [f"transport: githubuniverse.com via Web Unlocker {transport['brightdata:web_unlocker']}x, "
+                f"direct {transport['direct']}x (api/search POST is direct)"]
 
     async def discover(self, query: DiscoveryQuery) -> DiscoveryResult:
         if query.conference_id not in (None, CONFERENCE_ID):
@@ -166,7 +180,8 @@ class OfficialConferenceSource:
             unique_count=len(items), pages=sum(r.pages for r in runs),
             expected_count=expected, errors=errors,
             warnings=warnings + [f"{r.kind}: {r.termination}, {len(r.items)} items"
-                                 for r in runs],
+                                 for r in runs]
+            + self._transport_note(),
         )
         return DiscoveryResult(items=items, run_report=report, errors=errors)
 

@@ -307,6 +307,19 @@ def create_app(
     def plan() -> dict[str, Any]:
         return _envelope(state, ["events", "people"], _plan_payload(), extra_warnings=_plan_warnings())
 
+    @api.get("/brightdata")
+    def brightdata_usage() -> dict[str, Any]:
+        """What Bright Data actually returned in this process, per API; config state, never the key."""
+        from conferge.core import brightdata as bd
+
+        client = bd.BrightDataClient.from_env()
+        apis = ("datasets", "web_unlocker", "serp")
+        return _envelope(state, [], {
+            "usage": bd.usage(),
+            "ready": {api: client.not_ready(api) is None for api in apis},
+            "not_ready_reason": {api: client.not_ready(api) for api in apis},
+        }, mode_override="live")
+
     @api.get("/search")
     def search(q: str = Query(..., min_length=2, max_length=100),
                limit: int = Query(10, ge=1, le=50)) -> dict[str, Any]:

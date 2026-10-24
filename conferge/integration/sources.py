@@ -235,18 +235,35 @@ async def _live_official() -> SourceSlice:
     return _official_slice("live", await official.run({"id": CONFERENCE_ID}))
 
 
+# Hand-picked demo searches, sent first through the Bright Data SERP API.
+DISCOVERY_EXTRA_QUERIES = ("GitHub Universe 2026 side event",
+                           "AI founders happy hour San Francisco October 28")
+
+
 async def _live_discovery() -> SourceSlice:
+    """Bright Data SERP -> candidate URLs -> routed detail pages -> events (window 04 pipeline).
+
+    Without BRIGHTDATA_SERP_ZONE the SERP step reports failed and the slice carries no
+    events: assembly keeps the other sources (visible fallback, nothing invented).
+    """
+    from conferge.api.data import load_fixture as load_api_fixture
     from conferge.core.brightdata import BrightDataClient
     from conferge.events import discovery
+    from conferge.events.discovery.pipeline import run as run_discovery
 
     plan = discovery.fixture_plan(explicit_opt_in=True)  # query plan is configuration
+    plan = plan.model_copy(update={"extra_queries": list(DISCOVERY_EXTRA_QUERIES)})
+    conference = load_api_fixture().conference  # anchor id github-universe-2026
     async with BrightDataClient.from_env() as bd:
-        result = await discovery.SerpDiscoverySource(bd).discover_plan(plan)
-    report = result.run_report
-    # Candidate URLs only; detail verification is window 04's probe (make probe-discovery).
-    return SourceSlice("discovery", "04", "live", report.source_mode, report.status,
-                       reports=[report], errors=list(result.errors),
-                       warnings=[f"{len(result.items)} live candidate URLs (not events)",
+        found = await run_discovery(conference, source=discovery.SerpDiscoverySource(bd), plan=plan)
+    report = found.discovery.run_report
+    events = list(found.events.items)
+    return SourceSlice("discovery", "04", "live", report.source_mode,
+                       report.status if events or report.status == "failed" else "degraded",
+                       events=events, reports=[report, *found.events.reports],
+                       errors=list(dict.fromkeys([*found.discovery.errors, *found.events.errors])),
+                       warnings=[f"{len(found.discovery.items)} SERP candidate URLs via brightdata:serp, "
+                                 f"{len(events)} events after detail fetch",
                                  *report.warnings],
                        collected_at=report.finished_at)
 

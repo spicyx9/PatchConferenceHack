@@ -50,6 +50,8 @@ class QueryPlan(BaseModel):
     topics: list[str] = Field(default_factory=list)
     max_sponsors: int = Field(default=8, ge=0)
     max_platform_days: int = Field(default=4, ge=0)
+    extra_queries: list[str] = Field(default_factory=list)
+    """Explicit queries sent first, as written (e.g. the demo's hand-picked searches)."""
 
 
 def _quote(value: str) -> str:
@@ -88,6 +90,8 @@ def build_queries(plan: QueryPlan) -> list[SerpQuery]:
         if text and all(q.text.casefold() != text.casefold() for q in out):
             out.append(SerpQuery(text=text, family=family, reason=reason))
 
+    for text in plan.extra_queries:
+        add(text, "conference", "explicit query")
     if plan.conference_name:
         name = _quote(plan.conference_name)
         for word in SIDE_EVENT_WORDS:
