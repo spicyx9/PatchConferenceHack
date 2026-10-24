@@ -1,12 +1,11 @@
-## CANONICAL STRUCTURE — READ THIS FIRST (updated 2026-10-23 PT)
+## WORKSTREAM INSTRUCTIONS — CANONICAL (2026-10-23 PT)
 
-Window 00 is already completed on the **actual** Python package `conferge/` with green CI.
-Authoritative instructions, in order: `CLAUDE.md` → `docs/CONTRACTS.md` → `docs/WORKSTREAMS.md` → `docs/prompts/wNN-<slug>.md`.
-The `docs/knowledge/` directory is a research/reference library, **not a source of repo paths or schemas**.
-The alternate `docs/prompts/wNN.md` and `docs/prompts/_common.md` were authored for an old `backend/app/` proposal and are **legacy, not executable**. Do not follow their branch names, directory names, signature requirements, or instructions to unzip a starter.
-Do not recreate the repository, re-unzip files, rename packages, or change `conferge/core` contracts. Use the exact existing `scripts/create_worktrees.sh`.
-The orchestrator's final instructions are `docs/ORCHESTRATOR_CANONICAL.md` and the progress ledger is `STATUS.md`.
-Never run unattended with `--dangerously-skip-permissions`. Keep CI, permissions and path ownership enforced. Qodo reviews, if available, are auxiliary; sponsor tracks are Bright Data and FalkorDB.
+**Window 00 is already installed and CI-tested. Do not recreate or unzip a second starter.**
+The real package is `conferge/`; the frozen contract lives in `conferge/core/` (schemas v0.2).
+Read in order: `CLAUDE.md` → `docs/CONTRACTS.md` → `docs/WORKSTREAMS.md` → `docs/prompts/README.md` → window's `docs/prompts/wNN-<slug>.md` (binding mission). `docs/prompts/wNN.md` is a **technical reference** with endpoints and edge cases, not the source of file paths, branch names, schema names, or API signatures. Interpret old `backend/app` paths using the mapping in `docs/prompts/README.md`. `docs/prompts/_common.md` may be used as the common preamble after this precedence is understood.
+`docs/knowledge/` is a research library, not an overriding architecture. Where historical content conflicts with core contracts, favor the actual repo.
+The orchestrator follows `docs/ORCHESTRATOR_CANONICAL.md` and records *verified* progress in `STATUS.md`.
+Don't run unattended with `--dangerously-skip-permissions`; retain access/sandbox controls. Qodo is optional PR review assistance; the hackathon sponsor technologies remain **Bright Data and FalkorDB**.
 
 # Conferge — Claude Code multi-window rules
 

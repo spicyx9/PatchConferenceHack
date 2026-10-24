@@ -9,7 +9,7 @@ git pull --ff-only origin main
 bash scripts/create_worktrees.sh
 ```
 
-The script creates worktrees `~/HTest-wNN-slug`, all independently based on the same main commit. **Do not run `git clone` again.** Each new Claude Code/Codex terminal should `cd ~/HTest-wNN-slug` and use the corresponding single-file instruction in `docs/prompts/wNN-slug.md`.
+The script creates worktrees `~/HTest-wNN-slug`, all independently based on the same main commit. **Do not run `git clone` again.** Each new Claude Code/Codex terminal should `cd ~/HTest-wNN-slug`, read the binding mission in `docs/prompts/wNN-slug.md` and supplement it with the technical detail in `docs/prompts/wNN.md` using the mapping in `docs/prompts/README.md`. Never follow a legacy `backend/app/` path.
 
 **Launch initially:** w01-luma-partiful, w02-eventbrite-aggregators, w03-official, w04-discovery, w08-graph, w12-api, w13-demo. Optional: w05-lodging and w06-flights can do API-schema mock work now and live probes once keys are available. w07-people, w09-planner, w10-antifomo follow on fixture contracts. w11-travel is optional. w15-integration is reserved for validation of combined work.
 

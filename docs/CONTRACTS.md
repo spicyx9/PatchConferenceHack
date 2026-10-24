@@ -1,6 +1,6 @@
-# Shared contracts — v0.1 (frozen after window 0)
+# Shared contracts — v0.2 (frozen after window 0)
 
-The source of truth is `conferge/core/schemas.py` + `contracts.py`. These Python classes, field names, and async signatures are **not** edited by workstreams.
+The source of truth is `conferge/core/schemas.py` + `contracts.py`. Schema v0.2 has backwards-compatible optional fields for roles/topics, event registration capacity, lodging fees, flight baggage, and opportunity paths. These classes, field names, and async signatures are **not** edited by workstreams.
 
 ## Source interface
 

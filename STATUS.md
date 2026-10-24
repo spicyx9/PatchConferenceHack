@@ -1,13 +1,14 @@
 # Conferge STATUS — window 00
 
-Last verified: 2026-10-23 PT; GitHub base SHA `7cc2aa5df5d7da3db4c464683ba89f5b4162c1b2`.
+Last verified: 2026-10-23 PT; foundation and post-schema-update CI green. Check current HEAD after pulling.
 
 ## Foundation
 - `conferge/core` installed on `main`.
 - CI: green as observed before this documentation update; recheck CI on the new head.
 - Knowledge: present in `docs/knowledge/` (research only).
 - Canonical workstream prompts: `docs/prompts/wNN-<slug>.md`.
-- Obsolete prompts: `docs/prompts/wNN.md` and `docs/prompts/_common.md` refer to `backend/app` and are NOT to be run.
+- Detailed technical specs: `docs/prompts/wNN.md` contain useful endpoints and test details; they **supplement** `wNN-<slug>.md` under the path-mapping/precedence rules in `docs/prompts/README.md`. `_common.md` is a corrected optional preamble. Neither overrides canonical `conferge/` paths.
+- Core v0.2 fields are optional and backwards compatible. No window may modify `core/` without the integrator.
 
 ## Workstreams
 | Window | Branch | Status | PR | CI | Note |
@@ -29,5 +30,5 @@ Last verified: 2026-10-23 PT; GitHub base SHA `7cc2aa5df5d7da3db4c464683ba89f5b4
 
 ## Next actions
 - On Mac: `cd ~/HTest && git pull --ff-only origin main && make check && bash scripts/create_worktrees.sh`.
-- Launch Wave 1 in six **independent** worktrees; do not recursively spawn six more agents per worktree.
+- Launch Wave 1 in six **independent** worktrees; at most six active agents TOTAL including nested subagents. Claude Code delegation is not automatically Codex CLI. Confirm actual process and branch before counting any window as running.
 - Verify PRs before merge, record real progress here.
