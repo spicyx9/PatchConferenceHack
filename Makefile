@@ -22,7 +22,7 @@ down:
 	docker compose down
 
 # Demo API + front on http://127.0.0.1:$(DEMO_PORT), assembled data loaded into FalkorDB.
-# make demo DEMO_PORT=8001 when 8000 is taken; DEMO_ARGS="--travel fixture" skips live travel.
+# make demo DEMO_PORT=8001 when 8000 is taken; DEMO_ARGS="--travel live" adds live Bright Data travel.
 DEMO_PORT ?= 8000
 DEMO_ARGS ?=
 demo:
