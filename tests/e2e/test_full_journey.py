@@ -161,12 +161,14 @@ def ranking(api: Api) -> list[str]:
 
 
 def test_01_reset(api: Api) -> None:
+    print("providers:", api.call("GET", "/sources").get("providers"))
     body = envelope(api.call("POST", "/reset", {}))
     assert body["plan"]["days"], "reset returned an empty plan"
 
 
 def test_02_goal_in_natural_language(api: Api, journey: dict[str, Any]) -> None:
     body = envelope(api.call("POST", "/goal", {"text": GOAL}))
+    print("goal computed_by:", body["computed_by"])
     goals = body["goals"]
     roles = {r for g in goals for r in g.get("target_roles", [])}
     assert {"investor", "founder", "pm"} <= roles, f"goal roles parsed: {sorted(roles)}"
