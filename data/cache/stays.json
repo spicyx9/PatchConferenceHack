@@ -1267,5 +1267,23 @@
     ]
    }
   }
+ ],
+ "runs": [
+  {
+   "provider": "google_hotels",
+   "api": "dataset",
+   "status": "failed",
+   "records": 0,
+   "reason": "Bright Data dataset gd_mg3gjfmg12tc2n5d4d: crawler error no_peers (snapshot sd_mvmqn1k358049lk2z: 0 records)",
+   "collected_at": "2026-10-24T18:34:23.523000+00:00"
+  },
+  {
+   "provider": "google_hotels_direct",
+   "api": "direct",
+   "status": "degraded",
+   "records": 0,
+   "reason": "page rendered for 2026-11-02..2026-11-03 USD, not 2026-10-27..2026-10-30 USD: prices discarded (one attempt, no RPC)",
+   "collected_at": "2026-10-24T20:55:42+00:00"
+  }
  ]
 }

@@ -65,11 +65,14 @@ def default_sources() -> dict[str, Any]:
     from conferge.lodging.airbnb import AirbnbSource, BrightDataAirbnbBackend
     from conferge.lodging.booking import BookingSource
     from conferge.lodging.google_hotels import GoogleHotelsSource
+    from conferge.lodging.google_hotels_direct import GoogleHotelsDirectSource
     from conferge.lodging.unlocker import UnlockerHotelsSource
 
     return {"booking": BookingSource(), "google_hotels": GoogleHotelsSource(),
             "airbnb": AirbnbSource(primary=BrightDataAirbnbBackend(), fallback=None),
-            "unlocker": UnlockerHotelsSource()}
+            "unlocker": UnlockerHotelsSource(),
+            # Secondary, labelled google_hotels_direct; shown after the datasets (tier 2).
+            "google_hotels_direct": GoogleHotelsDirectSource()}
 
 
 def default_fallback_sources() -> dict[str, Any]:
