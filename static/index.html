@@ -562,19 +562,30 @@
             <div class="filter-feedback"><span id="filter-count" role="status" aria-live="polite"></span>
               <button type="button" id="filter-reset" hidden>Reset filters</button></div>
           </div>
+          <label class="connection-query-label" for="connection-query">Ask about your connections</label>
           <form id="connection-search" class="connection-search">
             <span class="search-spark" aria-hidden="true">✳</span>
-            <label class="sr-only" for="connection-query">Ask about people in this list</label>
             <input id="connection-query" maxlength="1000" minlength="2" required autocomplete="off"
-              placeholder="Who can help me with…" />
+              placeholder="Describe who you want to meet or what you need help with…" />
             <button type="submit" id="connection-submit">Find people <span aria-hidden="true">↗</span></button>
           </form>
-          <div class="connection-examples">
-            <button type="button" data-connection-query="Who works on AI agents?">AI agents</button>
-            <button type="button" data-connection-query="Who can help with developer tools?">Developer tools</button>
-            <button type="button" data-connection-query="Who works on open source security?">Open source security</button>
-            <span id="connection-ai-status"></span>
-          </div>
+          <section class="connection-examples" aria-labelledby="connection-examples-title">
+            <div class="connection-examples-heading">
+              <div><h2 id="connection-examples-title">Try an example</h2><p>Click a question to search the people matching your filters.</p></div>
+              <span id="connection-ai-status"></span>
+            </div>
+            <div class="connection-prompt-grid">
+              <button type="button" data-connection-query="Who works on AI agents?">
+                <span>Who works on AI agents?</span><small>Run search <span aria-hidden="true">↗</span></small>
+              </button>
+              <button type="button" data-connection-query="Who can help me build developer tools?">
+                <span>Who can help me build developer tools?</span><small>Run search <span aria-hidden="true">↗</span></small>
+              </button>
+              <button type="button" data-connection-query="Who works on security for open source projects?">
+                <span>Who works on security for open source projects?</span><small>Run search <span aria-hidden="true">↗</span></small>
+              </button>
+            </div>
+          </section>
           <div class="connection-workspace">
             <div class="network-pane">
               <div class="network-toolbar"><span>3D network <span id="network-count"></span></span>
