@@ -18,8 +18,5 @@ Tout ce qui a été extrait avant le hackathon (recherches, audits, décisions).
 | 12-repos-to-reuse.md | Repos GitHub à copier, adapter, éviter, avec licences | tous |
 | 13-brightdata.md | Produits, endpoints REST, dataset IDs, coûts, gestion d'échec | w01 à w07 |
 | 14-market-landscape.md | Concurrents, différenciation, ce que personne ne fait | w12 (pitch) |
-| 15-workstreams.md | 13 fenêtres, dossiers, dépendances, ordre | orchestrateur |
-| 16-orchestrator.md | Boucle de l'orchestrateur, STATUS.md, relance, merge, checklist du matin | orchestrateur |
-| ../prompts/w01.md à w13.md | Prompt complet de chaque fenêtre | orchestrateur |
 
 Conventions : jamais de tiret cadratin dans les textes. Dates en ISO. Prix en chaînes décimales. Une donnée absente est null.

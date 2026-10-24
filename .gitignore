@@ -33,3 +33,7 @@ data/probes/linkedin_*.json
 
 # Bright Data dataset snapshots (scripts/probes/flights_collect.py): scraped bodies, never committed
 data/snapshots/
+
+# Local drafts: never committed
+*.draft
+*.draft.md

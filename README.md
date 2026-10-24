@@ -148,14 +148,15 @@ Fort Mason Center, San Francisco, October 28 and 29. Fictional traveller from Ne
 ## Quickstart
 
 ```bash
-make up        # FalkorDB in Docker on 127.0.0.1:6379, Browser on :3000
+git clone https://github.com/spicyx9/PatchConferenceHack.git && cd PatchConferenceHack
+make up        # FalkorDB 6.0.3 in Docker on 127.0.0.1:6379, Browser on :3000
 make install   # Python deps with uv
 make demo      # API + UI on http://127.0.0.1:8000, demo data loaded into FalkorDB
 ```
 
-No `.env` is needed. Port: if 6379 is already taken by a local Redis, run `FALKORDB_PORT=6380 make up` and `FALKORDB_PORT=6380 make demo` (or put `FALKORDB_PORT=6380` in `.env`); `make demo` stops with "port 6379 is a plain Redis, set FALKORDB_PORT to the FalkorDB port" when it finds a Redis without the FalkorDB module.
+No `.env` is needed for the demo. **Port 6379 already taken** (a local Redis, for example): run `FALKORDB_PORT=6380 make up` and `FALKORDB_PORT=6380 make demo` (or put `FALKORDB_PORT=6380` in `.env`); `make demo` stops with "port 6379 is a plain Redis, set FALKORDB_PORT to the FalkorDB port" when it finds a Redis without the FalkorDB module.
 
-`uv run python scripts/run_demo.py --mode live` collects from the public sources instead of the snapshot. Copy `.env.example` to `.env` and add `BRIGHTDATA_API_KEY` to enable the Bright Data connectors.
+`uv run python scripts/run_demo.py --mode live` collects from the public sources instead of the snapshot. Copy `.env.example` to `.env` and set `BRIGHTDATA_API_KEY` (plus `BRIGHTDATA_UNLOCKER_ZONE` and `BRIGHTDATA_SERP_ZONE`) to enable the Bright Data connectors.
 
 ## Tracks
 
