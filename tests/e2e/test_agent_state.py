@@ -63,6 +63,9 @@ def test_plan_write_is_idempotent(store: GraphStore) -> None:
 
 
 def test_new_plan_invalidates_old_edges_without_deleting(store: GraphStore) -> None:
+    # Rule (decided 2026-10-24, E2E_FINDINGS F4): in normal use replanning never deletes a plan, the
+    # dropped events become ``invalidated`` with their last ``plan_version``. ``POST /reset`` is a hard
+    # demo reset and does delete the demo user's PLANS, SKIPS and Change (GraphStore.delete_user_state).
     publish_plan(store, USER, _plan("e1", "e2"), attended=set())
     second = publish_plan(store, USER, _plan("e2", "e3"), attended=set())
     assert second["plan_version"] == 2 and second["invalidated"] == ["e1"]
