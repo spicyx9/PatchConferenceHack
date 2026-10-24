@@ -427,6 +427,7 @@ def create_app(
                 "company": company.model_dump(mode="json") if company else None,
                 "met": bool(person and person.id in state.met),
                 "met_note": state.met.get(person.id) if person else None,
+                "linkedin": state.data.linkedin.get(person.id) if person else None,
             })
         return _envelope(state, ["people", "companies"], {"items": cards, "count": len(cards)},
                          extra_warnings=_plan_warnings())
