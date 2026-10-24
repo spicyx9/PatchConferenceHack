@@ -101,7 +101,7 @@ class FastFlightsProvider:
         )
 
     async def _one_way(self, origin: str, destination: str, day: date, adults: int,
-                       cabin: str) -> tuple[list[Any], str]:
+                       cabin: str, failures: list[str]) -> tuple[list[Any], str]:
         from fast_flights import FlightQuery, Passengers, create_query, get_flights
 
         query = create_query(
@@ -114,10 +114,14 @@ class FastFlightsProvider:
         if key and zone:
             from fast_flights.integrations import BrightData
 
-            result = await asyncio.to_thread(
-                get_flights, query, integration=BrightData(api_key=key, zone=zone))
-        else:
-            result = await asyncio.to_thread(get_flights, query)
+            try:
+                result = await asyncio.to_thread(
+                    get_flights, query, integration=BrightData(api_key=key, zone=zone))
+                return list(result or []), query.url()
+            except Exception as exc:  # noqa: BLE001 - the SERP transport failed: go direct
+                failures.append(f"bright_data_serp_transport_failed: "
+                                               f"{type(exc).__name__}; fetched directly")
+        result = await asyncio.to_thread(get_flights, query)
         return list(result or []), query.url()
 
     def _offers(self, items: list[Any], search_url: str, collected_at: datetime,
@@ -162,9 +166,10 @@ class FastFlightsProvider:
                     "round-trip query; offers are one-way fares, not a combined round trip"]
         if not (env_value("BRIGHTDATA_API_KEY") and env_value("BRIGHTDATA_SERP_ZONE")):
             warnings.append("fast_flights_direct: no Bright Data integration configured")
+        failures: list[str] = []
         results = await asyncio.gather(
-            self._one_way(origin, destination, departure, adults, cabin),
-            self._one_way(destination, origin, return_date, adults, cabin),
+            self._one_way(origin, destination, departure, adults, cabin, failures),
+            self._one_way(destination, origin, return_date, adults, cabin, failures),
             return_exceptions=True,
         )
         collected_at = self.clock()
@@ -183,6 +188,7 @@ class FastFlightsProvider:
             if not found:
                 errors.append(f"{direction}: zero offers")
             offers.extend(found)
+        warnings.extend(dict.fromkeys(failures))
         if not offers:
             return [], self._report(started, "failed", "error", fetched=fetched,
                                     errors=errors or ["zero offers"], warnings=warnings)

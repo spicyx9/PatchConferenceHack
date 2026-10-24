@@ -19,6 +19,8 @@ from pydantic import BaseModel, ConfigDict, Field
 
 logger = logging.getLogger(__name__)
 _RETRY_STATUSES = {429, 500, 502, 503, 504}
+# /datasets/v3/scrape holds the connection up to ~60 s before answering 202 + snapshot_id.
+SYNC_TIMEOUT = 75.0
 
 BrightDataApi = Literal["datasets", "web_unlocker", "serp"]
 # Process-wide count of what Bright Data actually returned (successful responses only):
@@ -82,7 +84,7 @@ class BrightDataClient:
         self.serp_zone = serp_zone
         self.unlocker_zone = unlocker_zone
         self._client = client or httpx.AsyncClient(
-            base_url="https://api.brightdata.com", timeout=30.0
+            base_url="https://api.brightdata.com", timeout=SYNC_TIMEOUT
         )
         self._owns_client = client is None
         self.retries = retries
@@ -236,8 +238,14 @@ class BrightDataClient:
             "POST", "/request",
             payload={"zone": self.unlocker_zone, "url": url, "format": "raw"},
         )
+        text = response.text
+        if len(text) < 2000 and text.lstrip().startswith("Residential Failed"):
+            # Bright Data answers its own refusal (e.g. KYC required) with HTTP 200.
+            reason = text.split(":", 1)[0].strip()
+            kyc = " (KYC required for this site)" if "kyc" in text.lower() else ""
+            raise BrightDataError(f"Web Unlocker refused {reason}{kyc}")
         record_usage("web_unlocker")
-        return response.text
+        return text
 
     @staticmethod
     def load_fixture(path: str | Path, *, explicit_opt_in: bool = False) -> CollectionOutput:
