@@ -101,7 +101,9 @@ def linkedin_enrichment(args: argparse.Namespace, assembly: Any, goals: list[Any
     assembly.demo.linkedin = li.cards(res.enrichments)
     report = li.run_report(started, targets=len(targets), written=len(res.enrichments),
                            source_mode=res.source_mode, errors=res.errors)
-    assembly.demo.pipeline.append(row("linkedin", report))
+    # The row's time is when the profiles were collected, not this startup (cache read).
+    stamps = [str(c["collected_at"]) for c in assembly.demo.linkedin.values() if c.get("collected_at")]
+    assembly.demo.pipeline.append(row("linkedin", report, collected_at=max(stamps, default=None)))
     print(f"  linkedin ({res.source_mode}): {len(targets)} targets, {res.from_files} from files, "
           f"{len(res.enrichments)} matched, {len(res.unmatched)} name mismatch, "
           f"{len(res.absent_after)} missing; graph "

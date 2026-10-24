@@ -191,6 +191,7 @@
     if (src.id) tip.push("id: " + src.id);
     if (src.site) tip.push("site: " + src.site);
     if (src.snapshot_id) tip.push("snapshot: " + src.snapshot_id);
+    if (src.collected_at) tip.push("collected_at: " + src.collected_at);
     return (
       '<span class="badge src ' +
       cls +
@@ -245,9 +246,45 @@
     );
   }
 
-  function sourceBadge(mode) {
-    if (["fixture", "cached", "live"].indexOf(mode) >= 0) return "";
-    return sourceModeBadge(mode);
+  // Clock time of a collection, in the conference time zone ("11:41 AM").
+  function fmtClock(iso) {
+    var d = new Date(iso);
+    if (!iso || isNaN(d.getTime())) return null;
+    try {
+      return new Intl.DateTimeFormat("en-US", {
+        timeZone: EVENT_TZ,
+        hour: "numeric",
+        minute: "2-digit",
+      }).format(d);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // live / cached / fixture of a stay or flight: top-level when present, else its first evidence.
+  function recordMode(r) {
+    return (
+      (r && r.source_mode) ||
+      (r && r.evidence && r.evidence[0] && r.evidence[0].source_mode) ||
+      "unknown"
+    );
+  }
+
+  // Every record says how it was obtained: "Cached · 11:41 AM", "Live · 9:02 AM", "Fixture".
+  function sourceBadge(mode, collectedAt) {
+    var labels = { live: "Live", cached: "Cached", fixture: "Fixture" };
+    if (!labels[mode]) return sourceModeBadge(mode);
+    var clock = mode !== "fixture" && collectedAt ? fmtClock(collectedAt) : null;
+    return (
+      '<span class="badge src-mode ' +
+      (mode === "fixture" ? "fixture" : mode === "live" ? "live" : "neutral") +
+      '" title="Data source: ' +
+      esc(mode) +
+      (collectedAt ? ", collected_at " + esc(collectedAt) : "") +
+      '">' +
+      esc(labels[mode] + (clock ? " · " + clock : "")) +
+      "</span>"
+    );
   }
 
   function sourceModeBadge(mode) {
@@ -1337,7 +1374,12 @@
                   .filter(Boolean)
                   .join(" · "),
               ) +
-              '</p></div><div class="travel-offer-price"><strong>' +
+              '</p></div><div class="travel-offer-price">' +
+              sourceBadge(
+                recordMode(leg),
+                leg.collected_at || (leg.source && leg.source.collected_at),
+              ) +
+              "<strong>" +
               esc(flightPriceText(leg)) +
               "</strong>" +
               (link
@@ -1346,12 +1388,11 @@
                   '" target="_blank" rel="noopener noreferrer">View flight</a>'
                 : '<span class="muted small-text">Search the airline for this route</span>') +
               "</div><details><summary>Offer details</summary>" +
-              sourceBadge(leg.source_mode) +
               sourceApiBadge(leg.source) +
               "<p>Collected " +
               esc(
-                leg.collected_at
-                  ? fmtTime(leg.collected_at)
+                leg.collected_at || (leg.source && leg.source.collected_at)
+                  ? fmtTime(leg.collected_at || leg.source.collected_at)
                   : "date unavailable",
               ) +
               "</p><p>Price status: " +
@@ -1402,7 +1443,12 @@
               esc(shortDate(st.check_in)) +
               " – " +
               esc(shortDate(st.check_out)) +
-              '</p></div><div class="trip-stay-price"><strong>' +
+              '</p></div><div class="trip-stay-price">' +
+              sourceBadge(
+                recordMode(st),
+                st.collected_at || (st.source && st.source.collected_at),
+              ) +
+              "<strong>" +
               esc(
                 st.total_price == null
                   ? "Price unavailable"
@@ -1427,8 +1473,8 @@
                 [
                   st.availability,
                   st.price_status,
-                  st.collected_at
-                    ? "Collected " + fmtTime(st.collected_at)
+                  st.collected_at || (st.source && st.source.collected_at)
+                    ? "Collected " + fmtTime(st.collected_at || st.source.collected_at)
                     : null,
                 ]
                   .filter(Boolean)
@@ -3463,50 +3509,49 @@
           (fShare !== null ? "Flights via Bright Data: " + esc(fShare) : "") +
           "</div>"
         : "";
-    function part(api, label) {
-      return (
-        esc(label) +
-        " " +
-        esc(u[api] || 0) +
-        (ready[api] ? "" : ' <span class="muted">(not configured)</span>')
-      );
-    }
-    var c = (res && res.cached) || {};
-    var stamps = Object.keys(c.collected_at || {})
-      .map(function (k) {
-        return c.collected_at[k];
-      })
-      .sort();
-    var cachedLine = c.total
-      ? '<div class="bd-travel">From the Bright Data cache: ' +
-        esc(c.total) +
-        " records (datasets " +
-        esc(c.datasets || 0) +
-        ", Web Unlocker " +
-        esc(c.web_unlocker || 0) +
-        "), collected " +
-        esc(
-          stamps.length
-            ? fmtTime(stamps[0]) +
-                (stamps.length > 1
-                  ? " to " + fmtTime(stamps[stamps.length - 1])
-                  : "")
-            : "unknown",
-        ) +
-        "</div>"
-      : "";
+    var products = (res && res.products) || [];
+    var apiName = { dataset: "dataset", unlocker: "Web Unlocker", serp: "SERP" };
+    var range = function (p) {
+      if (!p.collected_first) return "—";
+      var a = fmtTime(p.collected_first),
+        b = fmtTime(p.collected_last);
+      return a === b ? a : a + " to " + b;
+    };
+    var table = products.length
+      ? '<table class="pipeline-table bd-products"><thead><tr><th>Product</th><th>API</th>' +
+        "<th>Requests</th><th>Records</th><th>Collected (records' own time)</th>" +
+        "<th>List price estimate</th></tr></thead><tbody>" +
+        products
+          .map(function (p) {
+            return (
+              "<tr><td>" + esc(p.product) + "</td><td>" + esc(apiName[p.api] || p.api) +
+              "</td><td>" + esc(p.requests) + "</td><td>" + esc(p.records) + "</td><td>" +
+              esc(range(p)) + "</td><td>" +
+              esc(p.list_price_usd !== null && p.list_price_usd !== undefined
+                ? "$" + p.list_price_usd
+                : "not priced") +
+              "</td></tr>"
+            );
+          })
+          .join("") +
+        "</tbody></table>"
+      : '<p class="muted">No Bright Data record in this demo.</p>';
+    var notReady = ["datasets", "web_unlocker", "serp"].filter(function (k) {
+      return !ready[k];
+    });
     $("bd-counter").innerHTML =
-      "<b>Records collected through Bright Data: " +
-      esc((u.total || 0) + (c.total || 0)) +
-      "</b>" +
-      ' <span class="bd-detail">' +
-      part("datasets", "datasets") +
-      " | " +
-      part("web_unlocker", "Web Unlocker") +
-      " | " +
-      part("serp", "SERP API") +
+      "<b>Bright Data: " + esc(res && res.requests != null ? res.requests : 0) +
+      " requests, " + esc(res && res.records != null ? res.records : 0) + " records</b>" +
+      ' <span class="bd-detail">(a request is one API call; one Web Unlocker page can yield many records). ' +
+      "Estimated cost $" + esc((res && res.list_price_usd) || "0") + ", " +
+      esc((res && res.cost_label) || "list price estimate, not billed") +
+      ", dataset records only." +
+      (u.total ? " This process: " + esc(u.total) + " records returned live." : "") +
+      (notReady.length
+        ? ' <span class="muted">(not configured here: ' + esc(notReady.join(", ")) + ")</span>"
+        : "") +
       "</span>" +
-      cachedLine +
+      table +
       travel;
   }
 
@@ -3544,7 +3589,7 @@
               "</td><td>" +
               esc(
                 r.estimated_cost_usd !== null
-                  ? "$" + r.estimated_cost_usd + " (estimate)"
+                  ? "$" + r.estimated_cost_usd + " (list price estimate, not billed)"
                   : "—",
               ) +
               "</td></tr>"
@@ -3558,11 +3603,12 @@
     var t = (res && res.totals) || {},
       calls = (res && res.brightdata_calls) || [];
     $("pipeline-calls").innerHTML =
-      "Bright Data records: " +
+      "Bright Data records in these runs: " +
       esc(t.brightdata_records || 0) +
       ", estimated cost $" +
       esc(t.estimated_cost_usd || "0") +
-      " (estimate: records × 1.5 / 1000). Bright Data calls: " +
+      " (list price estimate, not billed: dataset records × 1.5 / 1000; Web Unlocker rows not priced)." +
+      " Bright Data calls in this process: " +
       (calls.length
         ? calls
             .map(function (c) {
@@ -3588,15 +3634,20 @@
     var box = $("pipeline-cost");
     if (!box) return;
     if (!c) {
-      box.innerHTML = '<span class="muted">Bright Data cost counter unavailable.</span>';
+      box.innerHTML = '<span class="muted">Bright Data counter unavailable.</span>';
       return;
     }
     var by = c.by_api || {};
+    var part = function (k, label) {
+      var v = by[k] || {};
+      return label + " " + esc(v.requests || 0) + " req / " + esc(v.records || 0) + " rec";
+    };
     box.innerHTML =
-      "<b>Bright Data, live in this process:</b> " + esc(c.calls) + " calls, $" + esc(c.usd) +
-      ' <span class="muted">(estimate: $' + esc(c.usd_per_call) +
-      " per call, real price not verified)</span> · datasets " + esc(by.datasets || 0) +
-      " · unlocker " + esc(by.unlocker || 0) + " · serp " + esc(by.serp || 0);
+      "<b>Bright Data, live in this process:</b> " + esc(c.requests) + " requests, " +
+      esc(c.records) + " records, $" + esc(c.usd) +
+      ' <span class="muted">(' + esc(c.cost_label) + ", dataset records only)</span> · " +
+      part("datasets", "datasets") + " · " + part("unlocker", "unlocker") + " · " +
+      part("serp", "serp");
   }
 
   function renderTimings(t, overall) {

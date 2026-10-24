@@ -19,7 +19,8 @@ from conferge.core.schemas import RunReport
 
 HEADLINE = ("Agents never fetch the web at query time: all reasoning runs on the stored, "
             "deduplicated, provenance-tagged graph.")
-# Estimate only: Bright Data pay-as-you-go list price, USD 1.50 per 1,000 records.
+# List price estimate, not billed: Bright Data datasets, USD 1.50 per 1,000 records. Never
+# applied to rows extracted from a Web Unlocker page (one request, many rows) or to SERP.
 USD_PER_1000_RECORDS = Decimal("1.5")
 _DATASET_PROVIDERS = {"booking", "google_hotels", "brightdata_google_flights", "brightdata",
                       "facebook_events", "brightdata:linkedin"}
@@ -35,24 +36,28 @@ def _api(report: RunReport) -> str | None:
     return "unlocker" if any(used) else None
 
 
-def row(source: str, report: RunReport, *, fallback: bool = False) -> dict[str, Any]:
+def row(source: str, report: RunReport, *, fallback: bool = False,
+        collected_at: str | None = None) -> dict[str, Any]:
+    """``collected_at``: the records' own collection time when the report's end is not it
+    (a cache read at startup finishes "now")."""
     api = None if fallback else _api(report)
     kind = "fallback" if fallback or report.source_mode == "fixture" else (
         "brightdata" if api else "direct")
     records = report.unique_count
     estimate = None
-    if kind == "brightdata" and report.status != "failed":
+    if kind == "brightdata" and api == "dataset" and report.status != "failed":
         estimate = str((Decimal(records) * USD_PER_1000_RECORDS / 1000).quantize(Decimal("0.0001")))
     return {
         "source": source, "provider": report.provider, "kind": kind, "brightdata_api": api,
-        "records": records, "collected_at": report.finished_at.isoformat(),
+        "records": records, "collected_at": collected_at or report.finished_at.isoformat(),
         "cached": report.source_mode == "cached",
         "status": report.status, "termination": report.termination,
         # brightdata_no_peers is shown as is (Bright Data out of peers after 15/30/60 s retries).
         "reason": NO_PEERS if NO_PEERS in report.warnings else (
             report.errors[0] if report.errors else None),
         "estimated_cost_usd": estimate,
-        "estimate_basis": "records x 1.5 / 1000 (estimate)" if estimate is not None else None,
+        "estimate_basis": ("dataset records x 1.5 / 1000, list price estimate, not billed"
+                           if estimate is not None else None),
     }
 
 

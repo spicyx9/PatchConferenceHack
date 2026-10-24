@@ -12,7 +12,8 @@ Contract (consumed by the UI, key names are frozen)::
      "site": "booking"|"google_hotels"|"airbnb"|"hilton"|"google_flights"|... or None,
      "snapshot_id": str or None,
      "tier": 0 dataset | 1 unlocker | 2 fallback | 3 fixture/unknown,
-     "label": short human text}
+     "label": short human text,
+     "collected_at": ISO time of the record's own collection (first evidence) or None}
 
 Airbnb: both backends share the provider name ``airbnb``. The Bright Data backend sets
 ``request_id`` (-> ``raw_ref``) to the dataset snapshot id; pyairbnb sets it to None. So an
@@ -74,6 +75,12 @@ def _unlocker(raw_ref: str | None, default_site: str | None = None) -> dict[str,
 
 def source_of(evidence: Sequence[SourceEvidence] | None) -> dict[str, Any]:
     """Provider/API provenance of an item, from its evidence list (first entry wins)."""
+    out = _source_of(evidence)
+    out["collected_at"] = evidence[0].collected_at.isoformat() if evidence else None
+    return out
+
+
+def _source_of(evidence: Sequence[SourceEvidence] | None) -> dict[str, Any]:
     if not evidence:
         return _out("unknown", "unknown", "Unknown source")
     ev = evidence[0]
