@@ -1,6 +1,7 @@
 """Flight search service: airport fan-out, provider router, cache, fixture opt-in.
 
-Router per airport pair: Bright Data dataset first, then Bright Data Web Unlocker
+Router per airport pair: Bright Data dataset snapshot (< 24 h, collected out of the demo
+path) first, then Bright Data Web Unlocker
 (Google Flights page); if they fail, return nothing or no priced offer, fast-flights;
 then SerpApi. Every provider report is
 kept in the envelope. A fixture is only returned when `allow_fixture=True`
@@ -74,13 +75,17 @@ def load_fixture_offers(path: Path = FIXTURE_PATH, *, explicit_opt_in: bool = Fa
 
 
 def default_providers() -> list[tuple[str, FlightProvider]]:
-    from conferge.flights.brightdata_provider import BrightDataFlightsProvider
     from conferge.flights.fastflights_provider import FastFlightsProvider
     from conferge.flights.serpapi_provider import SerpApiFlightsProvider
     from conferge.flights.unlocker_provider import GoogleFlightsUnlockerProvider
 
+    from conferge.flights.snapshot_provider import GoogleFlightsSnapshotProvider
+
+    # The live dataset takes minutes: scripts/probes/flights_collect.py runs it out of the
+    # demo path and the router reads its snapshot (< 24 h). BrightDataFlightsProvider stays
+    # available for probes.
     return [
-        ("brightdata", BrightDataFlightsProvider()),
+        ("brightdata_snapshot", GoogleFlightsSnapshotProvider()),
         ("brightdata_unlocker", GoogleFlightsUnlockerProvider()),
         ("fastflights", FastFlightsProvider()),
         ("serpapi", SerpApiFlightsProvider()),

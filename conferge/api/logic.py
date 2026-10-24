@@ -18,6 +18,8 @@ from zoneinfo import ZoneInfo
 
 from conferge.api.data import DemoData
 from conferge.api.provenance import source_of
+from conferge.flights.round_trip_total import display as rt_display
+from conferge.flights.round_trip_total import is_round_trip, trip_price
 from conferge.core.schemas import Event, Goal, Opportunity, Person, SourceEvidence
 
 FALLBACK = "api-fallback"
@@ -495,6 +497,11 @@ def travel_view(
                 "departure_at": first.departure_at.isoformat() if first.departure_at else None,
                 "arrival_at": last.arrival_at.isoformat() if last.arrival_at else None,
                 "carrier": first.marketing_carrier, "price_status": flight.price_status,
+                "total_price": flight.total_price, "currency": flight.currency,
+                "price_label": None,
+                **({k: v for k, v in rt_display(flight).items()
+                    if k in {"price_status", "total_price", "currency", "price_label",
+                             "return_slice_collected"}}),
                 "source_mode": _mode_of(flight.evidence),
                 "source": source_of(flight.evidence),
             })
@@ -524,7 +531,7 @@ def travel_view(
             "computed_by": FALLBACK,
         })
     budget = Decimal(str(user["budget_usd"]))
-    flight_total = _sum_known([f.total_price for f in _trip_flights(data.flights)])
+    flight_total = _sum_known([trip_price(f) for f in _trip_flights(data.flights)])
     stay_total = _sum_known([s.total_price for s in data.stays[:1]])
     return {
         "itinerary": legs,
@@ -543,7 +550,7 @@ def travel_view(
 
 def _trip_flights(flights: list[Any]) -> list[Any]:
     """The offers one trip pays for: a round trip, or the first outbound + first return one-way."""
-    if not flights or flights[0].trip_type != "one_way":
+    if not flights or is_round_trip(flights[0]):
         return flights[:1]
     landed = flights[0].slices[0].segments[-1].destination_iata
     back = next((f for f in flights[1:] if f.trip_type == "one_way"
