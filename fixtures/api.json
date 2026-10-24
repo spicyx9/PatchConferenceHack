@@ -1,0 +1,246 @@
+{
+  "_meta": {
+    "owner": "w12-api",
+    "source_mode": "fixture",
+    "collected_at": "2026-10-23T12:00:00Z",
+    "note": "FIXTURE for the w12 demo API only. Every session, side event, person, company, hotel and flight below is FICTIONAL and labelled as such. Only the anchor conference (name, dates, city, venue, coordinates) comes from docs/knowledge/03-demo-scenario.md. Unknown prices, flight times and availability are null on purpose."
+  },
+  "conference": {
+    "id": "conf-github-universe-2026",
+    "name": "GitHub Universe 2026",
+    "start_date": "2026-10-28",
+    "end_date": "2026-10-29",
+    "city": "San Francisco",
+    "venue_name": "Fort Mason Center",
+    "timezone": "America/Los_Angeles",
+    "official_url": "https://githubuniverse.com/",
+    "latitude": 37.806,
+    "longitude": -122.432,
+    "topics": ["AI agents", "developer tools", "Copilot", "MCP"],
+    "evidence": [
+      {"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z", "raw_ref": "docs/knowledge/03-demo-scenario.md"}
+    ]
+  },
+  "user": {
+    "id": "demo-user",
+    "origin_city": "New York",
+    "origin_airports": ["JFK", "LGA", "EWR"],
+    "destination_airports": ["SFO", "OAK", "SJC"],
+    "depart_date": "2026-10-27",
+    "return_date": "2026-10-30",
+    "adults": 1,
+    "cabin": "economy",
+    "budget_usd": "2500"
+  },
+  "demo_goal_text": "Fondateur d'un outil dev IA, je vais a GitHub Universe pour rencontrer des investisseurs seed, des fondateurs d'agents IA et des PM Copilot.",
+  "events": [
+    {
+      "id": "evt-fx-universe-day1-agents",
+      "conference_id": "conf-github-universe-2026",
+      "title": "[FIXTURE] Fictional session: shipping AI agents with Copilot",
+      "event_type": "session",
+      "start_at": "2026-10-28T10:00:00-07:00",
+      "end_at": "2026-10-28T10:45:00-07:00",
+      "timezone": "America/Los_Angeles",
+      "venue": {"name": "Fort Mason Center", "city": "San Francisco", "latitude": 37.806, "longitude": -122.432, "coordinate_precision": "approximate"},
+      "speaker_ids": ["per-fx-01"],
+      "topics": ["AI agents", "Copilot"],
+      "room": "Fictional Room A",
+      "status": "scheduled",
+      "conference_relation": "candidate",
+      "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]
+    },
+    {
+      "id": "evt-fx-universe-day1-mcp",
+      "conference_id": "conf-github-universe-2026",
+      "title": "[FIXTURE] Fictional session: MCP servers for developer tools",
+      "event_type": "session",
+      "start_at": "2026-10-28T14:00:00-07:00",
+      "end_at": "2026-10-28T14:45:00-07:00",
+      "timezone": "America/Los_Angeles",
+      "venue": {"name": "Fort Mason Center", "city": "San Francisco", "latitude": 37.806, "longitude": -122.432, "coordinate_precision": "approximate"},
+      "speaker_ids": ["per-fx-02"],
+      "topics": ["MCP", "developer tools"],
+      "room": "Fictional Room B",
+      "status": "scheduled",
+      "conference_relation": "candidate",
+      "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]
+    },
+    {
+      "id": "evt-fx-universe-day2-copilot-pm",
+      "conference_id": "conf-github-universe-2026",
+      "title": "[FIXTURE] Fictional session: the Copilot product roadmap, from the PM seat",
+      "event_type": "session",
+      "start_at": "2026-10-29T11:00:00-07:00",
+      "end_at": "2026-10-29T11:45:00-07:00",
+      "timezone": "America/Los_Angeles",
+      "venue": {"name": "Fort Mason Center", "city": "San Francisco", "latitude": 37.806, "longitude": -122.432, "coordinate_precision": "approximate"},
+      "speaker_ids": ["per-fx-03"],
+      "topics": ["Copilot", "developer tools"],
+      "room": "Fictional Room A",
+      "status": "scheduled",
+      "conference_relation": "candidate",
+      "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]
+    },
+    {
+      "id": "evt-fx-eve-devmeetup",
+      "conference_id": "conf-github-universe-2026",
+      "title": "[FIXTURE] Fictional pre-conference developer meetup",
+      "event_type": "meetup",
+      "start_at": "2026-10-27T18:00:00-07:00",
+      "end_at": "2026-10-27T21:00:00-07:00",
+      "timezone": "America/Los_Angeles",
+      "venue": {"name": "Fictional venue SoMa", "city": "San Francisco", "latitude": 37.7785, "longitude": -122.3948, "coordinate_precision": "approximate"},
+      "organizer_ids": ["per-fx-04"],
+      "organizer_names": ["Fictional Dev Community"],
+      "topics": ["developer tools", "AI agents"],
+      "status": "scheduled",
+      "conference_relation": "candidate",
+      "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]
+    },
+    {
+      "id": "evt-fx-agents-founders-night",
+      "conference_id": "conf-github-universe-2026",
+      "title": "[FIXTURE] Fictional AI agent founders evening",
+      "event_type": "side_event",
+      "start_at": "2026-10-28T18:30:00-07:00",
+      "end_at": "2026-10-28T21:00:00-07:00",
+      "timezone": "America/Los_Angeles",
+      "venue": {"name": "Fictional venue Marina", "city": "San Francisco", "latitude": 37.8017, "longitude": -122.4381, "coordinate_precision": "approximate"},
+      "organizer_ids": ["per-fx-05"],
+      "organizer_names": ["Fictional Founders Collective"],
+      "topics": ["AI agents"],
+      "status": "scheduled",
+      "conference_relation": "candidate",
+      "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]
+    },
+    {
+      "id": "evt-fx-devtools-happy-hour",
+      "conference_id": "conf-github-universe-2026",
+      "title": "[FIXTURE] Fictional devtools happy hour",
+      "event_type": "party",
+      "start_at": "2026-10-28T19:00:00-07:00",
+      "end_at": "2026-10-28T21:30:00-07:00",
+      "timezone": "America/Los_Angeles",
+      "venue": {"name": "Fictional venue North Beach", "city": "San Francisco", "latitude": 37.8003, "longitude": -122.4102, "coordinate_precision": "approximate"},
+      "organizer_ids": ["per-fx-06"],
+      "organizer_names": ["Fictional Tools Co"],
+      "topics": ["developer tools", "MCP"],
+      "status": "scheduled",
+      "conference_relation": "candidate",
+      "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]
+    },
+    {
+      "id": "evt-fx-seed-breakfast",
+      "conference_id": "conf-github-universe-2026",
+      "title": "[FIXTURE] Fictional seed investors breakfast",
+      "event_type": "meetup",
+      "start_at": "2026-10-29T08:00:00-07:00",
+      "end_at": "2026-10-29T09:30:00-07:00",
+      "timezone": "America/Los_Angeles",
+      "venue": {"name": "Fictional cafe Cow Hollow", "city": "San Francisco", "latitude": 37.7979, "longitude": -122.4352, "coordinate_precision": "approximate"},
+      "organizer_ids": ["per-fx-07"],
+      "organizer_names": ["Fictional Example Ventures"],
+      "topics": ["AI agents", "developer tools"],
+      "status": "scheduled",
+      "conference_relation": "candidate",
+      "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]
+    },
+    {
+      "id": "evt-fx-mcp-workshop",
+      "conference_id": "conf-github-universe-2026",
+      "title": "[FIXTURE] Fictional MCP hands-on workshop",
+      "event_type": "workshop",
+      "start_at": "2026-10-29T17:30:00-07:00",
+      "end_at": "2026-10-29T19:30:00-07:00",
+      "timezone": "America/Los_Angeles",
+      "venue": {"name": "Fictional venue Mission", "city": "San Francisco", "latitude": 37.7599, "longitude": -122.4148, "coordinate_precision": "approximate"},
+      "organizer_ids": ["per-fx-08"],
+      "organizer_names": ["Fictional MCP Guild"],
+      "topics": ["MCP", "AI agents"],
+      "status": "scheduled",
+      "conference_relation": "candidate",
+      "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]
+    }
+  ],
+  "companies": [
+    {"id": "co-fx-example-ventures", "name": "Example Ventures (fictional)", "is_investor": true, "categories": ["seed fund"], "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]},
+    {"id": "co-fx-sample-capital", "name": "Sample Capital (fictional)", "is_investor": true, "categories": ["seed fund"], "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]},
+    {"id": "co-fx-agentworks", "name": "AgentWorks (fictional)", "is_investor": false, "categories": ["AI agents startup"], "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]},
+    {"id": "co-fx-toolsco", "name": "Fictional Tools Co", "is_investor": false, "categories": ["developer tools"], "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]},
+    {"id": "co-fx-codeplatform", "name": "Code Platform Inc (fictional)", "is_investor": false, "categories": ["developer platform"], "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]}
+  ],
+  "people": [
+    {"id": "per-fx-01", "name": "Avery Sample (fictional)", "company_id": "co-fx-agentworks", "title": "Founder", "roles": ["founder"], "topics": ["AI agents", "Copilot"], "participation": "confirmed_speaker", "event_ids": ["evt-fx-universe-day1-agents"], "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]},
+    {"id": "per-fx-02", "name": "Blake Placeholder (fictional)", "company_id": "co-fx-toolsco", "title": "Staff engineer", "roles": ["engineer"], "topics": ["MCP", "developer tools"], "participation": "confirmed_speaker", "event_ids": ["evt-fx-universe-day1-mcp"], "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]},
+    {"id": "per-fx-03", "name": "Casey Demo (fictional)", "company_id": "co-fx-codeplatform", "title": "Product manager, Copilot-like product", "roles": ["pm"], "topics": ["Copilot", "developer tools"], "participation": "confirmed_speaker", "event_ids": ["evt-fx-universe-day2-copilot-pm"], "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]},
+    {"id": "per-fx-04", "name": "Devon Mock (fictional)", "title": "Community organizer", "roles": ["devrel"], "topics": ["developer tools"], "participation": "confirmed_organizer", "event_ids": ["evt-fx-eve-devmeetup"], "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]},
+    {"id": "per-fx-05", "name": "Emery Stub (fictional)", "company_id": "co-fx-agentworks", "title": "Co-founder", "roles": ["founder"], "topics": ["AI agents"], "participation": "confirmed_organizer", "event_ids": ["evt-fx-agents-founders-night"], "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]},
+    {"id": "per-fx-06", "name": "Finley Dummy (fictional)", "company_id": "co-fx-toolsco", "title": "Head of DevRel", "roles": ["devrel"], "topics": ["developer tools", "MCP"], "participation": "confirmed_organizer", "event_ids": ["evt-fx-devtools-happy-hour"], "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]},
+    {"id": "per-fx-07", "name": "Gray Example (fictional)", "company_id": "co-fx-example-ventures", "title": "Partner, seed fund", "roles": ["investor"], "topics": ["AI agents", "developer tools"], "participation": "confirmed_organizer", "event_ids": ["evt-fx-seed-breakfast"], "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]},
+    {"id": "per-fx-08", "name": "Harper Test (fictional)", "title": "MCP maintainer", "roles": ["engineer"], "topics": ["MCP", "AI agents"], "participation": "confirmed_organizer", "event_ids": ["evt-fx-mcp-workshop"], "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]},
+    {"id": "per-fx-09", "name": "Indigo Sample (fictional)", "company_id": "co-fx-sample-capital", "title": "Principal, seed fund", "roles": ["investor"], "topics": ["AI agents"], "participation": "relevant_candidate", "event_ids": ["evt-fx-agents-founders-night"], "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]},
+    {"id": "per-fx-10", "name": "Jordan Fixture (fictional)", "company_id": "co-fx-codeplatform", "title": "Group PM, AI coding assistant", "roles": ["pm"], "topics": ["Copilot", "AI agents"], "participation": "relevant_candidate", "event_ids": ["evt-fx-devtools-happy-hour"], "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]},
+    {"id": "per-fx-11", "name": "Kai Placeholder (fictional)", "title": "Founder, agent infrastructure", "roles": ["founder"], "topics": ["AI agents", "MCP"], "participation": "relevant_candidate", "event_ids": ["evt-fx-mcp-workshop"], "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]},
+    {"id": "per-fx-12", "name": "Lane Mock (fictional)", "company_id": "co-fx-example-ventures", "title": "Associate, seed fund", "roles": ["investor"], "topics": ["developer tools"], "participation": "unknown", "event_ids": [], "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]}
+  ],
+  "stays": [
+    {
+      "id": "stay-fx-marina-hotel",
+      "name": "[FIXTURE] Fictional hotel near Fort Mason",
+      "provider": "fixture:w12-api",
+      "lodging_type": "hotel",
+      "check_in": "2026-10-27",
+      "check_out": "2026-10-30",
+      "adults": 1,
+      "venue": {"name": "Fictional hotel Marina", "city": "San Francisco", "latitude": 37.8004, "longitude": -122.4367, "coordinate_precision": "approximate"},
+      "price_status": "unknown",
+      "availability": "unknown",
+      "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]
+    },
+    {
+      "id": "stay-fx-soma-apartment",
+      "name": "[FIXTURE] Fictional apartment in SoMa",
+      "provider": "fixture:w12-api",
+      "lodging_type": "apartment",
+      "check_in": "2026-10-27",
+      "check_out": "2026-10-30",
+      "adults": 1,
+      "venue": {"name": "Fictional apartment SoMa", "city": "San Francisco", "latitude": 37.7793, "longitude": -122.4028, "coordinate_precision": "approximate"},
+      "price_status": "unknown",
+      "availability": "unknown",
+      "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]
+    }
+  ],
+  "flights": [
+    {
+      "id": "flt-fx-jfk-sfo-rt",
+      "trip_type": "round_trip",
+      "slices": [
+        {"segments": [{"origin_iata": "JFK", "destination_iata": "SFO", "connection_type": "unknown"}]},
+        {"segments": [{"origin_iata": "SFO", "destination_iata": "JFK", "connection_type": "unknown"}]}
+      ],
+      "price_status": "unknown",
+      "collected_at": "2026-10-23T12:00:00Z",
+      "warnings": ["FIXTURE: fictional placeholder; no carrier, times or price were collected"],
+      "evidence": [{"provider": "fixture:w12-api", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00Z"}]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "sold-out-founders-night",
+      "label": "The fictional AI agent founders evening becomes sold out",
+      "changes": [{"event_id": "evt-fx-agents-founders-night", "set": {"status": "sold_out"}}]
+    },
+    {
+      "id": "workshop-rescheduled",
+      "label": "The fictional MCP workshop moves to 2026-10-29 13:00",
+      "changes": [{"event_id": "evt-fx-mcp-workshop", "set": {"start_at": "2026-10-29T13:00:00-07:00", "end_at": "2026-10-29T15:00:00-07:00"}}]
+    },
+    {
+      "id": "breakfast-cancelled",
+      "label": "The fictional seed investors breakfast is cancelled",
+      "changes": [{"event_id": "evt-fx-seed-breakfast", "set": {"status": "cancelled"}}]
+    }
+  ]
+}
