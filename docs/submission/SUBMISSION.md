@@ -1,6 +1,6 @@
 # Conferge
 
-**Don't just attend conferences. Be in the right place, with the right people, at the right time.**
+**Plan a conference trip in minutes and maximize the professional opportunities you get out of it.**
 
 ## Problem
 
@@ -10,14 +10,11 @@ Most attendees go home with a few business cards and the feeling they were in th
 
 ## What it does
 
-1. **Goal first**: one sentence ("meet seed investors, AI agent founders, Copilot PMs") becomes weighted goals.
-2. **Event discovery**: official sessions plus side events from Luma, Partiful, Eventbrite and party aggregators, linked to the conference.
-3. **Who to meet, and why**: people ranked against your goals, each with the FalkorDB path from goal to person and its sources.
-4. **Reverse planning**: a day-by-day plan for the days you are in town, with a map of the venues.
-5. **Anti-FOMO**: which events to skip (time conflict, travel too long, low score) and what you gain by skipping them.
-6. **Live replanning**: when an event sells out, the plan is recomputed and the diff explains what was removed, what replaces it and why.
-7. **Memory**: "I met this person" is written to the graph and the ranking changes immediately.
-
+1. **Opportunity Graph**: one sentence ("meet seed investors, AI agent founders, Copilot PMs") becomes weighted goals, and official sessions plus side events (Luma, Partiful, Eventbrite, conferenceparties) are linked in FalkorDB to people, companies and topics.
+2. **Reverse Planning**: starts from the goals to build a day-by-day plan for the days you are in town, with a map of the venues.
+3. **Smart Networking**: who to meet and why, ranked against your goals with the explainable FalkorDB path and its sources; "I met this person" is written to the graph and the ranking changes immediately.
+4. **Anti-FOMO**: tells you which events to skip (time conflict, travel too long, low score, outside hours) and what you gain by skipping them.
+5. **Live Replanning**: when an event sells out, the plan is recomputed and the diff says what was removed, what replaces it and why.
 ## Tracks
 
 - **FalkorDB**: the graph of record (697 nodes, 2,195 edges), written only through `GraphStore` MERGE methods and queried for the goal to person explanation paths, conflicts, replanning impact and meeting memory.

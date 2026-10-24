@@ -230,22 +230,6 @@
       (plan.scenario_id ? " | scenario actif: " + plan.scenario_id : "") : "";
   }
 
-  function roiTile(name, value) {
-    var unknown = value === null || value === undefined;
-    return '<div class="roi-tile"><div class="value' + (unknown ? " unknown" : "") + '">' +
-      esc(unknown ? "unknown" : value) + '</div><div class="name">' + esc(name) + "</div></div>";
-  }
-
-  function renderRoi(roi) {
-    if (!roi) { $("roi-grid").innerHTML = '<p class="muted">ROI indisponible.</p>'; return; }
-    $("roi-grid").innerHTML =
-      roiTile("Depenses (USD)", roi.spend_usd === null || roi.spend_usd === undefined ? null : fmtUsd(roi.spend_usd)) +
-      roiTile("Rencontres", roi.meetings) +
-      roiTile("Contacts qualifies", roi.qualified_contacts) +
-      roiTile("Opportunites (score >= 30)", roi.opportunities);
-    $("roi-note").textContent = "Budget: " + fmtUsd(roi.budget_usd) + (roi.spend_note ? " | " + roi.spend_note : "");
-  }
-
   function planItems(plan) {
     var out = [];
     ((plan && plan.plan && plan.plan.days) || []).forEach(function (d) {
@@ -609,7 +593,6 @@
     var errors = [];
     return Promise.all([
       settle(api("/plan", null, "plan"), "plan", function (p) { renderGoals(p); renderNextActions(p); renderPlan(p); }, errors),
-      settle(api("/roi", null, "roi"), "roi", renderRoi, errors),
       settle(api("/events", null, "events"), "events", renderEvents, errors),
       settle(api("/travel", null, "travel"), "travel", renderTravel, errors),
       settle(api("/stays", null, "stays"), "stays", renderStays, errors),
