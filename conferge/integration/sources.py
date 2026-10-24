@@ -199,8 +199,22 @@ def _fixture_eventbrite() -> SourceSlice:
 def _fixture_aggregators() -> SourceSlice:
     from conferge.events.aggregators import load_fixture
     from conferge.events.aggregators.normalize import normalize_records
+    from conferge.events.aggregators.source import DEFAULT_TARGETS
 
     result = load_fixture(explicit_opt_in=True)
+    # Same pages as the live run for the anchor (conferenceparties/github26). The fixture
+    # also holds another conference's page (reinvent2026, parser breadth): linking those
+    # rows to GitHub Universe would be an invented relation.
+    slugs = {t["slug"] for t in DEFAULT_TARGETS[CONFERENCE_ID]}
+    kept = [r for r in result.items if r.source_id.split(":", 1)[0] in slugs]
+    dropped = sorted({r.source_id.split(":", 1)[0] for r in result.items} - slugs)
+    if len(kept) != len(result.items):
+        report = result.run_report.model_copy(update={
+            "unique_count": len({r.source_id for r in kept}),
+            "warnings": [*result.run_report.warnings,
+                         f"{len(result.items) - len(kept)} records from other conference pages "
+                         f"({', '.join(dropped)}) not linked to {CONFERENCE_ID}"]})
+        result = result.model_copy(update={"items": kept, "run_report": report})
     events, errors = normalize_records(result.items, conference_id=CONFERENCE_ID,
                                        timezone_name="America/Los_Angeles",
                                        city="San Francisco")

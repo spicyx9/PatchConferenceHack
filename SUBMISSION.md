@@ -42,8 +42,9 @@ Bright Data (datasets, Web Unlocker, SERP)   public endpoints (RainFocus, Luma, 
 
 | Measure | Value | Read from |
 |---|---|---|
-| Events in the demo dataset | 207: 161 official sessions (RainFocus), 12 Luma, 6 Partiful, 8 Eventbrite, 20 conferenceparties | `GET /api/v1/events` (`data_source: fixture`, snapshot of the 2026-10-24 public collection) |
-| Collection runs | official 210 records, Luma 12, Partiful 6 (`page_cap`, degraded), Eventbrite 8, conferenceparties 20 | `GET /api/v1/pipeline` rows (RunReports) |
+| Events in the demo dataset | 194: 161 official sessions (RainFocus), 12 Luma, 6 Partiful, 8 Eventbrite, 7 conferenceparties (github26) | `GET /api/v1/events` (`data_source: fixture`, snapshot of the 2026-10-24 public collection) |
+| Collection runs | official 210 records, Luma 12, Partiful 6 (`page_cap`, shown as partial), Eventbrite 8, conferenceparties 7 | `GET /api/v1/pipeline` rows (RunReports) |
+| Live probe totals (not the demo snapshot) | Partiful 85 unique (11 in window, `page_cap`), Luma 1092 raw (194 in window), conferenceparties/github26 7 | `probes/partiful.md`, `probes/luma.md`, `probes/eventbrite-aggregators.md` |
 | People ranked for the goal | 50, computed from FalkorDB traversals | `GET /api/v1/people?limit=100` (`total`) |
 | FalkorDB graph | 703 nodes, 2,201 edges | Cypher `count` on the graph the app serves (`/graph` returns a capped sample, not totals) |
 | Stays | 21 records through Bright Data datasets (15 Booking `gd_m4bf7a917zfezv9d5`, 6 Airbnb `gd_ld7ll037kqy322v05`), collected 18:41 UTC, 6 shown | `GET /api/v1/pipeline`, `GET /api/v1/stays` (`data_source: cached`) |

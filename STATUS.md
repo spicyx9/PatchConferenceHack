@@ -2,7 +2,7 @@
 
 1. Conferge: goal-first planner for GitHub Universe 2026 (Fort Mason, SF): who to meet, why, where and when.
 2. Rankings of people and events come from FalkorDB 6.0.3 traversals; without FalkorDB the API is labelled `degraded_no_graph`. Demo graph: 703 nodes, 2,201 edges (read 2026-10-24 20:12 UTC).
-3. Demo dataset (`GET /api/v1/events`, fixture snapshot of 2026-10-24): 207 events, 161 official sessions (RainFocus), 12 Luma, 6 Partiful, 8 Eventbrite, 20 conferenceparties; probe reports in `probes/`.
+3. Demo dataset (`GET /api/v1/events`, fixture snapshot of 2026-10-24): 194 events, 161 official sessions (RainFocus), 12 Luma, 6 Partiful, 8 Eventbrite, 7 conferenceparties (github26 page only); probe reports in `probes/`. Live probe totals are larger and are not what the demo shows: Partiful Explore returned 85 unique events (11 in Oct 27-30, `page_cap`, not exhaustive), Luma 1092 raw rows (194 kept in the window), conferenceparties/github26 7 (`probes/*.md`).
 4. Bright Data travel runs: 21 stays through datasets (15 Booking, 6 Airbnb) and 34 Google Flights itineraries through Web Unlocker, served from cache; fast-flights and pyairbnb as fallbacks.
 5. Bright Data LinkedIn: 10 targets, 9 matched, 9 people cards with headline and company; presence is never inferred from LinkedIn.
 6. Reachability (`data/block_matrix.json`): 10 of 21 sites without Bright Data, 12 with Web Unlocker alone, 14 with Bright Data (Web Unlocker or dataset); 18 projected once KYC is approved.

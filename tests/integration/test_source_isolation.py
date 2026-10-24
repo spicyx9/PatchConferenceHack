@@ -92,3 +92,14 @@ def test_status_display_failed_partial_ok() -> None:
     assert shown["reason"].startswith("Eventbrite failed (RuntimeError: upstream 500")
     assert "SECRET42" not in shown["reason"] and "degraded" not in shown["reason"]
     assert status_display([_with_event(SourceSlice("a", "01", "live", "live", "ok"))])["label"] == "ok"
+
+
+def test_aggregator_fixture_keeps_only_the_anchor_page() -> None:
+    from conferge.integration.sources import fixture_slices
+
+    s = fixture_slices(["aggregators"])[0]
+    assert len(s.events) == 7  # conferenceparties/github26, same page as the live run
+    assert all(e.start_at is None or e.start_at.month == 10 for e in s.events)
+    report = s.reports[0]
+    assert report.fetched_count == 20 and report.unique_count == 7
+    assert any("reinvent2026" in w for w in report.warnings)
