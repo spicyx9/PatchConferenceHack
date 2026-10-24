@@ -16,7 +16,7 @@ Every recommendation carries its evidence path or an explicit fallback rationale
 | A real problem | **Discover** tab | One goal sentence becomes an agenda of 25 items and the top 50 people ranked from FalkorDB traversals (top 3 Ryan Hecht 56, Camila Maia 47, Nick Liffen 40). |
 | The demo runs | **Discover** → **Explore a sold-out scenario**, then **I met …** | The agenda is replanned with the reason and the path; the meeting is written to the graph (MET memory survives restarts, `POST /reset` clears it). |
 | Provenance | **Sources and how it works** (header) → **Data pipeline** | One row per collection run from its RunReport: provider, Bright Data API, records, collected_at, outcome. Events: 194: 161 catalogue slots (142 official sessions outside Social, 19 catalogue Social items classed `confirmed_side_event`) and 33 external side events (Luma 12, Eventbrite 8, conferenceparties 7, Partiful 6). |
-| A judge can run it | `make up`, `make install`, `make demo` | Same screens on the judge's machine; `make check`: 1470 passed, 26 skipped. |
+| A judge can run it | `make up`, `make install`, `make demo` | Same screens on the judge's machine; `make check`: 1476 passed, 26 skipped. |
 
 ## Bright Data
 

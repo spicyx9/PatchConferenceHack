@@ -27,5 +27,5 @@ Every value below was read by command on this checkout after `make predemo` (fre
 | Crunchbase | 2/10 companies normalized | `probes/crunchbase.md` |
 | Google Maps | 4/9 venues found (snapshot `sd_mvmvwe7c2bqi2xcka6`) | `data/cache/venues.json` |
 | Reachability (21 sites, block matrix) | 10 without Bright Data, 12 with Web Unlocker alone, 14 with Bright Data; 18 projected once KYC is approved | `GET /api/v1/pipeline` `reachability` |
-| `make check` | 1470 passed, 26 skipped | local run |
+| `make check` | 1476 passed, 26 skipped | local run |
 | HEAD | `dfca2bf` | `git rev-parse --short HEAD`, `/health` `git_sha` |
