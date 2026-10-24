@@ -426,6 +426,9 @@ def create_app(
                          extra_warnings=_plan_warnings())
 
     def _events_view(event_type: str | None, day: str | None, min_score: float | None) -> list[dict[str, Any]]:
+        from conferge.api.artwork import event_artwork, load_fixture_covers
+
+        covers = load_fixture_covers()
         scores = state.event_scores()
         out = []
         for event in state.data.events:
@@ -441,6 +444,7 @@ def create_app(
             item["source_mode"] = logic._mode_of(event.evidence)
             item["attended"] = event.id in state.attended
             item["skipped"] = event.id in state.skipped
+            item.update(event_artwork(event, covers))
             item["simulated"] = event.id in state.simulated_events
             out.append(item)
         out.sort(key=lambda e: (e["start_at"] is None, e["start_at"] or "", e["id"]))

@@ -340,7 +340,9 @@ def build_graph(
         mode = _mode_of(event.evidence)
         node(event.id, "Event", event.title, mode)
         provider = event.evidence[0].provider if event.evidence else "unknown"
-        edge(event.id, "PART_OF", conf.id, provider, event.relation_score or 0.5, collected)
+        if (event.conference_id == conf.id
+                and event.conference_relation in {"official", "confirmed_side_event"}):
+            edge(event.id, "PART_OF", conf.id, provider, event.relation_score or 0.5, collected)
         for topic in event.topics:
             node(f"topic:{topic}", "Topic", topic, "fixture")
             edge(event.id, "ABOUT", f"topic:{topic}", provider, 0.8, collected)
