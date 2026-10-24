@@ -214,7 +214,7 @@
                   >San Francisco</span
                 >
               </h1>
-              <p>Find the right events.<br />Meet the right people.</p>
+
               <div class="hero-meta">
                 <span id="conference-title">Loading conference…</span
                 ><span aria-hidden="true">·</span
@@ -230,16 +230,14 @@
               <section class="event-discovery-section">
                 <div class="section-heading">
                   <div>
-                    <span class="eyebrow">AROUND THE CONFERENCE</span>
-                    <h2>Worth making time for</h2>
+
+                    <h2>Events</h2>
                   </div>
                   <a href="#events" data-nav="events" class="text-button"
                     >View all</a
                   >
                 </div>
-                <p class="discovery-note">
-                  Discover what’s happening during your trip.
-                </p>
+
                 <div id="discover-events" class="discover-events">
                   <div class="skeleton-card"></div>
                   <div class="skeleton-card"></div>
@@ -248,7 +246,7 @@
               <section id="step-opps" class="overview-section">
                 <div class="section-heading">
                   <div>
-                    <span class="eyebrow">BEYOND THE BADGE</span>
+
                     <h2>People to connect with</h2>
                   </div>
                   <a href="#people" data-nav="people" class="text-button"
@@ -265,7 +263,7 @@
                 <section id="step-plan" class="panel agenda-preview">
                   <div class="section-heading">
                     <div>
-                      <span class="eyebrow">TIME WELL SPENT</span>
+
                       <h2>Your agenda</h2>
                     </div>
                     <a
@@ -286,7 +284,7 @@
                 <section class="panel map-preview">
                   <div class="section-heading">
                     <div>
-                      <span class="eyebrow">ON THE GROUND</span>
+
                       <h2>Your meeting places</h2>
                     </div>
                     <svg class="icon"><use href="#i-pin" /></svg>
@@ -296,7 +294,7 @@
                     class="map story-map"
                     aria-label="Map of agenda locations"
                   ></div>
-                  <p class="map-note">Your agenda, mapped out.</p>
+
                 </section>
               </div>
               <details id="step-antifomo" class="discover-alternatives">
@@ -376,9 +374,9 @@
         >
           <header class="agenda-heading">
             <div>
-              <p class="agenda-overline">Your time, well spent</p>
+
               <h1 id="agenda-title">My agenda</h1>
-              <p>A few great events. Room for the unexpected.</p>
+
             </div>
             <button class="agenda-edit-priorities" data-open="goal-dialog">
               <svg class="icon" aria-hidden="true"><use href="#i-edit" /></svg
@@ -423,8 +421,8 @@
           >
             <div class="agenda-explore-heading">
               <div>
-                <h2 id="agenda-explore-title">Keep exploring</h2>
-                <p>Find something else that catches your eye.</p>
+                <h2 id="agenda-explore-title">More events</h2>
+
               </div>
               <span id="events-result-count" class="muted"></span>
             </div>
@@ -464,9 +462,9 @@
         >
           <div class="page-heading">
             <div>
-              <span class="eyebrow">YOUR NETWORK AT UNIVERSE</span>
-              <h1 id="people-title">People worth meeting.</h1>
-              <p>A short list, shaped around your priorities.</p>
+
+              <h1 id="people-title">People</h1>
+
             </div>
             <button class="secondary" data-open="goal-dialog">
               Edit priorities
@@ -487,9 +485,7 @@
             ></span>
           </div>
           <div id="people-cards" class="cards"></div>
-          <p class="section-note">
-            Find the context behind each connection on their profile.
-          </p>
+
         </section>
 
         <section
@@ -650,10 +646,9 @@
             </div>
           </form>
           <div id="travel-local-note" hidden>
-            <h2>You’re ready to explore.</h2>
+            <h2>Travel not needed</h2>
             <p>
-              Your conference venues and agenda are on the map below. You can
-              search for travel whenever you need it.
+              View your venues and agenda on the map.
             </p>
             <button type="button" id="travel-resume" class="secondary">
               Search travel
@@ -743,8 +738,7 @@
                 >
               </fieldset>
               <p class="travel-filter-note">
-                Your destination is close to the conference. Prices are for the
-                full quoted trip or stay.
+                Prices are for the full quoted trip or stay.
               </p>
             </aside>
             <div class="travel-result-column">
@@ -853,8 +847,8 @@
           >
             <div class="travel-map-heading">
               <div>
-                <span class="eyebrow">GET TO KNOW THE NEIGHBORHOOD</span>
-                <h2 id="travel-map-title" tabindex="-1">Your places in the city.</h2>
+
+                <h2 id="travel-map-title" tabindex="-1">Places</h2>
                 <p id="travel-map-count" class="muted">Loading places…</p>
               </div>
               <button id="travel-back-results" type="button" class="secondary" hidden>
@@ -954,7 +948,7 @@
               placeholder="Describe who you want to meet or what you need help with…" />
             <button type="submit" id="connection-submit">Find people <span aria-hidden="true">↗</span></button>
           </form>
-          <div class="panel" id="graph-gaps">
+          <div class="panel" id="graph-gaps" hidden>
             <span class="eyebrow">GAPS IN THE EVIDENCE</span>
             <h2>No path in our graph</h2>
             <p>No recorded path found, and that's the answer: the graph has no evidence linking this goal to anyone at the conference. It does not prove the person or event is absent.</p>
@@ -995,7 +989,7 @@
               <div class="connection-sidebar-head"><h2 id="connection-results-title">People</h2>
                 <button type="button" id="connection-clear" hidden>All connections</button></div>
               <p id="connection-summary" role="status" aria-live="polite"></p>
-              <p id="connection-summary-source" class="small-text muted"></p>
+              <p hidden id="connection-summary-source" class="small-text muted"></p>
               <div id="connection-results"></div>
               <div id="graph-detail" class="graph-detail" role="status" aria-live="polite"></div>
             </aside>
@@ -1011,7 +1005,7 @@
         >
           <div class="page-heading">
             <div>
-              <span class="eyebrow">THE BIGGER PICTURE</span>
+
               <h1>Your trip at a glance.</h1>
             </div>
           </div>
@@ -1049,7 +1043,7 @@
             id="step-roi"
             aria-labelledby="trip-results-title"
           >
-            <span class="eyebrow">BEYOND THIS CONFERENCE</span>
+
             <h2 id="trip-results-title">Your trip, in perspective.</h2>
             <div class="roi-grid roi-story">
               <div class="roi-tile">
@@ -1075,8 +1069,8 @@
           </section>
         </section>
         <footer class="footer"><span>Conferge</span>
-          <a class="text-button" href="/api/v1/how-it-works?format=text" target="_blank" rel="noopener">How scoring works</a>
-          <button type="button" class="text-button" data-open="sources-dialog">Sources and how it works</button>
+          <a hidden class="text-button" href="/api/v1/how-it-works?format=text" target="_blank" rel="noopener">How scoring works</a>
+          <button hidden type="button" class="text-button" data-open="sources-dialog">Sources and how it works</button>
         </footer>
       </main>
     </div>
