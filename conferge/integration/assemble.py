@@ -94,14 +94,14 @@ def _scenarios(fixture_scenarios: list[dict[str, Any]], events: list[Event]) -> 
             if all(c.get("event_id") in ids for c in s.get("changes", []))]
     if kept:
         return kept
-    target = next((e for e in events if e.event_type in {"side_event", "party", "meetup"}
-                   and e.status == "scheduled"), None) or next(iter(events), None)
-    if target is None:
+    if not events:
         return []
+    # The target is bound to the top-scored event of the current plan when the change is
+    # simulated (api.logic.resolve_scenario), so the replan diff is never empty by design.
     return [{
         "id": "w15-simulated-sold-out",
-        "label": f"SIMULATION (not observed): {target.title[:60]} becomes sold out",
-        "changes": [{"event_id": target.id, "set": {"status": "sold_out"}}],
+        "label": "SIMULATION (not observed): the top event of your plan becomes sold out",
+        "changes": [{"target": "top_plan_event", "set": {"status": "sold_out"}}],
     }]
 
 

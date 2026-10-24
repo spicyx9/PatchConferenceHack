@@ -538,6 +538,61 @@ def roi_view(
     }
 
 
+TOP_PLAN_EVENT = "top_plan_event"
+
+
+def top_plan_item(plan: dict[str, Any]) -> dict[str, Any] | None:
+    """Highest-scored item of the plan; ties go to the earliest in plan order."""
+    items = [i for d in plan["days"] for i in d["items"]]
+    return max(items, key=lambda i: i["score"], default=None) if items else None
+
+
+def resolve_scenario(scenario: dict[str, Any], plan: dict[str, Any]) -> dict[str, Any]:
+    """Bind ``{"target": "top_plan_event"}`` changes to the current plan, never to a fixed id."""
+    changes = []
+    for change in scenario.get("changes", []):
+        if change.get("target") == TOP_PLAN_EVENT:
+            top = top_plan_item(plan)
+            if top is None:
+                continue
+            change = {"event_id": top["event_id"], "set": change["set"]}
+        changes.append(change)
+    return {**scenario, "changes": changes}
+
+
+def explain_replan(before: dict[str, Any], after: dict[str, Any], changed: list[str],
+                   data: DemoData) -> list[dict[str, Any]]:
+    """Per removed item: the replacement chosen in its slot and why, in plain words."""
+    old = {i["event_id"]: (d["day"], i) for d in before["days"] for i in d["items"]}
+    new = {i["event_id"]: (d["day"], i) for d in after["days"] for i in d["items"]}
+    out = []
+    for event_id in sorted(old.keys() - new.keys()):
+        day, item = old[event_id]
+        event = data.event(event_id)
+        added = [i for k, (d, i) in new.items() if k not in old and d == day]
+        same_slot = [i for i in added if event and (e := data.event(i["event_id"])) and _overlaps(event, e)]
+        replacement = max(same_slot or added, key=lambda i: i["score"], default=None)
+        status = event.status if event else "removed"
+        cause = (f"'{item['title']}' is now {status}" + (" (simulated change)" if event_id in changed else ""))
+        if replacement is None:
+            reason = f"{cause}; no other scheduled event fits that day, the slot stays free."
+        else:
+            slot = "in the same time slot" if replacement in same_slot else "the same day"
+            reason = (f"{cause}; '{replacement['title']}' is the best remaining event {slot} "
+                      f"(score {replacement['score']} vs {item['score']}).")
+        out.append({
+            "removed": {"event_id": event_id, "title": item["title"], "start_at": item["start_at"],
+                        "score": item["score"], "status": status},
+            "replacement": None if replacement is None else {
+                "event_id": replacement["event_id"], "title": replacement["title"],
+                "start_at": replacement["start_at"], "score": replacement["score"],
+                "people": replacement["people"],
+            },
+            "reason": reason,
+        })
+    return out
+
+
 def apply_scenario(data: DemoData, scenario: dict[str, Any]) -> list[str]:
     """Mutate events in place (validated by pydantic); return changed event ids."""
     changed = []

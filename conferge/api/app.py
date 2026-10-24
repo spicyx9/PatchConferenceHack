@@ -450,19 +450,42 @@ def create_app(
         items = [{"id": s["id"], "label": s["label"]} for s in state.data.scenarios]
         return _envelope(state, ["events"], {"items": items, "active": state.scenario_id})
 
+    def _replacement_path(replacement: dict[str, Any] | None) -> dict[str, Any] | None:
+        """Why the replacement matters: goal -> person path for the first person it brings."""
+        if not replacement or not replacement["people"]:
+            return None
+        person = replacement["people"][0]["person_id"]
+        live = _falkordb_path(person, "demo-user")
+        if live is not None:
+            labels = [s["node"]["label"] for s in live["steps"] if "node" in s]
+            return {"backend": "falkordb", "person_id": person, "nodes": labels,
+                    "explanation": live["explanation"]}
+        g = logic.build_graph(state.data, state.goals, state.met)
+        steps = logic.shortest_path(g, "user:demo-user", person)
+        if not steps:
+            return None
+        return {"backend": logic.FALLBACK, "person_id": person,
+                "nodes": [s["node"].get("label", s["node"]["id"]) for s in steps if "node" in s],
+                "explanation": None}
+
     @api.post("/simulate-change")
     def simulate_change(req: ScenarioRequest) -> dict[str, Any]:
         scenario = next((s for s in state.data.scenarios if s["id"] == req.scenario_id), None)
         if scenario is None:
             raise HTTPException(404, f"unknown scenario_id {req.scenario_id!r}")
         before = state.plan()
+        scenario = logic.resolve_scenario(scenario, before)
         changed = logic.apply_scenario(state.data, scenario)
         state.scenario_id = scenario["id"]
         payload = _plan_payload()
+        replan = logic.explain_replan(before, payload["plan"], changed, state.data)
+        for entry in replan:
+            entry["graph_path"] = _replacement_path(entry["replacement"])
         payload.update({
             "scenario": {"id": scenario["id"], "label": scenario["label"]},
             "changed_events": changed,
             "diff": logic.plan_diff(before, payload["plan"]),
+            "replan": replan,
         })
         return _envelope(state, ["events", "people"], payload,
                          extra_warnings=[*_plan_warnings(), "simulated change: not a real update from the source"])

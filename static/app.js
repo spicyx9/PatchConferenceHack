@@ -522,6 +522,14 @@
         var b = x.before || {}, a = x.after || {};
         return "<li>" + esc(x.event_id) + ": " + esc(fmtTime(b.start_at)) + " (" + esc(b.status) + ") vers " +
           esc(fmtTime(a.start_at)) + " (" + esc(a.status) + ")</li>";
+      }) +
+      section("Replanification", "diff-replan", res.replan, function (x) {
+        var r = x.replacement, p = x.graph_path;
+        return "<li><b>Retire :</b> " + esc(x.removed.title) +
+          (r ? "<br><b>Remplace par :</b> " + esc(r.title) + " (" + esc(fmtTime(r.start_at)) + ")" : "") +
+          "<br><b>Raison :</b> " + esc(x.reason) +
+          (p ? "<br><b>Chemin :</b> " + esc(p.nodes.join(" > ")) + (p.explanation ? '<br><span class="muted">' + esc(p.explanation) + "</span>" : "") : "") +
+          "</li>";
       }) + '<p class="muted small-text">Changement simule, pas une mise a jour reelle de la source.</p>';
     $("diff-panel").classList.remove("hidden");
   }
