@@ -32,6 +32,29 @@
   .cols li { font-size: 2.2vw; }
   .live h2 { color: var(--green); } .live li::before { background: var(--green); }
   .wait h2 { color: var(--amber); } .wait li::before { background: var(--amber); }
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4vw 2vw; counter-reset: step; }
+  .steps div { background: var(--panel); border: 2px solid var(--line); border-radius: 1vw; padding: 2vh 1.4vw; }
+  .steps div b { display: block; font-size: 2.2vw; margin-bottom: 1vh; }
+  .steps div b::before { counter-increment: step; content: counter(step) ". "; color: var(--blue); }
+  .steps div span { font-size: 1.6vw; color: var(--muted); line-height: 1.35; }
+  .path { display: flex; align-items: center; gap: 1vw; margin: 0 0 4vh; }
+  .node { background: var(--panel); border: 2px solid var(--green); border-radius: 1vw; padding: 1.6vh 1.6vw; text-align: center; }
+  .node b { display: block; font-size: 2.2vw; color: var(--green); }
+  .node span { font-size: 1.4vw; color: var(--muted); }
+  .edge { font-size: 1.5vw; color: var(--muted); text-align: center; white-space: nowrap; }
+  .edge::after { content: ""; display: block; height: 2px; background: var(--green); margin-top: .6vh; }
+  pre { background: var(--panel); border: 2px solid var(--line); border-radius: 1vw; padding: 2vh 1.6vw;
+        font-size: 1.6vw; line-height: 1.4; color: var(--fg); margin: 0 0 3vh; white-space: pre-wrap; }
+  table { border-collapse: collapse; width: 100%; font-size: 2vw; }
+  td, th { text-align: left; padding: 1.3vh 1vw; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; }
+  td.num { color: var(--green); font-weight: 700; white-space: nowrap; }
+  .dense h1 { font-size: 3.8vw; margin-bottom: 3vh; }
+  .dense li { font-size: 2.1vw; margin-bottom: 1.6vh; }
+  .dense table { font-size: 1.8vw; }
+  .dense th { width: 30%; }
+  .dense .cols li { font-size: 2vw; }
+  .dense .cols h2 { font-size: 2.3vw; }
   .pager { position: fixed; right: 3vw; bottom: 3vh; font-size: 1.4vw; color: var(--muted); }
 </style>
 </head>
@@ -48,43 +71,98 @@
 </section>
 
 <section class="slide">
-  <p class="kicker">Architecture</p>
-  <h1>One graph, explainable end to end.</h1>
-  <div class="flow">
-    <div class="box src"><b>Sources</b><span>RainFocus catalog, Luma, Partiful, Eventbrite, aggregators. Bright Data: SERP, flights, hotels, LinkedIn</span></div>
-    <div class="arrow">&rarr;</div>
-    <div class="box graph"><b>FalkorDB</b><span>697 nodes, 2,195 edges. Every relation keeps its source URL and timestamp</span></div>
-    <div class="arrow">&rarr;</div>
-    <div class="box agents"><b>Agents</b><span>planner and networking, anti-FOMO, minimal-change replanner</span></div>
-    <div class="arrow">&rarr;</div>
-    <div class="box"><b>API</b><span>FastAPI, 2 to 61 ms per call on the demo graph</span></div>
-    <div class="arrow">&rarr;</div>
-    <div class="box"><b>UI</b><span>goal, who to meet and why, plan and map, skips, live change, memory</span></div>
+  <p class="kicker">What Conferge does</p>
+  <h1>One sentence in. Who to meet, where, and why, out.</h1>
+  <div class="steps">
+    <div><b>Goal</b><span>"Meet seed investors, AI agent founders, Copilot PMs" becomes three weighted goals.</span></div>
+    <div><b>Who to meet, and why</b><span>People ranked against your goals. The why is a path in the graph, with its sources.</span></div>
+    <div><b>Plan and map</b><span>Day by day for the days you are in town. Official sessions and side events together.</span></div>
+    <div><b>Anti-FOMO</b><span>Two events at once: which one, why, and what you give up.</span></div>
+    <div><b>Live replanning</b><span>An event sells out. The plan is recomputed, the diff explains the swap.</span></div>
+    <div><b>Memory</b><span>"I met this person" is written to the graph. The ranking changes now and stays for the next conference.</span></div>
   </div>
-  <p class="note">Writes go only through GraphStore MERGE. "Why this person" is a real graph path query.</p>
 </section>
 
-<section class="slide">
-  <p class="kicker">What is real today</p>
-  <h1>Live where it can be, labelled where it is not.</h1>
+<section class="slide dense">
+  <p class="kicker">FalkorDB, the graph that decides</p>
+  <h1>"Why this person" is a path, not a score.</h1>
+  <div class="path">
+    <div class="node"><b>Goal</b><span>seed investors 0.45</span></div>
+    <div class="edge">ABOUT</div>
+    <div class="node"><b>Topic</b><span>AI agents</span></div>
+    <div class="edge">ABOUT</div>
+    <div class="node"><b>Event</b><span>session or side event</span></div>
+    <div class="edge">SPEAKS_AT, HOSTS</div>
+    <div class="node"><b>Person</b><span>source URL, timestamp</span></div>
+  </div>
+<pre>MATCH p = (g:Goal {user_id: $user_id})-[:ABOUT]->(:Topic)<-[:ABOUT]-(:Event)
+          <-[:SPEAKS_AT]-(person:Person {id: $person_id})
+RETURN g.id, length(p), p ORDER BY length(p) LIMIT $cap</pre>
+  <ul>
+    <li>One graph for the planner, the replanner and your memory. Same ids, shared state between agents.</li>
+    <li>Replanning is one traversal: who else is at the sold-out event, where else do they appear. Writes only through GraphStore MERGE.</li>
+  </ul>
+</section>
+
+<section class="slide dense">
+  <p class="kicker">Bright Data, the acquisition layer</p>
+  <h1>Data a plain request cannot reach, labelled by freshness.</h1>
   <div class="cols">
     <div class="live">
-      <h2>Live, no key needed</h2>
+      <h2>Collected live today, public endpoints</h2>
       <ul>
-        <li>Official catalog, Luma, Partiful, Eventbrite, aggregators</li>
+        <li>Official catalog, Luma, Partiful, Eventbrite, party aggregators</li>
         <li>BART fares, OSRM routes</li>
-        <li>FalkorDB graph, 926 tests passing</li>
+        <li>Every record: source URL, collected_at, source_mode</li>
       </ul>
     </div>
     <div class="wait">
-      <h2>Labelled, not live</h2>
+      <h2>Behind one Bright Data client</h2>
       <ul>
-        <li>Bright Data connectors built, waiting for a key</li>
-        <li>Demo runs on the 2026-10-24 snapshot, tagged fixture</li>
-        <li>Sold-out change is a labelled simulation</li>
+        <li>SERP discovery for the long tail of side events</li>
+        <li>Google Flights, Booking and LinkedIn datasets, Web Unlocker for pages that block</li>
+        <li>No key: the connector says missing_credentials, the UI shows a fixture badge. Nothing invented.</li>
       </ul>
     </div>
   </div>
+  <p class="note">The header badge reads fixture or live. We say on stage exactly what it says.</p>
+</section>
+
+<section class="slide">
+  <p class="kicker">Live demo</p>
+  <h1>Six steps, one page, two tabs.</h1>
+  <div class="steps">
+    <div><b>Goal</b><span>Type it, press Lancer. Watch the badge and the collection date.</span></div>
+    <div><b>Who to meet</b><span>Open a card. Then the same path in the FalkorDB Browser.</span></div>
+    <div><b>Plan and map</b><span>Day by day, venues on the map.</span></div>
+    <div><b>Anti-FOMO</b><span>The evening conflict on October 28, the verdict, the loss.</span></div>
+    <div><b>Simulated sell-out</b><span>One click. The diff: removed, replacement, reason. Labelled simulation.</span></div>
+    <div><b>I met this person</b><span>One click. Top 3 before and after. Persisted in the graph.</span></div>
+  </div>
+</section>
+
+<section class="slide dense">
+  <p class="kicker">Measured numbers</p>
+  <h1>Measured on October 24, 2026. Nothing rounded up.</h1>
+  <table>
+    <tr><th>Live collection, public endpoints</th><td class="num">161 sessions, 183 speakers, 122 companies, 231 side events</td></tr>
+    <tr><th>Side events by source</th><td class="num">194 Luma, 19 Eventbrite, 11 Partiful, 7 aggregator parties</td></tr>
+    <tr><th>Demo snapshot, deduplicated</th><td class="num">207 events, 183 people</td></tr>
+    <tr><th>FalkorDB graph</th><td class="num">697 nodes, 2,195 edges, 49 HOSTS edges, loaded in about 1 s</td></tr>
+    <tr><th>API on the demo graph</th><td class="num">goal 61 ms, graph path 11 ms, plan 8 ms, simulate change 26 ms, meeting 17 ms</td></tr>
+    <tr><th>Tests, make check</th><td class="num">984 passed, 22 skipped</td></tr>
+  </table>
+</section>
+
+<section class="slide">
+  <p class="kicker">After the conference</p>
+  <h1>The agenda ends on Thursday. The graph does not.</h1>
+  <ul>
+    <li>Who you met, who you skipped and why, stays in FalkorDB for the next conference.</li>
+    <li>The same goal, run again on a new city: the ranking starts from your history.</li>
+    <li>Next: Bright Data live flights, hotels and LinkedIn with a key, and a follow-up draft after each meeting, proposed, never sent.</li>
+  </ul>
+  <p class="note">Conferge. Be in the right place, with the right people, at the right time. Axel Carron, Ilan Sainte Agathe.</p>
 </section>
 
 <div class="pager" id="pager"></div>
