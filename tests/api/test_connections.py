@@ -51,3 +51,19 @@ async def test_bad_embedding_response_rejected(monkeypatch):
     monkeypatch.setattr(c, 'openai_post', AsyncMock(return_value={'data': [{'index': 1, 'embedding': [0.0] * 512}]}))
     with pytest.raises(ValueError):
         await c.embed(['profile'])
+
+
+def test_overview_keeps_every_person_and_focus_is_scoped(monkeypatch):
+    from types import SimpleNamespace
+
+    from conferge.graph import queries
+
+    monkeypatch.setattr(queries, 'path_user_to_person', lambda *args: {'paths': []})
+    graph = SimpleNamespace(query=lambda *args, **kwargs: SimpleNamespace(result_set=[]))
+    state = SimpleNamespace(store=lambda: SimpleNamespace(graph=graph), opportunities=lambda: [])
+    items = [{'id': f'p{i}', 'name': f'Person {i}', 'source_mode': 'fixture'} for i in range(50)]
+    overview = c.graph_view(state, items, None)
+    assert {n['id'] for n in overview['nodes']} == {p['id'] for p in items}
+    focused = c.graph_view(state, items, 'p9')
+    assert [n['id'] for n in focused['nodes']] == ['p9']
+    assert 'outsider' not in {n['id'] for n in c.graph_view(state, items, 'outsider')['nodes']}

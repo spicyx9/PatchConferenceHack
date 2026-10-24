@@ -15,8 +15,9 @@ explicitly uses keyword matching; it does not simulate AI answers.
 `Conference people` is the loaded directory; `People I've met` is scoped to recorded
 meetings for the existing demo user. This does not import an address book or provide
 multi-user isolation. Profile evidence retains fixture/live labels and source links.
-The default graph shows five ranked people; selecting a person shows their real graph
-neighbourhood and goal path. Vector relevance is not represented as factual confidence.
+The galaxy overview includes every person in the selected list, with their graph
+neighbourhoods and five featured goal paths. Selecting a person shows their neighbourhood
+and goal path; All connections clears the search or focus and restores the full list. Vector relevance is not represented as factual confidence.
 
 Validation: unit tests cover scope, malformed embeddings and rejecting unknown model IDs.
 The vector adapter, index creation, cache and scoped nearest-neighbour query were also

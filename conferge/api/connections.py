@@ -194,11 +194,11 @@ def graph_view(state: Any, items: list[dict], focus: str | None) -> dict:
         return {"nodes": [], "edges": [], "backend": "unavailable"}
     ids = [i["id"] for i in items]
     ranked = [o.person_ids[0] for o in state.opportunities() if o.person_ids and o.person_ids[0] in ids]
-    chosen = [focus] if focus and focus in ids else list(dict.fromkeys(ranked + ids))[:5]
+    chosen = [focus] if focus and focus in ids else list(dict.fromkeys(ranked + ids))
     nodes, edges = {}, {}
     rows = store.graph.query(
         "MATCH (a:Person)-[r:WORKS_AT|SPEAKS_AT|ABOUT]->(b) WHERE a.id IN $ids "
-        "RETURN a, r, b LIMIT 120", params={"ids": chosen}).result_set
+        "RETURN a, r, b LIMIT 1600", params={"ids": chosen}).result_set
     for a, r, b in rows:
         ae, re_, be = _entity(a), _entity(r), _entity(b)
         for e in (ae, be):
@@ -209,7 +209,7 @@ def graph_view(state: Any, items: list[dict], focus: str | None) -> dict:
         eid = f"{source}|{re_['relation']}|{target}"
         edges[eid] = {"id": eid, **re_["properties"], "evidence_source": re_["properties"].get("source"),
                       "source": source, "target": target, "type": re_["relation"]}
-    for pid in chosen:
+    for pid in chosen[:5]:
         result = path_user_to_person(store, "demo-user", pid)
         for path in result["paths"][:1]:
             for n in path["nodes"]:

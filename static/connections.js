@@ -3,7 +3,7 @@
   'use strict';
   const $ = id => document.getElementById(id);
   const esc = value => String(value == null ? '' : value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const colors = {Person:'#bad3c4', Company:'#e7e2f2', Event:'#ead1ba', Topic:'#e8ebee', Goal:'#202d29', User:'#202d29'};
+  const colors = {Person:'#7fbbff', Company:'#b99aff', Event:'#ffbd80', Topic:'#6ee7d8', Goal:'#fff2bd', User:'#fff2bd'};
   const labels = {WORKS_AT:'works at', SPEAKS_AT:'speaks at', ABOUT:'about', HOSTS:'hosts', HAS_GOAL:'prioritizes', ATTENDS_CONFIRMED:'attends'};
   let scope='all', all=[], shown=[], cy=null, request=0, selected=null, busy=false;
   async function api(path, body) {
@@ -33,28 +33,36 @@
       return;
     }
     $('graph').innerHTML='';
-    const types=['Goal','Topic','Person','Event','Company','User'];
+    const dense=nodes.length>40;
     const groups={};nodes.forEach(n=>(groups[n.type] ||= []).push(n));
     const elements=nodes.map(n=>{
-      const group=groups[n.type], index=group.indexOf(n), column=types.indexOf(n.type);
-      return {data:{...n,color:colors[n.type]||'#e9e9e9'},position:{x:column*190+((index%2)*20),y:index*100-(group.length*50)}};
+      const group=groups[n.type], i=group.indexOf(n);
+      const angle=i*2.399963+(n.type==='Person'?0:1.1);
+      const radius=n.type==='Goal'?35: n.type==='Person'?180+Math.sqrt(i)*47:75+Math.sqrt(i)*31;
+      return {data:{...n,color:colors[n.type]||'#abb7db',displayLabel:!dense || (n.type==='Person' && i<5) || n.type==='Goal'?n.label:''},
+        position:{x:Math.cos(angle)*radius*1.25,y:Math.sin(angle)*radius}};
     }).concat(edges.map(e=>({data:{...e,edgeLabel:labels[e.type]||e.type}})));
-    cy=cytoscape({container:$('graph'),elements,minZoom:0.25,maxZoom:2.5,wheelSensitivity:0.2,
+    cy=cytoscape({container:$('graph'),elements,minZoom:0.1,maxZoom:3,wheelSensitivity:0.2,
       style:[
-        {selector:'node',style:{'background-color':'data(color)','border-color':'#ffffff','border-width':3,'label':'data(label)',
-          'font-family':'Inter, Arial, sans-serif','font-size':18,'font-weight':500,'color':'#46534e','text-valign':'bottom','text-margin-y':9,
-          'text-wrap':'ellipsis','text-max-width':155,'width':38,'height':38,'overlay-opacity':0}},
-        {selector:'node[type="Person"]',style:{'width':58,'height':58,'border-width':4,'font-size':20,'font-weight':650,'color':'#1c3028'}},
-        {selector:'node[type="Company"]',style:{'shape':'round-rectangle','width':35,'height':35}},
-        {selector:'node[type="Event"]',style:{'shape':'round-rectangle','width':36,'height':36}},
-        {selector:'node[type="Goal"]',style:{'shape':'round-rectangle','width':124,'height':46,'color':'#ffffff','font-size':14,'text-valign':'center','text-margin-y':0,'text-max-width':110,'text-wrap':'wrap'}},
-        {selector:'edge',style:{'width':1.2,'line-color':'#aebfb5','curve-style':'bezier','opacity':0.85,'target-arrow-shape':'none'}},
-        {selector:'node:selected',style:{'border-color':'#759b85','border-width':4}},
-        {selector:'.muted',style:{'opacity':0.14}},
-        {selector:'edge:selected',style:{'line-color':'#597f6c','width':2.5,'label':'data(edgeLabel)','font-size':10,'text-background-color':'#fafcf9','text-background-opacity':1,'text-background-padding':4}},
-      ],layout:{name:'cose',randomize:false,animate:false,nodeRepulsion:()=>6500,idealEdgeLength:()=>65,
-        edgeElasticity:()=>80,gravity:0.8,numIter:600,padding:45,fit:true,stop:()=>{$('graph').setAttribute('data-layout-ready','true');}}});
-    cy.nodes().positions(n=>({x:n.position('x')*1.15,y:n.position('y')*0.67}));
+        {selector:'node',style:{'background-color':'data(color)','border-color':'data(color)','border-width':1,'border-opacity':0.5,
+          'label':'data(displayLabel)','font-family':'Inter, Arial, sans-serif','font-size':dense?20:15,'font-weight':500,'color':'#d7e5ff',
+          'text-valign':'bottom','text-margin-y':10,'text-wrap':'ellipsis','text-max-width':170,
+          'text-outline-color':'#080d20','text-outline-width':3,'width':dense?9:20,'height':dense?9:20,'overlay-opacity':0,
+          'underlay-color':'data(color)','underlay-opacity':0.09,'underlay-padding':dense?7:10}},
+        {selector:'node[type="Person"]',style:{'width':dense?15:34,'height':dense?15:34,'font-weight':600,'color':'#edf4ff'}},
+        {selector:'node[type="Goal"]',style:{'width':dense?26:38,'height':dense?26:38,'color':'#fff1b9','underlay-opacity':0.16,'underlay-padding':15}},
+        {selector:'edge',style:{'width':dense?0.9:1.3,'line-color':'#668acb','curve-style':'haystack','opacity':dense?0.18:0.48,'target-arrow-shape':'none'}},
+        {selector:'node:selected',style:{'border-color':'#ffffff','border-width':2,'underlay-opacity':0.3}},
+        {selector:'.muted',style:{'opacity':0.08}},
+        {selector:'.illuminated',style:{'opacity':1,'label':'data(label)','z-index':10}},
+        {selector:'edge.illuminated',style:{'line-color':'#b4d9ff','width':2,'opacity':0.85,'label':''}},
+        {selector:'edge:selected',style:{'line-color':'#b4d9ff','width':2.5,'label':'data(edgeLabel)','font-size':12,'color':'#e2ecff','text-background-color':'#111b36','text-background-opacity':1,'text-background-padding':5}},
+      ],layout:dense?{name:'preset',padding:45,fit:true}:{name:'cose',randomize:false,animate:false,nodeRepulsion:()=>6500,idealEdgeLength:()=>65,
+        edgeElasticity:()=>80,gravity:0.8,numIter:600,padding:45,fit:true}});
+    if(!dense)cy.nodes().positions(n=>({x:n.position('x')*1.15,y:n.position('y')*0.67}));
+    $('graph').setAttribute('data-layout-ready','true');
+    cy.on('mouseover','node',event=>{const near=event.target.closedNeighborhood();cy.elements().not(near).addClass('muted');near.addClass('illuminated');$('graph').style.cursor='pointer';});
+    cy.on('mouseout','node',()=>{cy.elements().removeClass('muted illuminated');$('graph').style.cursor='grab';});
     cy.on('tap','node',event=>{const d=event.target.data();if(d.type==='Person') focus(d.id);else showNode(d);});
     cy.on('tap','edge',event=>{const d=event.target.data();$('graph-detail').innerHTML=`<div class="connection-detail"><span class="detail-kicker">RELATIONSHIP</span><h3>${esc(labels[d.type]||d.type)}</h3><p>${esc(cy.getElementById(d.source).data('label'))} → ${esc(cy.getElementById(d.target).data('label'))}</p><small>Source: ${esc(d.source_mode || 'unknown')} · ${esc(d.evidence_source || '')}</small></div>`;});
     fit();
@@ -73,7 +81,7 @@
       ${sources.length?`<h4>Sources</h4>${sources.slice(0,3).map(s=>`<a class="connection-source-link" href="${esc(s.source_url)}" target="_blank" rel="noopener noreferrer">${esc(s.provider)} ↗</a>`).join('')}`:''}</div>`;
   }
   async function focus(id) {
-    const ticket=++request;selected=id;
+    const ticket=++request;selected=id;$('connection-clear').hidden=false;$('network-all').hidden=false;
     $('graph-detail').textContent='Loading profile…';
     personRows(shown);
     try {
@@ -90,11 +98,11 @@
     try {
       const data=await api('connections?scope='+scope);
       if(ticket!==request)return;
-      all=data.items;const visible=new Set(data.graph.nodes.filter(n=>n.type==='Person').map(n=>n.id));shown=[...all.filter(p=>visible.has(p.id)),...all.filter(p=>!visible.has(p.id))].slice(0,30);selected=null;
+      all=data.items;const visible=new Set(data.graph.nodes.filter(n=>n.type==='Person').map(n=>n.id));shown=[...all.filter(p=>visible.has(p.id)),...all.filter(p=>!visible.has(p.id))];selected=null;
       $('connections-count').textContent=`${all.length} people in ${scope==='met'?'your recorded meetings':'the conference directory'}`;
       $('connection-ai-status').textContent=data.ai_configured?'AI search ready':'Keyword search · OpenAI not connected';
-      $('connection-results-title').textContent='People';$('connection-clear').hidden=true;
-      $('connection-summary').textContent=all.length>30?'Showing 30 people. Search the full list.':'';
+      $('connection-results-title').textContent='People';$('connection-clear').hidden=true;$('network-all').hidden=true;
+      $('connection-summary').textContent='';
       $('graph-detail').innerHTML='';personRows(shown);draw(data.graph);
     }catch(e){$('connection-summary').textContent=e.message;}
   }
@@ -107,7 +115,7 @@
       const result=await api('connections/search',{query,scope});if(ticket!==request)return;
       shown=result.items;selected=null;personRows(shown);
       $('connection-results-title').textContent=`${shown.length} matches`;
-      $('connection-summary').textContent=result.summary;$('connection-clear').hidden=false;
+      $('connection-summary').textContent=result.summary;$('connection-clear').hidden=false;$('network-all').hidden=false;
       $('connection-ai-status').textContent=result.mode==='semantic'?'OpenAI + FalkorDB vectors':result.mode==='keyword'?'Keyword search':'No matches';
       if(!shown.length)draw({nodes:[],edges:[],backend:'falkordb'});
       if(shown.length){const data=await api(`connections?scope=${scope}&focus=${encodeURIComponent(shown[0].id)}`);if(ticket===request)draw(data.graph);}
@@ -122,7 +130,9 @@
   }));
   document.querySelectorAll('[data-connection-query]').forEach(button=>button.addEventListener('click',()=>{$('connection-query').value=button.dataset.connectionQuery;search();}));
   $('connection-results').addEventListener('click',e=>{const b=e.target.closest('[data-person]');if(b)focus(b.dataset.person);});
-  $('connection-clear').addEventListener('click',()=>{$('connection-query').value='';render();});
+  function resetSearch() {$('connection-query').value='';render();}
+  $('connection-clear').addEventListener('click',resetSearch);
+  $('network-all').addEventListener('click',resetSearch);
   $('network-fit').addEventListener('click',fit);
   $('network-zoom-in').addEventListener('click',()=>{if(cy)cy.zoom(cy.zoom()*1.2);});
   $('network-zoom-out').addEventListener('click',()=>{if(cy)cy.zoom(cy.zoom()/1.2);});
