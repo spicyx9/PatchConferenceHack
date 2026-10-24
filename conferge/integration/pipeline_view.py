@@ -14,6 +14,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
+from conferge.core.brightdata import NO_PEERS
 from conferge.core.schemas import RunReport
 
 HEADLINE = ("Agents never fetch the web at query time: all reasoning runs on the stored, "
@@ -47,7 +48,9 @@ def row(source: str, report: RunReport, *, fallback: bool = False) -> dict[str, 
         "records": records, "collected_at": report.finished_at.isoformat(),
         "cached": report.source_mode == "cached",
         "status": report.status, "termination": report.termination,
-        "reason": report.errors[0] if report.errors else None,
+        # brightdata_no_peers is shown as is (Bright Data out of peers after 15/30/60 s retries).
+        "reason": NO_PEERS if NO_PEERS in report.warnings else (
+            report.errors[0] if report.errors else None),
         "estimated_cost_usd": estimate,
         "estimate_basis": "records x 1.5 / 1000 (estimate)" if estimate is not None else None,
     }

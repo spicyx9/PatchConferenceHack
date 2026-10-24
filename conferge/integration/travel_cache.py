@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any
 
 from conferge.api.provenance import source_of
+from conferge.core.brightdata import NO_PEERS
 from conferge.core.schemas import FlightOffer, Lodging, RunReport
 from conferge.flights.round_trip_total import display as rt_display
 from conferge.integration.stays_flights import LiveDomain, dedupe_flights, pick_flights, pick_stays
@@ -96,7 +97,9 @@ def _run_reports(doc: dict[str, Any]) -> list[RunReport]:
                              status=run["status"], termination="error", source_mode="cached",
                              fetched_count=run.get("records", 0), unique_count=run.get("records", 0),
                              errors=[run["reason"]] if run.get("reason") else [],
-                             warnings=[f"recorded run, {run.get('records', 0)} records"]))
+                             warnings=[f"recorded run, {run.get('records', 0)} records",
+                                       *([NO_PEERS] if "no_peers" in (run.get("reason") or "")
+                                         else [])]))
     return out
 
 

@@ -20,7 +20,7 @@ from collections.abc import Callable
 from datetime import date, datetime, time, timedelta, timezone
 from typing import Any
 
-from conferge.core.brightdata import BrightDataClient, BrightDataError
+from conferge.core.brightdata import NO_PEERS, BrightDataClient, BrightDataError
 from conferge.core.schemas import (
     DiscoveryQuery,
     FlightOffer,
@@ -202,10 +202,12 @@ class BrightDataFlightsSource:
         return record
 
     def _failed(self, started: datetime, message: str, termination: str) -> DiscoveryResult:
+        no_peers = NO_PEERS in message or "no_peers" in message
         report = RunReport(
             provider=PROVIDER, started_at=started, finished_at=max(self.clock(), started),
-            status="failed", termination=termination, source_mode="live",
-            fetched_count=0, unique_count=0, errors=[message],
+            status="degraded" if no_peers else "failed", termination=termination,
+            source_mode="live", fetched_count=0, unique_count=0, errors=[message],
+            warnings=[NO_PEERS] if no_peers else [],
         )
         return DiscoveryResult(items=[], run_report=report, errors=[message])
 

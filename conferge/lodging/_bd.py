@@ -12,7 +12,7 @@ import time
 from dataclasses import dataclass, field
 from typing import Any
 
-from conferge.core.brightdata import BrightDataClient, BrightDataError
+from conferge.core.brightdata import NO_PEERS, BrightDataClient, BrightDataError
 
 
 class SnapshotPending(BrightDataError):
@@ -75,4 +75,6 @@ async def collect(
         result.rows.append(row)
     if result.error_rows:
         result.warnings.append(f"{dataset_id}: {result.error_rows} row(s) with error excluded")
+    if NO_PEERS in out.warnings:
+        result.warnings.append(NO_PEERS)
     return result
