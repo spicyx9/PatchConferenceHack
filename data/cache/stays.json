@@ -1,0 +1,1271 @@
+{
+ "kind": "conferge.travel_cache",
+ "domain": "stays",
+ "generated_at": "2026-10-24T20:02:18.967562+00:00",
+ "collected_at": "2026-10-24T18:41:15.246314+00:00",
+ "sources": [
+  "stays-20261024T184109Z.json"
+ ],
+ "records": [
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "dataset",
+    "id": "gd_m4bf7a917zfezv9d5",
+    "site": "booking",
+    "snapshot_id": "sd_mvmqn1ir1b96s56ixb",
+    "label": "Bright Data dataset gd_m4bf7a917zfezv9d5 (Booking)",
+    "source_url": "https://www.booking.com/hotel/us/chelsea-inn-san-francisco.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "collected_at": "2026-10-24T18:41:14.855339+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "booking:1887396",
+    "name": "Chelsea Inn",
+    "provider": "booking",
+    "lodging_type": "hotel",
+    "check_in": "2026-10-27",
+    "check_out": "2026-10-30",
+    "adults": 2,
+    "rooms": 1,
+    "venue": {
+     "name": "Chelsea Inn",
+     "address": "2095 Lombard St",
+     "city": "San Francisco",
+     "latitude": 37.79984321228068,
+     "longitude": -122.43578945461313,
+     "coordinate_precision": "exact"
+    },
+    "distance_to_venue_m": 761,
+    "total_price": "500.00",
+    "nightly_avg": "166.67",
+    "base_total": null,
+    "taxes": null,
+    "fees_total": null,
+    "payable_at_property": null,
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "availability": "unknown",
+    "verified_at": null,
+    "includes_all_fees": null,
+    "free_cancellation": null,
+    "rating": 8.2,
+    "rating_scale": 10,
+    "rating_count": 1861,
+    "booking_url": "https://www.booking.com/hotel/us/chelsea-inn-san-francisco.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "dedup_group": "stay:booking:1887396",
+    "evidence": [
+     {
+      "provider": "booking",
+      "source_mode": "live",
+      "source_url": "https://www.booking.com/hotel/us/chelsea-inn-san-francisco.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+      "collected_at": "2026-10-24T18:41:14.855339Z",
+      "raw_ref": "sd_mvmqn1ir1b96s56ixb",
+      "source_record_id": "1887396",
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "dataset",
+    "id": "gd_m4bf7a917zfezv9d5",
+    "site": "booking",
+    "snapshot_id": "sd_mvmqn1ir1b96s56ixb",
+    "label": "Bright Data dataset gd_m4bf7a917zfezv9d5 (Booking)",
+    "source_url": "https://www.booking.com/hotel/us/la-luna-inn.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "collected_at": "2026-10-24T18:41:14.855339+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "booking:56196",
+    "name": "La Luna Inn, an Ascend Collection Hotel",
+    "provider": "booking",
+    "lodging_type": "hotel",
+    "check_in": "2026-10-27",
+    "check_out": "2026-10-30",
+    "adults": 2,
+    "rooms": 1,
+    "venue": {
+     "name": "La Luna Inn, an Ascend Collection Hotel",
+     "address": "2599 Lombard Street",
+     "city": "San Francisco (California)",
+     "latitude": 37.79867172028307,
+     "longitude": -122.4437340348959,
+     "coordinate_precision": "exact"
+    },
+    "distance_to_venue_m": 1314,
+    "total_price": "564.00",
+    "nightly_avg": "188.00",
+    "base_total": null,
+    "taxes": null,
+    "fees_total": null,
+    "payable_at_property": null,
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "availability": "unknown",
+    "verified_at": null,
+    "includes_all_fees": null,
+    "free_cancellation": true,
+    "rating": 7.5,
+    "rating_scale": 10,
+    "rating_count": 1192,
+    "booking_url": "https://www.booking.com/hotel/us/la-luna-inn.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "dedup_group": "stay:booking:56196",
+    "evidence": [
+     {
+      "provider": "booking",
+      "source_mode": "live",
+      "source_url": "https://www.booking.com/hotel/us/la-luna-inn.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+      "collected_at": "2026-10-24T18:41:14.855339Z",
+      "raw_ref": "sd_mvmqn1ir1b96s56ixb",
+      "source_record_id": "56196",
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "dataset",
+    "id": "gd_m4bf7a917zfezv9d5",
+    "site": "booking",
+    "snapshot_id": "sd_mvmqn1ir1b96s56ixb",
+    "label": "Bright Data dataset gd_m4bf7a917zfezv9d5 (Booking)",
+    "source_url": "https://www.booking.com/hotel/us/nob-hill-motor-inn.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "collected_at": "2026-10-24T18:41:14.855339+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "booking:55851",
+    "name": "Nob Hill Motor Inn",
+    "provider": "booking",
+    "lodging_type": "hotel",
+    "check_in": "2026-10-27",
+    "check_out": "2026-10-30",
+    "adults": 2,
+    "rooms": 1,
+    "venue": {
+     "name": "Nob Hill Motor Inn",
+     "address": "1630 Pacific Avenue",
+     "city": "San Francisco (California)",
+     "latitude": 37.7949934117291,
+     "longitude": -122.42210268974304,
+     "coordinate_precision": "exact"
+    },
+    "distance_to_venue_m": 1501,
+    "total_price": "501.00",
+    "nightly_avg": "167.00",
+    "base_total": null,
+    "taxes": null,
+    "fees_total": null,
+    "payable_at_property": null,
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "availability": "unknown",
+    "verified_at": null,
+    "includes_all_fees": null,
+    "free_cancellation": null,
+    "rating": 8.2,
+    "rating_scale": 10,
+    "rating_count": 2347,
+    "booking_url": "https://www.booking.com/hotel/us/nob-hill-motor-inn.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "dedup_group": "stay:booking:55851",
+    "evidence": [
+     {
+      "provider": "booking",
+      "source_mode": "live",
+      "source_url": "https://www.booking.com/hotel/us/nob-hill-motor-inn.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+      "collected_at": "2026-10-24T18:41:14.855339Z",
+      "raw_ref": "sd_mvmqn1ir1b96s56ixb",
+      "source_record_id": "55851",
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "dataset",
+    "id": "gd_m4bf7a917zfezv9d5",
+    "site": "booking",
+    "snapshot_id": "sd_mvmqn1ir1b96s56ixb",
+    "label": "Bright Data dataset gd_m4bf7a917zfezv9d5 (Booking)",
+    "source_url": "https://www.booking.com/hotel/us/san-remo.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "collected_at": "2026-10-24T18:41:14.855339+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "booking:56424",
+    "name": "San Remo Hotel",
+    "provider": "booking",
+    "lodging_type": "hotel",
+    "check_in": "2026-10-27",
+    "check_out": "2026-10-30",
+    "adults": 2,
+    "rooms": 1,
+    "venue": {
+     "name": "San Remo Hotel",
+     "address": "2237 Mason Street",
+     "city": "San Francisco (California)",
+     "latitude": 37.80434619315536,
+     "longitude": -122.4134586006403,
+     "coordinate_precision": "exact"
+    },
+    "distance_to_venue_m": 1639,
+    "total_price": "323.00",
+    "nightly_avg": "107.67",
+    "base_total": null,
+    "taxes": null,
+    "fees_total": null,
+    "payable_at_property": null,
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "availability": "unknown",
+    "verified_at": null,
+    "includes_all_fees": null,
+    "free_cancellation": true,
+    "rating": 7.5,
+    "rating_scale": 10,
+    "rating_count": 1340,
+    "booking_url": "https://www.booking.com/hotel/us/san-remo.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "dedup_group": "stay:booking:56424",
+    "evidence": [
+     {
+      "provider": "booking",
+      "source_mode": "live",
+      "source_url": "https://www.booking.com/hotel/us/san-remo.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+      "collected_at": "2026-10-24T18:41:14.855339Z",
+      "raw_ref": "sd_mvmqn1ir1b96s56ixb",
+      "source_record_id": "56424",
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "dataset",
+    "id": "gd_m4bf7a917zfezv9d5",
+    "site": "booking",
+    "snapshot_id": "sd_mvmqn1ir1b96s56ixb",
+    "label": "Bright Data dataset gd_m4bf7a917zfezv9d5 (Booking)",
+    "source_url": "https://www.booking.com/hotel/us/holiday-inn-san-francisco-golden-gateway.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "collected_at": "2026-10-24T18:41:14.855339+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "booking:182300",
+    "name": "Holiday Inn San Francisco - Golden Gateway newly renovated with No Resort Fee",
+    "provider": "booking",
+    "lodging_type": "hotel",
+    "check_in": "2026-10-27",
+    "check_out": "2026-10-30",
+    "adults": 2,
+    "rooms": 1,
+    "venue": {
+     "name": "Holiday Inn San Francisco - Golden Gateway newly renovated with No Resort Fee",
+     "address": "1500 Van Ness Avenue",
+     "city": "San Francisco (California)",
+     "latitude": 37.78993080169053,
+     "longitude": -122.4220510572195,
+     "coordinate_precision": "exact"
+    },
+    "distance_to_venue_m": 1989,
+    "total_price": "1213.00",
+    "nightly_avg": "404.33",
+    "base_total": null,
+    "taxes": null,
+    "fees_total": null,
+    "payable_at_property": null,
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "availability": "unknown",
+    "verified_at": null,
+    "includes_all_fees": null,
+    "free_cancellation": true,
+    "rating": 8.4,
+    "rating_scale": 10,
+    "rating_count": 4138,
+    "booking_url": "https://www.booking.com/hotel/us/holiday-inn-san-francisco-golden-gateway.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "dedup_group": "stay:booking:182300",
+    "evidence": [
+     {
+      "provider": "booking",
+      "source_mode": "live",
+      "source_url": "https://www.booking.com/hotel/us/holiday-inn-san-francisco-golden-gateway.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+      "collected_at": "2026-10-24T18:41:14.855339Z",
+      "raw_ref": "sd_mvmqn1ir1b96s56ixb",
+      "source_record_id": "182300",
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "dataset",
+    "id": "gd_m4bf7a917zfezv9d5",
+    "site": "booking",
+    "snapshot_id": "sd_mvmqn1ir1b96s56ixb",
+    "label": "Bright Data dataset gd_m4bf7a917zfezv9d5 (Booking)",
+    "source_url": "https://www.booking.com/hotel/us/majestic-san-francisco.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "collected_at": "2026-10-24T18:41:14.855339+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "booking:58354",
+    "name": "Hotel Majestic",
+    "provider": "booking",
+    "lodging_type": "hotel",
+    "check_in": "2026-10-27",
+    "check_out": "2026-10-30",
+    "adults": 2,
+    "rooms": 1,
+    "venue": {
+     "name": "Hotel Majestic",
+     "address": "1500 Sutter Street",
+     "city": "San Francisco (California)",
+     "latitude": 37.787188983843464,
+     "longitude": -122.4253360927105,
+     "coordinate_precision": "exact"
+    },
+    "distance_to_venue_m": 2172,
+    "total_price": "689.00",
+    "nightly_avg": "229.67",
+    "base_total": null,
+    "taxes": null,
+    "fees_total": null,
+    "payable_at_property": null,
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "availability": "unknown",
+    "verified_at": null,
+    "includes_all_fees": null,
+    "free_cancellation": null,
+    "rating": 8.4,
+    "rating_scale": 10,
+    "rating_count": 2096,
+    "booking_url": "https://www.booking.com/hotel/us/majestic-san-francisco.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "dedup_group": "stay:booking:58354",
+    "evidence": [
+     {
+      "provider": "booking",
+      "source_mode": "live",
+      "source_url": "https://www.booking.com/hotel/us/majestic-san-francisco.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+      "collected_at": "2026-10-24T18:41:14.855339Z",
+      "raw_ref": "sd_mvmqn1ir1b96s56ixb",
+      "source_record_id": "58354",
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "dataset",
+    "id": "gd_m4bf7a917zfezv9d5",
+    "site": "booking",
+    "snapshot_id": "sd_mvmqn1ir1b96s56ixb",
+    "label": "Bright Data dataset gd_m4bf7a917zfezv9d5 (Booking)",
+    "source_url": "https://www.booking.com/hotel/us/carlton-san-francisco12.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "collected_at": "2026-10-24T18:41:14.855339+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "booking:8365399",
+    "name": "FOUND Hotel Carlton, Nob Hill",
+    "provider": "booking",
+    "lodging_type": "hotel",
+    "check_in": "2026-10-27",
+    "check_out": "2026-10-30",
+    "adults": 2,
+    "rooms": 1,
+    "venue": {
+     "name": "FOUND Hotel Carlton, Nob Hill",
+     "address": "1075 Sutter Street",
+     "city": "San Francisco",
+     "latitude": 37.787832,
+     "longitude": -122.418013,
+     "coordinate_precision": "exact"
+    },
+    "distance_to_venue_m": 2365,
+    "total_price": "477.00",
+    "nightly_avg": "159.00",
+    "base_total": null,
+    "taxes": null,
+    "fees_total": null,
+    "payable_at_property": null,
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "availability": "unknown",
+    "verified_at": null,
+    "includes_all_fees": null,
+    "free_cancellation": true,
+    "rating": 7.8,
+    "rating_scale": 10,
+    "rating_count": 3209,
+    "booking_url": "https://www.booking.com/hotel/us/carlton-san-francisco12.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "dedup_group": "stay:booking:8365399",
+    "evidence": [
+     {
+      "provider": "booking",
+      "source_mode": "live",
+      "source_url": "https://www.booking.com/hotel/us/carlton-san-francisco12.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+      "collected_at": "2026-10-24T18:41:14.855339Z",
+      "raw_ref": "sd_mvmqn1ir1b96s56ixb",
+      "source_record_id": "8365399",
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "dataset",
+    "id": "gd_m4bf7a917zfezv9d5",
+    "site": "booking",
+    "snapshot_id": "sd_mvmqn1ir1b96s56ixb",
+    "label": "Bright Data dataset gd_m4bf7a917zfezv9d5 (Booking)",
+    "source_url": "https://www.booking.com/hotel/us/beresford-arms.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "collected_at": "2026-10-24T18:41:14.855339+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "booking:58774",
+    "name": "Beresford Arms",
+    "provider": "booking",
+    "lodging_type": "hotel",
+    "check_in": "2026-10-27",
+    "check_out": "2026-10-30",
+    "adults": 2,
+    "rooms": 1,
+    "venue": {
+     "name": "Beresford Arms",
+     "address": "701 Post Street",
+     "city": "San Francisco (California)",
+     "latitude": 37.78754721707836,
+     "longitude": -122.4135672301054,
+     "coordinate_precision": "exact"
+    },
+    "distance_to_venue_m": 2614,
+    "total_price": "564.00",
+    "nightly_avg": "188.00",
+    "base_total": null,
+    "taxes": null,
+    "fees_total": null,
+    "payable_at_property": null,
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "availability": "unknown",
+    "verified_at": null,
+    "includes_all_fees": null,
+    "free_cancellation": null,
+    "rating": 8.0,
+    "rating_scale": 10,
+    "rating_count": 1180,
+    "booking_url": "https://www.booking.com/hotel/us/beresford-arms.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "dedup_group": "stay:booking:58774",
+    "evidence": [
+     {
+      "provider": "booking",
+      "source_mode": "live",
+      "source_url": "https://www.booking.com/hotel/us/beresford-arms.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+      "collected_at": "2026-10-24T18:41:14.855339Z",
+      "raw_ref": "sd_mvmqn1ir1b96s56ixb",
+      "source_record_id": "58774",
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "dataset",
+    "id": "gd_m4bf7a917zfezv9d5",
+    "site": "booking",
+    "snapshot_id": "sd_mvmqn1ir1b96s56ixb",
+    "label": "Bright Data dataset gd_m4bf7a917zfezv9d5 (Booking)",
+    "source_url": "https://www.booking.com/hotel/us/union-square-plaza.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "collected_at": "2026-10-24T18:41:14.855339+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "booking:56172",
+    "name": "Union Square Plaza Hotel",
+    "provider": "booking",
+    "lodging_type": "hotel",
+    "check_in": "2026-10-27",
+    "check_out": "2026-10-30",
+    "adults": 2,
+    "rooms": 1,
+    "venue": {
+     "name": "Union Square Plaza Hotel",
+     "address": "432 Geary Street",
+     "city": "San Francisco (California)",
+     "latitude": 37.78716566682716,
+     "longitude": -122.41040959954262,
+     "coordinate_precision": "exact"
+    },
+    "distance_to_venue_m": 2826,
+    "total_price": "378.00",
+    "nightly_avg": "126.00",
+    "base_total": null,
+    "taxes": null,
+    "fees_total": null,
+    "payable_at_property": null,
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "availability": "unknown",
+    "verified_at": null,
+    "includes_all_fees": null,
+    "free_cancellation": null,
+    "rating": 6.9,
+    "rating_scale": 10,
+    "rating_count": 458,
+    "booking_url": "https://www.booking.com/hotel/us/union-square-plaza.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "dedup_group": "stay:booking:56172",
+    "evidence": [
+     {
+      "provider": "booking",
+      "source_mode": "live",
+      "source_url": "https://www.booking.com/hotel/us/union-square-plaza.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+      "collected_at": "2026-10-24T18:41:14.855339Z",
+      "raw_ref": "sd_mvmqn1ir1b96s56ixb",
+      "source_record_id": "56172",
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "dataset",
+    "id": "gd_m4bf7a917zfezv9d5",
+    "site": "booking",
+    "snapshot_id": "sd_mvmqn1ir1b96s56ixb",
+    "label": "Bright Data dataset gd_m4bf7a917zfezv9d5 (Booking)",
+    "source_url": "https://www.booking.com/hotel/us/embassy-san-francisco.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "collected_at": "2026-10-24T18:41:14.855339+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "booking:12066223",
+    "name": "EMBASSY HOTEL",
+    "provider": "booking",
+    "lodging_type": "hotel",
+    "check_in": "2026-10-27",
+    "check_out": "2026-10-30",
+    "adults": 2,
+    "rooms": 1,
+    "venue": {
+     "name": "EMBASSY HOTEL",
+     "address": "610 Polk Street",
+     "city": "San Francisco",
+     "latitude": 37.7823906,
+     "longitude": -122.418877,
+     "coordinate_precision": "exact"
+    },
+    "distance_to_venue_m": 2867,
+    "total_price": "316.00",
+    "nightly_avg": "105.33",
+    "base_total": null,
+    "taxes": null,
+    "fees_total": null,
+    "payable_at_property": null,
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "availability": "unknown",
+    "verified_at": null,
+    "includes_all_fees": null,
+    "free_cancellation": null,
+    "rating": 5.9,
+    "rating_scale": 10,
+    "rating_count": 736,
+    "booking_url": "https://www.booking.com/hotel/us/embassy-san-francisco.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "dedup_group": "stay:booking:12066223",
+    "evidence": [
+     {
+      "provider": "booking",
+      "source_mode": "live",
+      "source_url": "https://www.booking.com/hotel/us/embassy-san-francisco.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+      "collected_at": "2026-10-24T18:41:14.855339Z",
+      "raw_ref": "sd_mvmqn1ir1b96s56ixb",
+      "source_record_id": "12066223",
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "dataset",
+    "id": "gd_m4bf7a917zfezv9d5",
+    "site": "booking",
+    "snapshot_id": "sd_mvmqn1ir1b96s56ixb",
+    "label": "Bright Data dataset gd_m4bf7a917zfezv9d5 (Booking)",
+    "source_url": "https://www.booking.com/hotel/us/the-mosser-san-francisco.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "collected_at": "2026-10-24T18:41:14.855339+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "booking:56069",
+    "name": "The Mosser Hotel",
+    "provider": "booking",
+    "lodging_type": "hotel",
+    "check_in": "2026-10-27",
+    "check_out": "2026-10-30",
+    "adults": 2,
+    "rooms": 1,
+    "venue": {
+     "name": "The Mosser Hotel",
+     "address": "54 4th Street",
+     "city": "San Francisco (California)",
+     "latitude": 37.7850162302717,
+     "longitude": -122.40513034164906,
+     "coordinate_precision": "exact"
+    },
+    "distance_to_venue_m": 3319,
+    "total_price": "252.00",
+    "nightly_avg": "84.00",
+    "base_total": null,
+    "taxes": null,
+    "fees_total": null,
+    "payable_at_property": null,
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "availability": "unknown",
+    "verified_at": null,
+    "includes_all_fees": null,
+    "free_cancellation": true,
+    "rating": 7.5,
+    "rating_scale": 10,
+    "rating_count": 1302,
+    "booking_url": "https://www.booking.com/hotel/us/the-mosser-san-francisco.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "dedup_group": "stay:booking:56069",
+    "evidence": [
+     {
+      "provider": "booking",
+      "source_mode": "live",
+      "source_url": "https://www.booking.com/hotel/us/the-mosser-san-francisco.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+      "collected_at": "2026-10-24T18:41:14.855339Z",
+      "raw_ref": "sd_mvmqn1ir1b96s56ixb",
+      "source_record_id": "56069",
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "dataset",
+    "id": "gd_m4bf7a917zfezv9d5",
+    "site": "booking",
+    "snapshot_id": "sd_mvmqn1ir1b96s56ixb",
+    "label": "Bright Data dataset gd_m4bf7a917zfezv9d5 (Booking)",
+    "source_url": "https://www.booking.com/hotel/us/the-pickwick-san-francisco.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "collected_at": "2026-10-24T18:41:14.855339+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "booking:56077",
+    "name": "The Pickwick Hotel San Francisco",
+    "provider": "booking",
+    "lodging_type": "hotel",
+    "check_in": "2026-10-27",
+    "check_out": "2026-10-30",
+    "adults": 2,
+    "rooms": 1,
+    "venue": {
+     "name": "The Pickwick Hotel San Francisco",
+     "address": "85 Fifth Street",
+     "city": "San Francisco (California)",
+     "latitude": 37.78301300087134,
+     "longitude": -122.40675240755081,
+     "coordinate_precision": "exact"
+    },
+    "distance_to_venue_m": 3385,
+    "total_price": "691.00",
+    "nightly_avg": "230.33",
+    "base_total": null,
+    "taxes": null,
+    "fees_total": null,
+    "payable_at_property": null,
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "availability": "unknown",
+    "verified_at": null,
+    "includes_all_fees": null,
+    "free_cancellation": true,
+    "rating": 7.4,
+    "rating_scale": 10,
+    "rating_count": 2159,
+    "booking_url": "https://www.booking.com/hotel/us/the-pickwick-san-francisco.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "dedup_group": "stay:booking:56077",
+    "evidence": [
+     {
+      "provider": "booking",
+      "source_mode": "live",
+      "source_url": "https://www.booking.com/hotel/us/the-pickwick-san-francisco.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+      "collected_at": "2026-10-24T18:41:14.855339Z",
+      "raw_ref": "sd_mvmqn1ir1b96s56ixb",
+      "source_record_id": "56077",
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "dataset",
+    "id": "gd_m4bf7a917zfezv9d5",
+    "site": "booking",
+    "snapshot_id": "sd_mvmqn1ir1b96s56ixb",
+    "label": "Bright Data dataset gd_m4bf7a917zfezv9d5 (Booking)",
+    "source_url": "https://www.booking.com/hotel/us/casa-loma.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "collected_at": "2026-10-24T18:41:14.855339+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "booking:238459",
+    "name": "Casa Loma Hotel",
+    "provider": "booking",
+    "lodging_type": "hotel",
+    "check_in": "2026-10-27",
+    "check_out": "2026-10-30",
+    "adults": 2,
+    "rooms": 1,
+    "venue": {
+     "name": "Casa Loma Hotel",
+     "address": "610 Fillmore Street",
+     "city": "San Francisco (California)",
+     "latitude": 37.77508434339283,
+     "longitude": -122.43094190955162,
+     "coordinate_precision": "exact"
+    },
+    "distance_to_venue_m": 3439,
+    "total_price": "252.00",
+    "nightly_avg": "84.00",
+    "base_total": null,
+    "taxes": null,
+    "fees_total": null,
+    "payable_at_property": null,
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "availability": "unknown",
+    "verified_at": null,
+    "includes_all_fees": null,
+    "free_cancellation": true,
+    "rating": 7.1,
+    "rating_scale": 10,
+    "rating_count": 558,
+    "booking_url": "https://www.booking.com/hotel/us/casa-loma.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "dedup_group": "stay:booking:238459",
+    "evidence": [
+     {
+      "provider": "booking",
+      "source_mode": "live",
+      "source_url": "https://www.booking.com/hotel/us/casa-loma.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+      "collected_at": "2026-10-24T18:41:14.855339Z",
+      "raw_ref": "sd_mvmqn1ir1b96s56ixb",
+      "source_record_id": "238459",
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "dataset",
+    "id": "gd_m4bf7a917zfezv9d5",
+    "site": "booking",
+    "snapshot_id": "sd_mvmqn1ir1b96s56ixb",
+    "label": "Bright Data dataset gd_m4bf7a917zfezv9d5 (Booking)",
+    "source_url": "https://www.booking.com/hotel/us/bei-san-francisco-trademark-collection-by-wyndham.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "collected_at": "2026-10-24T18:41:14.855339+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "booking:7213345",
+    "name": "BEI San Francisco, Trademark Collection by Wyndham",
+    "provider": "booking",
+    "lodging_type": "hotel",
+    "check_in": "2026-10-27",
+    "check_out": "2026-10-30",
+    "adults": 2,
+    "rooms": 1,
+    "venue": {
+     "name": "BEI San Francisco, Trademark Collection by Wyndham",
+     "address": "50 8th Street ",
+     "city": "San Francisco",
+     "latitude": 37.777811,
+     "longitude": -122.414295,
+     "coordinate_precision": "exact"
+    },
+    "distance_to_venue_m": 3499,
+    "total_price": "705.00",
+    "nightly_avg": "235.00",
+    "base_total": null,
+    "taxes": null,
+    "fees_total": null,
+    "payable_at_property": null,
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "availability": "unknown",
+    "verified_at": null,
+    "includes_all_fees": null,
+    "free_cancellation": null,
+    "rating": 6.3,
+    "rating_scale": 10,
+    "rating_count": 824,
+    "booking_url": "https://www.booking.com/hotel/us/bei-san-francisco-trademark-collection-by-wyndham.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "dedup_group": "stay:booking:7213345",
+    "evidence": [
+     {
+      "provider": "booking",
+      "source_mode": "live",
+      "source_url": "https://www.booking.com/hotel/us/bei-san-francisco-trademark-collection-by-wyndham.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+      "collected_at": "2026-10-24T18:41:14.855339Z",
+      "raw_ref": "sd_mvmqn1ir1b96s56ixb",
+      "source_record_id": "7213345",
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "dataset",
+    "id": "gd_m4bf7a917zfezv9d5",
+    "site": "booking",
+    "snapshot_id": "sd_mvmqn1ir1b96s56ixb",
+    "label": "Bright Data dataset gd_m4bf7a917zfezv9d5 (Booking)",
+    "source_url": "https://www.booking.com/hotel/us/city-center-inn-and-suites.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "collected_at": "2026-10-24T18:41:14.855339+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "booking:57680",
+    "name": "City Center Inn and Suites",
+    "provider": "booking",
+    "lodging_type": "hotel",
+    "check_in": "2026-10-27",
+    "check_out": "2026-10-30",
+    "adults": 2,
+    "rooms": 1,
+    "venue": {
+     "name": "City Center Inn and Suites",
+     "address": "240 7th Street",
+     "city": "San Francisco (California)",
+     "latitude": 37.77727646904562,
+     "longitude": -122.40870304405689,
+     "coordinate_precision": "exact"
+    },
+    "distance_to_venue_m": 3794,
+    "total_price": "395.00",
+    "nightly_avg": "131.67",
+    "base_total": null,
+    "taxes": null,
+    "fees_total": null,
+    "payable_at_property": null,
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "availability": "unknown",
+    "verified_at": null,
+    "includes_all_fees": null,
+    "free_cancellation": null,
+    "rating": 7.0,
+    "rating_scale": 10,
+    "rating_count": 1247,
+    "booking_url": "https://www.booking.com/hotel/us/city-center-inn-and-suites.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+    "dedup_group": "stay:booking:57680",
+    "evidence": [
+     {
+      "provider": "booking",
+      "source_mode": "live",
+      "source_url": "https://www.booking.com/hotel/us/city-center-inn-and-suites.html?checkin=2026-10-27&checkout=2026-10-30&group_adults=2&no_rooms=1&group_children=0&selected_currency=USD&sb_price_type=total",
+      "collected_at": "2026-10-24T18:41:14.855339Z",
+      "raw_ref": "sd_mvmqn1ir1b96s56ixb",
+      "source_record_id": "57680",
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "dataset",
+    "id": "gd_ld7ll037kqy322v05",
+    "site": "airbnb",
+    "snapshot_id": "sd_mvmqn1lb1iu27stdzv",
+    "label": "Bright Data dataset gd_ld7ll037kqy322v05 (Airbnb)",
+    "source_url": "https://www.airbnb.com/rooms/1412525448669004203?check_in=2026-10-27&check_out=2026-10-30&adults=2&currency=USD",
+    "collected_at": "2026-10-24T18:41:15.246314+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "airbnb:1412525448669004203",
+    "name": "At Mine - Golden State Park Suite",
+    "provider": "airbnb",
+    "lodging_type": "apartment",
+    "check_in": "2026-10-27",
+    "check_out": "2026-10-30",
+    "adults": 2,
+    "rooms": 1,
+    "venue": {
+     "name": "At Mine - Golden State Park Suite",
+     "address": null,
+     "city": "San Francisco, California, United States",
+     "latitude": 37.7811,
+     "longitude": -122.4704,
+     "coordinate_precision": "exact"
+    },
+    "distance_to_venue_m": 4365,
+    "total_price": "647.00",
+    "nightly_avg": "215.67",
+    "base_total": null,
+    "taxes": null,
+    "fees_total": null,
+    "payable_at_property": null,
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "availability": "unknown",
+    "verified_at": null,
+    "includes_all_fees": null,
+    "free_cancellation": null,
+    "rating": 4.95,
+    "rating_scale": 5,
+    "rating_count": 472,
+    "booking_url": "https://www.airbnb.com/rooms/1412525448669004203?check_in=2026-10-27&check_out=2026-10-30&adults=2&currency=USD",
+    "dedup_group": "stay:airbnb:1412525448669004203",
+    "evidence": [
+     {
+      "provider": "airbnb",
+      "source_mode": "live",
+      "source_url": "https://www.airbnb.com/rooms/1412525448669004203?check_in=2026-10-27&check_out=2026-10-30&adults=2&currency=USD",
+      "collected_at": "2026-10-24T18:41:15.246314Z",
+      "raw_ref": "sd_mvmqn1lb1iu27stdzv",
+      "source_record_id": "1412525448669004203",
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "dataset",
+    "id": "gd_ld7ll037kqy322v05",
+    "site": "airbnb",
+    "snapshot_id": "sd_mvmqn1lb1iu27stdzv",
+    "label": "Bright Data dataset gd_ld7ll037kqy322v05 (Airbnb)",
+    "source_url": "https://www.airbnb.com/rooms/4429527?check_in=2026-10-27&check_out=2026-10-30&adults=2&currency=USD",
+    "collected_at": "2026-10-24T18:41:15.246314+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "airbnb:4429527",
+    "name": "Cozy & quiet 1BR in West Portal",
+    "provider": "airbnb",
+    "lodging_type": "apartment",
+    "check_in": "2026-10-27",
+    "check_out": "2026-10-30",
+    "adults": 2,
+    "rooms": 1,
+    "venue": {
+     "name": "Cozy & quiet 1BR in West Portal",
+     "address": null,
+     "city": "San Francisco, California, United States",
+     "latitude": 37.73772,
+     "longitude": -122.46597,
+     "coordinate_precision": "approximate"
+    },
+    "distance_to_venue_m": 8158,
+    "total_price": "755.16",
+    "nightly_avg": "251.72",
+    "base_total": null,
+    "taxes": null,
+    "fees_total": null,
+    "payable_at_property": null,
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "availability": "unknown",
+    "verified_at": null,
+    "includes_all_fees": null,
+    "free_cancellation": null,
+    "rating": 4.9,
+    "rating_scale": 5,
+    "rating_count": 170,
+    "booking_url": "https://www.airbnb.com/rooms/4429527?check_in=2026-10-27&check_out=2026-10-30&adults=2&currency=USD",
+    "dedup_group": "stay:airbnb:4429527",
+    "evidence": [
+     {
+      "provider": "airbnb",
+      "source_mode": "live",
+      "source_url": "https://www.airbnb.com/rooms/4429527?check_in=2026-10-27&check_out=2026-10-30&adults=2&currency=USD",
+      "collected_at": "2026-10-24T18:41:15.246314Z",
+      "raw_ref": "sd_mvmqn1lb1iu27stdzv",
+      "source_record_id": "4429527",
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "dataset",
+    "id": "gd_ld7ll037kqy322v05",
+    "site": "airbnb",
+    "snapshot_id": "sd_mvmqn1lb1iu27stdzv",
+    "label": "Bright Data dataset gd_ld7ll037kqy322v05 (Airbnb)",
+    "source_url": "https://www.airbnb.com/rooms/1665654235983005935?check_in=2026-10-27&check_out=2026-10-30&adults=2&currency=USD",
+    "collected_at": "2026-10-24T18:41:15.246314+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "airbnb:1665654235983005935",
+    "name": "Spacious & Quiet | Fast Train to Downtown SF",
+    "provider": "airbnb",
+    "lodging_type": "apartment",
+    "check_in": "2026-10-27",
+    "check_out": "2026-10-30",
+    "adults": 2,
+    "rooms": 1,
+    "venue": {
+     "name": "Spacious & Quiet | Fast Train to Downtown SF",
+     "address": null,
+     "city": null,
+     "latitude": 37.7334,
+     "longitude": -122.4764,
+     "coordinate_precision": "exact"
+    },
+    "distance_to_venue_m": 8967,
+    "total_price": "685.00",
+    "nightly_avg": "228.33",
+    "base_total": null,
+    "taxes": null,
+    "fees_total": null,
+    "payable_at_property": null,
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "availability": "unknown",
+    "verified_at": null,
+    "includes_all_fees": null,
+    "free_cancellation": null,
+    "rating": 4.93,
+    "rating_scale": 5,
+    "rating_count": 29,
+    "booking_url": "https://www.airbnb.com/rooms/1665654235983005935?check_in=2026-10-27&check_out=2026-10-30&adults=2&currency=USD",
+    "dedup_group": "stay:airbnb:1665654235983005935",
+    "evidence": [
+     {
+      "provider": "airbnb",
+      "source_mode": "live",
+      "source_url": "https://www.airbnb.com/rooms/1665654235983005935?check_in=2026-10-27&check_out=2026-10-30&adults=2&currency=USD",
+      "collected_at": "2026-10-24T18:41:15.246314Z",
+      "raw_ref": "sd_mvmqn1lb1iu27stdzv",
+      "source_record_id": "1665654235983005935",
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "dataset",
+    "id": "gd_ld7ll037kqy322v05",
+    "site": "airbnb",
+    "snapshot_id": "sd_mvmqn1lb1iu27stdzv",
+    "label": "Bright Data dataset gd_ld7ll037kqy322v05 (Airbnb)",
+    "source_url": "https://www.airbnb.com/rooms/8207632?check_in=2026-10-27&check_out=2026-10-30&adults=2&currency=USD",
+    "collected_at": "2026-10-24T18:41:15.246314+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "airbnb:8207632",
+    "name": "Comfortable Guest Suite in Parkside.",
+    "provider": "airbnb",
+    "lodging_type": "apartment",
+    "check_in": "2026-10-27",
+    "check_out": "2026-10-30",
+    "adults": 2,
+    "rooms": 1,
+    "venue": {
+     "name": "Comfortable Guest Suite in Parkside.",
+     "address": null,
+     "city": "San Francisco, California, United States",
+     "latitude": 37.7346,
+     "longitude": -122.49304,
+     "coordinate_precision": "approximate"
+    },
+    "distance_to_venue_m": 9582,
+    "total_price": "788.80",
+    "nightly_avg": "262.93",
+    "base_total": null,
+    "taxes": null,
+    "fees_total": null,
+    "payable_at_property": null,
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "availability": "unknown",
+    "verified_at": null,
+    "includes_all_fees": null,
+    "free_cancellation": null,
+    "rating": 4.93,
+    "rating_scale": 5,
+    "rating_count": 135,
+    "booking_url": "https://www.airbnb.com/rooms/8207632?check_in=2026-10-27&check_out=2026-10-30&adults=2&currency=USD",
+    "dedup_group": "stay:airbnb:8207632",
+    "evidence": [
+     {
+      "provider": "airbnb",
+      "source_mode": "live",
+      "source_url": "https://www.airbnb.com/rooms/8207632?check_in=2026-10-27&check_out=2026-10-30&adults=2&currency=USD",
+      "collected_at": "2026-10-24T18:41:15.246314Z",
+      "raw_ref": "sd_mvmqn1lb1iu27stdzv",
+      "source_record_id": "8207632",
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "dataset",
+    "id": "gd_ld7ll037kqy322v05",
+    "site": "airbnb",
+    "snapshot_id": "sd_mvmqn1lb1iu27stdzv",
+    "label": "Bright Data dataset gd_ld7ll037kqy322v05 (Airbnb)",
+    "source_url": "https://www.airbnb.com/rooms/25808640?check_in=2026-10-27&check_out=2026-10-30&adults=2&currency=USD",
+    "collected_at": "2026-10-24T18:41:15.246314+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "airbnb:25808640",
+    "name": "Pet-Friendly SF Guest Suite w/ Yard, Games & Views",
+    "provider": "airbnb",
+    "lodging_type": "apartment",
+    "check_in": "2026-10-27",
+    "check_out": "2026-10-30",
+    "adults": 2,
+    "rooms": 1,
+    "venue": {
+     "name": "Pet-Friendly SF Guest Suite w/ Yard, Games & Views",
+     "address": null,
+     "city": "San Francisco, California, United States",
+     "latitude": 37.71957,
+     "longitude": -122.40414,
+     "coordinate_precision": "approximate"
+    },
+    "distance_to_venue_m": 9918,
+    "total_price": "791.12",
+    "nightly_avg": "263.71",
+    "base_total": null,
+    "taxes": null,
+    "fees_total": null,
+    "payable_at_property": null,
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "availability": "unknown",
+    "verified_at": null,
+    "includes_all_fees": null,
+    "free_cancellation": null,
+    "rating": 4.81,
+    "rating_scale": 5,
+    "rating_count": 253,
+    "booking_url": "https://www.airbnb.com/rooms/25808640?check_in=2026-10-27&check_out=2026-10-30&adults=2&currency=USD",
+    "dedup_group": "stay:airbnb:25808640",
+    "evidence": [
+     {
+      "provider": "airbnb",
+      "source_mode": "live",
+      "source_url": "https://www.airbnb.com/rooms/25808640?check_in=2026-10-27&check_out=2026-10-30&adults=2&currency=USD",
+      "collected_at": "2026-10-24T18:41:15.246314Z",
+      "raw_ref": "sd_mvmqn1lb1iu27stdzv",
+      "source_record_id": "25808640",
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "dataset",
+    "id": "gd_ld7ll037kqy322v05",
+    "site": "airbnb",
+    "snapshot_id": "sd_mvmqn1lb1iu27stdzv",
+    "label": "Bright Data dataset gd_ld7ll037kqy322v05 (Airbnb)",
+    "source_url": "https://www.airbnb.com/rooms/1433750247345631058?check_in=2026-10-27&check_out=2026-10-30&adults=2&currency=USD",
+    "collected_at": "2026-10-24T18:41:15.246314+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "airbnb:1433750247345631058",
+    "name": "Serene 2BR 2Bath Home in Daly Near San Francisco",
+    "provider": "airbnb",
+    "lodging_type": "apartment",
+    "check_in": "2026-10-27",
+    "check_out": "2026-10-30",
+    "adults": 2,
+    "rooms": 1,
+    "venue": {
+     "name": "Serene 2BR 2Bath Home in Daly Near San Francisco",
+     "address": null,
+     "city": "Daly City, California, United States",
+     "latitude": 37.70355,
+     "longitude": -122.42459,
+     "coordinate_precision": "approximate"
+    },
+    "distance_to_venue_m": 11411,
+    "total_price": "648.00",
+    "nightly_avg": "216.00",
+    "base_total": null,
+    "taxes": null,
+    "fees_total": null,
+    "payable_at_property": null,
+    "currency": "USD",
+    "price_status": "quoted_total",
+    "availability": "unknown",
+    "verified_at": null,
+    "includes_all_fees": null,
+    "free_cancellation": null,
+    "rating": 5.0,
+    "rating_scale": 5,
+    "rating_count": 1,
+    "booking_url": "https://www.airbnb.com/rooms/1433750247345631058?check_in=2026-10-27&check_out=2026-10-30&adults=2&currency=USD",
+    "dedup_group": "stay:airbnb:1433750247345631058",
+    "evidence": [
+     {
+      "provider": "airbnb",
+      "source_mode": "live",
+      "source_url": "https://www.airbnb.com/rooms/1433750247345631058?check_in=2026-10-27&check_out=2026-10-30&adults=2&currency=USD",
+      "collected_at": "2026-10-24T18:41:15.246314Z",
+      "raw_ref": "sd_mvmqn1lb1iu27stdzv",
+      "source_record_id": "1433750247345631058",
+      "confidence": null
+     }
+    ]
+   }
+  }
+ ]
+}

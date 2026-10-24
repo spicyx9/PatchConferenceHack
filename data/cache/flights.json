@@ -1,0 +1,2303 @@
+{
+ "kind": "conferge.travel_cache",
+ "domain": "flights",
+ "generated_at": "2026-10-24T20:02:18.967562+00:00",
+ "collected_at": "2026-10-24T18:18:14+00:00",
+ "sources": [
+  "web_unlocker https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en"
+ ],
+ "records": [
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-ea56555c5a06583d",
+    "dedup_key": "itin-215d1e049160ee41",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "EWR",
+        "destination_iata": "ATL",
+        "departure_at": "2026-10-27T11:35:00-04:00",
+        "arrival_at": "2026-10-27T14:15:00-04:00",
+        "marketing_carrier": "F9",
+        "operating_carrier": null,
+        "flight_number": "F94601",
+        "aircraft": null,
+        "duration_minutes": 160,
+        "connection_type": "unknown"
+       },
+       {
+        "origin_iata": "ATL",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T15:28:00-04:00",
+        "arrival_at": "2026-10-27T18:10:00-07:00",
+        "marketing_carrier": "F9",
+        "operating_carrier": null,
+        "flight_number": "F91447",
+        "aircraft": null,
+        "duration_minutes": 342,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "413 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-fb6bbbacd40a891d",
+    "dedup_key": "itin-5aad2b3559cce5d5",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "JFK",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T10:00:00-04:00",
+        "arrival_at": "2026-10-27T13:44:00-07:00",
+        "marketing_carrier": "B6",
+        "operating_carrier": null,
+        "flight_number": "B6215",
+        "aircraft": null,
+        "duration_minutes": 404,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "716 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-a09bcf7a93845699",
+    "dedup_key": "itin-a587aa8337b4ce9f",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "JFK",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T09:00:00-04:00",
+        "arrival_at": "2026-10-27T12:31:00-07:00",
+        "marketing_carrier": "DL",
+        "operating_carrier": null,
+        "flight_number": "DL669",
+        "aircraft": null,
+        "duration_minutes": 391,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "753 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-6f871d6811a6ad5e",
+    "dedup_key": "itin-7377bb7da8db85f7",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "JFK",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T11:30:00-04:00",
+        "arrival_at": "2026-10-27T14:53:00-07:00",
+        "marketing_carrier": "AS",
+        "operating_carrier": null,
+        "flight_number": "AS41",
+        "aircraft": null,
+        "duration_minutes": 383,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "753 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-cd69f30ee39fc758",
+    "dedup_key": "itin-93792c9291a60649",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "JFK",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T08:29:00-04:00",
+        "arrival_at": "2026-10-27T12:02:00-07:00",
+        "marketing_carrier": "AA",
+        "operating_carrier": null,
+        "flight_number": "AA179",
+        "aircraft": null,
+        "duration_minutes": 393,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "764 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-aafc4ceb9d10a0ac",
+    "dedup_key": "itin-2d08f8814f66f009",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "LGA",
+        "destination_iata": "ATL",
+        "departure_at": "2026-10-27T09:29:00-04:00",
+        "arrival_at": "2026-10-27T12:13:00-04:00",
+        "marketing_carrier": "F9",
+        "operating_carrier": null,
+        "flight_number": "F94347",
+        "aircraft": null,
+        "duration_minutes": 164,
+        "connection_type": "unknown"
+       },
+       {
+        "origin_iata": "ATL",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T15:28:00-04:00",
+        "arrival_at": "2026-10-27T18:10:00-07:00",
+        "marketing_carrier": "F9",
+        "operating_carrier": null,
+        "flight_number": "F91447",
+        "aircraft": null,
+        "duration_minutes": 342,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "587 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-891f0c5419cd5e86",
+    "dedup_key": "itin-4de27e36cb0ef295",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "EWR",
+        "destination_iata": "PHX",
+        "departure_at": "2026-10-27T10:29:00-04:00",
+        "arrival_at": "2026-10-27T13:07:00-07:00",
+        "marketing_carrier": "AA",
+        "operating_carrier": null,
+        "flight_number": "AA2825",
+        "aircraft": null,
+        "duration_minutes": 338,
+        "connection_type": "unknown"
+       },
+       {
+        "origin_iata": "PHX",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T14:05:00-07:00",
+        "arrival_at": "2026-10-27T16:10:00-07:00",
+        "marketing_carrier": "AA",
+        "operating_carrier": null,
+        "flight_number": "AA2860",
+        "aircraft": null,
+        "duration_minutes": 125,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "667 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-7bcea647e7d0903f",
+    "dedup_key": "itin-651a48a5d2f2d29e",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "JFK",
+        "destination_iata": "BOS",
+        "departure_at": "2026-10-27T17:48:00-04:00",
+        "arrival_at": "2026-10-27T19:41:00-04:00",
+        "marketing_carrier": "B6",
+        "operating_carrier": null,
+        "flight_number": "B6818",
+        "aircraft": null,
+        "duration_minutes": 113,
+        "connection_type": "unknown"
+       },
+       {
+        "origin_iata": "BOS",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T20:40:00-04:00",
+        "arrival_at": "2026-10-28T00:25:00-07:00",
+        "marketing_carrier": "B6",
+        "operating_carrier": null,
+        "flight_number": "B6333",
+        "aircraft": null,
+        "duration_minutes": 405,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "678 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-bb8ffb85bcf040ab",
+    "dedup_key": "itin-092d00f1214db6b7",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "JFK",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T06:00:00-04:00",
+        "arrival_at": "2026-10-27T09:34:00-07:00",
+        "marketing_carrier": "B6",
+        "operating_carrier": null,
+        "flight_number": "B6115",
+        "aircraft": null,
+        "duration_minutes": 394,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "716 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-7a10c41a324313c3",
+    "dedup_key": "itin-1538621049f530c6",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "JFK",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T07:32:00-04:00",
+        "arrival_at": "2026-10-27T11:12:00-07:00",
+        "marketing_carrier": "B6",
+        "operating_carrier": null,
+        "flight_number": "B615",
+        "aircraft": null,
+        "duration_minutes": 400,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "716 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-ee93545143d0c0f6",
+    "dedup_key": "itin-aa4567500ea59b32",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "JFK",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T17:55:00-04:00",
+        "arrival_at": "2026-10-27T21:41:00-07:00",
+        "marketing_carrier": "B6",
+        "operating_carrier": null,
+        "flight_number": "B6615",
+        "aircraft": null,
+        "duration_minutes": 406,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "716 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-19225b97f25bd855",
+    "dedup_key": "itin-928460ccc0da4876",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "JFK",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T20:15:00-04:00",
+        "arrival_at": "2026-10-27T23:58:00-07:00",
+        "marketing_carrier": "B6",
+        "operating_carrier": null,
+        "flight_number": "B6515",
+        "aircraft": null,
+        "duration_minutes": 403,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "716 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-d0434909168e8b7a",
+    "dedup_key": "itin-333fdb51851d8497",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "JFK",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T07:00:00-04:00",
+        "arrival_at": "2026-10-27T10:29:00-07:00",
+        "marketing_carrier": "DL",
+        "operating_carrier": null,
+        "flight_number": "DL668",
+        "aircraft": null,
+        "duration_minutes": 389,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "753 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-9b5900a17eb38ae4",
+    "dedup_key": "itin-b206d34cf8027a43",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "JFK",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T11:30:00-04:00",
+        "arrival_at": "2026-10-27T15:05:00-07:00",
+        "marketing_carrier": "DL",
+        "operating_carrier": null,
+        "flight_number": "DL363",
+        "aircraft": null,
+        "duration_minutes": 395,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "753 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-3cacb21cf6b9dd0d",
+    "dedup_key": "itin-3aff13cdd06eeb9b",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "JFK",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T15:59:00-04:00",
+        "arrival_at": "2026-10-27T19:32:00-07:00",
+        "marketing_carrier": "DL",
+        "operating_carrier": null,
+        "flight_number": "DL679",
+        "aircraft": null,
+        "duration_minutes": 393,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "753 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-f4c2a60c50a38ebf",
+    "dedup_key": "itin-1d2e0fe2d790d005",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "JFK",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T16:46:00-04:00",
+        "arrival_at": "2026-10-27T20:14:00-07:00",
+        "marketing_carrier": "AS",
+        "operating_carrier": null,
+        "flight_number": "AS32",
+        "aircraft": null,
+        "duration_minutes": 388,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "753 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-3e66aa4f4b005a79",
+    "dedup_key": "itin-38829d5e2bfd36ca",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "JFK",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T17:25:00-04:00",
+        "arrival_at": "2026-10-27T21:01:00-07:00",
+        "marketing_carrier": "DL",
+        "operating_carrier": null,
+        "flight_number": "DL365",
+        "aircraft": null,
+        "duration_minutes": 396,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "753 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-528d2b4ae5597aac",
+    "dedup_key": "itin-328e40a3e3b573df",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "JFK",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T19:15:00-04:00",
+        "arrival_at": "2026-10-27T22:56:00-07:00",
+        "marketing_carrier": "DL",
+        "operating_carrier": null,
+        "flight_number": "DL667",
+        "aircraft": null,
+        "duration_minutes": 401,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "753 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-ff4831fb3ed76b71",
+    "dedup_key": "itin-a75ed41392b0c96c",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "JFK",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T07:00:00-04:00",
+        "arrival_at": "2026-10-27T10:33:00-07:00",
+        "marketing_carrier": "AA",
+        "operating_carrier": null,
+        "flight_number": "AA76",
+        "aircraft": null,
+        "duration_minutes": 393,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "764 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-999affd29c6444d1",
+    "dedup_key": "itin-1fe222bd423126d6",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "JFK",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T10:59:00-04:00",
+        "arrival_at": "2026-10-27T14:31:00-07:00",
+        "marketing_carrier": "AA",
+        "operating_carrier": null,
+        "flight_number": "AA149",
+        "aircraft": null,
+        "duration_minutes": 392,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "764 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-a37940a5dc489af5",
+    "dedup_key": "itin-fb816ec275df45ca",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "JFK",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T17:00:00-04:00",
+        "arrival_at": "2026-10-27T20:45:00-07:00",
+        "marketing_carrier": "AA",
+        "operating_carrier": null,
+        "flight_number": "AA15",
+        "aircraft": null,
+        "duration_minutes": 405,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "764 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-ee5936a1b00a6152",
+    "dedup_key": "itin-08245f09ff7db699",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "JFK",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T21:30:00-04:00",
+        "arrival_at": "2026-10-28T01:12:00-07:00",
+        "marketing_carrier": "AA",
+        "operating_carrier": null,
+        "flight_number": "AA177",
+        "aircraft": null,
+        "duration_minutes": 402,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "764 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-9213adbd1ce60f7f",
+    "dedup_key": "itin-4683e1bb97af19f2",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "EWR",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T06:00:00-04:00",
+        "arrival_at": "2026-10-27T09:30:00-07:00",
+        "marketing_carrier": "UA",
+        "operating_carrier": null,
+        "flight_number": "UA648",
+        "aircraft": null,
+        "duration_minutes": 390,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "773 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-f02c3f04adc8ba27",
+    "dedup_key": "itin-7175a117e18e0fcd",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "EWR",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T07:00:00-04:00",
+        "arrival_at": "2026-10-27T10:27:00-07:00",
+        "marketing_carrier": "UA",
+        "operating_carrier": null,
+        "flight_number": "UA1180",
+        "aircraft": null,
+        "duration_minutes": 387,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "773 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-a15b17773a8b34be",
+    "dedup_key": "itin-6fe038a1f6e13248",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "EWR",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T09:00:00-04:00",
+        "arrival_at": "2026-10-27T12:27:00-07:00",
+        "marketing_carrier": "UA",
+        "operating_carrier": null,
+        "flight_number": "UA1777",
+        "aircraft": null,
+        "duration_minutes": 387,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "773 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-131a0b4e77e3bd93",
+    "dedup_key": "itin-feb93eb0c904b7b6",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "EWR",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T10:00:00-04:00",
+        "arrival_at": "2026-10-27T13:38:00-07:00",
+        "marketing_carrier": "UA",
+        "operating_carrier": null,
+        "flight_number": "UA548",
+        "aircraft": null,
+        "duration_minutes": 398,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "773 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-ff2fcedd824fb2e2",
+    "dedup_key": "itin-43647a6c81cd779d",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "EWR",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T11:55:00-04:00",
+        "arrival_at": "2026-10-27T15:23:00-07:00",
+        "marketing_carrier": "UA",
+        "operating_carrier": null,
+        "flight_number": "UA1914",
+        "aircraft": null,
+        "duration_minutes": 388,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "773 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-b236874ca5509d23",
+    "dedup_key": "itin-3629b3ace38c1486",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "EWR",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T13:15:00-04:00",
+        "arrival_at": "2026-10-27T16:29:00-07:00",
+        "marketing_carrier": "UA",
+        "operating_carrier": null,
+        "flight_number": "UA1227",
+        "aircraft": null,
+        "duration_minutes": 374,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "773 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-dba184bf13bc440a",
+    "dedup_key": "itin-922492f8ab3b83bb",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "EWR",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T15:00:00-04:00",
+        "arrival_at": "2026-10-27T18:33:00-07:00",
+        "marketing_carrier": "UA",
+        "operating_carrier": null,
+        "flight_number": "UA794",
+        "aircraft": null,
+        "duration_minutes": 393,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "773 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-229c9f7421e51b2c",
+    "dedup_key": "itin-6c2f6ddea4f6d4c8",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "EWR",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T16:30:00-04:00",
+        "arrival_at": "2026-10-27T19:44:00-07:00",
+        "marketing_carrier": "UA",
+        "operating_carrier": null,
+        "flight_number": "UA1844",
+        "aircraft": null,
+        "duration_minutes": 374,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "773 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-d482eb28c90b1276",
+    "dedup_key": "itin-1cae437bcaa4e693",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "EWR",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T18:00:00-04:00",
+        "arrival_at": "2026-10-27T21:25:00-07:00",
+        "marketing_carrier": "UA",
+        "operating_carrier": null,
+        "flight_number": "UA2171",
+        "aircraft": null,
+        "duration_minutes": 385,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "773 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-b39881336562044c",
+    "dedup_key": "itin-2edbff52835140ad",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "EWR",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T19:15:00-04:00",
+        "arrival_at": "2026-10-27T22:52:00-07:00",
+        "marketing_carrier": "UA",
+        "operating_carrier": null,
+        "flight_number": "UA2364",
+        "aircraft": null,
+        "duration_minutes": 397,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "773 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-23646d5c916b81c3",
+    "dedup_key": "itin-9356096f34f1225a",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "EWR",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T20:20:00-04:00",
+        "arrival_at": "2026-10-27T23:57:00-07:00",
+        "marketing_carrier": "UA",
+        "operating_carrier": null,
+        "flight_number": "UA1800",
+        "aircraft": null,
+        "duration_minutes": 397,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "773 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  },
+  {
+   "provenance": {
+    "provider": "brightdata",
+    "api": "unlocker",
+    "id": "web_unlocker1",
+    "site": "google_flights",
+    "snapshot_id": null,
+    "label": "Bright Data Web Unlocker web_unlocker1 (Google Flights)",
+    "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "collected_at": "2026-10-24T18:18:14+00:00",
+    "price_status": "quoted_total"
+   },
+   "record": {
+    "id": "fo-3967c237ce930a15",
+    "dedup_key": "itin-11706064c6a17a78",
+    "trip_type": "one_way",
+    "slices": [
+     {
+      "segments": [
+       {
+        "origin_iata": "JFK",
+        "destination_iata": "SFO",
+        "departure_at": "2026-10-27T15:55:00-04:00",
+        "arrival_at": "2026-10-27T19:34:00-07:00",
+        "marketing_carrier": "B6",
+        "operating_carrier": null,
+        "flight_number": "B6415",
+        "aircraft": null,
+        "duration_minutes": 399,
+        "connection_type": "unknown"
+       }
+      ],
+      "duration_minutes": null,
+      "self_transfer": null
+     }
+    ],
+    "total_price": null,
+    "raw_price_text": "841 USD round trip total",
+    "price_scope": "unknown",
+    "currency": null,
+    "price_status": "unknown",
+    "collected_at": "2026-10-24T18:18:14Z",
+    "booking_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+    "booking_url_type": "google_flights_search",
+    "baggage_verified": null,
+    "carry_on_included": null,
+    "checked_bags_included": null,
+    "warnings": [
+     "outbound_only: Google lists the return after an outbound is chosen",
+     "price_missing",
+     "baggage_unverified: price may exclude bags and card fees",
+     "round_trip_total_not_split: observed price kept in raw_price_text, not as a one-way total_price"
+    ],
+    "evidence": [
+     {
+      "provider": "brightdata_unlocker_google_flights",
+      "source_mode": "live",
+      "source_url": "https://www.google.com/travel/flights?q=Flights%20from%20NYC%20to%20SFO%20on%202026-10-27%20through%202026-10-30&curr=USD&hl=en",
+      "collected_at": "2026-10-24T18:18:14Z",
+      "raw_ref": "unlocker:web_unlocker1:google_flights",
+      "source_record_id": null,
+      "confidence": null
+     }
+    ]
+   }
+  }
+ ]
+}
