@@ -134,6 +134,23 @@
       '%"></span>'
     );
   }
+  // Score parts in short words, non-zero only: "goal fit 12 · presence 40 · corroboration 4".
+  var BREAKDOWN_LABELS = [
+    ["goal_fit", "goal fit"], ["presence", "presence"], ["identity", "identity"],
+    ["corroboration", "corroboration"], ["graph", "graph"],
+  ];
+  function scoreBreakdownLine(parts) {
+    if (!parts) return "";
+    var words = BREAKDOWN_LABELS.filter(function (l) {
+      return Math.round(parts[l[0]] || 0) !== 0;
+    }).map(function (l) {
+      return l[1] + " " + Math.round(parts[l[0]]);
+    });
+    return words.length
+      ? '<p class="people-breakdown small-text muted">' + esc(words.join(" · ")) + "</p>"
+      : "";
+  }
+
   function candidatePriority(card) {
     var ids = (card.opportunity && card.opportunity.goal_ids) || [],
       goals = (envelopes.plan && envelopes.plan.goals) || [];
@@ -2745,7 +2762,9 @@
               esc(person.title || "") +
               '</p><p class="people-company">' +
               esc(company.name || "") +
-              '</p><div class="people-session"><span class="people-session-label">' +
+              "</p>" +
+              scoreBreakdownLine(opportunity.score_breakdown) +
+              '<div class="people-session"><span class="people-session-label">' +
               (card.met ? "Conversation saved" : "Find them at") +
               "</span>" +
               (event
@@ -2781,7 +2800,7 @@
               (card.met
                 ? '<div class="followup" id="followup-' + esc(id) + '"></div>'
                 : "") +
-              '<div class="small-text" id="why-' + esc(id) + '"></div>' +
+              '<div class="small-text people-why" id="why-' + esc(id) + '"></div>' +
               '<div class="people-actions">' +
               '<button class="secondary" data-action="why" data-id="' +
               esc(id) +

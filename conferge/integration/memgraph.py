@@ -44,6 +44,11 @@ class MemoryGraph:
             return {}
         return {key: params[name] for key, name in _ASSIGN_RE.findall(set_clause)}
 
+    def _name(self, key: tuple[str, str]) -> str:
+        props = self.nodes[key]
+        return str(next((props[k] for k in ("name", "title", "description") if props.get(k)),
+                        key[1]))
+
     def query(self, q: str, params: dict[str, object] | None = None) -> QueryResult:
         self.queries += 1
         values: dict[str, Any] = dict(params or {})
@@ -67,6 +72,9 @@ class MemoryGraph:
             if "r.evidence_ids = CASE" in (match["set"] or ""):  # appended, as in FalkorDB
                 known = list(edge.get("evidence_ids") or [])
                 edge["evidence_ids"] = known + [x for x in values["evidence_ids"] if x not in known]
+            if "r.rationale = replace(" in (match["set"] or ""):  # endpoint names filled in
+                edge["rationale"] = str(values["rationale"]).replace(
+                    "{from}", self._name(src)).replace("{to}", self._name(dst))
             return QueryResult([[src[1], dst[1]]])
         self.refused.append(q[:120])
         raise ValueError("MemoryGraph accepts only GraphStore MERGE statements")

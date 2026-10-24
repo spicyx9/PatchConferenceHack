@@ -76,69 +76,83 @@ def evidence_ids(from_kind: str, from_id: str, props: dict[str, Any]) -> list[st
     return list(dict.fromkeys(ids))
 
 
+# Placeholders filled by GraphStore.merge_edge with the endpoint node names, in the same
+# Cypher statement: coalesce(name, title, description, id) of the MATCHed nodes.
+FROM, TO = "{from}", "{to}"
+_TAGGED = {"Event": "Session", "Conference": "Conference", "Company": "Company"}
+
+
 def rationale(relation: str, from_kind: str, props: dict[str, Any]) -> str:
-    """One sentence saying why the edge exists, from its own provenance only."""
+    """One sentence saying why the edge exists, from its own provenance only.
+
+    It names the entities it links through the ``{from}`` / ``{to}`` placeholders.
+    """
     verification = props.get("verification")
     source = props.get("source")
     page = _page(source, verification)
+    to, frm = f"'{TO}'", f"'{FROM}'"
     if relation == "WORKS_AT" and props.get("linkedin_verification"):
-        sentence = ("WORKS_AT corroborated by LinkedIn profile collected via Bright Data"
+        sentence = (f"Works at {to}: corroborated by LinkedIn profile collected via Bright Data"
                     + _on(props.get("linkedin_observed_at")))
     elif relation == "WORKS_AT" and verification == "linkedin_profile":
-        sentence = ("WORKS_AT stated by LinkedIn profile collected via Bright Data"
+        sentence = (f"Works at {to}: stated by LinkedIn profile collected via Bright Data"
                     + _on(props.get("observed_at")))
     elif relation == "WORKS_AT" and verification == "person_record":
-        sentence = f"Employer listed on the person profile of the {page}"
+        sentence = f"Employer {to} listed on the person profile of the {page}"
     elif relation == "SPEAKS_AT" and verification == "event_speaker_list":
-        sentence = f"Listed as speaker on the {page}"
+        sentence = f"Listed as speaker of {to} on the {page}"
     elif relation == "SPEAKS_AT" and verification == "person_record":
-        sentence = f"Speaker role stated on the person profile of the {page}"
+        sentence = f"Speaker of {to} per the person profile of the {page}"
     elif relation == "HOSTS" and verification == "event_organizer_list":
-        sentence = f"Listed as organizer on the {page}"
+        sentence = f"Listed as organizer of {to} on the {page}"
     elif relation == "HOSTS" and verification == "person_record":
-        sentence = f"Organizer role stated on the person profile of the {page}"
+        sentence = f"Organizer of {to} per the person profile of the {page}"
     elif relation == "ATTENDS_CONFIRMED" and verification == "public_attendee_listing":
-        sentence = f"Publicly listed as attendee on the {page}"
+        sentence = f"Publicly listed as attendee of {to} on the {page}"
     elif relation == "ABOUT" and verification == "user_goal":
-        sentence = "Topic stated by the user in this goal"
+        sentence = f"Topic {to} stated by the user in goal {frm}"
     elif relation == "ABOUT" and verification == "keyword_match":
-        sentence = f"Topic inferred by keyword match in the text of the {page}"
+        sentence = f"Topic {to} inferred by keyword match in the text of {frm} on the {page}"
     elif relation == "ABOUT" and verification == "person_record":
-        sentence = f"Topic listed on the person profile of the {page}"
+        sentence = f"Topic {to} listed on the person profile of the {page}"
     elif relation == "ABOUT":
-        sentence = f"Topic tagged on the {page}"
+        sentence = f"{_TAGGED.get(from_kind, from_kind)} tagged {to} on the {page}"
     elif relation == "PART_OF":
         kind = str(props.get("relation") or "unknown").replace("_", " ")
         basis = "" if verification == "relation_evidence" else ", relation not verified"
-        sentence = f"Conference relation '{kind}' taken from the {page}{basis}"
+        sentence = f"{frm} is {kind} to {to}, per the {page}{basis}"
     elif relation == "LOCATED_AT":
-        sentence = f"Venue published on the {page}"
+        sentence = f"Venue {to} published on the {page}"
     elif relation == "EXHIBITS_AT":
-        sentence = f"Listed as {props.get('role') or 'exhibitor'} on the {page}"
+        sentence = f"Listed as {props.get('role') or 'exhibitor'} of {to} on the {page}"
     elif relation == "NEAR" and props.get("distance_m") is not None:
-        sentence = f"Distance of {props['distance_m']} m reported by the {page}"
+        sentence = f"{props['distance_m']} m from {to}, reported by the {page}"
     elif relation == "NEAR":
         modes = sorted(k.removesuffix("_minutes") for k in props if k.endswith("_minutes"))
         providers = sorted({str(props[f"{m}_source"]) for m in modes if props.get(f"{m}_source")})
-        sentence = (f"Travel time ({', '.join(modes) or 'unknown mode'}) computed by "
-                    f"{', '.join(providers) or 'an unknown provider'}")
-    elif relation in {"SERVES_GOAL", "INVOLVES"} and from_kind == "Opportunity":
-        sentence = f"Planner agent opportunity built from the {page}"
+        sentence = (f"Travel time ({', '.join(modes) or 'unknown mode'}) from {frm} to {to} "
+                    f"computed by {', '.join(providers) or 'an unknown provider'}")
+    elif relation == "SERVES_GOAL" and from_kind == "Opportunity":
+        sentence = f"Planner agent opportunity for goal {to}, built from the {page}"
+    elif relation == "INVOLVES" and from_kind == "Opportunity":
+        sentence = f"Planner agent opportunity involving {to}, built from the {page}"
     elif relation in {"MET", "INVOLVES"} and from_kind == "Meeting":
-        sentence = "Meeting reported by the user" + _on(props.get("observed_at") or props.get("at"))
+        sentence = (f"Meeting with {to} reported by the user"
+                    + _on(props.get("observed_at") or props.get("at")))
     elif relation == "PLANS" and props.get("state") == "invalidated":
-        sentence = f"Removed from the user's plan by {props.get('invalidated_by') or 'an agent'}"
+        sentence = f"{to} removed from the user's plan by {props.get('invalidated_by') or 'an agent'}"
     elif relation == "PLANS":
-        sentence = f"In the user's plan, written by {props.get('written_by') or 'an agent'}"
+        sentence = f"{to} in the user's plan, written by {props.get('written_by') or 'an agent'}"
     elif relation == "SKIPS" and props.get("state") == "invalidated":
-        sentence = f"Skip withdrawn by {props.get('invalidated_by') or 'an agent'}"
+        sentence = f"Skip of {to} withdrawn by {props.get('invalidated_by') or 'an agent'}"
     elif relation == "SKIPS":
         reason = f" ({props['reason']})" if props.get("reason") else ""
-        sentence = f"Skipped in the user's plan{reason}, written by {props.get('written_by') or 'an agent'}"
+        sentence = (f"{to} skipped in the user's plan{reason}, written by "
+                    f"{props.get('written_by') or 'an agent'}")
     elif relation == "AFFECTS":
-        sentence = f"Plan change written by {props.get('written_by') or 'an agent'} affects this event"
+        sentence = f"Plan change written by {props.get('written_by') or 'an agent'} affects {to}"
     else:
-        sentence = f"{relation} recorded from the {page}"
+        sentence = f"{frm} {relation} {to}, recorded from the {page}"
     if props.get("source_mode") == "fixture":
         sentence = "[fixture] " + sentence
     return sentence
