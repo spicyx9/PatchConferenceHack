@@ -94,22 +94,24 @@ def test_people_for_goal_aggregates_excludes_and_ranks():
     graph = _goal_graph()
     result = people_for_goal(graph, "demo-user", "g1")
     rows = result["rows"]
-    assert [r["person_id"] for r in rows] == ["p-alice", "p-frank", "p-bob"]
+    assert [r["person_id"] for r in rows] == ["p-frank", "p-alice", "p-bob"]
     by_id = {r["person_id"]: r for r in rows}
-    # alice: speaker 1.0 + topic 0.4, times goal priority 0.5
-    assert by_id["p-alice"]["score"] == pytest.approx(0.7)
+    # alice: speaker and topic paths carry no provenance, so they share the "unknown" root
+    # source (max, not sum) and no confidence (0.5): max(1.0, 0.4) * 0.5, times priority 0.5
+    assert by_id["p-alice"]["score"] == pytest.approx(0.25)
+    assert by_id["p-alice"]["unknown_confidence"] is True
     assert by_id["p-alice"]["path_count"] == 2
     assert by_id["p-alice"]["reasons"] == ["speaker", "topic"]
     assert by_id["p-alice"]["shortest_hops"] == 2
     assert by_id["p-alice"]["name"] == "Alice"
     assert by_id["p-frank"]["score"] == pytest.approx(0.3)
     assert by_id["p-frank"]["path_count"] == 0
-    assert by_id["p-bob"]["score"] == pytest.approx(0.2)  # SKIPPED does not exclude
+    assert by_id["p-bob"]["score"] == pytest.approx(0.1)  # SKIPPED does not exclude
     assert "p-carol" not in by_id  # MET memory excludes
 
     paths = result["paths"]
     assert len(paths) == 3  # alice speaker + alice topic + bob topic
-    first = paths[0]  # strongest evidence (speaker) first
+    first = paths[0]  # frank has no path; alice strongest evidence (speaker) first
     assert [n["id"] for n in first["nodes"]] == ["g1", "topic:ai-agents", "e-talk", "p-alice"]
     for p in paths:
         for n in p["nodes"]:
@@ -118,8 +120,9 @@ def test_people_for_goal_aggregates_excludes_and_ranks():
         for e in p["edges"]:
             assert {"source", "target", "type"} <= set(e)
     assert first["nodes"][-1]["label"] == "Person"
-    assert first["edges"][-1] == {"source": "p-alice", "target": "e-talk",
-                                  "type": "SPEAKS_AT", "props": {}}
+    assert first["edges"][-1] == {"source": "p-alice", "target": "e-talk", "type": "SPEAKS_AT",
+                                  "props": {}, "evidence_source": None, "confidence": None,
+                                  "observed_at": None}
     assert first["edges"][0]["source"] == "g1" and first["edges"][0]["target"] == "topic:ai-agents"
 
 
@@ -233,3 +236,61 @@ def test_graph_package_never_builds_merge_cypher():
     assert files
     for source in files:
         assert "MERGE (" not in source.read_text(encoding="utf-8"), source.name
+
+
+# -- evidence scoring: unknown confidence, root-source grouping, noisy-OR ----------
+
+
+def _sourced(src: str, url: str, *items: Any) -> Path:
+    p = path(*items)
+    for e in p.edges():
+        e.properties = {"source": src, "source_url": url, "confidence": 1.0}
+    return p
+
+
+def test_missing_edge_confidence_counts_half_and_flags_path():
+    serialized = q.serialize_path(ALICE_SPEAKER)
+    assert q._path_confidence(serialized) == pytest.approx(0.5)
+    assert serialized["flags"] == ["unknown_confidence"]
+
+
+def test_three_paths_from_one_source_count_once():
+    t2, t3 = node("Event", "e-2", title="T2"), node("Event", "e-3", title="T3")
+    same = [_sourced("rainfocus", "https://cat", GOAL, "ABOUT>", TOPIC, "<ABOUT", ev, "<SPEAKS_AT", ALICE)
+            for ev in (TALK, t2, t3)]
+    graph = FakeGraph([(q.Q_GOAL, [[1.0, "g"]]),
+                       (q.Q_PEOPLE_VIA_SPEAKER, [["p-alice", p] for p in same])])
+    row = people_for_goal(graph, "demo-user", "g1")["rows"][0]
+    assert row["path_count"] == 3
+    assert row["score"] == pytest.approx(1.0 * 1.0)  # one contribution, not 3.0
+    assert row["sources"] == ["rainfocus|https://cat"]
+    assert row["unknown_confidence"] is False
+
+
+def test_independent_sources_noisy_or_with_diminishing_returns():
+    assert q.combine_by_source([("a", 0.4), ("a", 0.3), ("a", 0.4)]) == pytest.approx(0.4)
+    two = q.combine_by_source([("a", 0.4), ("b", 0.4)])
+    three = q.combine_by_source([("a", 0.4), ("b", 0.4), ("c", 0.4)])
+    assert two == pytest.approx(1 - 0.6 * 0.6)
+    assert 0.4 < two < three < 1.0
+    assert (two - 0.4) > (three - two)  # each extra source adds less
+
+
+# -- explicit path signatures ------------------------------------------------------
+
+
+def test_path_user_to_person_tries_signatures_in_order():
+    hosted = path(GOAL, "ABOUT>", TOPIC, "<ABOUT", NIGHT, "<HOSTS", BOB)
+    graph = FakeGraph([(q.Q_PATH_HOST, [["g1", 3, hosted]]),
+                       (q.Q_PATH_OPPORTUNITY, [["g1", 2, path(GOAL, "<SERVES_GOAL", node("Opportunity", "o"), "INVOLVES>", BOB)]])])
+    result = q.path_user_to_person(graph, "demo-user", "p-bob")
+    assert result["rows"][0]["signature"] == "host"
+    assert [c[0] for c in graph.calls][:5] == [q.Q_PATH_SPEAKER, q.Q_PATH_ATTENDEE, q.Q_PATH_HOST_COMPANY,
+                                               q.Q_PATH_COMPANY_TOPIC, q.Q_PATH_HOST]
+    edge = result["paths"][0]["edges"][-1]
+    assert {"type", "evidence_source", "confidence", "observed_at"} <= set(edge)
+    assert "shortestPath" not in "".join(query for _, query in q.PATH_SIGNATURES)
+
+
+def test_path_user_to_person_without_match_is_empty():
+    assert q.path_user_to_person(FakeGraph([]), "demo-user", "p-x") == {"rows": [], "paths": []}

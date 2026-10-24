@@ -7,7 +7,7 @@ Duck-typed so tests can pass lightweight fakes: a path exposes ``nodes()`` and
 
 from __future__ import annotations
 
-from typing import Any, TypedDict
+from typing import Any, NotRequired, TypedDict
 
 
 class PathNode(TypedDict):
@@ -17,15 +17,19 @@ class PathNode(TypedDict):
 
 
 class PathEdge(TypedDict):
-    source: str
+    source: str  # from-node id; the provenance is evidence_source
     target: str
     type: str
     props: dict[str, Any]
+    evidence_source: str | None
+    confidence: float | None
+    observed_at: str | None
 
 
 class SerializedPath(TypedDict):
     nodes: list[PathNode]
     edges: list[PathEdge]
+    flags: NotRequired[list[str]]
 
 
 class GraphResult(TypedDict):
@@ -51,8 +55,12 @@ def serialize_path(path: Any) -> SerializedPath:
     for edge in path.edges():
         src = by_internal.get(_node_ref(edge.src_node), str(_node_ref(edge.src_node)))
         dst = by_internal.get(_node_ref(edge.dest_node), str(_node_ref(edge.dest_node)))
-        edges.append({"source": src, "target": dst, "type": edge.relation,
-                      "props": dict(getattr(edge, "properties", {}) or {})})
+        props = dict(getattr(edge, "properties", {}) or {})
+        confidence = props.get("confidence")
+        edges.append({"source": src, "target": dst, "type": edge.relation, "props": props,
+                      "evidence_source": props.get("source"),
+                      "confidence": float(confidence) if isinstance(confidence, (int, float)) else None,
+                      "observed_at": props.get("observed_at")})
     return {"nodes": nodes, "edges": edges}
 
 

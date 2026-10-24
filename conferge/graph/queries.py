@@ -36,6 +36,10 @@ Q_PEOPLE_VIA_ATTENDANCE = (
     "MATCH p = (g:Goal {id: $goal_id, user_id: $user_id})-[:ABOUT]->(:Topic)"
     "<-[:ABOUT]-(:Event)<-[:ATTENDS_CONFIRMED]-(person:Person) RETURN person.id, p LIMIT $cap"
 )
+Q_PEOPLE_VIA_COMPANY_TOPIC = (
+    "MATCH p = (g:Goal {id: $goal_id, user_id: $user_id})-[:ABOUT]->(:Topic)"
+    "<-[:ABOUT]-(:Company)<-[:WORKS_AT]-(person:Person) RETURN person.id, p LIMIT $cap"
+)
 Q_PEOPLE_VIA_TOPIC = (
     "MATCH p = (g:Goal {id: $goal_id, user_id: $user_id})-[:ABOUT]->(:Topic)"
     "<-[:ABOUT]-(person:Person) RETURN person.id, p LIMIT $cap"
@@ -75,10 +79,27 @@ Q_UNTIMED_EVENTS = (
 )
 
 # -- explanations / memory ---------------------------------------------------------
-Q_PATH_USER_TO_PERSON = (
-    "MATCH (g:Goal {user_id: $user_id}), (person:Person {id: $person_id}) "
-    "WITH g, shortestPath((g)-[*..5]-(person)) AS path WHERE path IS NOT NULL "
-    "RETURN g.id, length(path), path ORDER BY length(path) LIMIT $cap"
+# Explicit, bounded path signatures tried in order (no generic shortestPath): the first
+# signature that matches gives the explanation, so the "why" is always the strongest
+# kind of evidence and reads the same way every time.
+_GOAL_TOPIC = "MATCH p = (g:Goal {user_id: $user_id})-[:ABOUT]->(:Topic)"
+_TO_PERSON = "(person:Person {id: $person_id}) RETURN g.id, length(p), p ORDER BY length(p) LIMIT $cap"
+Q_PATH_SPEAKER = f"{_GOAL_TOPIC}<-[:ABOUT]-(:Event)<-[:SPEAKS_AT]-{_TO_PERSON}"
+Q_PATH_ATTENDEE = f"{_GOAL_TOPIC}<-[:ABOUT]-(:Event)<-[:ATTENDS_CONFIRMED]-{_TO_PERSON}"
+Q_PATH_HOST_COMPANY = f"{_GOAL_TOPIC}<-[:ABOUT]-(:Event)<-[:HOSTS]-(:Company)<-[:WORKS_AT]-{_TO_PERSON}"
+Q_PATH_COMPANY_TOPIC = f"{_GOAL_TOPIC}<-[:ABOUT]-(:Company)<-[:WORKS_AT]-{_TO_PERSON}"
+# Additional signatures after the four above (decision: keep Luma/Partiful hosts, a person's
+# own topics and the planner's opportunities explainable instead of returning no path).
+Q_PATH_HOST = f"{_GOAL_TOPIC}<-[:ABOUT]-(:Event)<-[:HOSTS]-{_TO_PERSON}"
+Q_PATH_PERSON_TOPIC = f"{_GOAL_TOPIC}<-[:ABOUT]-{_TO_PERSON}"
+Q_PATH_OPPORTUNITY = (
+    "MATCH p = (g:Goal {user_id: $user_id})<-[:SERVES_GOAL]-(:Opportunity)-[:INVOLVES]->"
+    + _TO_PERSON
+)
+PATH_SIGNATURES = (
+    ("speaker", Q_PATH_SPEAKER), ("attendance", Q_PATH_ATTENDEE),
+    ("host_company", Q_PATH_HOST_COMPANY), ("company_topic", Q_PATH_COMPANY_TOPIC),
+    ("host", Q_PATH_HOST), ("topic", Q_PATH_PERSON_TOPIC), ("opportunity", Q_PATH_OPPORTUNITY),
 )
 Q_PEOPLE_MET_BEFORE = (
     "MATCH p = (m:Meeting {user_id: $user_id})-[:MET|INVOLVES]->(person:Person) "
@@ -129,8 +150,10 @@ READ_QUERIES = {name: value for name, value in globals().items() if name.startsw
 # topic alone the weakest. Confirmed attendance requires evidence at ingest.
 PATH_WEIGHTS = {
     "speaker": 1.0, "attendance": 0.8, "host": 0.9, "host_company": 0.7,
-    "topic": 0.4, "role": 0.6,
+    "company_topic": 0.5, "topic": 0.4, "role": 0.6,
 }
+UNKNOWN_CONFIDENCE = 0.5  # an edge without confidence is not certain
+UNKNOWN_CONFIDENCE_FLAG = "unknown_confidence"
 
 
 def _graph(target: GraphStore | GraphQuery) -> GraphQuery:
@@ -153,9 +176,38 @@ def _dedup(paths: list[SerializedPath]) -> list[SerializedPath]:
 
 
 def _path_confidence(path: SerializedPath) -> float:
+    """Weakest edge; a missing confidence counts as 0.5 and flags the path."""
     values = [e["props"].get("confidence") for e in path["edges"]]
-    known = [float(v) for v in values if isinstance(v, (int, float))]
-    return min(known) if known else 1.0
+    if any(not isinstance(v, (int, float)) for v in values):
+        flags = path.setdefault("flags", [])
+        if UNKNOWN_CONFIDENCE_FLAG not in flags:
+            flags.append(UNKNOWN_CONFIDENCE_FLAG)
+    scored = [float(v) if isinstance(v, (int, float)) else UNKNOWN_CONFIDENCE for v in values]
+    return min(scored) if scored else UNKNOWN_CONFIDENCE
+
+
+def root_source(path: SerializedPath) -> str:
+    """Evidence root of a path: provenance of the edge that reaches the person."""
+    for edge in reversed(path["edges"]):
+        props = edge["props"]
+        if props.get("source") or props.get("source_url"):
+            return f"{props.get('source') or 'unknown'}|{props.get('source_url') or ''}"
+    return "unknown"
+
+
+def combine_by_source(contributions: list[tuple[str, float]]) -> float:
+    """Max per root source, then noisy-OR across distinct sources: 1 - prod(1 - s).
+
+    Three paths read off the same page are one piece of evidence; two independent
+    sources raise the score with diminishing returns and never above 1.
+    """
+    best: dict[str, float] = {}
+    for source, score in contributions:
+        best[source] = max(best.get(source, 0.0), min(max(score, 0.0), 1.0))
+    remaining = 1.0
+    for score in best.values():
+        remaining *= 1.0 - score
+    return 1.0 - remaining
 
 
 def _excluded_people(target: GraphStore | GraphQuery, user_id: str) -> set[str]:
@@ -172,12 +224,13 @@ def people_for_goal(target: GraphStore | GraphQuery, user_id: str, goal_id: str,
     priority = float(goal_rows[0][0]) if goal_rows[0][0] is not None else 1.0
     excluded = set() if include_met else _excluded_people(target, user_id)
 
-    scores: dict[str, float] = defaultdict(float)
+    contributions: dict[str, list[tuple[str, float]]] = defaultdict(list)
     reasons: dict[str, list[str]] = defaultdict(list)
     person_paths: dict[str, list[tuple[str, SerializedPath]]] = defaultdict(list)
-    for kind, query in (("speaker", Q_PEOPLE_VIA_SPEAKER), ("host", Q_PEOPLE_VIA_HOST),
+    for kind, query in (("speaker", Q_PEOPLE_VIA_SPEAKER), ("attendance", Q_PEOPLE_VIA_ATTENDANCE),
                         ("host_company", Q_PEOPLE_VIA_HOST_COMPANY),
-                        ("attendance", Q_PEOPLE_VIA_ATTENDANCE), ("topic", Q_PEOPLE_VIA_TOPIC)):
+                        ("company_topic", Q_PEOPLE_VIA_COMPANY_TOPIC),
+                        ("host", Q_PEOPLE_VIA_HOST), ("topic", Q_PEOPLE_VIA_TOPIC)):
         for person_id, raw_path in run_read(target, query, params):
             if person_id in excluded:
                 continue
@@ -185,13 +238,15 @@ def people_for_goal(target: GraphStore | GraphQuery, user_id: str, goal_id: str,
             if path_key(path) in {path_key(p) for _, p in person_paths[person_id]}:
                 continue
             person_paths[person_id].append((kind, path))
-            scores[person_id] += PATH_WEIGHTS[kind] * _path_confidence(path)
+            contributions[person_id].append(
+                (root_source(path), PATH_WEIGHTS[kind] * _path_confidence(path)))
             reasons[person_id].append(kind)
     for person_id, matched_roles in run_read(target, Q_PEOPLE_BY_ROLE, params):
         if person_id in excluded:
             continue
-        scores[person_id] += PATH_WEIGHTS["role"]
+        contributions[person_id].append(("person_record:roles", PATH_WEIGHTS["role"]))
         reasons[person_id].append(f"role:{','.join(matched_roles)}")
+    scores = {pid: combine_by_source(c) for pid, c in contributions.items()}
 
     ranked = sorted(scores, key=lambda pid: (-scores[pid], pid))[:limit]
     names = {row[0]: row[1:] for row in run_read(target, Q_PERSON_NAMES, {"ids": ranked})}
@@ -207,6 +262,9 @@ def people_for_goal(target: GraphStore | GraphQuery, user_id: str, goal_id: str,
             "score": round(scores[person_id] * priority, 4),
             "reasons": sorted(set(reasons[person_id])),
             "path_count": len(person_paths[person_id]),
+            "sources": sorted({src for src, _ in contributions[person_id]}),
+            "unknown_confidence": any(UNKNOWN_CONFIDENCE_FLAG in p.get("flags", [])
+                                      for _, p in person_paths[person_id]),
             "shortest_hops": min((len(p["edges"]) for p in best), default=None),
         })
         paths.extend(best)
@@ -275,12 +333,20 @@ def conflicts(target: GraphStore | GraphQuery, conference_id: str) -> GraphResul
 
 def path_user_to_person(target: GraphStore | GraphQuery, user_id: str, person_id: str,
                         limit: int = 3) -> GraphResult:
+    """Paths of the first matching signature in PATH_SIGNATURES order; empty if none."""
     params = {"user_id": user_id, "person_id": person_id, "cap": limit}
-    rows, paths = [], []
-    for goal_id, length, raw_path in run_read(target, Q_PATH_USER_TO_PERSON, params):
-        rows.append({"goal_id": goal_id, "hops": length})
-        paths.append(serialize_path(raw_path))
-    return {"rows": rows, "paths": paths}
+    for signature, query in PATH_SIGNATURES:
+        found = run_read(target, query, params)
+        if not found:
+            continue
+        rows, paths = [], []
+        for goal_id, length, raw_path in found:
+            path = serialize_path(raw_path)
+            rows.append({"goal_id": goal_id, "hops": length, "signature": signature,
+                         "confidence": _path_confidence(path)})
+            paths.append(path)
+        return {"rows": rows, "paths": paths}
+    return {"rows": [], "paths": []}
 
 
 def people_met_before(target: GraphStore | GraphQuery, user_id: str) -> GraphResult:
