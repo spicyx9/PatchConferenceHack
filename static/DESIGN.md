@@ -106,3 +106,12 @@ Flights and Stays are separate tasks with visible destination, dates and occupan
 ### Travel search interactions
 
 Search groups route, date range and party beside a single submit action. City and airport suggestions name the location and show IATA codes; city selections keep the collector’s actual city expansion. A shared range calendar guides departure/check-in then return/check-out, with one-way support. A party picker edits supported adult, cabin and room criteria. Children and daily fare estimates are not offered without collector support. Common real sorts and a nearby map action precede the results. Popovers support keyboard navigation, Escape, outside dismissal and viewport-aware placement; the underlying visible fields remain usable. Booking and Kayak public search interactions were reviewed on October 24, 2026.
+
+### Shared softer Travel / Connections surfaces
+
+Travel adopts the existing Connections conversation language: white 20–24px panels,
+ivory `#faf9f7` field surfaces, subtle `#e7e5e3` boundaries, charcoal `#343640` pill
+actions and gray-lavender secondary controls. Search, result cards and pickers use
+these same tokens. Keep the compact booking-style flow and the existing real offer
+content; softness comes from surfaces, boundaries and hierarchy rather than reducing
+text contrast or adding decoration. Connection styles remain unchanged.
