@@ -48,7 +48,7 @@ def test_map_routes_are_declared_straight_lines() -> None:
 def test_ui_shows_the_decor_labels() -> None:
     js = open("static/app.js", encoding="utf-8").read()
     html = open("static/index.html", encoding="utf-8").read()
-    assert "straight lines, not routes" in js
-    assert 'sourceBadge(b.source_mode)' in js
-    assert ">Note</button>" in js and ">Accept</button>" not in js
+    assert "Straight lines, not routes" in js
+    assert "sourceModeBadge(b.source_mode)" in js
+    assert ">Save suggestion</button>" in js and ">Accept</button>" not in js
     assert 'id="map-kind"' in html

@@ -978,6 +978,8 @@
       "<table><tbody>" +
       "<tr><th>Budget</th><td>" +
       esc(fmtUsd(b.budget_usd)) +
+      " " +
+      sourceModeBadge(b.source_mode) +
       "</td></tr>" +
       "<tr><th>Flights</th><td>" +
       esc(fmtUsd(b.flights_usd)) +
@@ -1068,9 +1070,24 @@
     return planned ? "#87a361" : "#b2bd9f";
   }
 
+  function routeKindLabel(polylines) {
+    var kinds = {};
+    (polylines || []).forEach(function (p) {
+      if (p && p.kind) kinds[p.kind] = true;
+    });
+    if (kinds.straight_line_order_of_visits) return "Straight lines, not routes";
+    return Object.keys(kinds).join(", ");
+  }
+
   function renderMap(m) {
     lastMapData = m;
     $("map-places").innerHTML = placesHtml((m && m.markers) || []);
+    var kindEl = $("map-kind");
+    if (kindEl) {
+      var kindLabel = routeKindLabel(m && m.polylines);
+      kindEl.textContent = kindLabel;
+      kindEl.className = kindLabel ? "badge neutral" : "hidden";
+    }
     var el = $("map");
     if (typeof L === "undefined") {
       el.innerHTML =
@@ -1098,7 +1115,11 @@
         opacity: 0.8,
         dashArray: "6 6",
       })
-        .bindTooltip("Day " + esc(p.day))
+        .bindTooltip(
+          "Day " +
+            esc(p.day) +
+            (p.kind === "straight_line_order_of_visits" ? ", straight line" : ""),
+        )
         .addTo(mapLayer);
     });
     ((m && m.markers) || []).forEach(function (mk) {
