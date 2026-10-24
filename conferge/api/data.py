@@ -51,6 +51,10 @@ class DemoData:
     """Data pipeline rows (integration.pipeline_view), from the real RunReports of this run."""
     linkedin: dict[str, dict[str, Any]] = field(default_factory=dict)
     """person_id -> LinkedIn evidence (integration.people_linkedin.cards) shown on /people cards."""
+    timings: dict[str, Any] = field(default_factory=dict)
+    """Per-step and per-source durations of the run that built this dataset (pipeline.Timings)."""
+    sources_report: dict[str, Any] | None = None
+    """Overall sources RunReport (integration.sources.overall_report): degraded when some failed."""
 
     def event(self, event_id: str) -> Event | None:
         return next((e for e in self.events if e.id == event_id), None)

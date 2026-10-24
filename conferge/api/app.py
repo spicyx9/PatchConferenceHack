@@ -10,6 +10,7 @@ from __future__ import annotations
 import copy
 import platform
 import subprocess
+import time
 from datetime import datetime, timezone
 from importlib import metadata
 from pathlib import Path
@@ -115,6 +116,7 @@ class DemoState:
         self.agent_opportunities: list[Opportunity] | None = None
         self.agent_warnings: list[str] = []
         self.rank_mode: str | None = None  # "graph" or DEGRADED_NO_GRAPH, set by _ranking()
+        self.rank_seconds: float | None = None  # wall time of the last uncached ranking
         self.rank_warnings: list[str] = []
         self._rank_cache: tuple[list[Opportunity], dict[str, float]] | None = None
         self._synced_goals: tuple[str, ...] | None = None
@@ -151,6 +153,13 @@ class DemoState:
     def _ranking(self) -> tuple[list[Opportunity], dict[str, float]]:
         if self._rank_cache is not None:
             return self._rank_cache
+        started = time.perf_counter()
+        try:
+            return self._compute_ranking()
+        finally:
+            self.rank_seconds = round(time.perf_counter() - started, 3)
+
+    def _compute_ranking(self) -> tuple[list[Opportunity], dict[str, float]]:
         graph = self._graph_ranking()
         if graph is not None:
             self.rank_mode = "graph"
@@ -373,11 +382,26 @@ def create_app(
         from conferge.integration.pipeline_view import HEADLINE, reachability, totals
 
         rows = state.data.pipeline
+        timings = {"steps": list(state.data.timings.get("steps", [])),
+                   "sources": list(state.data.timings.get("sources", []))}
+        if state.rank_seconds is not None:
+            timings["steps"].append({"step": "rank", "seconds": state.rank_seconds,
+                                     "note": f"last {state.rank_mode} ranking, measured at request time"})
         return _envelope(state, [], {
             "headline": HEADLINE, "rows": rows, "totals": totals(rows),
             "brightdata_calls": bd.calls(), "reachability": reachability(),
+            "timings": timings, "sources_report": state.data.sources_report,
             "note": None if rows else "no collection run in this process (dataset served as loaded)",
         }, mode_override="live" if any(r["kind"] != "fallback" for r in rows) else "fixture")
+
+    @api.get("/cost")
+    def cost() -> dict[str, Any]:
+        """Bright Data calls made by this process and their estimated USD cost (estimate only)."""
+        from conferge.core import cost as bd_cost
+
+        snap = bd_cost.snapshot()
+        return _envelope(state, [], snap, mode_override="live" if snap["calls"] else "unknown",
+                         extra_warnings=["estimate: flat USD 0.0015 per call, real price not verified"])
 
     @api.get("/brightdata")
     def brightdata_usage() -> dict[str, Any]:

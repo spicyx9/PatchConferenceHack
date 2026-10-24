@@ -2690,7 +2690,69 @@
             })
             .join("; ")
         : "none");
+    renderTimings(res && res.timings, res && res.sources_report);
     renderReachability(res && res.reachability);
+    api("/cost", null, null).then(renderCost, function () {
+      renderCost(null);
+    });
+  }
+
+  function renderCost(c) {
+    var box = $("pipeline-cost");
+    if (!box) return;
+    if (!c) {
+      box.innerHTML = '<span class="muted">Bright Data cost counter unavailable.</span>';
+      return;
+    }
+    var by = c.by_api || {};
+    box.innerHTML =
+      "<b>Bright Data, live in this process:</b> " + esc(c.calls) + " calls, $" + esc(c.usd) +
+      ' <span class="muted">(estimate: $' + esc(c.usd_per_call) +
+      " per call, real price not verified)</span> · datasets " + esc(by.datasets || 0) +
+      " · unlocker " + esc(by.unlocker || 0) + " · serp " + esc(by.serp || 0);
+  }
+
+  function renderTimings(t, overall) {
+    var box = $("pipeline-timings");
+    if (!box) return;
+    var steps = (t && t.steps) || [],
+      sources = (t && t.sources) || [];
+    if (!steps.length && !sources.length) {
+      box.innerHTML = "";
+      return;
+    }
+    var secs = function (v) {
+      return v === null || v === undefined ? "—" : Number(v).toFixed(2) + " s";
+    };
+    box.innerHTML =
+      "<h3>Durations</h3>" +
+      (overall
+        ? "<p>Sources overall: <b>" + esc(overall.status) + "</b>" +
+          (overall.errors && overall.errors.length
+            ? ' <span class="muted">(' + esc(overall.errors.join("; ")) + ")</span>"
+            : "") +
+          "</p>"
+        : "") +
+      '<table class="pipeline-table"><thead><tr><th>Step</th><th>Time</th></tr></thead><tbody>' +
+      steps
+        .map(function (s) {
+          return (
+            "<tr><td>" + esc(s.step) + (s.note ? ' <span class="muted">(' + esc(s.note) + ")</span>" : "") +
+            "</td><td>" + esc(secs(s.seconds)) + "</td></tr>"
+          );
+        })
+        .join("") +
+      "</tbody></table>" +
+      '<table class="pipeline-table"><thead><tr><th>Source</th><th>Status</th><th>Records</th><th>Time</th></tr></thead><tbody>' +
+      sources
+        .map(function (s) {
+          return (
+            "<tr><td>" + esc(s.source) + "</td><td>" + esc(s.status) + "</td><td>" +
+            esc(s.records) + "</td><td>" + esc(secs(s.seconds)) + "</td></tr>"
+          );
+        })
+        .join("") +
+      "</tbody></table>";
   }
 
   function renderReachability(r) {
