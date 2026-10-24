@@ -30,6 +30,9 @@ from conferge.core.store import GraphStore
 from conferge.graph.schema import topic_id, venue_id
 
 _RELATION_CONFIDENCE = {"official": 1.0, "confirmed_side_event": 0.9, "candidate": 0.5}
+# Organizer id prefix (set by the event connectors) -> node kind.
+_ORGANIZER_KINDS = (("luma:host:", "Person"), ("partiful:user:", "Person"),
+                    ("luma:calendar:", "Company"), ("eventbrite-organizer:", "Company"))
 
 
 def _scalar(value: Any) -> Any:
@@ -246,13 +249,30 @@ class GraphIngestor:
                         f"SPEAKS_AT {speaker}->{event.id}: person not ingested")
             for organizer in event.organizer_ids:
                 kind = ("Company" if self.has("Company", organizer)
-                        else "Person" if self.has("Person", organizer) else None)
+                        else "Person" if self.has("Person", organizer)
+                        else self._organizer_node(event, organizer))
                 if kind is None:
                     self.report.skipped_edges.append(
                         f"HOSTS {organizer}->{event.id}: organizer not ingested")
                     continue
                 self.write_edge(kind, organizer, "HOSTS", "Event", event.id,
                            evidence=event.evidence, verification="event_organizer_list")
+
+    def _organizer_node(self, event: Event, organizer: str) -> str | None:
+        """Merge an organizer listed on the event page but absent from people/companies.
+
+        The kind comes from the platform id prefix; the name is taken only when
+        organizer_ids and organizer_names line up one to one, never guessed.
+        """
+        kind = next((k for prefix, k in _ORGANIZER_KINDS if organizer.startswith(prefix)), None)
+        if kind is None or len(event.organizer_ids) != len(event.organizer_names):
+            return None
+        name = event.organizer_names[event.organizer_ids.index(organizer)]
+        props: dict[str, Any] = {"name": name}
+        if kind == "Person":
+            props["participation"] = "confirmed_organizer"
+        self.write_node(kind, organizer, props, event.evidence)
+        return kind
 
     def link_participation(self, people: Iterable[Person]) -> None:
         """Person-side participation edges; run after people and events.

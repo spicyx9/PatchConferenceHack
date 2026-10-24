@@ -224,6 +224,27 @@ def test_unknown_organizer_and_speaker_skipped(bundle):
     assert any("c-unknown" in s and "HOSTS" in s for s in report.skipped_edges)
 
 
+def test_platform_organizers_become_host_nodes_with_listed_names(bundle):
+    event = Event(id="e-luma", conference_id=bundle.conference.id, title="[FIXTURE] Luma",
+                  organizer_ids=["luma:host:usr-1", "luma:calendar:cal-1"],
+                  organizer_names=["Ada Host", "Agents Club"], evidence=_fx_evidence())
+    unaligned = Event(id="e-eb", conference_id=bundle.conference.id, title="[FIXTURE] EB",
+                      organizer_ids=["eventbrite-organizer:9"], organizer_names=[],
+                      evidence=_fx_evidence())
+    variant = bundle.model_copy(update={"events": [*bundle.events, event, unaligned]})
+    _, report, writes = _ingest(variant)
+    people = {n["id"]: n for n in _nodes(writes, "Person")}
+    companies = {n["id"]: n for n in _nodes(writes, "Company")}
+    assert people["luma:host:usr-1"]["props"]["name"] == "Ada Host"
+    assert people["luma:host:usr-1"]["props"]["participation"] == "confirmed_organizer"
+    assert companies["luma:calendar:cal-1"]["props"]["name"] == "Agents Club"
+    hosts = {(e["from"], e["to"]) for e in _edges(writes, "HOSTS")}
+    assert {("luma:host:usr-1", "e-luma"), ("luma:calendar:cal-1", "e-luma")} <= hosts
+    # No listed name to pair with: no node is invented, the edge stays reported.
+    assert "eventbrite-organizer:9" not in companies
+    assert any("eventbrite-organizer:9" in s and "HOSTS" in s for s in report.skipped_edges)
+
+
 # -- memory -----------------------------------------------------------------------------
 
 
