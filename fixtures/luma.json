@@ -1,0 +1,986 @@
+{
+ "source_mode": "fixture",
+ "provider": "luma",
+ "captured_at": "2026-10-24T06:29:34.196299+00:00",
+ "note": "Captured from the live public Luma discover feed by scripts/probes/luma.py --refresh-fixture, then sanitized (no featured guests, hosts = public name + id). FIXTURE: not a live response.",
+ "query": {
+  "domain": "events",
+  "conference_id": "github-universe-2026",
+  "city": "San Francisco",
+  "latitude": 37.806,
+  "longitude": -122.432,
+  "radius_km": 15.0,
+  "start_date": "2026-10-27",
+  "end_date": "2026-10-30",
+  "keywords": [],
+  "limit": 1000,
+  "filters": {}
+ },
+ "entries": [
+  {
+   "api_id": "evt-2jz74PXAk34B0fA",
+   "event": {
+    "api_id": "evt-2jz74PXAk34B0fA",
+    "calendar_api_id": "cal-9xlm8rlcNcsBdxW",
+    "cover_url": "https://images.lumacdn.com/uploads/nk/b46d5477-9a95-4508-a0db-c17de8864833.png",
+    "end_at": "2026-10-27T07:00:00.000Z",
+    "event_type": "independent",
+    "hide_rsvp": false,
+    "location_type": "offline",
+    "name": "A Court of Splintered Harmony Release Party",
+    "one_to_one": true,
+    "recurrence_id": null,
+    "show_guest_list": true,
+    "social_image_url": "https://images.lumacdn.com/event-social/07/f87e0380-8871-4c7f-86db-6e6db49f0347.png",
+    "start_at": "2026-10-27T05:00:00.000Z",
+    "timezone": "America/Los_Angeles",
+    "url": "59ktv2n1",
+    "user_api_id": "usr-gwmpo6bzAJLq3CN",
+    "visibility": "public",
+    "geo_address_info": {
+     "city": "San Francisco",
+     "type": "google",
+     "region": "California",
+     "address": "The Love Potion Library - Books, Tea, Pastries",
+     "country": "United States",
+     "place_id": "ChIJM8E_FFl_j4ARJRO0JpvreA0",
+     "localized": null,
+     "city_state": "San Francisco, CA",
+     "description": "",
+     "sublocality": "Duboce Triangle",
+     "country_code": "US",
+     "full_address": "The Love Potion Library - Books, Tea, Pastries, 284 Noe St, San Francisco, CA 94114, USA",
+     "region_short": "CA",
+     "short_address": "284 Noe St, San Francisco",
+     "place_coordinate": {
+      "latitude": 37.7645596,
+      "longitude": -122.4334143
+     },
+     "apple_maps_place_id": "I803CFA1DB503F8EB",
+     "mode": "shown"
+    },
+    "geo_address_visibility": "public",
+    "coordinate": {
+     "longitude": -122.4334143,
+     "latitude": 37.7645596
+    },
+    "waitlist_enabled": true,
+    "waitlist_status": "active"
+   },
+   "calendar": {
+    "api_id": "cal-9xlm8rlcNcsBdxW",
+    "name": "The Love Potion Library",
+    "slug": "thelovepotionlibrary",
+    "is_personal": false
+   },
+   "start_at": "2026-10-27T05:00:00.000Z",
+   "hosts": [
+    {
+     "api_id": "usr-gwmpo6bzAJLq3CN",
+     "name": "Veena Patel"
+    }
+   ],
+   "guest_count": 46,
+   "ticket_count": 51,
+   "ticket_info": {
+    "price": {
+     "cents": 4500,
+     "currency": "usd",
+     "is_flexible": false
+    },
+    "is_free": false,
+    "max_price": null,
+    "is_sold_out": true,
+    "spots_remaining": 0,
+    "is_near_capacity": false,
+    "require_approval": false
+   },
+   "registration_availability": "waitlist"
+  },
+  {
+   "api_id": "evt-37TZwDN4RCZT3Gh",
+   "event": {
+    "api_id": "evt-37TZwDN4RCZT3Gh",
+    "calendar_api_id": "cal-difg38hKGWPXDbJ",
+    "cover_url": "https://images.lumacdn.com/uploads/rf/aaf2dcbf-9ae2-41d8-b7d9-6afd6977937a.png",
+    "end_at": "2026-10-27T16:00:00.000Z",
+    "event_type": "independent",
+    "hide_rsvp": false,
+    "location_type": "offline",
+    "name": "Breakfast & Agentic Hacking Challenge with Alt Security, Okta Ventures, and Runtime Ventures",
+    "one_to_one": true,
+    "recurrence_id": null,
+    "show_guest_list": false,
+    "social_image_url": "https://images.lumacdn.com/event-social/9y/f0d0dca8-118f-4cc2-a174-5b80b0dec5ec.png",
+    "start_at": "2026-10-27T14:30:00.000Z",
+    "timezone": "America/Los_Angeles",
+    "url": "x7lmea3h",
+    "user_api_id": "usr-DDpSzUjC5B3inUO",
+    "visibility": "public",
+    "geo_address_info": {
+     "city": "San Francisco",
+     "type": "google",
+     "region": "California",
+     "address": "San Francisco Proper Hotel",
+     "country": "United States",
+     "place_id": "ChIJw-FJ0oSAhYARCwH4NNWTliw",
+     "localized": null,
+     "city_state": "San Francisco, CA",
+     "description": "",
+     "sublocality": "Tenderloin",
+     "country_code": "US",
+     "full_address": "San Francisco Proper Hotel, 45 McAllister St, San Francisco, CA 94102, USA",
+     "region_short": "CA",
+     "short_address": "45 McAllister St, San Francisco",
+     "place_coordinate": {
+      "latitude": 37.780904,
+      "longitude": -122.4126505
+     },
+     "apple_maps_place_id": "I5245A948E6D98FC5",
+     "mode": "shown"
+    },
+    "geo_address_visibility": "public",
+    "coordinate": {
+     "longitude": -122.4126505,
+     "latitude": 37.780904
+    },
+    "waitlist_enabled": true,
+    "waitlist_status": "active"
+   },
+   "calendar": {
+    "api_id": "cal-difg38hKGWPXDbJ",
+    "name": "Okta Ventures",
+    "slug": null,
+    "is_personal": false
+   },
+   "start_at": "2026-10-27T14:30:00.000Z",
+   "hosts": [
+    {
+     "api_id": "usr-DDpSzUjC5B3inUO",
+     "name": "David Lopez-Henriquez"
+    },
+    {
+     "api_id": "usr-CGc4izuFv5mUnG0",
+     "name": "Okta Ventures"
+    },
+    {
+     "api_id": "usr-Pjwofv3FURX7Yft",
+     "name": "Runtime Ventures"
+    },
+    {
+     "api_id": "usr-qaznOmJ2BbnqrKF",
+     "name": "Noa Hen"
+    },
+    {
+     "api_id": "usr-jSKluzX610OjGvZ",
+     "name": "Nahman Khayet"
+    },
+    {
+     "api_id": "usr-LPdkmrGurpHnH97",
+     "name": "Michael Sutton"
+    },
+    {
+     "api_id": "usr-H9C2wVfW5rbAVt7",
+     "name": "David Endler"
+    },
+    {
+     "api_id": "usr-FaACsNVmnoA7Un1",
+     "name": "Alona Nissan"
+    }
+   ],
+   "guest_count": 0,
+   "ticket_count": 0,
+   "ticket_info": {
+    "price": null,
+    "is_free": true,
+    "max_price": null,
+    "is_sold_out": true,
+    "spots_remaining": 0,
+    "is_near_capacity": false,
+    "require_approval": true
+   },
+   "registration_availability": "waitlist"
+  },
+  {
+   "api_id": "evt-PIhNiH8vJ8axnTE",
+   "event": {
+    "api_id": "evt-PIhNiH8vJ8axnTE",
+    "calendar_api_id": "cal-RA0UCcGik6LaPTn",
+    "cover_url": "https://images.lumacdn.com/uploads/dg/3a34dc3a-3dc7-47d7-b331-a58f006b3d2d.jpg",
+    "end_at": "2026-10-29T01:00:00.000Z",
+    "event_type": "independent",
+    "hide_rsvp": false,
+    "location_type": "offline",
+    "name": "Agentic Infrastructure Stack Summit",
+    "one_to_one": true,
+    "recurrence_id": null,
+    "show_guest_list": false,
+    "social_image_url": "https://images.lumacdn.com/event-social/pe/00b5b1af-0cb2-4d52-91fe-54d68e3ce98f.png",
+    "start_at": "2026-10-28T16:00:00.000Z",
+    "timezone": "America/Los_Angeles",
+    "url": "69r7rj77",
+    "user_api_id": "usr-c6z5eEhRTKVDqRF",
+    "visibility": "public",
+    "geo_address_info": {
+     "city": "San Francisco",
+     "type": "google",
+     "region": "California",
+     "address": "Terra Gallery & Event Venue",
+     "country": "United States",
+     "place_id": "ChIJN7hCzHuAhYARq5V3nMtb-_U",
+     "localized": null,
+     "city_state": "San Francisco, CA",
+     "description": "",
+     "sublocality": "Rincon Hill",
+     "country_code": "US",
+     "full_address": "Terra Gallery & Event Venue, 511 Harrison St, San Francisco, CA 94105, USA",
+     "region_short": "CA",
+     "short_address": "511 Harrison St, San Francisco",
+     "place_coordinate": {
+      "latitude": 37.785673599999996,
+      "longitude": -122.3932373
+     },
+     "apple_maps_place_id": "I7690940EF669CC4C",
+     "mode": "shown"
+    },
+    "geo_address_visibility": "public",
+    "coordinate": {
+     "longitude": -122.3932373,
+     "latitude": 37.785673599999996
+    },
+    "waitlist_enabled": true,
+    "waitlist_status": "enabled"
+   },
+   "calendar": {
+    "api_id": "cal-RA0UCcGik6LaPTn",
+    "name": "Personal",
+    "slug": null,
+    "is_personal": true
+   },
+   "start_at": "2026-10-28T16:00:00.000Z",
+   "hosts": [
+    {
+     "api_id": "usr-c6z5eEhRTKVDqRF",
+     "name": "VentureBeat"
+    }
+   ],
+   "guest_count": 0,
+   "ticket_count": 0,
+   "ticket_info": {
+    "price": null,
+    "is_free": true,
+    "max_price": null,
+    "is_sold_out": false,
+    "spots_remaining": 514,
+    "is_near_capacity": false,
+    "require_approval": true
+   },
+   "registration_availability": "open"
+  },
+  {
+   "api_id": "evt-pQLZuaisAei0vHC",
+   "event": {
+    "api_id": "evt-pQLZuaisAei0vHC",
+    "calendar_api_id": "cal-MknLOGNQ2Wx8cr6",
+    "cover_url": "https://images.lumacdn.com/event-covers/6f/d3db823e-c18e-4ba1-a677-4435832050ff.jpg",
+    "end_at": "2026-10-29T16:30:00.000Z",
+    "event_type": "independent",
+    "hide_rsvp": false,
+    "location_type": "offline",
+    "name": "Agent Builders Breakfast - Founders & Builders in SOMA, SF",
+    "one_to_one": true,
+    "recurrence_id": null,
+    "show_guest_list": true,
+    "social_image_url": "https://images.lumacdn.com/event-social/xq/094f8a8e-9308-46dd-a456-1610bb29e1e6.png",
+    "start_at": "2026-10-29T15:00:00.000Z",
+    "timezone": "America/Los_Angeles",
+    "url": "xueo91fw",
+    "user_api_id": "usr-4qEkD8geKOpxShe",
+    "visibility": "public",
+    "geo_address_info": {
+     "mode": "obfuscated",
+     "city": "San Francisco",
+     "city_state": "San Francisco, California",
+     "sublocality": "SoMa",
+     "country": "United States",
+     "country_code": "US",
+     "region": "California"
+    },
+    "geo_address_visibility": "guests-only",
+    "coordinate": {
+     "latitude": 37.77384830540951,
+     "longitude": -122.40897789276467
+    },
+    "waitlist_enabled": true,
+    "waitlist_status": "active"
+   },
+   "calendar": {
+    "api_id": "cal-MknLOGNQ2Wx8cr6",
+    "name": "Personal",
+    "slug": null,
+    "is_personal": true
+   },
+   "start_at": "2026-10-29T15:00:00.000Z",
+   "hosts": [
+    {
+     "api_id": "usr-4qEkD8geKOpxShe",
+     "name": "Michael Ducker"
+    }
+   ],
+   "guest_count": 165,
+   "ticket_count": 165,
+   "ticket_info": {
+    "price": null,
+    "is_free": true,
+    "max_price": null,
+    "is_sold_out": false,
+    "spots_remaining": 15,
+    "is_near_capacity": false,
+    "require_approval": true
+   },
+   "registration_availability": "open"
+  },
+  {
+   "api_id": "evt-ESzIcjB6CmeezPV",
+   "event": {
+    "api_id": "evt-ESzIcjB6CmeezPV",
+    "calendar_api_id": "cal-9X5tnuONm6ecVDy",
+    "cover_url": "https://images.lumacdn.com/uploads/ge/6bcedbe2-66eb-4155-a4d9-c2bdd088d007.jpg",
+    "end_at": "2026-10-30T23:00:00.000Z",
+    "event_type": "independent",
+    "hide_rsvp": false,
+    "location_type": "offline",
+    "name": "BARTable Crosstown Combo",
+    "one_to_one": true,
+    "recurrence_id": null,
+    "show_guest_list": false,
+    "social_image_url": "https://images.lumacdn.com/event-social/y0/d69cb4ce-22c7-4190-9982-bb370f572be5.png",
+    "start_at": "2026-10-30T16:00:00.000Z",
+    "timezone": "America/Los_Angeles",
+    "url": "2114hluh",
+    "user_api_id": "usr-RVMVjEkYrjOagcS",
+    "visibility": "public",
+    "geo_address_info": {
+     "city": "San Francisco",
+     "type": "google",
+     "region": "California",
+     "address": "Glen Park",
+     "country": "United States",
+     "place_id": "ChIJI0rWFGN-j4ARG4deHtpP_Ok",
+     "localized": null,
+     "city_state": "San Francisco, CA",
+     "description": "Meet outside the BART station",
+     "sublocality": "Glen Park",
+     "country_code": "US",
+     "full_address": "Glen Park, 2901 Diamond St, San Francisco, CA 94131, USA",
+     "region_short": "CA",
+     "short_address": "Glen Park Bay Area Rapid Transit Station, 2901 Diamond St, San Francisco",
+     "place_coordinate": {
+      "latitude": 37.7331047,
+      "longitude": -122.4337965
+     },
+     "apple_maps_place_id": "I81A3E6737FD59F6",
+     "mode": "shown"
+    },
+    "geo_address_visibility": "public",
+    "coordinate": {
+     "longitude": -122.4337965,
+     "latitude": 37.7331047
+    },
+    "waitlist_enabled": true,
+    "waitlist_status": "enabled"
+   },
+   "calendar": {
+    "api_id": "cal-9X5tnuONm6ecVDy",
+    "name": "Crosstober 2026",
+    "slug": "crosstober2026",
+    "is_personal": false
+   },
+   "start_at": "2026-10-30T16:00:00.000Z",
+   "hosts": [
+    {
+     "api_id": "usr-RVMVjEkYrjOagcS",
+     "name": "SF Crosstown Trails"
+    },
+    {
+     "api_id": "usr-2I2wRLgexb3U3VN",
+     "name": "Guy"
+    }
+   ],
+   "guest_count": 0,
+   "ticket_count": 0,
+   "ticket_info": {
+    "price": {
+     "cents": 1000,
+     "currency": "usd",
+     "is_flexible": false
+    },
+    "is_free": false,
+    "max_price": null,
+    "is_sold_out": false,
+    "spots_remaining": 24,
+    "is_near_capacity": false,
+    "require_approval": false
+   },
+   "registration_availability": "open"
+  },
+  {
+   "api_id": "evt-YyphB0zuBwmzJ5z",
+   "event": {
+    "api_id": "evt-YyphB0zuBwmzJ5z",
+    "calendar_api_id": "cal-AF8aQlCEE1nnWHl",
+    "cover_url": "https://images.lumacdn.com/uploads/ab/69f4a58b-293d-4ded-bf2f-a6b90c8c742e.png",
+    "end_at": "2026-10-27T21:00:00.000Z",
+    "event_type": "independent",
+    "hide_rsvp": false,
+    "location_type": "offline",
+    "name": "Free Coffee for Devs with Solstice",
+    "one_to_one": true,
+    "recurrence_id": null,
+    "show_guest_list": false,
+    "social_image_url": "https://images.lumacdn.com/event-social/7y/ec1b371c-67dd-47d0-9647-e668b24bdfa0.png",
+    "start_at": "2026-10-27T15:00:00.000Z",
+    "timezone": "America/Los_Angeles",
+    "url": "a33dkf1s",
+    "user_api_id": "usr-7c2yjvJbn5xui7S",
+    "visibility": "public",
+    "geo_address_info": {
+     "city": "San Francisco",
+     "type": "google",
+     "region": "California",
+     "address": "Sightglass Coffee",
+     "country": "United States",
+     "place_id": "ChIJf-V9OIKAhYARu8bBG2S6RME",
+     "localized": null,
+     "city_state": "San Francisco, CA",
+     "description": "",
+     "sublocality": "SoMa",
+     "country_code": "US",
+     "full_address": "Sightglass Coffee, 270 7th St, San Francisco, CA 94103, USA",
+     "region_short": "CA",
+     "short_address": "270 7th St, San Francisco",
+     "place_coordinate": {
+      "latitude": 37.7770356,
+      "longitude": -122.40845429999997
+     },
+     "apple_maps_place_id": "I594FECA0B369D14A",
+     "mode": "shown"
+    },
+    "geo_address_visibility": "public",
+    "coordinate": {
+     "longitude": -122.40845429999997,
+     "latitude": 37.7770356
+    },
+    "waitlist_enabled": false,
+    "waitlist_status": "disabled"
+   },
+   "calendar": {
+    "api_id": "cal-AF8aQlCEE1nnWHl",
+    "name": "Personal",
+    "slug": null,
+    "is_personal": true
+   },
+   "start_at": "2026-10-27T15:00:00.000Z",
+   "hosts": [
+    {
+     "api_id": "usr-7c2yjvJbn5xui7S",
+     "name": "Solstice"
+    }
+   ],
+   "guest_count": 0,
+   "ticket_count": 0,
+   "ticket_info": {
+    "price": null,
+    "is_free": true,
+    "max_price": null,
+    "is_sold_out": false,
+    "spots_remaining": null,
+    "is_near_capacity": false,
+    "require_approval": true
+   },
+   "registration_availability": "open"
+  },
+  {
+   "api_id": "evt-GuR42PVSB03OQ7N",
+   "event": {
+    "api_id": "evt-GuR42PVSB03OQ7N",
+    "calendar_api_id": "cal-T3QXfRpK0pBwYqX",
+    "cover_url": "https://images.lumacdn.com/uploads/4g/fa7080ba-1261-4329-9315-95ff64841d5c.jpg",
+    "end_at": "2026-10-29T03:30:00.000Z",
+    "event_type": "independent",
+    "hide_rsvp": false,
+    "location_type": "offline",
+    "name": "Hack With YOU @AWS Builder Loft - Halloween Edition",
+    "one_to_one": true,
+    "recurrence_id": null,
+    "show_guest_list": true,
+    "social_image_url": "https://images.lumacdn.com/event-social/bk/13c57c9a-37fe-4834-adc2-c747d22cf5f7.png",
+    "start_at": "2026-10-28T16:00:00.000Z",
+    "timezone": "America/Los_Angeles",
+    "url": "you-halloween",
+    "user_api_id": "usr-1jIPC0WEOyq8jNi",
+    "visibility": "public",
+    "geo_address_info": {
+     "city": "San Francisco",
+     "type": "google",
+     "region": "California",
+     "address": "AWS Builder Loft",
+     "country": "United States",
+     "place_id": "ChIJYU1rSACBhYAR8gX_suu-tiA",
+     "localized": null,
+     "city_state": "San Francisco, CA",
+     "description": "",
+     "sublocality": "Financial District",
+     "country_code": "US",
+     "full_address": "AWS Builder Loft, First Market Tower, 525 Market St Entrance, San Francisco, CA 94105, USA",
+     "region_short": "CA",
+     "short_address": "First Market Tower, 525 Market St Entrance, San Francisco",
+     "place_coordinate": {
+      "latitude": 37.7904122,
+      "longitude": -122.39934480000001
+     },
+     "apple_maps_place_id": "I878B8BA4F4614156",
+     "mode": "shown"
+    },
+    "geo_address_visibility": "public",
+    "coordinate": {
+     "longitude": -122.39934480000001,
+     "latitude": 37.7904122
+    },
+    "waitlist_enabled": false,
+    "waitlist_status": "disabled"
+   },
+   "calendar": {
+    "api_id": "cal-T3QXfRpK0pBwYqX",
+    "name": "You.com",
+    "slug": "you.com",
+    "is_personal": false
+   },
+   "start_at": "2026-10-28T16:00:00.000Z",
+   "hosts": [
+    {
+     "api_id": "usr-VMIYM3gGgnmxyAY",
+     "name": "Manish Tyagi"
+    },
+    {
+     "api_id": "usr-EhoNwiRZB8YG6ER",
+     "name": "Madison Lee"
+    },
+    {
+     "api_id": "usr-BhL1mNyX78ZX6D1",
+     "name": "AWS Builder Loft"
+    },
+    {
+     "api_id": "usr-67N1cIZGGQcBAkh",
+     "name": "Founders Bay"
+    }
+   ],
+   "guest_count": 144,
+   "ticket_count": 144,
+   "ticket_info": {
+    "price": null,
+    "is_free": true,
+    "max_price": null,
+    "is_sold_out": false,
+    "spots_remaining": null,
+    "is_near_capacity": false,
+    "require_approval": true
+   },
+   "registration_availability": "open"
+  },
+  {
+   "api_id": "evt-vKvA9Pp0uPv3Yez",
+   "event": {
+    "api_id": "evt-vKvA9Pp0uPv3Yez",
+    "calendar_api_id": "cal-DXox6bKVCcCBdh0",
+    "cover_url": "https://images.lumacdn.com/uploads/2i/313d1ed8-e723-495a-a25a-a7b486d4c14d.png",
+    "end_at": "2026-10-29T21:00:00.000Z",
+    "event_type": "independent",
+    "hide_rsvp": false,
+    "location_type": "offline",
+    "name": "Convergence: RL Summit",
+    "one_to_one": true,
+    "recurrence_id": null,
+    "show_guest_list": false,
+    "social_image_url": "https://images.lumacdn.com/event-social/9a/4682b2e5-eab3-44e2-b3dc-30a9e4d8222c.png",
+    "start_at": "2026-10-29T15:00:00.000Z",
+    "timezone": "America/Los_Angeles",
+    "url": "gbcompna",
+    "user_api_id": "usr-tQXQeuQ0mXZ3GBM",
+    "visibility": "public",
+    "geo_address_info": {
+     "mode": "obfuscated",
+     "city": "San Francisco",
+     "city_state": "San Francisco, CA",
+     "sublocality": "Financial District",
+     "country": "United States",
+     "country_code": "US",
+     "region": "California",
+     "region_short": "CA"
+    },
+    "geo_address_visibility": "guests-only",
+    "coordinate": {
+     "latitude": 37.78960224680009,
+     "longitude": -122.397780340807
+    },
+    "waitlist_enabled": true,
+    "waitlist_status": "enabled"
+   },
+   "calendar": {
+    "api_id": "cal-DXox6bKVCcCBdh0",
+    "name": "Terac",
+    "slug": "terac",
+    "is_personal": false
+   },
+   "start_at": "2026-10-29T15:00:00.000Z",
+   "hosts": [
+    {
+     "api_id": "usr-tBwLgIfOXZJDA3V",
+     "name": "Zac Baker"
+    },
+    {
+     "api_id": "usr-rTDYTCkBEWf63wI",
+     "name": "Ryan Wexler"
+    }
+   ],
+   "guest_count": 0,
+   "ticket_count": 0,
+   "ticket_info": {
+    "price": null,
+    "is_free": true,
+    "max_price": null,
+    "is_sold_out": false,
+    "spots_remaining": 22,
+    "is_near_capacity": false,
+    "require_approval": true
+   },
+   "registration_availability": "open"
+  },
+  {
+   "api_id": "evt-uiA2sfTzfHkfYdf",
+   "event": {
+    "api_id": "evt-uiA2sfTzfHkfYdf",
+    "calendar_api_id": "cal-YAqicfZFbugfBGR",
+    "cover_url": "https://images.lumacdn.com/uploads/ag/0d72e8d6-54be-4d6a-b421-09dc6b67309b.png",
+    "end_at": "2026-10-30T20:30:00.000Z",
+    "event_type": "independent",
+    "hide_rsvp": false,
+    "location_type": "offline",
+    "name": "GC Executive Forum, Private Lunch",
+    "one_to_one": true,
+    "recurrence_id": null,
+    "show_guest_list": false,
+    "social_image_url": "https://images.lumacdn.com/event-social/5h/65731a8f-9bcb-4752-9680-820eafe0a0cc.png",
+    "start_at": "2026-10-30T19:00:00.000Z",
+    "timezone": "America/Los_Angeles",
+    "url": "murray-c4bu",
+    "user_api_id": "usr-RcXk3TznkK8qQWW",
+    "visibility": "public",
+    "geo_address_info": {
+     "mode": "obfuscated",
+     "city": "San Francisco",
+     "city_state": "San Francisco, CA",
+     "sublocality": "Financial District",
+     "country": "United States",
+     "country_code": "US",
+     "region": "California",
+     "region_short": "CA"
+    },
+    "geo_address_visibility": "guests-only",
+    "coordinate": {
+     "latitude": 37.79423620309058,
+     "longitude": -122.399405487834
+    },
+    "waitlist_enabled": true,
+    "waitlist_status": "enabled"
+   },
+   "calendar": {
+    "api_id": "cal-YAqicfZFbugfBGR",
+    "name": "GC Executive Forum",
+    "slug": "GC_Executive_Forum",
+    "is_personal": false
+   },
+   "start_at": "2026-10-30T19:00:00.000Z",
+   "hosts": [
+    {
+     "api_id": "usr-RcXk3TznkK8qQWW",
+     "name": "Yvonne Newlands"
+    },
+    {
+     "api_id": "usr-dPi3Uv7E2ETajqT",
+     "name": "Murray"
+    },
+    {
+     "api_id": "usr-wCF6XJfF2sMUdRV",
+     "name": "Preet Gill"
+    },
+    {
+     "api_id": "usr-CGNzCByBd8yxK00",
+     "name": "Louis Lehot"
+    },
+    {
+     "api_id": "usr-sJoNSqWFchK6GRE",
+     "name": "Emily Jones"
+    },
+    {
+     "api_id": "usr-ucs4nhrIeQ8htez",
+     "name": "Erika Wu"
+    },
+    {
+     "api_id": "usr-VR4HSaXGa7Tucto",
+     "name": "Tiaan De Nysschen"
+    }
+   ],
+   "guest_count": 0,
+   "ticket_count": 0,
+   "ticket_info": {
+    "price": null,
+    "is_free": true,
+    "max_price": null,
+    "is_sold_out": false,
+    "spots_remaining": 12,
+    "is_near_capacity": false,
+    "require_approval": true
+   },
+   "registration_availability": "open"
+  },
+  {
+   "api_id": "evt-8GiUkOf9PAmQE4i",
+   "event": {
+    "api_id": "evt-8GiUkOf9PAmQE4i",
+    "calendar_api_id": "cal-Ubdr92Gl7MXwi3P",
+    "cover_url": "https://images.lumacdn.com/event-covers/ns/008b0598-6722-4a2b-85df-f31f98db243f.jpg",
+    "end_at": "2026-10-28T02:30:00.000Z",
+    "event_type": "independent",
+    "hide_rsvp": false,
+    "location_type": "offline",
+    "name": "SEV0 - The reliability conference (SF)",
+    "one_to_one": true,
+    "recurrence_id": null,
+    "show_guest_list": false,
+    "social_image_url": "https://images.lumacdn.com/event-social/jy/b5e3b365-38f1-4016-9cd3-b2ae4392239f.png",
+    "start_at": "2026-10-27T16:00:00.000Z",
+    "timezone": "America/Los_Angeles",
+    "url": "wuoe9ul2",
+    "user_api_id": "usr-pSxj8rw7J0LbCYC",
+    "visibility": "public",
+    "geo_address_info": {
+     "city": "San Francisco",
+     "type": "google",
+     "region": "California",
+     "address": "SFJAZZ",
+     "country": "United States",
+     "place_id": "ChIJS53IPGGAhYARbUmMvoOAZ88",
+     "localized": {
+      "en-GB": {
+       "city": "San Francisco",
+       "region": "California",
+       "address": "SFJAZZ",
+       "country": "United States",
+       "city_state": "San Francisco, California",
+       "sublocality": "Civic Center",
+       "full_address": "SFJAZZ, 201 Franklin St, San Francisco, CA 94102, USA",
+       "short_address": "201 Franklin St, San Francisco"
+      }
+     },
+     "city_state": "San Francisco, California",
+     "description": "",
+     "sublocality": "Civic Center",
+     "country_code": "US",
+     "full_address": "SFJAZZ, 201 Franklin St, San Francisco, CA 94102, USA",
+     "short_address": "201 Franklin St, San Francisco",
+     "place_coordinate": null,
+     "apple_maps_place_id": "ID5D49E5EDC2FF984",
+     "mode": "shown"
+    },
+    "geo_address_visibility": "public",
+    "coordinate": {
+     "longitude": -122.421631,
+     "latitude": 37.7764351
+    },
+    "waitlist_enabled": false,
+    "waitlist_status": "disabled"
+   },
+   "calendar": {
+    "api_id": "cal-Ubdr92Gl7MXwi3P",
+    "name": "incident.io US",
+    "slug": "incident-us",
+    "is_personal": false
+   },
+   "start_at": "2026-10-27T16:00:00.000Z",
+   "hosts": [
+    {
+     "api_id": "usr-pSxj8rw7J0LbCYC",
+     "name": "incident.io"
+    }
+   ],
+   "guest_count": 0,
+   "ticket_count": 0,
+   "ticket_info": {
+    "price": {
+     "cents": 19900,
+     "currency": "usd",
+     "is_flexible": false
+    },
+    "is_free": false,
+    "max_price": null,
+    "is_sold_out": false,
+    "spots_remaining": 44,
+    "is_near_capacity": false,
+    "require_approval": false
+   },
+   "registration_availability": "open"
+  },
+  {
+   "api_id": "evt-s3EWJDIum6y8B4J",
+   "event": {
+    "api_id": "evt-s3EWJDIum6y8B4J",
+    "calendar_api_id": "cal-iBRVnXUpDLC2Wo2",
+    "cover_url": "https://images.lumacdn.com/event-covers/g7/46962759-13df-4298-b420-4b7fb9aba8c5.png",
+    "end_at": "2026-10-30T01:00:00.000Z",
+    "event_type": "independent",
+    "hide_rsvp": false,
+    "location_type": "offline",
+    "name": "One Way Summit 2026: The Flagship Event for Immigrant Entrepreneurship",
+    "one_to_one": true,
+    "recurrence_id": null,
+    "show_guest_list": false,
+    "social_image_url": "https://images.lumacdn.com/event-social/fv/6d752cd9-6378-4aa0-b3ad-1b254a79411a.png",
+    "start_at": "2026-10-28T16:00:00.000Z",
+    "timezone": "America/Los_Angeles",
+    "url": "onewaysummit2026",
+    "user_api_id": "usr-vCTzI1pZFlGQTSD",
+    "visibility": "public",
+    "geo_address_info": {
+     "city": "San Francisco",
+     "type": "google",
+     "region": "California",
+     "address": "The Commonwealth Club",
+     "country": "United States",
+     "place_id": "ChIJ75fLhWKAhYARDxivfRW3Vr4",
+     "localized": null,
+     "city_state": "San Francisco, California",
+     "description": "",
+     "sublocality": "Embarcadero",
+     "country_code": "US",
+     "full_address": "The Commonwealth Club, 110 The Embarcadero, San Francisco, CA 94105, USA",
+     "short_address": "110 The Embarcadero, San Francisco",
+     "place_coordinate": null,
+     "apple_maps_place_id": "I2DFF85973D5CEA39",
+     "mode": "shown"
+    },
+    "geo_address_visibility": "public",
+    "coordinate": {
+     "longitude": -122.3925028,
+     "latitude": 37.7933452
+    },
+    "waitlist_enabled": false,
+    "waitlist_status": "disabled"
+   },
+   "calendar": {
+    "api_id": "cal-iBRVnXUpDLC2Wo2",
+    "name": "One Way Summit",
+    "slug": "oneway",
+    "is_personal": false
+   },
+   "start_at": "2026-10-28T16:00:00.000Z",
+   "hosts": [
+    {
+     "api_id": "usr-57CmJBYQHJCJFN5",
+     "name": "Eugene Malobrodsky"
+    },
+    {
+     "api_id": "usr-WtIKDu0TUnMENxU",
+     "name": "Brian Sparkes"
+    },
+    {
+     "api_id": "usr-YPz0V4pii7MTVg1",
+     "name": "James Gee"
+    }
+   ],
+   "guest_count": 0,
+   "ticket_count": 0,
+   "ticket_info": {
+    "price": {
+     "cents": 14900,
+     "currency": "usd",
+     "is_flexible": false
+    },
+    "is_free": false,
+    "max_price": {
+     "cents": 49900,
+     "currency": "usd"
+    },
+    "is_sold_out": false,
+    "spots_remaining": 1680,
+    "is_near_capacity": false,
+    "require_approval": false
+   },
+   "registration_availability": "open"
+  },
+  {
+   "api_id": "evt-ZC2PPpdaK1O3l3v",
+   "event": {
+    "api_id": "evt-ZC2PPpdaK1O3l3v",
+    "calendar_api_id": "cal-KR8EukYxbUOhVlI",
+    "cover_url": "https://images.lumacdn.com/uploads/lu/f61e35d1-0c7c-44d0-8832-2899fa0ad1c7.png",
+    "end_at": "2026-10-29T18:00:00.000Z",
+    "event_type": "independent",
+    "hide_rsvp": false,
+    "location_type": "offline",
+    "name": "Entire Espresso with Gergely Orosz and Thomas Dohmke",
+    "one_to_one": true,
+    "recurrence_id": null,
+    "show_guest_list": true,
+    "social_image_url": "https://images.lumacdn.com/event-social/aj/54a7d08b-3769-4e96-b8f2-2a3a802fa6c7.png",
+    "start_at": "2026-10-29T16:00:00.000Z",
+    "timezone": "America/Los_Angeles",
+    "url": "0m8oub77",
+    "user_api_id": "usr-QfaZp8EcAgJc0VU",
+    "visibility": "public",
+    "geo_address_info": {
+     "mode": "obfuscated",
+     "city": "San Francisco",
+     "city_state": "San Francisco, CA",
+     "sublocality": "Marina District",
+     "country": "United States",
+     "country_code": "US",
+     "region": "California",
+     "region_short": "CA"
+    },
+    "geo_address_visibility": "guests-only",
+    "coordinate": {
+     "latitude": 37.80178543323482,
+     "longitude": -122.44152537680941
+    },
+    "waitlist_enabled": true,
+    "waitlist_status": "enabled"
+   },
+   "calendar": {
+    "api_id": "cal-KR8EukYxbUOhVlI",
+    "name": "Entire Events",
+    "slug": "entire",
+    "is_personal": false
+   },
+   "start_at": "2026-10-29T16:00:00.000Z",
+   "hosts": [
+    {
+     "api_id": "usr-QfaZp8EcAgJc0VU",
+     "name": "Entire"
+    }
+   ],
+   "guest_count": 181,
+   "ticket_count": 181,
+   "ticket_info": {
+    "price": null,
+    "is_free": true,
+    "max_price": null,
+    "is_sold_out": false,
+    "spots_remaining": 319,
+    "is_near_capacity": false,
+    "require_approval": true
+   },
+   "registration_availability": "open"
+  }
+ ]
+}
