@@ -37,7 +37,6 @@
   function draw(graph) {
     if(cy) {cy.destroy();cy=null;}
     const nodes=graph.nodes || [], edges=graph.edges || [];
-    $('graph-backend').textContent = graph.backend==='falkordb' ? 'FalkorDB' : 'Graph unavailable';
     $('network-count').textContent = nodes.length ? `${nodes.length} nodes · ${edges.length} links` : '';
     $('graph-focus-summary').textContent=`${nodes.length} entities in the current network.`;
     $('graph-legend').innerHTML=Object.keys(colors).filter(t=>nodes.some(n=>n.type===t)).map(t=>`<span><i style="background:${colors[t]}"></i>${t==='Goal'?'Priority':esc(t)}</span>`).join('');
