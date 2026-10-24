@@ -79,3 +79,13 @@ def test_graph_gaps_block_is_back_under_the_search() -> None:
     assert "<h2>No path in our graph</h2>" in tab and SUBTITLE in tab
     assert 'api("/graph/gaps", null, null), "graph gaps", renderGraphGaps' in APP
     assert "No gaps for these goals" in APP and '<pre class="cypher">' in APP
+
+
+# -- 3. footer: How scoring works + Sources and how it works ------------------------------
+
+def test_footer_links_scoring_text_and_opens_the_sources_dialog() -> None:
+    footer = HTML[HTML.index('<footer class="footer">'):HTML.index("</footer>")]
+    assert 'href="/api/v1/how-it-works?format=text"' in footer and "How scoring works" in footer
+    assert 'data-open="sources-dialog"' in footer and "Sources and how it works" in footer
+    assert '<dialog id="sources-dialog"' in HTML  # the dialog the button opens still exists
+    assert 'closest("[data-open]")' in APP  # the generic opener handles the button
