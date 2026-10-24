@@ -16,12 +16,12 @@ BRIGHTDATA_API_KEY and BRIGHTDATA_SERP_ZONE are set, otherwise direct.
 from __future__ import annotations
 
 import asyncio
-import os
 from collections.abc import Callable
 from datetime import date, datetime, timezone
 from typing import Any
 
 from conferge.core.schemas import FlightOffer, RunReport, SourceEvidence
+from conferge.core.settings import env_value
 from conferge.flights.normalize import (
     NormalizationError,
     RawOffer,
@@ -101,7 +101,7 @@ class FastFlightsProvider:
         )
 
     async def _one_way(self, origin: str, destination: str, day: date, adults: int,
-                       cabin: str) -> tuple[list[Any], str]:
+                       cabin: str, failures: list[str]) -> tuple[list[Any], str]:
         from fast_flights import FlightQuery, Passengers, create_query, get_flights
 
         query = create_query(
@@ -110,14 +110,18 @@ class FastFlightsProvider:
             trip="one-way", seat=cabin, passengers=Passengers(adults=adults),
             currency="USD", language="en-US",
         )
-        key, zone = os.environ.get("BRIGHTDATA_API_KEY"), os.environ.get("BRIGHTDATA_SERP_ZONE")
+        key, zone = env_value("BRIGHTDATA_API_KEY"), env_value("BRIGHTDATA_SERP_ZONE")
         if key and zone:
             from fast_flights.integrations import BrightData
 
-            result = await asyncio.to_thread(
-                get_flights, query, integration=BrightData(api_key=key, zone=zone))
-        else:
-            result = await asyncio.to_thread(get_flights, query)
+            try:
+                result = await asyncio.to_thread(
+                    get_flights, query, integration=BrightData(api_key=key, zone=zone))
+                return list(result or []), query.url()
+            except Exception as exc:  # noqa: BLE001 - the SERP transport failed: go direct
+                failures.append(f"bright_data_serp_transport_failed: "
+                                               f"{type(exc).__name__}; fetched directly")
+        result = await asyncio.to_thread(get_flights, query)
         return list(result or []), query.url()
 
     def _offers(self, items: list[Any], search_url: str, collected_at: datetime,
@@ -160,11 +164,12 @@ class FastFlightsProvider:
             return [], self._report(started, "failed", "error", errors=[NOT_INSTALLED])
         warnings = ["round_trip_as_two_one_way: Google lists only outbound options for a "
                     "round-trip query; offers are one-way fares, not a combined round trip"]
-        if not (os.environ.get("BRIGHTDATA_API_KEY") and os.environ.get("BRIGHTDATA_SERP_ZONE")):
+        if not (env_value("BRIGHTDATA_API_KEY") and env_value("BRIGHTDATA_SERP_ZONE")):
             warnings.append("fast_flights_direct: no Bright Data integration configured")
+        failures: list[str] = []
         results = await asyncio.gather(
-            self._one_way(origin, destination, departure, adults, cabin),
-            self._one_way(destination, origin, return_date, adults, cabin),
+            self._one_way(origin, destination, departure, adults, cabin, failures),
+            self._one_way(destination, origin, return_date, adults, cabin, failures),
             return_exceptions=True,
         )
         collected_at = self.clock()
@@ -174,7 +179,7 @@ class FastFlightsProvider:
         for direction, result in zip(("outbound", "return"), results, strict=True):
             if isinstance(result, BaseException):
                 message = f"{direction} {type(result).__name__}: {str(result)[:200]}"
-                key = os.environ.get("BRIGHTDATA_API_KEY")
+                key = env_value("BRIGHTDATA_API_KEY")
                 errors.append(message.replace(key, "***") if key else message)
                 continue
             items, url = result
@@ -183,6 +188,7 @@ class FastFlightsProvider:
             if not found:
                 errors.append(f"{direction}: zero offers")
             offers.extend(found)
+        warnings.extend(dict.fromkeys(failures))
         if not offers:
             return [], self._report(started, "failed", "error", fetched=fetched,
                                     errors=errors or ["zero offers"], warnings=warnings)

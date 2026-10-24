@@ -19,11 +19,28 @@ from pydantic import BaseModel, ConfigDict, Field
 
 logger = logging.getLogger(__name__)
 _RETRY_STATUSES = {429, 500, 502, 503, 504}
+# /datasets/v3/scrape holds the connection up to ~60 s before answering 202 + snapshot_id.
+SYNC_TIMEOUT = 75.0
 
 BrightDataApi = Literal["datasets", "web_unlocker", "serp"]
 # Process-wide count of what Bright Data actually returned (successful responses only):
 # dataset rows, Web Unlocker pages, SERP result pages. Shown on the demo home screen.
 _USAGE: dict[str, int] = {"datasets": 0, "web_unlocker": 0, "serp": 0}
+
+
+def parse_body(response: httpx.Response) -> Any:
+    """JSON body, or a list of rows when Bright Data answers JSON Lines (application/jsonl)."""
+    ctype = response.headers.get("content-type", "")
+    text = response.text
+    if "jsonl" in ctype or "ndjson" in ctype:
+        return [json.loads(line) for line in text.splitlines() if line.strip()]
+    try:
+        return json.loads(text) if text.strip() else None
+    except json.JSONDecodeError:
+        try:
+            return [json.loads(line) for line in text.splitlines() if line.strip()]
+        except json.JSONDecodeError as exc:
+            raise BrightDataError("Bright Data response is neither JSON nor JSON Lines") from exc
 
 
 def record_usage(api: BrightDataApi, count: int = 1) -> None:
@@ -67,7 +84,7 @@ class BrightDataClient:
         self.serp_zone = serp_zone
         self.unlocker_zone = unlocker_zone
         self._client = client or httpx.AsyncClient(
-            base_url="https://api.brightdata.com", timeout=30.0
+            base_url="https://api.brightdata.com", timeout=SYNC_TIMEOUT
         )
         self._owns_client = client is None
         self.retries = retries
@@ -154,7 +171,7 @@ class BrightDataClient:
             params=self._dataset_params(dataset_id, method, limit_per_input),
             payload={"input": inputs},
         )
-        payload = response.json()
+        payload = parse_body(response)
         if response.status_code == 202:
             snapshot_id = payload.get("snapshot_id") if isinstance(payload, dict) else None
             if not snapshot_id:
@@ -174,14 +191,14 @@ class BrightDataClient:
             params=self._dataset_params(dataset_id, method, limit_per_input),
             payload=inputs,
         )
-        payload = response.json()
+        payload = parse_body(response)
         if not isinstance(payload, dict) or not payload.get("snapshot_id"):
             raise BrightDataError("Bright Data trigger did not return snapshot_id")
         return str(payload["snapshot_id"])
 
     async def snapshot_progress(self, snapshot_id: str) -> dict[str, Any]:
         response = await self._request("GET", f"/datasets/v3/progress/{snapshot_id}")
-        data = response.json()
+        data = parse_body(response)
         if not isinstance(data, dict):
             raise BrightDataError("Bright Data progress response is not an object")
         return data
@@ -190,7 +207,7 @@ class BrightDataClient:
         response = await self._request(
             "GET", f"/datasets/v3/snapshot/{snapshot_id}", params={"format": "json"}
         )
-        data = response.json()
+        data = parse_body(response)
         if response.status_code == 202 or (
             isinstance(data, dict) and data.get("status") in {"starting", "running", "building"}
         ):
@@ -221,8 +238,14 @@ class BrightDataClient:
             "POST", "/request",
             payload={"zone": self.unlocker_zone, "url": url, "format": "raw"},
         )
+        text = response.text
+        if len(text) < 2000 and text.lstrip().startswith("Residential Failed"):
+            # Bright Data answers its own refusal (e.g. KYC required) with HTTP 200.
+            reason = text.split(":", 1)[0].strip()
+            kyc = " (KYC required for this site)" if "kyc" in text.lower() else ""
+            raise BrightDataError(f"Web Unlocker refused {reason}{kyc}")
         record_usage("web_unlocker")
-        return response.text
+        return text
 
     @staticmethod
     def load_fixture(path: str | Path, *, explicit_opt_in: bool = False) -> CollectionOutput:
