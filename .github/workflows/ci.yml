@@ -21,3 +21,23 @@ jobs:
         run: uv run ruff check .
       - name: Pytest offline
         run: uv run pytest -q
+
+  e2e:
+    # Full journey against the real API and a FalkorDB service; not blocking while findings are open.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    continue-on-error: true
+    services:
+      falkordb:
+        image: falkordb/falkordb:6.0.3
+        ports:
+          - 6380:6379
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - name: Install dependencies
+        run: uv sync --group dev
+      - name: End-to-end journey
+        run: make e2e
