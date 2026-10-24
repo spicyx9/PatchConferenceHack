@@ -152,21 +152,25 @@ def main() -> int:
 
     t0 = time.perf_counter()
     report = pipeline.E2EReport(mode=args.mode, started_at=datetime.now(timezone.utc))
-    slices = asyncio.run(pipeline._collect(args.mode, False, 90.0, None))
+    timings = report.timings
     from conferge.integration import travel_cache
 
-    if args.travel is None:
-        args.travel = "cached" if travel_cache.available() else "fixture"
-    if args.travel == "live":
-        travel = asyncio.run(collect_stays_flights(args.travel_timeout))
-    elif args.travel == "cached":
-        travel = travel_cache.load()
-    else:
-        travel = None
-    usable_slices = pipeline._usable(slices)
-    assembly = assemble(usable_slices, travel)
+    with timings.step("collect"):
+        slices = asyncio.run(pipeline._collect(args.mode, False, 90.0, None))
+        if args.travel is None:
+            args.travel = "cached" if travel_cache.available() else "fixture"
+        if args.travel == "live":
+            travel = asyncio.run(collect_stays_flights(args.travel_timeout))
+        elif args.travel == "cached":
+            travel = travel_cache.load()
+        else:
+            travel = None
+    with timings.step("assemble"):
+        usable_slices = pipeline._usable(slices)
+        assembly = assemble(usable_slices, travel)
     goals = parse_goals(assembly.demo.demo_goal_text)
-    opps = asyncio.run(pipeline._stage_planning(report, assembly, goals))
+    with timings.step("plan"):
+        opps = asyncio.run(pipeline._stage_planning(report, assembly, goals))
     print(f"assembled data_mode={assembly.data_mode}: {len(assembly.events)} events, "
           f"{len(assembly.people)} people, {len(opps)} opportunities "
           f"in {time.perf_counter() - t0:.1f}s")
@@ -202,7 +206,8 @@ def main() -> int:
             lodging=assembly.demo.stays, flights=assembly.demo.flights,
         )
         t1 = time.perf_counter()
-        ingest = ingest_bundle(store, bundle)
+        with timings.step("ingest"):
+            ingest = ingest_bundle(store, bundle)
         print(f"graph {args.graph}: {ingest.nodes} node writes, {ingest.edges} edge writes, "
               f"{len(ingest.skipped_edges)} skipped, in {time.perf_counter() - t1:.2f}s")
         states = {(i["label"], s) for i in store.index_status() for s in [i["status"]]}
@@ -214,6 +219,7 @@ def main() -> int:
         linkedin_enrichment(args, assembly, goals, None, ranked=[
             pid for o in opps for pid in o.person_ids])
 
+    pipeline.record_collection(assembly.demo, slices, timings, report.started_at)
     app = create_app(data=assembly.demo)
     uvicorn.run(app, host=args.host, port=args.port, log_level="warning")
     return 0
