@@ -568,7 +568,7 @@
       settle(api("/graph", null, "graph"), "graph", renderGraph, errors),
       settle(api("/people", null, "people"), "people", renderPeople, errors),
       settle(api("/scenarios", null, "scenarios"), "scenarios", renderScenarios, errors)
-    ]).then(function () {
+    ]).then(loadAgentsState).then(function () {
       if (errors.length) showError("Erreur de chargement: " + errors.join(" | "));
     });
   }
@@ -611,6 +611,40 @@
       return '<span class="path-node t-' + esc(s.node.type || "Node") + '">' + esc(s.node.label || s.node.id) + "</span>";
     });
     return '<div class="path">' + nodes.join('<span class="path-arrow">&rarr;</span>') + "</div>";
+  }
+
+  function fmtMs(ms) {
+    if (ms === null || ms === undefined) return "jamais";
+    return fmtTime(new Date(Number(ms)).toISOString(), EVENT_TZ);
+  }
+
+  function renderAgentsState(res) {
+    var box = $("agents-state");
+    if (!box) return;
+    if (!res || res.backend !== "falkordb") {
+      $("agents-plan-version").textContent = "?";
+      box.innerHTML = '<p class="muted">FalkorDB non joignable : pas d\'etat partage.</p>';
+      return;
+    }
+    var plan = res.plan || {};
+    $("agents-plan-version").textContent = "v" + (plan.plan_version || 0);
+    var rows = (res.agents || []).map(function (a) {
+      return "<tr><td><b>" + esc(a.agent) + "</b></td><td>" + esc(a.writes) + "</td><td>" + esc(fmtMs(a.last_at_ms)) + "</td></tr>";
+    }).join("");
+    var open = res.browser_url && safeUrl(res.browser_url)
+      ? '<a class="btn primary" target="_blank" rel="noopener" href="' + esc(safeUrl(res.browser_url)) + '">Show in FalkorDB Browser</a> '
+      : "";
+    box.innerHTML = '<table><thead><tr><th>Agent</th><th>Ecritures</th><th>Derniere (at_ms)</th></tr></thead><tbody>' +
+      rows + "</tbody></table>" +
+      '<p class="small-text">' + esc((plan.items || []).length) + " evenements dans le plan (PLANS), " +
+      esc((res.skips || []).length) + " ecartes (SKIPS), " + esc((res.changes || []).length) + " changements (Change).</p>" +
+      '<div class="cypher-panel">' + open +
+      '<button data-action="copy-agents-cypher" class="small">Copier la requete</button>' +
+      '<pre id="agents-cypher" class="cypher">' + esc(res.cypher) + "</pre></div>";
+  }
+
+  function loadAgentsState() {
+    return api("/agents/state", null, "agents").then(renderAgentsState).catch(function () { renderAgentsState(null); });
   }
 
   function cypherPanel(res) {
@@ -741,7 +775,7 @@
         renderStoryPlan(r[0], r[1]);
         var opps = renderStoryOpps(r[2]);
         storyMetButton();
-        var fomo = api("/antifomo", null, "antifomo").then(renderStoryAntifomo);
+        var fomo = api("/antifomo", null, "antifomo").then(renderStoryAntifomo).then(loadAgentsState);
         return Promise.all([opps, fomo]);
       }).catch(function (e) { showError("Demo: " + e.message); });
   }
@@ -756,7 +790,7 @@
       renderStoryDiff(res);
       return api("/plan", null, "plan").then(function (plan) {
         return api("/travel/map", null, "map").then(function (m) { renderStoryPlan(plan, m); });
-      });
+      }).then(loadAgentsState);
     });
   }
 
@@ -813,6 +847,9 @@
       var note = window.prompt("Note sur la rencontre (optionnel):", "");
       if (note === null) return;
       withBusy(btn, function () { return mutate("/met", { person_id: id, note: note || null }); });
+    } else if (action === "copy-agents-cypher") {
+      var q = $("agents-cypher") ? $("agents-cypher").textContent : "";
+      if (navigator.clipboard) navigator.clipboard.writeText(q).then(function () { btn.textContent = "Copie"; });
     } else if (action === "copy-cypher") {
       var text = $("story-cypher") ? $("story-cypher").textContent : "";
       if (navigator.clipboard) navigator.clipboard.writeText(text).then(function () { btn.textContent = "Copie"; });
