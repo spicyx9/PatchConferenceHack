@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Conferge: plan de conference</title>
+  <title>Conferge: conference plan</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
   <link rel="stylesheet" href="/static/styles.css">
 </head>
@@ -14,57 +14,57 @@
       <span id="conf-name" class="muted"></span>
     </div>
     <div class="goal-row">
-      <label for="goal-text" class="sr-only">Objectif</label>
-      <textarea id="goal-text" rows="2" placeholder="Decris ton objectif pour la conference"></textarea>
-      <button id="btn-goal" class="primary">Lancer</button>
+      <label for="goal-text" class="sr-only">Goal</label>
+      <textarea id="goal-text" rows="2" placeholder="Describe your goal for the conference"></textarea>
+      <button id="btn-goal" class="primary">Run</button>
     </div>
     <div class="controls-row">
-      <span class="label">Donnees</span>
+      <span class="label">Data</span>
       <span id="badge-source" class="badge neutral">...</span>
-      <span class="label">Statut</span>
+      <span class="label">Status</span>
       <span id="badge-status" class="badge neutral">...</span>
-      <span class="label">Collecte</span>
+      <span class="label">Collected</span>
       <span id="collected-at" class="mono">unknown</span>
       <span class="spacer"></span>
       <label for="scenario-select" class="label">Scenario</label>
       <select id="scenario-select"></select>
-      <button id="btn-simulate">Simuler un changement</button>
-      <button id="btn-reset" class="danger">Reinitialiser</button>
+      <button id="btn-simulate">Simulate a change</button>
+      <button id="btn-reset" class="danger">Reset</button>
     </div>
   </header>
 
   <div id="error-banner" class="error-banner hidden" role="alert"></div>
   <div id="degraded-banner" class="degraded-banner hidden" role="alert">
-    MODE DEGRADE (degraded_no_graph) : FalkorDB injoignable, classement calcule en Python sans le graphe.
+    DEGRADED MODE (degraded_no_graph): FalkorDB unreachable, ranking computed in Python without the graph.
   </div>
 
   <section id="diff-panel" class="panel diff-panel hidden" aria-live="polite">
     <div class="panel-head">
-      <h2>Changement simule</h2>
-      <button id="btn-close-diff" class="small">Fermer</button>
+      <h2>Simulated change</h2>
+      <button id="btn-close-diff" class="small">Close</button>
     </div>
     <div id="diff-body"></div>
   </section>
 
   <nav class="tabs" role="tablist">
     <button class="tab active" data-tab="story" role="tab">Demo</button>
-    <button class="tab" data-tab="dashboard" role="tab">Tableau de bord</button>
-    <button class="tab" data-tab="travel" role="tab">Voyage</button>
-    <button class="tab" data-tab="events" role="tab">Evenements</button>
-    <button class="tab" data-tab="graph" role="tab">Graphe</button>
-    <button class="tab" data-tab="people" role="tab">Personnes</button>
+    <button class="tab" data-tab="dashboard" role="tab">Dashboard</button>
+    <button class="tab" data-tab="travel" role="tab">Travel</button>
+    <button class="tab" data-tab="events" role="tab">Events</button>
+    <button class="tab" data-tab="graph" role="tab">Graph</button>
+    <button class="tab" data-tab="people" role="tab">People</button>
   </nav>
 
   <main>
     <section id="tab-story" class="tab-panel active story">
       <div class="bd-counter" id="bd-counter">Records collected via Bright Data: ...</div>
       <div class="step" id="step-goal">
-        <h2><span class="num">1</span>Objectif</h2>
+        <h2><span class="num">1</span>Goal</h2>
         <p id="story-goal" class="story-goal"></p>
         <div id="story-goals" class="chips"></div>
       </div>
       <div class="step" id="step-opps">
-        <h2><span class="num">2</span>Qui rencontrer, et pourquoi (chemin du graphe)</h2>
+        <h2><span class="num">2</span>Who to meet, and why (graph path)</h2>
         <div id="story-opps"></div>
       </div>
       <div class="step" id="step-plan">
@@ -75,37 +75,37 @@
         </div>
       </div>
       <div class="step" id="step-antifomo">
-        <h2><span class="num">4</span>Anti-FOMO : ce qu'on saute, et ce qu'on y gagne</h2>
+        <h2><span class="num">4</span>Anti-FOMO: what we skip, and what we gain</h2>
         <div id="story-antifomo"></div>
       </div>
       <div class="step" id="step-change">
-        <h2><span class="num">5</span>Changement en direct</h2>
-        <button id="story-simulate" class="primary big-btn">Simuler : l'evenement n&deg;1 du plan est complet</button>
+        <h2><span class="num">5</span>Live change</h2>
+        <button id="story-simulate" class="primary big-btn">Simulate: event #1 of the plan is sold out</button>
         <div id="story-diff"></div>
       </div>
       <div class="step" id="step-met">
-        <h2><span class="num">6</span>Rencontre enregistree</h2>
+        <h2><span class="num">6</span>Meeting recorded</h2>
         <div id="story-met"></div>
       </div>
       <div class="step" id="step-roi">
-        <h2><span class="num">7</span>ROI : le graphe reste pour la prochaine conf</h2>
+        <h2><span class="num">7</span>ROI: the graph stays for the next conference</h2>
         <div class="roi-grid roi-story">
           <div class="roi-tile">
             <div id="roi-spend" class="value unknown">unknown</div>
-            <div class="name">Depenses vol + hotel</div>
+            <div class="name">Flight + hotel spend</div>
             <div id="roi-spend-note" class="note muted"></div>
           </div>
           <div class="roi-tile">
             <div id="roi-meetings" class="value unknown">unknown</div>
-            <div class="name">Rencontres</div>
+            <div class="name">Meetings</div>
           </div>
           <div class="roi-tile">
             <div id="roi-qualified" class="value unknown">unknown</div>
-            <div class="name">Contacts qualifies</div>
+            <div class="name">Qualified contacts</div>
           </div>
           <div class="roi-tile">
             <div id="roi-opportunities" class="value unknown">unknown</div>
-            <div class="name">Opportunites (score &gt;= 30)</div>
+            <div class="name">Opportunities (score &gt;= 30)</div>
           </div>
         </div>
       </div>
@@ -114,7 +114,7 @@
     <section id="tab-dashboard" class="tab-panel">
       <div class="grid two">
         <div class="panel">
-          <h2>Objectifs analyses</h2>
+          <h2>Parsed goals</h2>
           <div id="goals-list"></div>
           <p id="computed-by" class="muted small-text"></p>
         </div>
@@ -125,7 +125,7 @@
         </div>
       </div>
       <div class="panel">
-        <h2>Prochaines actions</h2>
+        <h2>Next actions</h2>
         <ol id="next-actions" class="next-actions"></ol>
       </div>
     </section>
@@ -133,7 +133,7 @@
     <section id="tab-travel" class="tab-panel">
       <div class="grid two">
         <div class="panel">
-          <h2>Itineraire</h2>
+          <h2>Itinerary</h2>
           <ol id="itinerary" class="itinerary"></ol>
         </div>
         <div class="panel">
@@ -142,36 +142,36 @@
         </div>
       </div>
       <div class="panel">
-        <h2>Propositions</h2>
+        <h2>Proposals</h2>
         <div id="proposals"></div>
       </div>
       <div class="panel">
-        <h2>Hebergements</h2>
+        <h2>Stays</h2>
         <div id="stays" class="cards"></div>
       </div>
       <div class="panel">
-        <h2>Carte</h2>
+        <h2>Map</h2>
         <div id="map" class="map"></div>
-        <p class="muted small-text">Lignes droites dans l'ordre des visites, pas un trajet reel. Coordonnees approximatives.</p>
+        <p class="muted small-text">Straight lines in visit order, not a real route. Approximate coordinates.</p>
       </div>
     </section>
 
     <section id="tab-events" class="tab-panel">
       <div class="panel">
-        <h2>Plan jour par jour</h2>
-        <p class="muted small-text">Heures affichees dans le fuseau de l'evenement (America/Los_Angeles).</p>
+        <h2>Day by day plan</h2>
+        <p class="muted small-text">Times shown in the event timezone (America/Los_Angeles).</p>
         <div id="plan-days"></div>
       </div>
       <div class="panel">
-        <h2>Conflits (anti-FOMO)</h2>
+        <h2>Conflicts (anti-FOMO)</h2>
         <div id="conflicts"></div>
       </div>
       <div class="panel">
-        <h2>Exclus</h2>
+        <h2>Excluded</h2>
         <ul id="excluded" class="plain-list"></ul>
       </div>
       <div class="panel">
-        <h2>Tous les evenements</h2>
+        <h2>All events</h2>
         <div id="events-list"></div>
       </div>
     </section>
@@ -179,28 +179,28 @@
     <section id="tab-graph" class="tab-panel">
       <div class="panel">
         <div class="panel-head">
-          <h2>Graphe de relations</h2>
+          <h2>Relationship graph</h2>
           <span>Backend: <span id="graph-backend" class="badge neutral">unknown</span></span>
         </div>
         <div id="graph-legend" class="legend"></div>
-        <p class="muted small-text">Clique sur une personne pour voir le chemin depuis toi. Clique sur un lien pour voir sa preuve.</p>
+        <p class="muted small-text">Click a person to see the path from you. Click an edge to see its evidence.</p>
         <div id="graph" class="graph"></div>
         <div id="graph-fallback" class="hidden"></div>
-        <div id="graph-detail" class="graph-detail muted">Aucune selection.</div>
+        <div id="graph-detail" class="graph-detail muted">No selection.</div>
       </div>
       <div class="panel">
         <div class="panel-head">
           <h2>Agents on the graph</h2>
           <span>Plan version: <span id="agents-plan-version" class="badge neutral">?</span></span>
         </div>
-        <p class="muted small-text">Le planner, l'anti-FOMO et le replanner se coordonnent par FalkorDB : chacun lit ce que l'autre a ecrit.</p>
+        <p class="muted small-text">The planner, the anti-FOMO agent and the replanner coordinate through FalkorDB: each reads what the others wrote.</p>
         <div id="agents-state"></div>
       </div>
     </section>
 
     <section id="tab-people" class="tab-panel">
       <div class="panel">
-        <h2>Top 10 personnes a rencontrer</h2>
+        <h2>Top 10 people to meet</h2>
         <div id="people-cards" class="cards"></div>
       </div>
     </section>
@@ -208,7 +208,7 @@
 
   <footer class="footer">
     <details id="warnings-box">
-      <summary>Avertissements (<span id="warnings-count">0</span>)</summary>
+      <summary>Warnings (<span id="warnings-count">0</span>)</summary>
       <ul id="warnings-list"></ul>
     </details>
   </footer>

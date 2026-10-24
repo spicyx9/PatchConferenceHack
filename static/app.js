@@ -65,11 +65,11 @@
   }
 
   function fmtTime(iso, tz) {
-    if (!iso) return "heure unknown";
+    if (!iso) return "time unknown";
     var d = new Date(iso);
-    if (isNaN(d.getTime())) return "heure unknown";
+    if (isNaN(d.getTime())) return "time unknown";
     try {
-      return new Intl.DateTimeFormat("fr-FR", {
+      return new Intl.DateTimeFormat("en-US", {
         timeZone: tz || EVENT_TZ, weekday: "short", day: "2-digit", month: "short",
         hour: "2-digit", minute: "2-digit"
       }).format(d) + zoneLabel(tz);
@@ -83,7 +83,7 @@
     var d = new Date(iso);
     if (isNaN(d.getTime())) return "?";
     try {
-      return new Intl.DateTimeFormat("fr-FR", {
+      return new Intl.DateTimeFormat("en-US", {
         timeZone: tz || EVENT_TZ, hour: "2-digit", minute: "2-digit"
       }).format(d) + zoneLabel(tz);
     } catch (e) {
@@ -92,10 +92,10 @@
   }
 
   function fmtDay(day) {
-    if (!day) return "jour unknown";
+    if (!day) return "day unknown";
     var d = new Date(day + "T12:00:00Z");
     if (isNaN(d.getTime())) return day;
-    return new Intl.DateTimeFormat("fr-FR", {
+    return new Intl.DateTimeFormat("en-US", {
       timeZone: "UTC", weekday: "long", day: "numeric", month: "long"
     }).format(d);
   }
@@ -170,7 +170,7 @@
     var badge = $("badge-source");
     badge.className = "badge " + (mode === "live" ? "live" : mode === "fixture" ? "fixture" : "neutral");
     badge.textContent = mode.toUpperCase();
-    badge.title = "data_source agrege des dernieres reponses";
+    badge.title = "data_source aggregated over the latest responses";
 
     var st = $("badge-status");
     st.className = "badge " + (worst || "neutral");
@@ -194,9 +194,9 @@
         '</span><span class="bar"><span style="width:' + pct + '%"></span></span><span>' +
         esc(g.description) + ' <span class="muted small-text">' + esc((g.target_roles || []).join(", ")) +
         "</span></span></div>";
-    }).join("") : '<p class="muted">Aucun objectif reconnu.</p>';
-    $("computed-by").textContent = plan ? "Calcule par: " + orUnknown(plan.computed_by) +
-      (plan.scenario_id ? " | scenario actif: " + plan.scenario_id : "") : "";
+    }).join("") : '<p class="muted">No goal recognized.</p>';
+    $("computed-by").textContent = plan ? "Computed by: " + orUnknown(plan.computed_by) +
+      (plan.scenario_id ? " | active scenario: " + plan.scenario_id : "") : "";
   }
 
   function roiTile(name, value) {
@@ -215,15 +215,15 @@
   }
 
   function renderRoi(roi) {
-    if (!roi) { $("roi-grid").innerHTML = '<p class="muted">ROI indisponible.</p>'; return; }
+    if (!roi) { $("roi-grid").innerHTML = '<p class="muted">ROI unavailable.</p>'; return; }
     var spendKnown = roi.spend_usd !== null && roi.spend_usd !== undefined;
     var spend = spendKnown ? fmtUsd(roi.spend_usd) : null;
     // Dashboard tab (same figures, grid rebuilt).
     $("roi-grid").innerHTML =
-      roiTile("Depenses vol + hotel", spend) +
-      roiTile("Rencontres", roi.meetings) +
-      roiTile("Contacts qualifies", roi.qualified_contacts) +
-      roiTile("Opportunites (score >= 30)", roi.opportunities);
+      roiTile("Flight + hotel spend", spend) +
+      roiTile("Meetings", roi.meetings) +
+      roiTile("Qualified contacts", roi.qualified_contacts) +
+      roiTile("Opportunities (score >= 30)", roi.opportunities);
     $("roi-note").textContent = "Budget: " + fmtUsd(roi.budget_usd) + (roi.spend_note ? " | " + roi.spend_note : "");
     // Demo tab, step 7: fixed ids so the figures can be checked after each /met, /attended, /skipped.
     setRoiFigure("roi-spend", spend);
@@ -251,8 +251,8 @@
       var who = (i.people || []).map(function (p) { return p.name; }).join(", ");
       return "<li><b>" + esc(fmtTime(i.start_at, i.timezone)) + "</b> " + esc(i.title) +
         ' <span class="muted">(' + esc(orUnknown(i.venue)) + ")</span>" +
-        (who ? '<div class="muted small-text">Rencontrer: ' + esc(who) + "</div>" : "") + "</li>";
-    }).join("") : '<li class="muted">Aucune action planifiee.</li>';
+        (who ? '<div class="muted small-text">Meet: ' + esc(who) + "</div>" : "") + "</li>";
+    }).join("") : '<li class="muted">No action planned.</li>';
   }
 
   function renderPlan(plan) {
@@ -266,42 +266,42 @@
           (i.room ? ", " + esc(i.room) : "") + " | score " + esc(i.score) + " | " + esc(i.event_type) +
           "</span></span>" + sourceBadge(i.source_mode) + '<span class="actions">' +
           '<button class="small' + (i.attended ? " on" : "") + '" data-action="attended" data-id="' + esc(i.event_id) + '">' +
-          (i.attended ? "Present" : "J'y vais") + "</button>" +
-          '<button class="small" data-action="skipped" data-id="' + esc(i.event_id) + '">Passer</button>' +
+          (i.attended ? "Attended" : "Attend") + "</button>" +
+          '<button class="small" data-action="skipped" data-id="' + esc(i.event_id) + '">Skip</button>' +
           "</span></div>";
       }).join("") + "</div>";
-    }).join("") : '<p class="muted">Aucun evenement planifie.</p>';
+    }).join("") : '<p class="muted">No event planned.</p>';
 
     var conflicts = (plan && plan.plan && plan.plan.conflicts) || [];
     $("conflicts").innerHTML = conflicts.length ? conflicts.map(function (c) {
       var miss = c.what_you_miss || [];
       return '<div class="conflict"><div><b>' + esc(fmtDay(c.day)) + ":</b> " + esc(c.verdict) + "</div>" +
-        '<div class="small-text">Gagnant: ' + esc(c.winner && c.winner.title) + " | Perdant: " + esc(c.loser && c.loser.title) + "</div>" +
-        "<div><b>Ce que tu rates:</b>" + (miss.length ? "<ul>" + miss.map(function (m) {
+        '<div class="small-text">Winner: ' + esc(c.winner && c.winner.title) + " | Loser: " + esc(c.loser && c.loser.title) + "</div>" +
+        "<div><b>What you miss:</b>" + (miss.length ? "<ul>" + miss.map(function (m) {
           return "<li>" + esc(m.name) + ' <span class="muted">(score ' + esc(m.score) + ")</span></li>";
-        }).join("") + "</ul>" : ' <span class="muted">personne de ta liste</span>') + "</div></div>";
-    }).join("") : '<p class="muted">Aucun conflit.</p>';
+        }).join("") + "</ul>" : ' <span class="muted">nobody from your list</span>') + "</div></div>";
+    }).join("") : '<p class="muted">No conflict.</p>';
 
     var excluded = (plan && plan.plan && plan.plan.excluded) || [];
     $("excluded").innerHTML = excluded.length ? excluded.map(function (x) {
       return "<li>" + esc(x.title) + ' <span class="badge failed">' + esc(x.reason) + "</span>" +
         (x.detail ? ' <span class="muted small-text">' + esc(x.detail) + "</span>" : "") + "</li>";
-    }).join("") : '<li class="muted">Aucun.</li>';
+    }).join("") : '<li class="muted">None.</li>';
   }
 
   function renderEvents(ev) {
     var items = (ev && ev.items) || [];
-    $("events-list").innerHTML = items.length ? "<table><thead><tr><th>Quand (LA)</th><th>Titre</th><th>Type</th>" +
-      "<th>Lieu</th><th>Statut</th><th>Score</th><th>Source</th></tr></thead><tbody>" + items.map(function (e) {
+    $("events-list").innerHTML = items.length ? "<table><thead><tr><th>When (LA)</th><th>Title</th><th>Type</th>" +
+      "<th>Venue</th><th>Status</th><th>Score</th><th>Source</th></tr></thead><tbody>" + items.map(function (e) {
         var venue = e.venue && e.venue.name ? e.venue.name : null;
         var link = safeUrl(e.source_url) || safeUrl(e.registration_url);
         return "<tr><td>" + esc(fmtTime(e.start_at, e.timezone)) + "</td><td>" +
           (link ? '<a href="' + esc(link) + '" target="_blank" rel="noopener noreferrer">' + esc(e.title) + "</a>" : esc(e.title)) +
-          (e.attended ? ' <span class="badge ok">present</span>' : "") +
-          (e.skipped ? ' <span class="badge degraded">passe</span>' : "") +
+          (e.attended ? ' <span class="badge ok">attended</span>' : "") +
+          (e.skipped ? ' <span class="badge degraded">skipped</span>' : "") +
           "</td><td>" + esc(e.event_type) + "</td><td>" + esc(orUnknown(venue)) + "</td><td>" + esc(orUnknown(e.status)) +
           "</td><td>" + esc(e.score) + "</td><td>" + sourceBadge(e.source_mode) + "</td></tr>";
-      }).join("") + "</tbody></table>" : '<p class="muted">Aucun evenement.</p>';
+      }).join("") + "</tbody></table>" : '<p class="muted">No event.</p>';
   }
 
   function renderTravel(t) {
@@ -309,30 +309,30 @@
     var legs = t.itinerary || [];
     $("itinerary").innerHTML = legs.length ? legs.map(function (l) {
       if (l.kind === "flight") {
-        return "<li><b>Vol</b> " + esc(l.date) + ": " + esc(l.from) + " vers " + esc(l.to) +
-          ' <span class="muted">depart ' + esc(orUnknown(l.departure_at)) + ", arrivee " + esc(orUnknown(l.arrival_at)) +
-          ", compagnie " + esc(orUnknown(l.carrier)) + '</span> <span class="badge neutral">prix ' + esc(orUnknown(l.price_status)) +
+        return "<li><b>Flight</b> " + esc(l.date) + ": " + esc(l.from) + " to " + esc(l.to) +
+          ' <span class="muted">departs ' + esc(orUnknown(l.departure_at)) + ", arrives " + esc(orUnknown(l.arrival_at)) +
+          ", carrier " + esc(orUnknown(l.carrier)) + '</span> <span class="badge neutral">price ' + esc(orUnknown(l.price_status)) +
           "</span> " + sourceBadge(l.source_mode) + "</li>";
       }
-      return "<li><b>Hebergement</b> " + esc(l.name) + ' <span class="muted">' + esc(orUnknown(l.check_in)) + " au " +
-        esc(orUnknown(l.check_out)) + '</span> <span class="badge neutral">prix ' + esc(orUnknown(l.price_status)) + "</span> " +
+      return "<li><b>Stay</b> " + esc(l.name) + ' <span class="muted">' + esc(orUnknown(l.check_in)) + " to " +
+        esc(orUnknown(l.check_out)) + '</span> <span class="badge neutral">price ' + esc(orUnknown(l.price_status)) + "</span> " +
         sourceBadge(l.source_mode) + "</li>";
-    }).join("") : '<li class="muted">Aucun trajet.</li>';
+    }).join("") : '<li class="muted">No leg.</li>';
 
     var props = t.proposals || [];
     $("proposals").innerHTML = props.length ? props.map(function (p) {
       return '<div class="event-item"><span class="title">' + esc(p.text) +
         '<br><span class="muted small-text">' + esc(p.reason || "") + "</span></span>" +
-        (p.accepted ? '<span class="badge ok">Acceptee</span>'
-          : '<button class="small primary" data-action="accept" data-id="' + esc(p.id) + '">Accepter</button>') + "</div>";
-    }).join("") : '<p class="muted">Aucune proposition.</p>';
+        (p.accepted ? '<span class="badge ok">Accepted</span>'
+          : '<button class="small primary" data-action="accept" data-id="' + esc(p.id) + '">Accept</button>') + "</div>";
+    }).join("") : '<p class="muted">No proposal.</p>';
 
     var b = t.budget || {};
     $("budget").innerHTML = "<table><tbody>" +
       "<tr><th>Budget</th><td>" + esc(fmtUsd(b.budget_usd)) + "</td></tr>" +
-      "<tr><th>Vols</th><td>" + esc(fmtUsd(b.flights_usd)) + "</td></tr>" +
-      "<tr><th>Hebergement</th><td>" + esc(fmtUsd(b.lodging_usd)) + "</td></tr>" +
-      "<tr><th>Reste</th><td>" + esc(fmtUsd(b.remaining_usd)) + "</td></tr>" +
+      "<tr><th>Flights</th><td>" + esc(fmtUsd(b.flights_usd)) + "</td></tr>" +
+      "<tr><th>Lodging</th><td>" + esc(fmtUsd(b.lodging_usd)) + "</td></tr>" +
+      "<tr><th>Remaining</th><td>" + esc(fmtUsd(b.remaining_usd)) + "</td></tr>" +
       "</tbody></table>" + (b.note ? '<p class="muted small-text">' + esc(b.note) + "</p>" : "");
   }
 
@@ -341,19 +341,19 @@
     $("stays").innerHTML = items.length ? items.map(function (st) {
       var link = safeUrl(st.booking_url);
       var dist = st.distance_to_venue_m === null || st.distance_to_venue_m === undefined ? "unknown"
-        : st.distance_to_venue_m + " m" + (st.distance_is_straight_line_estimate ? " (vol d'oiseau)" : "");
+        : st.distance_to_venue_m + " m" + (st.distance_is_straight_line_estimate ? " (straight line)" : "");
       var priceCls = st.price_status === "verified" ? "ok" : "neutral";
       return '<div class="card"><div class="row"><b>' + esc(st.name) + "</b></div>" +
-        '<div class="row"><span class="badge ' + priceCls + '">prix ' + esc(orUnknown(st.price_status)) + "</span>" +
-        '<span class="badge neutral">dispo ' + esc(orUnknown(st.availability)) + "</span>" + sourceBadge(st.source_mode) + "</div>" +
+        '<div class="row"><span class="badge ' + priceCls + '">price ' + esc(orUnknown(st.price_status)) + "</span>" +
+        '<span class="badge neutral">availability ' + esc(orUnknown(st.availability)) + "</span>" + sourceBadge(st.source_mode) + "</div>" +
         '<div class="field"><b>Type:</b> ' + esc(orUnknown(st.lodging_type)) + "</div>" +
         '<div class="field"><b>Total:</b> ' + esc(st.total_price === null || st.total_price === undefined ? "unknown" :
           st.total_price + " " + (st.currency || "")) + "</div>" +
-        '<div class="field"><b>Distance au lieu:</b> ' + esc(dist) + "</div>" +
-        '<div class="field"><b>Dates:</b> ' + esc(orUnknown(st.check_in)) + " au " + esc(orUnknown(st.check_out)) + "</div>" +
-        (link ? '<div class="field"><a href="' + esc(link) + '" target="_blank" rel="noopener noreferrer">Reserver</a></div>' : "") +
+        '<div class="field"><b>Distance to venue:</b> ' + esc(dist) + "</div>" +
+        '<div class="field"><b>Dates:</b> ' + esc(orUnknown(st.check_in)) + " to " + esc(orUnknown(st.check_out)) + "</div>" +
+        (link ? '<div class="field"><a href="' + esc(link) + '" target="_blank" rel="noopener noreferrer">Book</a></div>' : "") +
         "</div>";
-    }).join("") : '<p class="muted">Aucun hebergement.</p>';
+    }).join("") : '<p class="muted">No stay.</p>';
   }
 
   function markerColor(kind, planned) {
@@ -366,7 +366,7 @@
     lastMapData = m;
     var el = $("map");
     if (typeof L === "undefined") {
-      el.innerHTML = '<p class="muted" style="padding:1rem">Leaflet non charge. Points: ' +
+      el.innerHTML = '<p class="muted" style="padding:1rem">Leaflet not loaded. Points: ' +
         esc(((m && m.markers) || []).map(function (x) { return x.label; }).join(", ")) + "</p>";
       return;
     }
@@ -383,7 +383,7 @@
     ((m && m.polylines) || []).forEach(function (p, idx) {
       if (!p.points || p.points.length < 2) return;
       L.polyline(p.points, { color: dayColors[idx % dayColors.length], weight: 4, opacity: 0.8, dashArray: "6 6" })
-        .bindTooltip("Jour " + esc(p.day)).addTo(mapLayer);
+        .bindTooltip("Day " + esc(p.day)).addTo(mapLayer);
     });
     ((m && m.markers) || []).forEach(function (mk) {
       if (typeof mk.lat !== "number" || typeof mk.lng !== "number") return;
@@ -392,7 +392,7 @@
         radius: mk.kind === "conference" ? 12 : 9, color: "#0d1117", weight: 2,
         fillColor: markerColor(mk.kind, mk.planned), fillOpacity: 0.95
       }).bindPopup("<b>" + esc(mk.label) + "</b><br>" + esc(mk.kind) +
-        (mk.planned === false ? " (non planifie)" : "") + "<br>precision: " + esc(orUnknown(mk.precision)))
+        (mk.planned === false ? " (not planned)" : "") + "<br>precision: " + esc(orUnknown(mk.precision)))
         .addTo(mapLayer);
     });
     if (bounds.length) map.fitBounds(bounds, { padding: [30, 30] });
@@ -405,9 +405,9 @@
   }
 
   function edgeDetail(e) {
-    return "<b>" + esc(e.type) + "</b>: " + esc(e.source) + " vers " + esc(e.target) +
-      "<br>Preuve: " + esc(orUnknown(e.evidence_source)) + " | confiance " + esc(orUnknown(e.confidence)) +
-      " | observe le " + esc(orUnknown(e.observed_at));
+    return "<b>" + esc(e.type) + "</b>: " + esc(e.source) + " to " + esc(e.target) +
+      "<br>Evidence: " + esc(orUnknown(e.evidence_source)) + " | confidence " + esc(orUnknown(e.confidence)) +
+      " | observed " + esc(orUnknown(e.observed_at));
   }
 
   function renderGraph(g) {
@@ -426,11 +426,11 @@
       $("graph").classList.add("hidden");
       var fb = $("graph-fallback");
       fb.classList.remove("hidden");
-      fb.innerHTML = '<p class="muted">cytoscape.js non charge: liste simple.</p><h3>Noeuds (' + nodes.length + ")</h3><ul>" +
+      fb.innerHTML = '<p class="muted">cytoscape.js not loaded: plain list.</p><h3>Nodes (' + nodes.length + ")</h3><ul>" +
         nodes.map(function (n) {
           return "<li>" + esc(n.type) + ": " + esc(n.label) + " " + sourceBadge(n.source_mode) +
-            (n.type === "Person" ? ' <button class="small" data-action="path" data-id="' + esc(n.id) + '">Chemin</button>' : "") + "</li>";
-        }).join("") + "</ul><h3>Liens (" + edges.length + ")</h3><ul>" +
+            (n.type === "Person" ? ' <button class="small" data-action="path" data-id="' + esc(n.id) + '">Path</button>' : "") + "</li>";
+        }).join("") + "</ul><h3>Edges (" + edges.length + ")</h3><ul>" +
         edges.map(function (e) { return "<li>" + edgeDetail(e) + "</li>"; }).join("") + "</ul>";
       return;
     }
@@ -484,7 +484,7 @@
       $("graph-detail").innerHTML = edgeDetail(evt.target.data());
     });
     cy.on("tap", function (evt) {
-      if (evt.target === cy) { clearHighlight(); $("graph-detail").textContent = "Aucune selection."; }
+      if (evt.target === cy) { clearHighlight(); $("graph-detail").textContent = "No selection."; }
     });
   }
 
@@ -500,7 +500,7 @@
       var labels = (res.path || []).map(function (s) {
         return s.node ? esc(s.node.label || s.node.id) : s.edge ? '<span class="muted">' + esc(s.edge.type) + "</span>" : "";
       });
-      $("graph-detail").innerHTML = "<b>Chemin (" + esc(res.hops) + " sauts):</b> " + labels.join(" &rarr; ") +
+      $("graph-detail").innerHTML = "<b>Path (" + esc(res.hops) + " hops):</b> " + labels.join(" &rarr; ") +
         "<br>" + (res.path || []).filter(function (s) { return s.edge; }).map(function (s) { return edgeDetail(s.edge); }).join("<br>");
       if (cy) {
         cy.elements().removeClass("path selected-edge").addClass("dim");
@@ -508,7 +508,7 @@
         edgeIds.forEach(function (id) { cy.getElementById(id).removeClass("dim").addClass("path"); });
       }
     }).catch(function (err) {
-      showError("Chemin introuvable: " + err.message);
+      showError("Path not found: " + err.message);
     });
   }
 
@@ -527,19 +527,19 @@
         '<div class="row"><b style="font-size:1.1rem">' + esc(person.name || o.title) + "</b>" +
         '<span class="score">' + esc(orUnknown(o.score)) + "</span></div>" +
         '<div class="row"><span class="badge ' + presCls + '">' + esc(presence) + "</span>" +
-        (c.met ? '<span class="badge met">rencontre</span>' : "") + sourceBadge(modeOfEvidence(o.evidence)) + "</div>" +
-        '<div class="field"><b>Titre:</b> ' + esc(orUnknown(person.title)) + "</div>" +
-        '<div class="field"><b>Entreprise:</b> ' + esc(orUnknown(company.name)) + "</div>" +
-        '<div class="field"><b>Pourquoi:</b> ' + esc(orUnknown(o.rationale)) + "</div>" +
-        '<div class="field"><b>Ou:</b> ' + esc(orUnknown(o.where)) + "</div>" +
-        '<div class="field"><b>Accroche:</b> ' + esc(orUnknown(o.opener)) + "</div>" +
+        (c.met ? '<span class="badge met">met</span>' : "") + sourceBadge(modeOfEvidence(o.evidence)) + "</div>" +
+        '<div class="field"><b>Title:</b> ' + esc(orUnknown(person.title)) + "</div>" +
+        '<div class="field"><b>Company:</b> ' + esc(orUnknown(company.name)) + "</div>" +
+        '<div class="field"><b>Why:</b> ' + esc(orUnknown(o.rationale)) + "</div>" +
+        '<div class="field"><b>Where:</b> ' + esc(orUnknown(o.where)) + "</div>" +
+        '<div class="field"><b>Opener:</b> ' + esc(orUnknown(o.opener)) + "</div>" +
         (c.met_note ? '<div class="field"><b>Note:</b> ' + esc(c.met_note) + "</div>" : "") +
         (c.met ? '<div class="followup" id="followup-' + esc(pid) + '"></div>' : "") +
-        '<div class="row">' + (c.met ? '<button class="small primary" data-action="followup" data-id="' + esc(pid) + '">Suivi</button>'
-          : '<button class="small primary" data-action="met" data-id="' + esc(pid) + '">Rencontre</button>') +
-        '<button class="small" data-action="showpath" data-id="' + esc(pid) + '">Voir le chemin</button></div>' +
+        '<div class="row">' + (c.met ? '<button class="small primary" data-action="followup" data-id="' + esc(pid) + '">Follow up</button>'
+          : '<button class="small primary" data-action="met" data-id="' + esc(pid) + '">Met</button>') +
+        '<button class="small" data-action="showpath" data-id="' + esc(pid) + '">Show path</button></div>' +
         "</div>";
-    }).join("") : '<p class="muted">Aucune personne.</p>';
+    }).join("") : '<p class="muted">No people.</p>';
   }
 
   function modeOfEvidence(ev) {
@@ -553,24 +553,24 @@
     var d = res.diff || {};
     function section(name, cls, list, fmt) {
       return '<div class="diff-section ' + cls + '"><span class="tag">' + esc(name) + " (" + (list || []).length + "):</span>" +
-        ((list || []).length ? "<ul>" + list.map(fmt).join("") + "</ul>" : '<span class="muted">aucun</span>') + "</div>";
+        ((list || []).length ? "<ul>" + list.map(fmt).join("") + "</ul>" : '<span class="muted">none</span>') + "</div>";
     }
     $("diff-body").innerHTML = "<p><b>" + esc(res.scenario && res.scenario.label) + "</b></p>" +
-      section("Ajoutes", "diff-added", d.added, function (x) { return "<li>" + esc(x.title || x.event_id) + "</li>"; }) +
-      section("Retires", "diff-removed", d.removed, function (x) { return "<li>" + esc(x.title || x.event_id) + "</li>"; }) +
-      section("Modifies", "diff-changed", d.changed, function (x) {
+      section("Added", "diff-added", d.added, function (x) { return "<li>" + esc(x.title || x.event_id) + "</li>"; }) +
+      section("Removed", "diff-removed", d.removed, function (x) { return "<li>" + esc(x.title || x.event_id) + "</li>"; }) +
+      section("Changed", "diff-changed", d.changed, function (x) {
         var b = x.before || {}, a = x.after || {};
-        return "<li>" + esc(x.event_id) + ": " + esc(fmtTime(b.start_at)) + " (" + esc(b.status) + ") vers " +
+        return "<li>" + esc(x.event_id) + ": " + esc(fmtTime(b.start_at)) + " (" + esc(b.status) + ") to " +
           esc(fmtTime(a.start_at)) + " (" + esc(a.status) + ")</li>";
       }) +
-      section("Replanification", "diff-replan", res.replan, function (x) {
+      section("Replanning", "diff-replan", res.replan, function (x) {
         var r = x.replacement, p = x.graph_path;
-        return "<li><b>Retire :</b> " + esc(x.removed.title) +
-          (r ? "<br><b>Remplace par :</b> " + esc(r.title) + " (" + esc(fmtTime(r.start_at)) + ")" : "") +
-          "<br><b>Raison :</b> " + esc(x.reason) +
-          (p ? "<br><b>Chemin :</b> " + esc(p.nodes.join(" > ")) + (p.explanation ? '<br><span class="muted">' + esc(p.explanation) + "</span>" : "") : "") +
+        return "<li><b>Removed:</b> " + esc(x.removed.title) +
+          (r ? "<br><b>Replaced by:</b> " + esc(r.title) + " (" + esc(fmtTime(r.start_at)) + ")" : "") +
+          "<br><b>Reason:</b> " + esc(x.reason) +
+          (p ? "<br><b>Path:</b> " + esc(p.nodes.join(" > ")) + (p.explanation ? '<br><span class="muted">' + esc(p.explanation) + "</span>" : "") : "") +
           "</li>";
-      }) + '<p class="muted small-text">Changement simule, pas une mise a jour reelle de la source.</p>';
+      }) + '<p class="muted small-text">Simulated change, not a real update of the source.</p>';
     $("diff-panel").classList.remove("hidden");
   }
 
@@ -578,7 +578,7 @@
 
   function settle(promise, label, render, errors) {
     return promise.then(function (data) {
-      try { render(data); } catch (e) { errors.push(label + ": rendu " + e.message); }
+      try { render(data); } catch (e) { errors.push(label + ": render " + e.message); }
     }).catch(function (e) { errors.push(label + ": " + e.message); });
   }
 
@@ -595,7 +595,7 @@
       settle(api("/people?limit=100", null, "people"), "people", renderPeople, errors),
       settle(api("/scenarios", null, "scenarios"), "scenarios", renderScenarios, errors)
     ]).then(loadAgentsState).then(function () {
-      if (errors.length) showError("Erreur de chargement: " + errors.join(" | "));
+      if (errors.length) showError("Load error: " + errors.join(" | "));
     });
   }
 
@@ -640,7 +640,7 @@
   }
 
   function fmtMs(ms) {
-    if (ms === null || ms === undefined) return "jamais";
+    if (ms === null || ms === undefined) return "never";
     return fmtTime(new Date(Number(ms)).toISOString(), EVENT_TZ);
   }
 
@@ -649,7 +649,7 @@
     if (!box) return;
     if (!res || res.backend !== "falkordb") {
       $("agents-plan-version").textContent = "?";
-      box.innerHTML = '<p class="muted">FalkorDB non joignable : pas d\'etat partage.</p>';
+      box.innerHTML = '<p class="muted">FalkorDB unreachable: no shared state.</p>';
       return;
     }
     var plan = res.plan || {};
@@ -660,12 +660,12 @@
     var open = res.browser_url && safeUrl(res.browser_url)
       ? '<a class="btn primary" target="_blank" rel="noopener" href="' + esc(safeUrl(res.browser_url)) + '">Show in FalkorDB Browser</a> '
       : "";
-    box.innerHTML = '<table><thead><tr><th>Agent</th><th>Ecritures</th><th>Derniere (at_ms)</th></tr></thead><tbody>' +
+    box.innerHTML = '<table><thead><tr><th>Agent</th><th>Writes</th><th>Last (at_ms)</th></tr></thead><tbody>' +
       rows + "</tbody></table>" +
-      '<p class="small-text">' + esc((plan.items || []).length) + " evenements dans le plan (PLANS), " +
-      esc((res.skips || []).length) + " ecartes (SKIPS), " + esc((res.changes || []).length) + " changements (Change).</p>" +
+      '<p class="small-text">' + esc((plan.items || []).length) + " events in the plan (PLANS), " +
+      esc((res.skips || []).length) + " skipped (SKIPS), " + esc((res.changes || []).length) + " changes (Change).</p>" +
       '<div class="cypher-panel">' + open +
-      '<button data-action="copy-agents-cypher" class="small">Copier la requete</button>' +
+      '<button data-action="copy-agents-cypher" class="small">Copy query</button>' +
       '<pre id="agents-cypher" class="cypher">' + esc(res.cypher) + "</pre></div>";
   }
 
@@ -678,7 +678,7 @@
       ? '<a class="btn primary" target="_blank" rel="noopener" href="' + esc(safeUrl(res.browser_url)) + '">Show in FalkorDB Browser</a> '
       : "";
     return '<div class="cypher-panel">' + open +
-      '<button data-action="copy-cypher" class="small">Copier la requete</button>' +
+      '<button data-action="copy-cypher" class="small">Copy query</button>' +
       '<pre id="story-cypher" class="cypher">' + esc(res.cypher) + "</pre></div>";
   }
 
@@ -696,8 +696,8 @@
       var p = c.person;
       return '<div class="opp"><div class="opp-name">' + (i + 1) + ". " + esc(p.name) +
         (p.title ? ' <span class="muted">' + esc(p.title) + "</span>" : "") + "</div>" +
-        '<div id="story-path-' + i + '" class="muted">chemin...</div></div>';
-    }).join("") || '<p class="muted">Aucune personne.</p>';
+        '<div id="story-path-' + i + '" class="muted">path...</div></div>';
+    }).join("") || '<p class="muted">No people.</p>';
     return Promise.all(cards.map(function (c, i) {
       return api("/graph/path?person=" + encodeURIComponent(c.person.id), null, "graph_path").then(function (res) {
         $("story-path-" + i).innerHTML = pathHtml(res.path) +
@@ -705,7 +705,7 @@
           '<div class="explain">source: ' + esc(res.backend || "graph") + " / " + esc(res.data_source) +
           (res.signature ? " / signature: " + esc(res.signature) : "") + "</div>" +
           (i === 0 && res.cypher ? cypherPanel(res) : "");
-      }).catch(function () { $("story-path-" + i).textContent = "pas de chemin dans le graphe"; });
+      }).catch(function () { $("story-path-" + i).textContent = "no path in the graph"; });
     }));
   }
 
@@ -714,8 +714,8 @@
     $("story-plan").innerHTML = days.map(function (d) {
       return '<div class="story-plan-day"><h3>' + esc(fmtDay(d.day)) + "</h3><ul>" + d.items.slice(0, 4).map(function (i) {
         return "<li><b>" + esc(fmtHour(i.start_at, i.timezone)) + "</b> " + esc(i.title) + "</li>";
-      }).join("") + (d.items.length > 4 ? '<li class="muted">+ ' + (d.items.length - 4) + " autres</li>" : "") + "</ul></div>";
-    }).join("") || '<p class="muted">Plan vide.</p>';
+      }).join("") + (d.items.length > 4 ? '<li class="muted">+ ' + (d.items.length - 4) + " more</li>" : "") + "</ul></div>";
+    }).join("") || '<p class="muted">Empty plan.</p>';
     if (typeof L === "undefined") return;
     if (!storyMap) {
       storyMap = L.map($("story-map")).setView([37.79, -122.42], 13);
@@ -745,22 +745,22 @@
     var skips = (res && res.skips) || [];
     $("story-antifomo").innerHTML = skips.map(function (s) {
       return '<div class="skip"><div class="cat">' + esc(s.category_label) + "</div>" +
-        "<div><b>On saute :</b> " + esc(s.title) + " " + '<span class="muted">(' + esc(fmtTime(s.start_at, s.timezone)) + ")</span></div>" +
+        "<div><b>Skipped:</b> " + esc(s.title) + " " + '<span class="muted">(' + esc(fmtTime(s.start_at, s.timezone)) + ")</span></div>" +
         '<div class="muted">' + esc(s.reason) + "</div>" +
-        '<div class="gain">On y gagne : ' + esc(s.gain) + "</div></div>";
-    }).join("") || '<p class="muted">Aucun evenement ecarte' + (res && res.computed_by ? "" : " (agent anti-FOMO indisponible)") + ".</p>";
+        '<div class="gain">Gained: ' + esc(s.gain) + "</div></div>";
+    }).join("") || '<p class="muted">No event skipped' + (res && res.computed_by ? "" : " (anti-FOMO agent unavailable)") + ".</p>";
   }
 
   function renderStoryDiff(res) {
     var replan = (res && res.replan) || [];
     var d = (res && res.diff) || {};
     var rows = replan.map(function (r) {
-      var html = '<div class="diff-row removed"><span class="tag-r">RETIRE</span> ' + esc(r.removed.title) + "</div>";
+      var html = '<div class="diff-row removed"><span class="tag-r">REMOVED</span> ' + esc(r.removed.title) + "</div>";
       if (r.replacement) {
-        html += '<div class="diff-row added"><span class="tag-a">AJOUTE</span> ' + esc(r.replacement.title) +
+        html += '<div class="diff-row added"><span class="tag-a">ADDED</span> ' + esc(r.replacement.title) +
           ' <span class="muted">(' + esc(fmtTime(r.replacement.start_at)) + ")</span></div>";
       }
-      html += '<div class="explain"><b>Raison :</b> ' + esc(r.reason) + "</div>";
+      html += '<div class="explain"><b>Reason:</b> ' + esc(r.reason) + "</div>";
       if (r.graph_path) {
         html += pathHtml(r.graph_path.nodes.map(function (n, i) {
           return { node: { label: n, type: i === r.graph_path.nodes.length - 1 ? "Person" : (i === 0 ? "Goal" : "Opportunity") } };
@@ -772,10 +772,10 @@
       return !replan.some(function (r) { return r.replacement && r.replacement.event_id === a.event_id; });
     });
     rows = rows.concat(added.map(function (a) {
-      return '<div class="diff-row added"><span class="tag-a">AJOUTE</span> ' + esc(a.title) + "</div>";
+      return '<div class="diff-row added"><span class="tag-a">ADDED</span> ' + esc(a.title) + "</div>";
     }));
     $("story-diff").innerHTML = "<p><b>" + esc(res.scenario && res.scenario.label) + "</b></p>" + rows.join("") +
-      '<p class="muted small-text">Changement simule, pas une mise a jour reelle de la source.</p>';
+      '<p class="muted small-text">Simulated change, not a real update of the source.</p>';
   }
 
   function renderStoryMet(before, res, after) {
@@ -783,14 +783,14 @@
       return ((p && p.items) || []).filter(function (c) { return c.person; }).slice(0, 3)
         .map(function (c) { return esc(c.person.name); }).join(", ");
     };
-    $("story-met").innerHTML = '<p class="met-ok">Rencontre avec ' + esc(res.person_name) + " enregistree (" +
-      esc(res.persisted === "falkordb" ? "FalkorDB" : "memoire") + ")</p>" +
-      "<p><b>Top 3 avant :</b> " + names(before) + "</p><p><b>Top 3 apres :</b> " + names(after) + "</p>";
+    $("story-met").innerHTML = '<p class="met-ok">Meeting with ' + esc(res.person_name) + " recorded (" +
+      esc(res.persisted === "falkordb" ? "FalkorDB" : "memory") + ")</p>" +
+      "<p><b>Top 3 before:</b> " + names(before) + "</p><p><b>Top 3 after:</b> " + names(after) + "</p>";
   }
 
   function storyMetButton() {
-    if (!storyTop) { $("story-met").innerHTML = '<p class="muted">Aucune personne.</p>'; return; }
-    $("story-met").innerHTML = '<button id="story-met-btn" class="primary big-btn">J\'ai rencontre ' +
+    if (!storyTop) { $("story-met").innerHTML = '<p class="muted">No people.</p>'; return; }
+    $("story-met").innerHTML = '<button id="story-met-btn" class="primary big-btn">I met ' +
       esc(storyTop.name) + "</button>";
   }
 
@@ -823,7 +823,7 @@
     return api("/scenarios", null, "scenarios").then(function (s) {
       var items = (s && s.items) || [];
       var pick = items.filter(function (it) { return /sold/i.test(it.id); })[0] || items[0];
-      if (!pick) throw new Error("Aucun scenario disponible.");
+      if (!pick) throw new Error("No scenario available.");
       return api("/simulate-change", { method: "POST", body: { scenario_id: pick.id } }, "plan");
     }).then(function (res) {
       renderStoryDiff(res);
@@ -883,7 +883,7 @@
         return api("/proposal/accept", { method: "POST", body: { proposal_id: id } }, "travel").then(renderTravel);
       });
     } else if (action === "met") {
-      var note = window.prompt("Note sur la rencontre (optionnel):", "");
+      var note = window.prompt("Meeting note (optional):", "");
       if (note === null) return;
       withBusy(btn, function () { return mutate("/met", { person_id: id, note: note || null }); });
     } else if (action === "followup") {
@@ -892,24 +892,24 @@
           var box = $("followup-" + id);
           if (!box) return;
           var next = d.next_action || {};
-          box.innerHTML = '<div class="field"><b>Brouillon (non envoye):</b></div>' +
+          box.innerHTML = '<div class="field"><b>Draft (not sent):</b></div>' +
             '<pre class="followup-text">' + esc(d.message) + "</pre>" +
-            '<div class="field"><b>Suite:</b> ' + esc(next.label || "") +
+            '<div class="field"><b>Next:</b> ' + esc(next.label || "") +
             (next.url ? ' <a href="' + esc(next.url) + '" target="_blank" rel="noopener">' + esc(next.url) + "</a>" : "") +
             (next.due_at ? " (" + esc(String(next.due_at).slice(0, 10)) + ")" : "") + "</div>" +
             (d.warnings && d.warnings.length ? '<div class="field muted small-text">' + esc(d.warnings.join("; ")) + "</div>" : "") +
-            '<button class="small" data-action="copy-followup" data-id="' + esc(id) + '">Copier</button>';
+            '<button class="small" data-action="copy-followup" data-id="' + esc(id) + '">Copy</button>';
         });
       });
     } else if (action === "copy-followup") {
       var pre = document.querySelector("#followup-" + id + " .followup-text");
-      if (pre && navigator.clipboard) navigator.clipboard.writeText(pre.textContent).then(function () { btn.textContent = "Copie"; });
+      if (pre && navigator.clipboard) navigator.clipboard.writeText(pre.textContent).then(function () { btn.textContent = "Copied"; });
     } else if (action === "copy-agents-cypher") {
       var q = $("agents-cypher") ? $("agents-cypher").textContent : "";
-      if (navigator.clipboard) navigator.clipboard.writeText(q).then(function () { btn.textContent = "Copie"; });
+      if (navigator.clipboard) navigator.clipboard.writeText(q).then(function () { btn.textContent = "Copied"; });
     } else if (action === "copy-cypher") {
       var text = $("story-cypher") ? $("story-cypher").textContent : "";
-      if (navigator.clipboard) navigator.clipboard.writeText(text).then(function () { btn.textContent = "Copie"; });
+      if (navigator.clipboard) navigator.clipboard.writeText(text).then(function () { btn.textContent = "Copied"; });
     } else if (action === "showpath" || action === "path") {
       if (action === "showpath") switchTab("graph");
       setTimeout(function () { highlightPath(id); }, action === "showpath" ? 300 : 0);
@@ -922,13 +922,13 @@
 
     $("btn-goal").addEventListener("click", function () {
       var text = $("goal-text").value.trim();
-      if (!text) { showError("Objectif vide."); return; }
+      if (!text) { showError("Empty goal."); return; }
       withBusy($("btn-goal"), function () { return mutate("/goal", { text: text }).then(loadStory); });
     });
 
     $("btn-simulate").addEventListener("click", function () {
       var id = $("scenario-select").value;
-      if (!id) { showError("Aucun scenario disponible."); return; }
+      if (!id) { showError("No scenario available."); return; }
       withBusy($("btn-simulate"), function () {
         return mutate("/simulate-change", { scenario_id: id }).then(renderDiff);
       });
@@ -960,7 +960,7 @@
       if (c && c.conference) {
         var conf = c.conference;
         $("conf-name").textContent = conf.name + " | " + orUnknown(conf.venue_name) + ", " + orUnknown(conf.city) +
-          " | " + orUnknown(conf.start_date) + " au " + orUnknown(conf.end_date);
+          " | " + orUnknown(conf.start_date) + " to " + orUnknown(conf.end_date);
       }
     }).catch(function (e) { showError("Conference: " + e.message); });
 
