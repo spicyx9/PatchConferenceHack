@@ -47,7 +47,8 @@ def test_cache_is_served_labelled_cached_with_provenance_and_pipeline_rows(no_ne
 
     rows = client.get("/api/v1/pipeline").json()["rows"]
     cached = [r for r in rows if r.get("cached")]
-    assert {r["brightdata_api"] for r in cached} == {"dataset", "unlocker"}
+    assert {r["brightdata_api"] for r in cached if r["kind"] == "brightdata"} == {"dataset", "unlocker"}
+    assert any(r["provider"] == "google_hotels_direct" and r["kind"] == "direct" for r in cached)
     assert sum(r["records"] for r in cached) == 55  # 21 stays + 34 itineraries
     bd = client.get("/api/v1/brightdata").json()["cached"]
     assert bd["total"] == 55 and bd["datasets"] == 21 and bd["web_unlocker"] == 34
