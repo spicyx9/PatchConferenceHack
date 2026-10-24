@@ -59,3 +59,21 @@ def test_fix4_spend_names_its_stay_and_carries_price_status() -> None:
     assert roi["spend_basis"] == budget["spend_basis"]
     if budget["lodging_usd"] is None:  # fixture prices are not collected: nothing is estimated
         assert roi["spend_usd"] is None
+
+
+def _js_function(name: str) -> str:
+    from pathlib import Path
+
+    js = (Path(__file__).resolve().parents[2] / "static" / "app.js").read_text()
+    start = js.index(f"function {name}(")
+    nxt = js.find("\n  function ", start + 1)
+    return js[start:nxt if nxt != -1 else len(js)]
+
+
+def test_fix5_every_amount_in_the_ui_shows_its_price_status() -> None:
+    travel = _js_function("renderTravel")
+    flight_branch = travel[travel.index('leg.kind === "flight"'):travel.index("var selected")]
+    assert "leg.price_status" in flight_branch
+    assert "priceStatusText(b.flights_price_status)" in travel
+    assert "priceStatusText(b.lodging_price_status)" in travel
+    assert "spend_price_status" in _js_function("renderRoi")

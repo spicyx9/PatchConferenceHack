@@ -202,6 +202,12 @@
     }).format(d);
   }
 
+  // Every amount shown carries the price_status of what it is made of (audit fix 5).
+  function priceStatusText(statuses) {
+    var list = (Array.isArray(statuses) ? statuses : [statuses]).filter(function (x) { return x != null; });
+    return list.length ? " (price " + list.join(", ") + ")" : " (price status unknown)";
+  }
+
   function fmtUsd(value) {
     if (value === null || value === undefined) return "Not provided";
     var n = Number(value);
@@ -644,7 +650,10 @@
       element.textContent = pair[1] == null ? "Not provided" : String(pair[1]);
       element.classList.toggle("unknown", pair[1] == null);
     });
-    $("roi-spend-note").textContent = roi.spend_usd == null ? "Prices are not available yet." : "";
+    var spendStatus = roi.spend_price_status || {};
+    $("roi-spend-note").textContent = (roi.spend_usd == null ? "Prices are not available yet." : "") +
+      priceStatusText([].concat(spendStatus.flights || [], spendStatus.lodging == null ? [] : [spendStatus.lodging])) +
+      (roi.spend_basis ? " · " + roi.spend_basis : "");
     $("stat-met").textContent = roi.meetings == null ? "—" : roi.meetings;
   }
 
@@ -913,6 +922,8 @@
                 esc(fmtDay(leg.date)) +
                 '</span><span class="muted">' +
                 esc(details.join(" · ") || "Flight details not available yet") +
+                '</span><span class="badge neutral">' +
+                esc(orUnknown(leg.price_status)) +
                 "</span></li>"
               );
             }
@@ -980,10 +991,10 @@
       esc(fmtUsd(b.budget_usd)) +
       "</td></tr>" +
       "<tr><th>Flights</th><td>" +
-      esc(fmtUsd(b.flights_usd)) +
+      esc(fmtUsd(b.flights_usd) + priceStatusText(b.flights_price_status)) +
       "</td></tr>" +
       "<tr><th>Stay</th><td>" +
-      esc(fmtUsd(b.lodging_usd)) +
+      esc(fmtUsd(b.lodging_usd) + priceStatusText(b.lodging_price_status)) +
       "</td></tr>" +
       "<tr><th>Remaining</th><td>" +
       esc(fmtUsd(b.remaining_usd)) +
