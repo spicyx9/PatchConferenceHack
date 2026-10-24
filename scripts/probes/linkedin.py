@@ -90,7 +90,7 @@ def main() -> int:
     res = asyncio.run(li.enrich(targets, assembly.companies, store,
                                 allow_collect=not args.no_collect))
     if res.enrichments:  # keep the committed public cache in step with a fresh run
-        li.write_public(res.enrichments)
+        li.write_public(res.enrichments, merge=True)  # keeps the SERP-found profiles
     after = people_for_goal(store, "demo-user", goal.id, 5)["rows"]
     tagged = store.graph.query(
         "MATCH (p:Person {provider: 'brightdata:linkedin'}) RETURN count(p)").result_set[0][0]

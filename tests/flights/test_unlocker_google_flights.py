@@ -52,7 +52,10 @@ def test_one_fetch_serves_every_pair_and_never_splits_the_round_trip_total() -> 
     assert [o.slices[0].segments[0].flight_number for o in jfk] == ["B6215"]
     assert lga == [] and lga_rep.status == "failed" and ewr_rep.status == "ok"
     offer = jfk[0]
-    assert offer.total_price is None and offer.price_status == "unknown"
+    # Stored as the page shows it: the round-trip total, quoted, return slice not collected.
+    assert (offer.trip_type, offer.total_price, offer.currency, offer.price_status) == (
+        "round_trip", "716", "USD", "quoted_total")
+    assert offer.return_slice_collected is False and len(offer.slices) == 1
     assert offer.raw_price_text == "716 USD round trip total"
     assert offer.slices[0].segments[0].departure_at.isoformat() == "2026-10-27T10:00:00-04:00"
     assert offer.evidence[0].raw_ref == "unlocker:web_unlocker1:google_flights"

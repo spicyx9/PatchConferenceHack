@@ -38,7 +38,8 @@ def test_round_trip_total_is_quoted_total() -> None:
     offer = fli.offer_from_pair(*_pair(300.0, 716.0), url=URL, collected_at=AT)
     assert offer.trip_type == "round_trip" and offer.total_price == "716"
     assert offer.price_scope == "total_all_passengers"
-    assert fli.display_status(offer) == "quoted_total" and display(offer)["price_status"] == "quoted_total"
+    assert offer.price_status == "quoted_total"  # stored, not rewritten for display
+    assert display(offer) == {}  # both slices collected: no label, nothing overridden
     ev = offer.evidence[0]
     assert ev.provider == "google_flights_fli" and str(ev.source_url) == URL and ev.collected_at == AT
 
@@ -46,10 +47,10 @@ def test_round_trip_total_is_quoted_total() -> None:
 def test_outbound_only_price_is_indicative_and_never_used_as_total() -> None:
     offer = fli.offer_from_pair(*_pair(300.0, None), url=URL, collected_at=AT)
     assert offer.total_price is None and offer.raw_price_text == "outbound row price 300.00 USD"
-    assert fli.display_status(offer) == "indicative"
+    assert offer.price_status == "unknown"  # an outbound row price is never a trip total
     none = fli.offer_from_pair(*_pair(None, None), url=URL, collected_at=AT)
     assert none.total_price is None and none.raw_price_text is None
-    assert fli.display_status(none) == "unknown"
+    assert none.price_status == "unknown"
 
 
 def test_fli_ranks_behind_web_unlocker_even_when_cheaper() -> None:

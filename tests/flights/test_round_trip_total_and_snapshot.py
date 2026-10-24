@@ -11,7 +11,7 @@ from conferge.api.app import create_app
 from conferge.api.data import load_fixture as load_api_fixture
 from conferge.api.providers import Providers
 from conferge.core.schemas import FlightOffer, SourceEvidence
-from conferge.flights.round_trip_total import display, round_trip_total, trip_price
+from conferge.flights.round_trip_total import as_stored, display, round_trip_total, trip_price
 from conferge.flights.snapshot_provider import GoogleFlightsSnapshotProvider, latest_snapshot
 from conferge.integration.stays_flights import pick_flights
 
@@ -37,13 +37,16 @@ UNLOCKER = "brightdata_unlocker_google_flights"
 ZONE = "unlocker:web_unlocker1:google_flights"
 
 
-def test_round_trip_total_is_read_back_unchanged_and_never_split() -> None:
-    rt = _offer("u1", UNLOCKER, "JFK", "SFO", 27, raw="716 USD round trip total", raw_ref=ZONE)
-    assert round_trip_total(rt) == ("716", "USD") and str(trip_price(rt)) == "716"
-    view = display(rt)
-    assert view["trip_type"] == "round_trip" and view["price_status"] == "quoted_total"
-    assert view["total_price"] == "716" and view["price_label"] == "round trip total"
-    assert view["return_slice_collected"] is False
+def test_round_trip_total_is_stored_as_shown_and_never_split() -> None:
+    legacy = _offer("u1", UNLOCKER, "JFK", "SFO", 27, raw="716 USD round trip total", raw_ref=ZONE)
+    assert round_trip_total(legacy) == ("716", "USD")
+    rt = as_stored(legacy)
+    assert (rt.trip_type, rt.total_price, rt.currency, rt.price_status, rt.return_slice_collected) \
+        == ("round_trip", "716", "USD", "quoted_total", False)
+    assert rt.raw_price_text == "716 USD round trip total" and rt.id == legacy.id
+    assert len(rt.slices) == 1 and str(trip_price(rt)) == "716"
+    assert as_stored(rt) == rt  # idempotent
+    assert display(rt) == {"price_label": "round trip total"}  # a label, nothing overridden
     assert display(_offer("f1", "fast_flights_google_flights", "JFK", "SFO", 27, price="333")) == {}
 
 
@@ -51,8 +54,10 @@ def test_unlocker_round_trip_beats_cheaper_fast_flights_fallback() -> None:
     offers = [
         _offer("f1", "fast_flights_google_flights", "JFK", "SFO", 27, price="333"),
         _offer("f2", "fast_flights_google_flights", "SFO", "JFK", 30, price="345"),
-        _offer("u1", UNLOCKER, "JFK", "SFO", 27, raw="716 USD round trip total", raw_ref=ZONE),
-        _offer("u2", UNLOCKER, "EWR", "SFO", 27, raw="413 USD round trip total", raw_ref=ZONE),
+        as_stored(_offer("u1", UNLOCKER, "JFK", "SFO", 27, raw="716 USD round trip total",
+                         raw_ref=ZONE)),
+        as_stored(_offer("u2", UNLOCKER, "EWR", "SFO", 27, raw="413 USD round trip total",
+                         raw_ref=ZONE)),
     ]
     assert [o.id for o in pick_flights(offers)] == ["u2"]
     data = load_api_fixture()
