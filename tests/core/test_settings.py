@@ -23,5 +23,4 @@ def test_falkordb_address_defaults_to_6379(monkeypatch: pytest.MonkeyPatch, tmp_
     monkeypatch.delenv("FALKORDB_HOST", raising=False)
     monkeypatch.delenv("FALKORDB_PORT", raising=False)
     monkeypatch.setattr(settings, "ENV_PATH", tmp_path / "absent.env")
-    monkeypatch.setattr(settings.env_value, "__kwdefaults__", {"path": tmp_path / "absent.env"})
     assert settings.falkordb_address() == ("127.0.0.1", 6379)

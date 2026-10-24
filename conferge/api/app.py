@@ -23,6 +23,8 @@ from pydantic import BaseModel, Field
 
 from conferge.api import logic, providers
 from conferge.api.data import DemoData, load_fixture
+from conferge.api.provenance import source_of
+from conferge.flights.round_trip_total import display as rt_display
 from conferge.core.schemas import AgentContext, Goal, Opportunity
 
 STATIC_DIR = Path(__file__).resolve().parents[2] / "static"
@@ -101,7 +103,7 @@ class DemoState:
             from conferge.graph import ranking
             from conferge.graph.ingest import GraphIngestor
 
-            ids = tuple(g.id for g in self.goals)
+            ids = tuple((g.id, g.stated_at) for g in self.goals)
             if self._synced_goals != ids:  # goals live in the graph, written through GraphStore
                 GraphIngestor(store, default_mode="live").ingest_goals(USER_ID, self.goals)
                 self._synced_goals = ids
@@ -297,6 +299,8 @@ def create_app(
         if req.conference_id and req.conference_id != state.data.conference.id:
             raise HTTPException(404, f"unknown conference_id {req.conference_id!r}")
         goals = logic.parse_goals(req.text)  # never empty: unknown role -> tagged defaults + warning
+        stated = datetime.now(timezone.utc)
+        goals = [g.model_copy(update={"stated_at": stated}) for g in goals]
         state.goal_text, state.goals = req.text, goals
         state.agent_mode, state.agent_opportunities, state.agent_warnings = None, None, []
         state.invalidate()
@@ -328,6 +332,19 @@ def create_app(
     @api.get("/plan")
     def plan() -> dict[str, Any]:
         return _envelope(state, ["events", "people"], _plan_payload(), extra_warnings=_plan_warnings())
+
+    @api.get("/pipeline")
+    def pipeline_view() -> dict[str, Any]:
+        """How every source of this demo was collected, from the RunReports of the run."""
+        from conferge.core import brightdata as bd
+        from conferge.integration.pipeline_view import HEADLINE, reachability, totals
+
+        rows = state.data.pipeline
+        return _envelope(state, [], {
+            "headline": HEADLINE, "rows": rows, "totals": totals(rows),
+            "brightdata_calls": bd.calls(), "reachability": reachability(),
+            "note": None if rows else "no collection run in this process (dataset served as loaded)",
+        }, mode_override="live" if any(r["kind"] != "fallback" for r in rows) else "fixture")
 
     @api.get("/brightdata")
     def brightdata_usage() -> dict[str, Any]:
@@ -421,6 +438,7 @@ def create_app(
                 "company": company.model_dump(mode="json") if company else None,
                 "met": bool(person and person.id in state.met),
                 "met_note": state.met.get(person.id) if person else None,
+                "linkedin": state.data.linkedin.get(person.id) if person else None,
             })
         return _envelope(state, ["people", "companies"], {"items": cards, "count": len(cards)},
                          extra_warnings=_plan_warnings())
@@ -470,7 +488,8 @@ def create_app(
 
     @api.get("/flights")
     def flights() -> dict[str, Any]:
-        items = [f.model_dump(mode="json") for f in state.data.flights]
+        items = [{**f.model_dump(mode="json"), **rt_display(f), "source": source_of(f.evidence)}
+                 for f in state.data.flights]
         return _envelope(state, ["flights"], {"items": items, "count": len(items)})
 
     @api.get("/travel")

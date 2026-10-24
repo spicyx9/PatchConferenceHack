@@ -15,7 +15,6 @@ from __future__ import annotations
 import asyncio
 import importlib.util
 import json
-import os
 import sys
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -24,6 +23,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
+from conferge.core.settings import env_value  # noqa: E402
 from conferge.lodging import LodgingService, fixture_envelope  # noqa: E402
 from conferge.lodging.airbnb import (  # noqa: E402
     AirbnbSource,
@@ -147,7 +147,7 @@ async def main() -> int:
         f"- run at: {run_at.isoformat()}",
         "- query: Fort Mason Center (37.8060, -122.4320), radius 3 km, check-in 2026-10-27, "
         "check-out 2026-10-30 (3 nights), 1 adult, 1 room, USD, country us, limit 5 per input",
-        f"- BRIGHTDATA_API_KEY present: {bool(os.getenv('BRIGHTDATA_API_KEY'))} | "
+        f"- BRIGHTDATA_API_KEY present: {bool(env_value('BRIGHTDATA_API_KEY'))} | "
         f"pyairbnb importable: {has_pyairbnb}",
         f"- envelope: **source_mode {env.source_mode}**, status **{env.status}**, "
         f"{len(env.items)} stays, {len(search.groups)} cross-provider dedup groups",
