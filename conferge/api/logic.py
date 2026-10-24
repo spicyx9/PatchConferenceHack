@@ -9,42 +9,18 @@ from __future__ import annotations
 
 import math
 import re
-import unicodedata
 from collections import deque
 from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
 from zoneinfo import ZoneInfo
 
+from conferge.agents.planner.goals import goal_warnings  # noqa: F401 - re-exported for app.py
+from conferge.agents.planner.goals import parse_goals as planner_parse_goals
 from conferge.api.data import DemoData
 from conferge.core.schemas import Event, Goal, Opportunity, Person, SourceEvidence
 
 FALLBACK = "api-fallback"
-
-_GOAL_RULES: list[tuple[str, re.Pattern[str], list[str], list[str], str]] = [
-    (
-        "goal-seed-investors",
-        re.compile(r"\b(investisseurs?|investors?|vcs?|seed|business angels?)\b"),
-        ["investor"], ["AI agents", "developer tools"], "Meet seed investors",
-    ),
-    (
-        "goal-agent-founders",
-        re.compile(r"\b(fondateurs?|founders?)\b[^.,;]*\bagents?\b|\bagents?\b[^.,;]*\b(fondateurs?|founders?)\b"),
-        ["founder"], ["AI agents", "MCP"], "Meet AI agent founders",
-    ),
-    (
-        "goal-copilot-pm",
-        re.compile(r"\b(pms?|product managers?)\b[^.,;]*\bcopilot\b|\bcopilot\b[^.,;]*\b(pms?|product managers?)\b"),
-        ["pm"], ["Copilot"], "Meet Copilot product managers",
-    ),
-    (
-        "goal-engineers",
-        re.compile(r"\b(ingenieurs?|engineers?|developpeurs?|developers?)\b"),
-        ["engineer"], ["AI agents", "developer tools"], "Meet engineers",
-    ),
-]
-# Weights by order of mention; the demo goal yields 0.45 / 0.35 / 0.20.
-_WEIGHTS = [0.45, 0.35, 0.20, 0.10]
 
 _PRESENCE_FACTOR = {
     "confirmed_speaker": 1.0,
@@ -55,29 +31,13 @@ _PRESENCE_FACTOR = {
 }
 
 
-def _fold(text: str) -> str:
-    norm = unicodedata.normalize("NFKD", text)
-    return "".join(c for c in norm if not unicodedata.combining(c)).lower()
+def parse_goals(text: str | None) -> list[Goal]:
+    """Goal extraction for the API: the planner rule set, so both sides agree on ids.
 
-
-def parse_goals(text: str) -> list[Goal]:
-    """Keyword goal extraction; the planner agent replaces this when present."""
-    folded = _fold(text)
-    found: list[tuple[int, tuple[str, list[str], list[str], str]]] = []
-    for goal_id, pattern, roles, topics, label in _GOAL_RULES:
-        match = pattern.search(folded)
-        if match:
-            found.append((match.start(), (goal_id, roles, topics, label)))
-    found.sort(key=lambda item: item[0])
-    picked = found[: len(_WEIGHTS)]
-    total = sum(_WEIGHTS[: len(picked)]) or 1.0
-    goals = []
-    for index, (_, (goal_id, roles, topics, label)) in enumerate(picked):
-        goals.append(Goal(
-            id=goal_id, description=label, priority=round(_WEIGHTS[index] / total, 2),
-            target_roles=roles, topics=topics, tags=["parsed:" + FALLBACK],
-        ))
-    return goals
+    Never empty: unrecognised text gives the tagged default goals and
+    ``goal_warnings()`` names it in the envelope.
+    """
+    return planner_parse_goals(text)
 
 
 def _event_label(event: Event) -> str:

@@ -557,8 +557,8 @@
     "note": "Output of PlannerAgent(people_limit=None) with constraints.goal_text; regression target for tests/planner and fallback plan for the API.",
     "goal_ids": [
       "goal-seed-investors",
-      "goal-founder",
-      "goal-pm"
+      "goal-agent-founders",
+      "goal-copilot-pms"
     ],
     "goal_weights": [
       0.45,
