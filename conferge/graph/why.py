@@ -33,8 +33,20 @@ def why_person(target: GraphStore | GraphQuery, user_id: str, person_id: str,
     result = path_user_to_person(target, user_id, person_id, limit)
     sentences: list[str] = []
     evidence: dict[str, str | None] = {}
+    edges: list[dict[str, Any]] = []
+    seen: set[tuple[str, str, str]] = set()
     for path in result["paths"]:
         for edge in path["edges"]:
+            key = (edge["source"], edge["type"], edge["target"])
+            if key not in seen:  # one row per edge of the paths, shared edges said once
+                seen.add(key)
+                edges.append({
+                    "source": edge["source"], "type": edge["type"], "target": edge["target"],
+                    "rationale": edge.get("rationale"),
+                    "source_mode": (edge.get("props") or {}).get("source_mode"),
+                    "evidence": [{"evidence_id": i, "source_url": _source_url(i, edge)}
+                                 for i in edge.get("evidence_ids") or []],
+                })
             ids = edge.get("evidence_ids") or []
             if not edge.get("rationale") or not ids:
                 continue
@@ -49,6 +61,7 @@ def why_person(target: GraphStore | GraphQuery, user_id: str, person_id: str,
         "paths": len(result["paths"]),
         "answer": " ".join(sentences) if sentences else None,
         "sentences": sentences,
+        "edges": edges,
         "evidence": [{"evidence_id": i, "source_url": url} for i, url in evidence.items()],
         "computed_by": "falkordb",
     }
