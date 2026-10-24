@@ -195,12 +195,24 @@ async def run(
     )
 
 
-def load_fixture_records(*, explicit_opt_in: bool = False) -> list[SourceRecord]:
-    """Labelled fixture rows; callers must opt in and display data_mode=fixture."""
+def load_fixture(path: str | Path = FIXTURE_PATH, *, explicit_opt_in: bool = False) -> DiscoveryResult:
+    """Labelled fixture replay as a DiscoveryResult, like the luma, partiful and discovery loaders."""
     if not explicit_opt_in:
         raise RuntimeError("fixture use must be explicitly enabled and labelled")
-    data: dict[str, Any] = json.loads(FIXTURE_PATH.read_text(encoding="utf-8"))
+    data: dict[str, Any] = json.loads(Path(path).read_text(encoding="utf-8"))
     records = [SourceRecord.model_validate(item) for item in data.get("aggregators", [])]
     if any(record.source_mode != "fixture" for record in records):
         raise ValueError("fixture file contains records not labelled source_mode=fixture")
-    return records
+    captured = datetime.fromisoformat(data["captured_at"])
+    report = RunReport(
+        provider="aggregators", started_at=captured, finished_at=captured, status="ok",
+        termination="not_applicable", source_mode="fixture", fetched_count=len(records),
+        unique_count=len({r.source_id for r in records}), pages=0,
+        warnings=[f"FIXTURE: {Path(path).name}; captured {data['captured_at']}; not live"],
+    )
+    return DiscoveryResult(items=records, run_report=report)
+
+
+def load_fixture_records(*, explicit_opt_in: bool = False) -> list[SourceRecord]:
+    """Backward-compatible alias: the records of `load_fixture`."""
+    return load_fixture(FIXTURE_PATH, explicit_opt_in=explicit_opt_in).items

@@ -8,7 +8,7 @@ import httpx
 import pytest
 from w02_helpers import COLLECTED_AT, read_fixture, static_client
 
-from conferge.core.schemas import DiscoveryQuery, SourceRecord, SourceRef
+from conferge.core.schemas import DiscoveryQuery, DiscoveryResult, SourceRecord, SourceRef
 from conferge.events.aggregators import conferenceparties as cp
 from conferge.events.aggregators import source as agg_source
 from conferge.events.aggregators.common import rsvp_refs
@@ -242,3 +242,12 @@ def test_fixture_loader_rejects_unlabelled_records(tmp_path, monkeypatch) -> Non
         agg_source.load_fixture_records(explicit_opt_in=True)
     with pytest.raises(ValueError):
         eb_source.load_fixture_records(explicit_opt_in=True)
+
+
+def test_load_fixture_returns_discovery_result_and_alias_matches() -> None:
+    for module in (agg_source, eb_source):
+        result = module.load_fixture(explicit_opt_in=True)
+        assert isinstance(result, DiscoveryResult)
+        assert result.run_report.source_mode == "fixture"
+        assert result.run_report.fetched_count == len(result.items) > 0
+        assert module.load_fixture_records(explicit_opt_in=True) == result.items

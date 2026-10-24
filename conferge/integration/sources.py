@@ -101,35 +101,33 @@ def _fixture_partiful() -> SourceSlice:
                        collected_at=result.run_report.finished_at)
 
 
-def _records_slice(name: str, records: list[Any], events: list[Event],
+def _records_slice(name: str, result: Any, events: list[Event],
                    errors: list[str]) -> SourceSlice:
-    collected = max((r.collected_at for r in records), default=None)
-    # The fixture loaders of window 02 return bare records, no RunReport: the
-    # slice is degraded so that completeness is never implied.
-    status: RunStatus = "failed" if not events else "degraded"
-    return SourceSlice(name, "02", "fixture", "fixture", status, events=events, errors=errors,
-                       warnings=[f"FIXTURE: {len(records)} labelled records, no run report"],
-                       collected_at=collected)
+    report = result.run_report
+    status: RunStatus = "failed" if not events else report.status
+    return SourceSlice(name, "02", "fixture", "fixture", status, events=events,
+                       reports=[report], errors=list(result.errors) + errors,
+                       warnings=list(report.warnings), collected_at=report.finished_at)
 
 
 def _fixture_eventbrite() -> SourceSlice:
-    from conferge.events.eventbrite import load_fixture_records
+    from conferge.events.eventbrite import load_fixture
     from conferge.events.eventbrite.normalize import normalize_records
 
-    records = load_fixture_records(explicit_opt_in=True)
-    events, errors = normalize_records(records, conference_id=None)
-    return _records_slice("eventbrite", records, events, errors)
+    result = load_fixture(explicit_opt_in=True)
+    events, errors = normalize_records(result.items, conference_id=None)
+    return _records_slice("eventbrite", result, events, errors)
 
 
 def _fixture_aggregators() -> SourceSlice:
-    from conferge.events.aggregators import load_fixture_records
+    from conferge.events.aggregators import load_fixture
     from conferge.events.aggregators.normalize import normalize_records
 
-    records = load_fixture_records(explicit_opt_in=True)
-    events, errors = normalize_records(records, conference_id=CONFERENCE_ID,
+    result = load_fixture(explicit_opt_in=True)
+    events, errors = normalize_records(result.items, conference_id=CONFERENCE_ID,
                                        timezone_name="America/Los_Angeles",
                                        city="San Francisco")
-    return _records_slice("aggregators", records, events, errors)
+    return _records_slice("aggregators", result, events, errors)
 
 
 def _official_slice(attempted: str, collection: Any) -> SourceSlice:
