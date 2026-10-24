@@ -221,20 +221,10 @@ function pass(name) {
 
     await nav("story");
     await page.locator('#tab-story [data-open="goal-dialog"]').first().click();
-    await page.locator("#goal-text").fill("I want to learn photography");
-    const rejected = page.waitForResponse(
-      (r) => r.url().endsWith("/api/v1/goal") && r.status() === 422,
-    );
+    await page.locator("#goal-text").fill("");
     await page.locator("#btn-goal").click();
-    await rejected;
-    await page
-      .locator("#goal-error")
-      .filter({ hasText: "Choose a supported profile" })
-      .waitFor();
-    assert.equal(
-      await page.locator("#goal-dialog").evaluate((e) => e.open),
-      true,
-    );
+    assert.equal(await page.locator("#goal-dialog").evaluate((element) => element.open), true);
+    assert.equal(await page.locator("#goal-text").evaluate((element) => element.validity.valueMissing), true);
     await page.locator("#goal-text").fill("Meet seed investors and engineers");
     await submit("#btn-goal", "/goal");
     await page.waitForFunction(
@@ -249,7 +239,7 @@ function pass(name) {
       /Meet seed investors and engineers/,
     );
     pass(
-      "Unrecognized goals show an inline error; valid goal updates every view",
+      "Empty goals stay in the form; natural-language goals update every view",
     );
 
     await nav("people");
