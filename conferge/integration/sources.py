@@ -104,6 +104,27 @@ def _failed(name: str, window: str, attempted: str, error: str) -> SourceSlice:
                        collected_at=now)
 
 
+def _kept(s: SourceSlice) -> str:
+    parts = [(len(s.events), "events"), (len(s.people), "people"), (len(s.companies), "companies")]
+    return ", ".join(f"{n} {label}" for n, label in parts if n) or "0 records"
+
+
+def status_display(slices: list[SourceSlice]) -> dict[str, str]:
+    """Screen wording for the overall status. ``failed``: a source raised or returned nothing;
+    ``partial``: a source is not exhausted (records kept); ``ok`` otherwise. The API's
+    ``degraded`` is never shown alone: the reason says which source and what was kept."""
+    failed = [s for s in slices if s.status == "failed"]
+    partial = [s for s in slices if s.status == "degraded"]
+    if failed:
+        reason = "; ".join(f"{s.name.capitalize()} failed ({s.errors[0] if s.errors else 'no records'})"
+                           for s in failed)
+        return {"label": "failed", "reason": reason}
+    if partial:
+        reason = "; ".join(f"{s.name.capitalize()} not exhausted, {_kept(s)} kept" for s in partial)
+        return {"label": "partial", "reason": reason}
+    return {"label": "ok", "reason": f"all {len(slices)} sources exhausted"}
+
+
 def overall_report(slices: list[SourceSlice], started_at: datetime | None = None) -> RunReport:
     """One RunReport for the whole collection: ok, degraded when some sources failed, failed
     when none produced records."""

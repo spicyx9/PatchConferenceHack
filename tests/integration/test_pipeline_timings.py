@@ -42,6 +42,8 @@ def test_pipeline_endpoint_serves_timings_and_rank() -> None:
     assert [s["step"] for s in before["timings"]["steps"]] == ["collect", "assemble", "plan", "ingest"]
     assert {s["source"]: s["seconds"] for s in before["timings"]["sources"]} == {"luma": 0.5, "eventbrite": 0.1}
     assert before["sources_report"]["status"] == "failed"  # no slice carries records here
+    assert before["sources_report"]["display"]["label"] == "failed"
+    assert before["sources_report"]["display"]["reason"] == "Eventbrite failed (boom)"
     client.get("/api/v1/people")
     after = client.get("/api/v1/pipeline").json()
     rank = after["timings"]["steps"][-1]

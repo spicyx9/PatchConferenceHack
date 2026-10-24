@@ -3597,12 +3597,9 @@
     };
     box.innerHTML =
       "<h3>Durations</h3>" +
-      (overall
-        ? "<p>Sources overall: <b>" + esc(overall.status) + "</b>" +
-          (overall.errors && overall.errors.length
-            ? ' <span class="muted">(' + esc(overall.errors.join("; ")) + ")</span>"
-            : "") +
-          "</p>"
+      (overall && overall.display
+        ? '<p>Sources overall: <b class="overall-' + esc(overall.display.label) + '">' +
+          esc(overall.display.label) + "</b>: " + esc(overall.display.reason) + "</p>"
         : "") +
       '<table class="pipeline-table"><thead><tr><th>Step</th><th>Time</th></tr></thead><tbody>' +
       steps
@@ -3618,7 +3615,8 @@
       sources
         .map(function (s) {
           return (
-            "<tr><td>" + esc(s.source) + "</td><td>" + esc(s.status) + "</td><td>" +
+            "<tr><td>" + esc(s.source) + "</td><td>" +
+            esc(s.status === "degraded" ? "partial (not exhausted)" : s.status) + "</td><td>" +
             esc(s.records) + "</td><td>" + esc(secs(s.seconds)) + "</td></tr>"
           );
         })
