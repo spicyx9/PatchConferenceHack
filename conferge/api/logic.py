@@ -493,14 +493,22 @@ def travel_view(
             "computed_by": FALLBACK,
         })
     budget = Decimal(str(user["budget_usd"]))
-    flight_total = _sum_known([trip_price(f) for f in _trip_flights(data.flights)])
-    stay_total = _sum_known([s.total_price for s in data.stays[:1]])
+    trip = _trip_flights(data.flights)
+    flight_total = _sum_known([trip_price(f) for f in trip])
+    # The stay counted is the one the itinerary shows (first listed); there is no stay choice yet.
+    stay = data.stays[0] if data.stays else None
+    stay_total = _sum_known([stay.total_price] if stay else [])
     return {
         "itinerary": legs,
         "proposals": proposals,
         "budget": {
             "budget_usd": str(budget),
             "flights_usd": flight_total, "lodging_usd": stay_total,
+            "flights_price_status": [rt_display(f).get("price_status", f.price_status) for f in trip],
+            "lodging_price_status": stay.price_status if stay else None,
+            "lodging_stay": {"id": stay.id, "name": stay.name} if stay else None,
+            "spend_basis": ("flights of the itinerary + the stay it shows "
+                            f"({stay.name if stay else 'none'}, first listed, not chosen by you)"),
             "remaining_usd": (
                 str(budget - Decimal(flight_total) - Decimal(stay_total))
                 if flight_total is not None and stay_total is not None else None
@@ -570,6 +578,9 @@ def roi_view(
     return {
         "spend_usd": spend,
         "spend_note": None if spend is not None else "unknown until flight and lodging prices are collected",
+        "spend_basis": travel["budget"]["spend_basis"],
+        "spend_price_status": {"flights": travel["budget"]["flights_price_status"],
+                               "lodging": travel["budget"]["lodging_price_status"]},
         "meetings": len(met),
         "qualified_contacts": len(qualified),
         "opportunities": sum(1 for o in opportunities if o.score >= 30),

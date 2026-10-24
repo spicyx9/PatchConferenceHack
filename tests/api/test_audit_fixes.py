@@ -43,3 +43,19 @@ def test_fix3_meetings_are_restored_from_the_graph_at_startup(monkeypatch: pytes
 def test_fix3_without_graph_memory_starts_empty() -> None:
     state = app_module.DemoState(load_fixture(), providers.Providers(), graph_probe=False)
     assert state.met == {} and state.restore_memory() == 0
+
+
+def test_fix4_spend_names_its_stay_and_carries_price_status() -> None:
+    data = load_fixture()
+    travel = logic.travel_view(data, {"days": []}, set())
+    budget = travel["budget"]
+    stay_leg = next(leg for leg in travel["itinerary"] if leg["kind"] == "stay")
+    assert budget["lodging_stay"]["id"] == stay_leg["stay_id"]  # same stay as the itinerary shows
+    assert budget["lodging_price_status"] == data.stays[0].price_status
+    assert len(budget["flights_price_status"]) >= 1
+    assert "not chosen by you" in budget["spend_basis"]
+    roi = logic.roi_view(data, [], [], {})
+    assert roi["spend_price_status"]["lodging"] == budget["lodging_price_status"]
+    assert roi["spend_basis"] == budget["spend_basis"]
+    if budget["lodging_usd"] is None:  # fixture prices are not collected: nothing is estimated
+        assert roi["spend_usd"] is None
