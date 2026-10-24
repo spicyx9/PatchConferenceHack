@@ -280,6 +280,32 @@ def test_record_memory_rejects_naive_and_met_non_person():
     graph.query.assert_not_called()
 
 
+def test_record_memory_occurrences_are_distinct_and_timestamped():
+    graph = Mock()
+    store = GraphStore(graph)
+    first = record_memory(store, "demo-user", "MET", "Person", "p-fx-alice", at=AT)
+    again = record_memory(store, "demo-user", "MET", "Person", "p-fx-alice", at=AT.replace(hour=15))
+    assert first != again and first.startswith("memory:")
+    assert record_memory(store, "demo-user", "MET", "Person", "p-fx-alice", at=AT) == first
+    nodes = _nodes(_writes(graph), "Meeting")
+    assert nodes[0]["props"]["at_ms"] == int(AT.timestamp() * 1000)
+    assert nodes[0]["props"]["target_id"] == "p-fx-alice"
+
+
+def test_record_memory_skipped_requires_a_reason():
+    graph = Mock()
+    store = GraphStore(graph)
+    with pytest.raises(ValueError):
+        record_memory(store, "demo-user", "SKIPPED", "Event", "e1", at=AT)
+    with pytest.raises(ValueError):
+        record_memory(store, "demo-user", "SKIPPED", "Event", "e1", at=AT, reason="bored")
+    with pytest.raises(ValueError):
+        record_memory(store, "demo-user", "MET", "Person", "p1", at=AT, reason="conflict")
+    graph.query.assert_not_called()
+    record_memory(store, "demo-user", "SKIPPED", "Event", "e1", at=AT, reason="conflict")
+    assert _nodes(_writes(graph), "Meeting")[0]["props"]["reason"] == "conflict"
+
+
 # -- lodging / flights ---------------------------------------------------------------------
 
 

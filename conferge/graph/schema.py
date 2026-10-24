@@ -15,7 +15,7 @@ Mapping (pydantic -> graph), restricted to labels/edges allowed by GraphStore:
     topics / categories      (:Topic)
     Opportunity              (:Opportunity)
     Lodging / FlightOffer    (:Lodging) / (:FlightOffer)
-    user memory              (:Meeting {user_id, kind})
+    user memory              (:Meeting {user_id, kind, at, at_ms, target_id, reason?})
 
     (Event)-[:PART_OF {relation, relation_score}]->(Conference)
     (Event|Person|Goal|Conference)-[:ABOUT {kind}]->(Topic)
@@ -88,5 +88,3 @@ def venue_id(name: str | None, address: str | None, city: str | None) -> str | N
     return f"venue:{slug(' '.join(part for part in (key, city) if part))}"
 
 
-def memory_id(user_id: str, kind: str, target_id: str) -> str:
-    return f"memory:{slug(user_id)}:{kind.lower()}:{target_id}"

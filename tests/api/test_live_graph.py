@@ -83,7 +83,8 @@ def test_met_persists_through_graphstore_when_person_exists(monkeypatch) -> None
     assert body["persisted"] == "falkordb"
     merges = [q for q in graph.queries if "MERGE" in q]
     assert any(q.startswith("MERGE (n:Meeting") for q in merges)
-    assert any("MERGE (a)-[r:INVOLVES]->(b)" in q for q in merges)
+    assert any("MERGE (a)-[r:MET]->(b)" in q for q in merges)
+    assert body["memory_id"].startswith("memory:")
 
 
 def test_graph_path_is_queried_in_falkordb_not_the_capped_sample(monkeypatch) -> None:  # type: ignore[no-untyped-def]

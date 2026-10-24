@@ -13,7 +13,7 @@ import subprocess
 from datetime import datetime, timezone
 from importlib import metadata
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import APIRouter, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -42,6 +42,10 @@ class MetRequest(BaseModel):
 
 class EventAction(BaseModel):
     event_id: str
+
+
+class SkipAction(EventAction):
+    reason: Literal["conflict", "not_interested", "cancelled"] = "not_interested"
 
 
 class ScenarioRequest(BaseModel):
@@ -453,7 +457,7 @@ def create_app(
         if person is None:
             raise HTTPException(404, f"unknown person_id {req.person_id!r}")
         state.met[person.id] = req.note or ""
-        persisted = "memory"
+        persisted, memory_id = "memory", None
         store = state.store()
         if store is not None:
             try:
@@ -461,18 +465,16 @@ def create_app(
                     "MATCH (p:Person {id: $id}) RETURN p.id", params={"id": person.id}
                 )
                 if getattr(found, "result_set", None):
-                    meeting_id = f"meeting:demo-user:{person.id}"
-                    store.merge_node("Meeting", meeting_id, {
-                        "user_id": "demo-user", "met_at": _now(), "source": "user",
-                    })
-                    store.merge_edge("Meeting", meeting_id, "INVOLVES", "Person", person.id, {
-                        "source": "user", "confidence": 1.0, "observed_at": _now(),
-                    })
+                    from conferge.graph import record_memory
+
+                    memory_id = record_memory(store, "demo-user", "MET", "Person", person.id,
+                                              note=req.note)
                     persisted = "falkordb"
             except Exception:  # noqa: BLE001 - memory still holds the meeting
                 persisted = "memory"
         payload = _plan_payload()
-        payload.update({"person_id": person.id, "persisted": persisted})
+        payload.update({"person_id": person.id, "persisted": persisted,
+                        "memory_id": memory_id if persisted == "falkordb" else None})
         return _envelope(state, ["people", "events"], payload, extra_warnings=_plan_warnings())
 
     def _event_or_404(event_id: str) -> None:
@@ -487,11 +489,23 @@ def create_app(
         return _envelope(state, ["events", "people"], _plan_payload(), extra_warnings=_plan_warnings())
 
     @api.post("/skipped")
-    def skipped(req: EventAction) -> dict[str, Any]:
+    def skipped(req: SkipAction) -> dict[str, Any]:
         _event_or_404(req.event_id)
         state.skipped.add(req.event_id)
         state.attended.discard(req.event_id)
-        return _envelope(state, ["events", "people"], _plan_payload(), extra_warnings=_plan_warnings())
+        persisted = "memory"
+        store = state.store()
+        if store is not None:
+            try:
+                from conferge.graph import record_memory
+
+                record_memory(store, "demo-user", "SKIPPED", "Event", req.event_id, reason=req.reason)
+                persisted = "falkordb"
+            except Exception:  # noqa: BLE001 - the plan still honours the skip
+                persisted = "memory"
+        payload = _plan_payload()
+        payload.update({"event_id": req.event_id, "reason": req.reason, "persisted": persisted})
+        return _envelope(state, ["events", "people"], payload, extra_warnings=_plan_warnings())
 
     @api.get("/scenarios")
     def scenarios() -> dict[str, Any]:
