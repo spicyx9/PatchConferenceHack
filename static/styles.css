@@ -93,6 +93,12 @@ select { padding: 0.4rem; max-width: 26rem; }
 .badge.probable { background: #234a7a; color: #cfe5ff; border-color: var(--accent); }
 .badge.unknown { background: var(--panel-2); color: var(--muted); }
 .badge.met { background: var(--violet); color: #0d1117; border-color: var(--violet); }
+/* Travel source channel (source.tier): 0/1 Bright Data, 2 fallback scraper, 3 fixture. */
+.badge.src { text-transform: none; margin-left: 0.25rem; cursor: help; }
+.badge.src-bd { background: var(--accent); color: #0d1117; border-color: var(--accent); }
+.badge.src-fallback { background: var(--panel-2); color: var(--amber); border-color: var(--amber); }
+.badge.src-fixture { background: var(--panel-2); color: var(--muted); border-color: var(--amber); border-style: dashed; }
+.bd-travel { margin-top: 0.25rem; font-size: 0.9rem; color: var(--muted); }
 
 .error-banner {
   background: #5a1d1a;
