@@ -290,6 +290,7 @@ def create_app(
                        "collected_at": s.collected_at.isoformat(), "warnings": s.warnings}
                 for name, s in state.data.domains.items()
             },
+            "badge": logic.source_badge(state.data.domains),
             "providers": [vars(s) for s in state.providers.statuses],
         })
 
@@ -473,15 +474,17 @@ def create_app(
         # The plan comes from the graph (written by the planner), not from this process.
         notes = [f"{result.agent}: {e}" for e in result.errors]
         store, plan_version, skips_written = state.store(), None, None
+        served = state.plan()  # the plan the UI shows: every "gain" below names one of its events
+        plan_items = {i["event_id"]: i for d in served["days"] for i in d["items"]}
         if store is not None:
             from conferge.agents.antifomo.graph_state import planned_from_graph, publish_skips
 
-            _publish_plan(state.plan())  # make sure the planner's current plan is in the graph
+            _publish_plan(served)  # make sure the planner's current plan is in the graph
             planned, plan_version = planned_from_graph(store, USER_ID)
         else:
-            planned = {i["event_id"] for d in state.plan()["days"] for i in d["items"]}
+            planned = set(plan_items)
             notes.append("FalkorDB not reachable: anti-FOMO read the plan from the API process")
-        skips = logic.antifomo_skips(result.decisions, state.data, planned=planned)
+        skips = logic.antifomo_skips(result.decisions, state.data, planned=planned, plan_items=plan_items)
         if store is not None:
             skips_written = publish_skips(store, USER_ID, skips)
         return _envelope(state, ["events", "people"], {

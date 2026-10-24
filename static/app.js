@@ -507,11 +507,19 @@
       mixed: "Mixed sources",
       unknown: "Sources need verification",
     };
+    // The API decides the badge: conference data's mode, travel named apart when it differs
+    // ("Sample data, live travel"), so live flights never turn the snapshot into "Mixed sources".
+    var apiBadge = envelopes.sources && envelopes.sources.badge;
+    var label = labels[mode] || labels.unknown;
+    if (apiBadge && apiBadge.label) {
+      mode = apiBadge.core_mode || mode;
+      label = apiBadge.label;
+    }
     var badge = $("badge-source");
     badge.className =
       "badge " +
       (mode === "fixture" ? "fixture" : mode === "live" ? "live" : "neutral");
-    badge.textContent = labels[mode] || labels.unknown;
+    badge.textContent = label;
     badge.title = "Record sources, separate from the ranking engine";
     var st = $("badge-status");
     st.className = "badge " + (worst || "neutral");
@@ -552,14 +560,7 @@
       .replace(/participation unknown/g, "attendance unconfirmed");
   }
   function displayGoalText(text) {
-    var value = String(text || "");
-    if (
-      /^fondateur d.un outil dev ia, je vais a github universe pour rencontrer des investisseurs seed, des fondateurs d.agents ia et des pm copilot\.$/.test(
-        fold(value),
-      )
-    )
-      return "I'm an AI developer tools founder attending GitHub Universe to meet seed investors, AI agent founders, and Copilot product managers.";
-    return value;
+    return String(text || "");
   }
   function fold(text) {
     return String(text || "")

@@ -108,6 +108,14 @@ def port_preflight(host: str, port: int) -> str | None:
     return None
 
 
+def build_app(demo: Any, *, no_graph: bool) -> Any:
+    """The served app. ``--no-graph`` serves without FalkorDB at all: the API must not probe a
+    graph it never loaded (stale or empty), so the ranking is visibly ``degraded_no_graph``."""
+    from conferge.api.app import create_app
+
+    return create_app(data=demo, graph_probe=not no_graph)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--mode", choices=["fixture", "live"], default="fixture")
@@ -143,7 +151,6 @@ def main() -> int:
 
     import uvicorn
 
-    from conferge.api.app import create_app
     from conferge.api.logic import parse_goals
     from conferge.graph import GraphBundle, ingest_bundle
     from conferge.integration import pipeline
@@ -220,7 +227,9 @@ def main() -> int:
             pid for o in opps for pid in o.person_ids])
 
     pipeline.record_collection(assembly.demo, slices, timings, report.started_at)
-    app = create_app(data=assembly.demo)
+    app = build_app(assembly.demo, no_graph=args.no_graph)
+    if args.no_graph:
+        print("graph: not loaded (--no-graph); ranking served as degraded_no_graph, banner shown")
     uvicorn.run(app, host=args.host, port=args.port, log_level="warning")
     return 0
 

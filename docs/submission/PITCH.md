@@ -21,8 +21,8 @@ Hook A is safer and 5 seconds shorter. Hook B works if the room is awake and som
 
 ## Rules that do not bend
 
-- Never present a fixture as live. The header badge says `fixture` for the snapshot, `live` only when the data was collected during the demo. Say out loud what the badge says.
-- Say "snapshot of the public collection from October 24" rather than "live data" unless the badge reads `live`.
+- Never present a fixture as live. The provenance badge (Sources dialog, line "Data provenance") reads `Sample data` for the snapshot, `Sample data, cached travel` when stays and flights come from an earlier Bright Data collection (the default today), `Sample data, live travel` when they came through Bright Data during the demo, and `Live data` only when everything was collected during the demo. Say out loud what the badge says.
+- Say "snapshot of the public collection from October 24" rather than "live data" unless the badge reads `Live data`. With `Sample data, cached travel` or `Sample data, live travel`, only the flights and the hotel came through Bright Data: say that and nothing more.
 - Every number you say comes from `SUBMISSION.md` at the repository root (read from the running app). If a number changes, change it there first, then here and in `slides.html`.
 - If a click fails, the Driver does not retry more than once. The Speaker keeps talking from the slide while the Driver switches to the backup video.
 
@@ -33,8 +33,8 @@ The UI is served on http://127.0.0.1:8000 and opens on the **Demo** tab, six num
 | Time | Who | Say | Driver clicks | What the jury must see | Track |
 |---|---|---|---|---|---|
 | 0:00 | Speaker | Hook A or B. "I am Ilan, this is Axel, we built Conferge." | Slides, slide 1 | The problem in one line | both |
-| 0:15 | Speaker | "Give it your goal in one sentence. Not a schedule, a goal." | Switch to the Conferge tab. The goal is already in the box: founder of an AI dev tool, wants seed investors, AI agent founders, Copilot PMs. Click **Lancer**. | Step 1: three weighted goals as chips (seed investors 0.45, AI agent founders 0.35, Copilot PMs 0.20). Header badge reads `fixture`, collection date October 24, 2026. | both |
-| 0:30 | Speaker | "The badge says fixture. This is a snapshot of what we collected from public sources this morning: official catalog, Luma, Partiful, Eventbrite, party aggregators. Bright Data connectors sit behind the same client for the pages that block plain HTTP: search discovery, flights, hotels, LinkedIn." | Point at the badge and the collection date. Point at the Bright Data counter line at the top of the Demo tab. | Badge, date, counter. | Bright Data |
+| 0:15 | Speaker | "Give it your goal in one sentence. Not a schedule, a goal." | Switch to the Conferge tab. The goal is already in the box: founder of an AI dev tool, wants seed investors, AI agent founders, Copilot PMs. Click **Lancer**. | Step 1: three weighted goals as chips (seed investors 0.45, AI agent founders 0.35, Copilot PMs 0.20). Provenance badge reads `Sample data, cached travel` (`Sample data, live travel` when flights and hotels were collected during the demo), collection date October 24, 2026. | both |
+| 0:30 | Speaker | "The badge says Sample data. This is a snapshot of what we collected from public sources this morning: official catalog, Luma, Partiful, Eventbrite, party aggregators. Bright Data connectors sit behind the same client for the pages that block plain HTTP: search discovery, flights, hotels, LinkedIn." | Point at the badge and the collection date. Point at the Bright Data counter line at the top of the Demo tab. | Badge, date, counter. | Bright Data |
 | 0:45 | Speaker | "Who should you meet, and why. Each card is a person, and the why is a real path in the graph, not a score from a black box." | Scroll to step 2. Click the first card's path. | Step 2: ranked people. Under the card, the chain goal, topic, event, person, with the source URL and timestamp on each hop. | FalkorDB |
 | 1:05 | Speaker | "Same path, in FalkorDB. Goal, topic, event, speaker. Four hops, and every edge carries where it came from." | Switch to the FalkorDB Browser tab, graph `conferge_demo`, run the prepared query (see below). | The path lights up in the browser. | FalkorDB |
 | 1:25 | Speaker | "From the people and events, a day by day plan for the days you are in town, with the venues on a map." | Back to Conferge. Scroll to step 3. | Step 3: plan per day, map with venues. | both |
@@ -59,7 +59,7 @@ What the FalkorDB judge should have seen by 2:40: a multi-hop query, the path sh
 
 ### What the Bright Data judge should have seen
 
-What `make demo` shows today (see `SUBMISSION.md`, "What is real"): events and people are the October 24 public snapshot, labelled `fixture`; stays, flights and the LinkedIn cards came through Bright Data earlier today (datasets and Web Unlocker) and are served from the cache of those runs, labelled `cached`, with their collection time. Say it that way: "collected through Bright Data this afternoon, stored in the graph, nothing fetched while you watch". Point at the Data pipeline panel (records per run, Bright Data API, collection time) and at its Reachability section (sites reachable with and without Bright Data). Say the KYC figure only as a projection.
+What `make demo` shows today (see `SUBMISSION.md`, "What is real"): events and people are the October 24 public snapshot, labelled `Sample data`; stays, flights and the LinkedIn cards came through Bright Data earlier today (datasets and Web Unlocker) and are served from the cache of those runs, labelled `Cached`, with their collection time, so the provenance badge reads `Sample data, cached travel`. Say it that way: "collected through Bright Data this afternoon, stored in the graph, nothing fetched while you watch". Point at the Data pipeline panel (records per run, Bright Data API, collection time) and at its Reachability section (sites reachable with and without Bright Data). Say the KYC figure only as a projection.
 
 ## Backup when the wifi or the API drops
 
@@ -76,6 +76,6 @@ Localhost does not need wifi. If only the venue wifi drops, the demo still runs,
 
 ## Three questions the jury may ask, and the short answer
 
-- "Is the data real?" The collection is real and public, captured on October 24 from the GitHub Universe catalog, Luma, Partiful and Eventbrite. The demo replays that snapshot so it works offline, and the badge says so. Flights and hotels are labelled fixtures today because we had no Bright Data key at capture time.
+- "Is the data real?" The collection is real and public, captured on October 24 from the GitHub Universe catalog, Luma, Partiful and Eventbrite. The demo replays that snapshot so it works offline, and the badge says `Sample data`. Flights and hotels are the only live part: the badge adds `live travel` when they came through Bright Data during the demo, `cached travel` when they come from an earlier Bright Data collection, each record with its own collection time.
 - "Where is the LLM?" There is none in the loop today. Goal parsing and ranking are deterministic, so nothing is invented: no price, no attendance, no guest list.
 - "Why a graph and not a table?" Because the answer to "why this person" is a path, and the same graph serves the planner, the replanner and your memory. Replanning after a sold-out event is one traversal: who else is at the event, where else do they appear.
