@@ -87,7 +87,7 @@ Ne pas conclure « API complète » sur la simple présence des routes. Recherch
 ## 4. Sources d'acquisition et BRIGHT DATA
 
 Dresser une matrice par site, API ou provider :
-RainFocus, Sessionize, Luma, Partiful, Eventbrite, conferenceparties, raidandev, reinventradar, Facebook public, Bright Data SERP, Web Unlocker, Browser/MCP/CLI s'ils existent vraiment dans le code, LinkedIn Profiles, LinkedIn Companies, X, Crunchbase, Google Flights Bright Data, Booking, Google Hotels, Airbnb/pyairbnb, fast-flights, SerpApi, BART, OSRM, Uber.
+RainFocus, Sessionize, Luma, Partiful, Eventbrite, conferenceparties, Facebook public, Bright Data SERP, Web Unlocker, Browser/MCP/CLI s'ils existent vraiment dans le code, LinkedIn Profiles, LinkedIn Companies, X, Crunchbase, Google Flights Bright Data, Booking, Google Hotels, Airbnb/pyairbnb, fast-flights, SerpApi, BART, OSRM, Uber.
 
 Par fournisseur : présent ou seulement mentionné dans docs ; point d'entrée ; prérequis/credentials ; méthode ; pagination/cursor/termination ; statut live vérifié vs mock/fixture ; couverture mesurée ; normaliseur ; champ manquant ; risques 403/429 ; retry/backoff/Retry-After ; coût unitaire vs réel mesuré ; script probe ; délai/timeout ; format de sortie ; date des dernières observations.
 
