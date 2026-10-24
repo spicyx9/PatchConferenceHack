@@ -5,9 +5,10 @@ do not exist in the assembled graph. This launcher assembles events/people/compa
 or live public sources), runs the planner agents, loads that bundle into FalkorDB through
 GraphStore, and serves the API on the same ``DemoData`` so API and graph ids match.
 
-Stays and flights are searched live by default (w05 lodging, w06 flights; 90 s each).
-A domain that fails or returns nothing falls back to the API fixture, labelled ``fixture``.
-``--travel fixture`` skips the live travel searches.
+Startup never starts a Bright Data collection. Stays and flights are the API fixture by
+default; ``--travel live`` searches them live (w05, w06) with the fixture as visible fallback.
+LinkedIn profiles are read from data/probes/linkedin_*.json (< 24 h), written by
+``make probe-linkedin`` (scripts/probes/linkedin.py); without those files nothing is enriched.
 
 ``--keep-graph`` serves on the graph as it is (no reset, no reload): restarting the API
 process this way keeps what the session wrote to FalkorDB (meetings, skips).
@@ -54,6 +55,43 @@ def falkordb_preflight() -> str | None:
     return None
 
 
+def linkedin_enrichment(args: argparse.Namespace, assembly: Any, goals: list[Any], store: Any,
+                        ranked: list[str] | None = None) -> None:
+    """Bright Data LinkedIn profiles onto the best ranked speakers (+ fixture hosts).
+
+    Profiles come only from data/probes/linkedin_*.json younger than 24 h (downloaded
+    snapshots first): startup never calls Bright Data. ``make probe-linkedin`` refreshes the
+    files. Writes go through GraphStore only.
+    """
+    from conferge.integration import people_linkedin as li
+    from conferge.integration.pipeline_view import row
+
+    started = datetime.now(timezone.utc)
+    if ranked is None:
+        from conferge.graph import ranking
+
+        ranked = [pid for o in ranking.rank_people(store, "demo-user", goals) for pid in o.person_ids]
+    targets = li.select_targets(ranked, assembly.people, li.fixture_hosts(),
+                                speakers=args.linkedin_speakers, host_count=args.linkedin_hosts)
+    known = {p.id for p in assembly.people}
+    res = asyncio.run(li.enrich([p for p in targets if p.id in known], assembly.companies, store,
+                                allow_collect=False))
+    if not res.enrichments:
+        print(f"  linkedin: {len(targets)} targets, no usable profile in data/probes "
+              f"(make probe-linkedin fills them) {res.errors[:1]}")
+        return
+    assembly.demo.people = li.apply_to_people(assembly.demo.people, res.enrichments)
+    assembly.demo.linkedin = li.cards(res.enrichments)
+    report = li.run_report(started, targets=len(targets), written=len(res.enrichments),
+                           source_mode=res.source_mode, errors=res.errors)
+    assembly.demo.pipeline.append(row("linkedin", report))
+    print(f"  linkedin ({res.source_mode}): {len(targets)} targets, {res.from_files} from files, "
+          f"{len(res.enrichments)} matched, {len(res.unmatched)} name mismatch, "
+          f"{len(res.absent_after)} missing; graph "
+          f"{len(res.written.persons_written) if res.written else 0} persons, "
+          f"{len(res.written.works_at) if res.written else 0} WORKS_AT")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--mode", choices=["fixture", "live"], default="fixture")
@@ -65,12 +103,18 @@ def main() -> int:
     parser.add_argument("--no-graph", action="store_true", help="serve without loading FalkorDB")
     parser.add_argument("--keep-graph", action="store_true",
                         help="serve on the existing graph without resetting or reloading it")
-    parser.add_argument("--travel", choices=["live", "fixture"], default="live",
-                        help="stays/flights: live search with fixture fallback, or fixture only")
+    parser.add_argument("--travel", choices=["live", "fixture"], default="fixture",
+                        help="stays/flights: fixture (default: no Bright Data call at startup), "
+                             "or live search with fixture fallback")
     parser.add_argument("--travel-timeout", type=float, default=150.0,
                         help="seconds for live stays/flights (Bright Data snapshots are slow)")
-    parser.add_argument("--linkedin", type=int, default=5,
-                        help="enrich the first N speakers with a linkedin_url via Bright Data (0: off)")
+    parser.add_argument("--linkedin", choices=["cached", "off"], default="cached",
+                        help="LinkedIn enrichment from data/probes/linkedin_*.json (< 24 h), never "
+                             "a Bright Data call; refresh with make probe-linkedin")
+    parser.add_argument("--linkedin-speakers", type=int, default=10,
+                        help="best ranked speakers with a linkedin_url to enrich")
+    parser.add_argument("--linkedin-hosts", type=int, default=5,
+                        help="hosts of fixtures/people.json with a linkedin_url to enrich")
     args = parser.parse_args()
     os.environ["FALKORDB_GRAPH"] = args.graph  # the API reads the same graph it was loaded into
     if not args.no_graph and (problem := falkordb_preflight()):
@@ -89,29 +133,8 @@ def main() -> int:
     t0 = time.perf_counter()
     report = pipeline.E2EReport(mode=args.mode, started_at=datetime.now(timezone.utc))
     slices = asyncio.run(pipeline._collect(args.mode, False, 90.0, None))
-    official = next((s for s in slices if s.name == "official"), None)
-
-    async def collect_extras() -> tuple[Any, Any]:
-        from conferge.integration.people_linkedin import enrich_with_linkedin
-
-        async def none() -> None:
-            return None
-        travel_task = (collect_stays_flights(args.travel_timeout)
-                       if args.travel == "live" else none())
-        linkedin_task = (enrich_with_linkedin(official.people, limit=args.linkedin)
-                         if official and args.linkedin > 0 else none())
-        return await asyncio.gather(travel_task, linkedin_task)  # concurrent: no extra wall time
-
-    travel, linkedin = asyncio.run(collect_extras())
+    travel = asyncio.run(collect_stays_flights(args.travel_timeout)) if args.travel == "live" else None
     usable_slices = pipeline._usable(slices)
-    if linkedin is not None and official is not None:
-        from conferge.integration.sources import SourceSlice
-
-        official.people, li_report = linkedin
-        print(f"  linkedin: {li_report.status} {li_report.unique_count}/{li_report.fetched_count} "
-              f"profiles {li_report.errors[:1]}")
-        usable_slices.append(SourceSlice("linkedin", "07", "live", "live", li_report.status,
-                                         reports=[li_report], collected_at=li_report.finished_at))
     assembly = assemble(usable_slices, travel)
     goals = parse_goals(assembly.demo.demo_goal_text)
     opps = asyncio.run(pipeline._stage_planning(report, assembly, goals))
@@ -156,6 +179,11 @@ def main() -> int:
         states = {(i["label"], s) for i in store.index_status() for s in [i["status"]]}
         print(f"indexes: {len(states)} labels, status {sorted({s for _, s in states})}"
               + (f", errors: {index_errors}" if index_errors else ""))
+        if args.linkedin != "off":
+            linkedin_enrichment(args, assembly, goals, store)
+    elif args.linkedin != "off":
+        linkedin_enrichment(args, assembly, goals, None, ranked=[
+            pid for o in opps for pid in o.person_ids])
 
     app = create_app(data=assembly.demo)
     uvicorn.run(app, host=args.host, port=args.port, log_level="warning")

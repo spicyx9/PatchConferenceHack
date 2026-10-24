@@ -526,6 +526,17 @@
     });
   }
 
+  // LinkedIn evidence collected by Bright Data: headline and company only, never presence.
+  function linkedinField(li) {
+    if (!li) return "";
+    var tip = ["dataset: " + li.dataset_id, "snapshot: " + orUnknown(li.snapshot_id),
+      "collected_at: " + li.collected_at, "identity_confidence: " + orUnknown(li.identity_confidence)];
+    return '<div class="field"><b>LinkedIn:</b> ' + esc(orUnknown(li.headline)) + " · " +
+      esc(orUnknown(li.company)) + ' <a href="' + esc(li.source_url) + '" target="_blank" rel="noopener">profil</a> ' +
+      '<span class="badge src src-bd" title="' + esc(tip.join(" | ")) + '">' + esc(li.provider) + "</span>" +
+      sourceBadge(li.source_mode) + "</div>";
+  }
+
   function renderPeople(p) {
     var items = (p && p.items) || [];
     $("people-cards").innerHTML = items.length ? items.map(function (c) {
@@ -542,6 +553,7 @@
         (c.met ? '<span class="badge met">rencontre</span>' : "") + sourceBadge(modeOfEvidence(o.evidence)) + "</div>" +
         '<div class="field"><b>Titre:</b> ' + esc(orUnknown(person.title)) + "</div>" +
         '<div class="field"><b>Entreprise:</b> ' + esc(orUnknown(company.name)) + "</div>" +
+        linkedinField(c.linkedin) +
         '<div class="field"><b>Pourquoi:</b> ' + esc(orUnknown(o.rationale)) + "</div>" +
         '<div class="field"><b>Ou:</b> ' + esc(orUnknown(o.where)) + "</div>" +
         '<div class="field"><b>Accroche:</b> ' + esc(orUnknown(o.opener)) + "</div>" +
