@@ -52,6 +52,76 @@ Most attendees go home with a few business cards and the feeling they were in th
 - **Bright Data** is the acquisition layer for everything a plain HTTP request cannot reach: long-tail event discovery through SERP, flights and hotels through Web Scraper datasets, LinkedIn profiles for people matching, and unblocking dynamic pages.
 - **FalkorDB** is the opportunity graph: every relation carries its evidence, the "why this person" explanation is a real graph path query, and the user's memory (who they met) lives in the same graph.
 
+## Graph model and Cypher queries
+
+FalkorDB `6.0.3` (pinned in `docker-compose.yml`), client `falkordb==1.8.0`. Labels and relationship types come from an allowlist in `conferge/core/store.py`; every value is a `$parameter`.
+
+**Nodes**: `Conference`, `Event {event_type, start_at, end_at, status}`, `Person {name, title, roles, participation}`, `Company`, `Venue {latitude, longitude}`, `Topic`, `Goal {user_id, priority}`, `Opportunity`, `Lodging`, `FlightOffer`, `Meeting {user_id, kind, at_ms, target_id, reason}`.
+
+**Edges** (each carries `source`, `source_url`, `source_mode`, `confidence`, `observed_at`, `verification`):
+
+```
+(Event)-[:PART_OF {relation, relation_score}]->(Conference)
+(Event|Person|Goal|Conference)-[:ABOUT]->(Topic)
+(Event|Conference)-[:LOCATED_AT]->(Venue)
+(Person)-[:SPEAKS_AT]->(Event)
+(Person|Company)-[:HOSTS]->(Event)
+(Person)-[:WORKS_AT {role, title}]->(Company)
+(Person)-[:ATTENDS_CONFIRMED]->(Event)          only with evidence
+(Company)-[:EXHIBITS_AT {role}]->(Conference)
+(Opportunity)-[:SERVES_GOAL]->(Goal)
+(Opportunity)-[:INVOLVES]->(Person|Company|Event)
+(Lodging)-[:NEAR {distance_m}]->(Venue)
+(Meeting)-[:MET]->(Person)                      one Meeting node per occurrence
+(Meeting)-[:INVOLVES]->(Person|Event)           ATTENDED, SKIPPED (with reason), CONTACTED
+```
+
+**The 6 main queries, as executed** (`conferge/core/store.py`, `conferge/graph/queries.py`):
+
+```cypher
+// 1. Ingestion: the only write path, MERGE on the stable id then SET (GraphStore)
+MERGE (n:Person {id: $id}) SET n.name = $prop_0, n.source = $prop_1, ... RETURN n.id
+MATCH (a:Person {id: $from_id}), (b:Event {id: $to_id})
+MERGE (a)-[r:SPEAKS_AT]->(b) SET r.confidence = $prop_0, ... RETURN a.id, b.id
+
+// 2. People for a goal (one of the bounded signatures; evidence grouped by root source, noisy-OR)
+MATCH p = (g:Goal {id: $goal_id, user_id: $user_id})-[:ABOUT]->(:Topic)<-[:ABOUT]-(:Event)
+          <-[:SPEAKS_AT]-(person:Person) RETURN person.id, p LIMIT $cap
+
+// 3. Why this person: explicit signatures tried in order (speaker, confirmed attendee,
+//    host company, company topic, ...), never a generic shortestPath
+MATCH p = (g:Goal {user_id: $user_id})-[:ABOUT]->(:Topic)<-[:ABOUT]-(:Event)
+          <-[:SPEAKS_AT]-(person:Person {id: $person_id})
+RETURN g.id, length(p), p ORDER BY length(p) LIMIT $cap
+
+// 4. Anti-FOMO conflicts: overlapping events of the conference, with venues
+MATCH (a:Event)-[:PART_OF]->(c:Conference {id: $conference_id})<-[:PART_OF]-(b:Event)
+WHERE a.id < b.id AND a.start_ts < b.end_ts AND a.end_ts > b.start_ts
+OPTIONAL MATCH (a)-[:LOCATED_AT]->(va:Venue) OPTIONAL MATCH (b)-[:LOCATED_AT]->(vb:Venue)
+RETURN a.id, a.title, b.id, b.title, va.name, va.latitude, va.longitude, vb.name, vb.latitude, vb.longitude
+
+// 5. Replanning: where else can I meet the people of a cancelled or sold-out event
+MATCH p = (e:Event {id: $event_id})<-[:SPEAKS_AT|HOSTS|ATTENDS_CONFIRMED]-(:Person)
+          -[:SPEAKS_AT|HOSTS|ATTENDS_CONFIRMED]->(alt:Event)
+WHERE alt.id <> e.id AND (alt.status IS NULL OR NOT alt.status IN ['cancelled', 'sold_out'])
+RETURN alt.id, alt.title, p LIMIT $cap
+
+// 6. Full-text search (GET /api/v1/search?q=)
+CALL db.idx.fulltext.queryNodes('Person', $q) YIELD node, score
+RETURN node.id, node.name, node.title, score ORDER BY score DESC LIMIT $limit
+```
+
+Query 4 is shortened here (the code also checks that start and end timestamps are not null).
+
+**Indexes** (created at store init, DDL syntax, all `OPERATIONAL` in `CALL db.indexes()`):
+
+```cypher
+CREATE INDEX FOR (n:<Label>) ON (n.id)      // one per label: Company, Conference, Event, FlightOffer,
+                                            // Goal, Lodging, Meeting, Opportunity, Person, Session, Topic, Venue
+CREATE FULLTEXT INDEX FOR (p:Person) ON (p.name, p.bio)
+CREATE FULLTEXT INDEX FOR (e:Event) ON (e.title)
+```
+
 ## Demo case: GitHub Universe 2026
 
 Fort Mason Center, San Francisco, October 28 and 29. Fictional traveller from New York, in town October 27 to 30.
