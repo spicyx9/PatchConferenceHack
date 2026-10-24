@@ -38,4 +38,4 @@ e2e:
 
 # Each window owns scripts/probes/<name>.py; the shared Makefile never changes.
 probe-%:
-	uv run python scripts/run_probe.py "$*"
+	uv run python scripts/run_probe.py "$*" $(ARGS)

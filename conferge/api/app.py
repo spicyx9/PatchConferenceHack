@@ -377,6 +377,27 @@ def create_app(
     def plan() -> dict[str, Any]:
         return _envelope(state, ["events", "people"], _plan_payload(), extra_warnings=_plan_warnings())
 
+    @api.post("/pipeline/refresh")
+    async def pipeline_refresh() -> dict[str, Any]:
+        """Data pipeline button: 2 real Bright Data calls (Web Unlocker flights, SERP LinkedIn)."""
+        from conferge.integration.live_refresh import refresh
+
+        from conferge.integration.live_refresh import cached_profiles
+
+        # A top-5 speaker, preferring one whose LinkedIn URL is already cached (verifiable).
+        known = cached_profiles()
+        candidates = []
+        for opp in state.opportunities()[:5]:
+            person = next((state.data.person(p) for p in opp.person_ids if state.data.person(p)), None)
+            if person is not None:
+                company = state.data.company(person.company_id)
+                candidates.append((person.name, company.name if company else None))
+        speaker = next((c for c in candidates if c[0].casefold() in known),
+                       next((c for c in candidates if c[1]), candidates[0] if candidates else None))
+        result = await refresh(state.data, speaker)
+        return _envelope(state, ["flights"], {"refresh": result},
+                         extra_warnings=result["errors"])
+
     @api.get("/pipeline")
     def pipeline_view() -> dict[str, Any]:
         """How every source of this demo was collected, from the RunReports of the run."""
@@ -398,12 +419,13 @@ def create_app(
 
     @api.get("/cost")
     def cost() -> dict[str, Any]:
-        """Bright Data calls made by this process and their estimated USD cost (estimate only)."""
+        """Bright Data requests and records of this process; list-price estimate, not billed."""
         from conferge.core import cost as bd_cost
 
         snap = bd_cost.snapshot()
-        return _envelope(state, [], snap, mode_override="live" if snap["calls"] else "unknown",
-                         extra_warnings=["estimate: flat USD 0.0015 per call, real price not verified"])
+        return _envelope(state, [], snap, mode_override="live" if snap["requests"] else "unknown",
+                         extra_warnings=[f"{bd_cost.COST_LABEL}: dataset records only, "
+                                         "Unlocker and SERP requests are not priced"])
 
     @api.get("/brightdata")
     def brightdata_usage() -> dict[str, Any]:
@@ -416,14 +438,21 @@ def create_app(
         # "live" only when at least one Bright Data API can actually be called from this
         # process; without a key nothing here is live, so the label says "unknown".
         notes = [] if any(ready.values()) else ["Bright Data not configured: no API ready in this process"]
+        from conferge.integration import brightdata_usage
+
+        # Requests and records per product, with the records' own collected_at (never a
+        # run report's finished_at, which can be the demo start time).
+        summary = brightdata_usage.summary()
         cached: dict[str, Any] = {"datasets": 0, "web_unlocker": 0, "serp": 0, "collected_at": {}}
         api_key = {"dataset": "datasets", "unlocker": "web_unlocker", "serp": "serp"}
-        for r in state.data.pipeline:
-            if r.get("cached") and r["kind"] == "brightdata" and r["brightdata_api"] in api_key:
-                cached[api_key[r["brightdata_api"]]] += r["records"] or 0
-                cached["collected_at"][r["provider"]] = r["collected_at"]
+        for p in summary["products"]:
+            if p["source"] == "cached" and p["api"] in api_key:
+                cached[api_key[p["api"]]] += p["records"]
+                if p["collected_first"]:
+                    cached["collected_at"][p["product"]] = [p["collected_first"], p["collected_last"]]
         cached["total"] = cached["datasets"] + cached["web_unlocker"] + cached["serp"]
         return _envelope(state, [], {
+            **summary,
             "usage": bd.usage(),
             "cached": cached,
             "ready": ready,

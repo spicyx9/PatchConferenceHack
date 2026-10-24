@@ -36,7 +36,9 @@ EDGE_RE = re.compile(
     r"MERGE \(a\)-\[r:[A-Z_]+\]->\(b\)"
     r" SET (?:r\.\w+ = \$prop_\d+, )*r\.evidence_ids = CASE WHEN r\.evidence_ids IS NULL "
     r"THEN \$evidence_ids ELSE r\.evidence_ids \+ \[x IN \$evidence_ids WHERE NOT x IN "
-    r"r\.evidence_ids\] END RETURN a\.id, b\.id$"
+    r"r\.evidence_ids\] END, r\.rationale = replace\(replace\(\$rationale, '\{from\}', "
+    r"coalesce\(a\.name, a\.title, a\.description, a\.id\)\), '\{to\}', "
+    r"coalesce\(b\.name, b\.title, b\.description, b\.id\)\) RETURN a\.id, b\.id$"
 )
 ASSIGN_RE = re.compile(r"[nr]\.(\w+) = \$(prop_\d+)")
 NODE_HEAD_RE = re.compile(r"^MERGE \(n:(\w+) ")
@@ -54,6 +56,7 @@ def _decode(call: Any) -> dict[str, Any]:
                 "id": params["id"], "props": props, "cypher": cypher, "params": params}
     from_kind, to_kind, rel = EDGE_HEAD_RE.match(cypher).groups()
     props["evidence_ids"] = params["evidence_ids"]
+    props["rationale"] = params["rationale"]  # template; the names are filled in by Cypher
     return {"type": "edge", "from_kind": from_kind, "to_kind": to_kind, "rel": rel,
             "from": params["from_id"], "to": params["to_id"], "props": props,
             "cypher": cypher, "params": params}

@@ -184,11 +184,16 @@ def build_plan(
     attended: set[str] | None = None,
     scores: dict[str, float] | None = None,
 ) -> dict[str, Any]:
-    """Greedy reverse plan: per day keep the best non-overlapping events.
+    """Greedy reverse plan: per day keep the best events that fit together.
 
-    Overlapping candidates become anti-FOMO conflicts with a verdict and the
-    people the user misses by choosing the winner.
+    Same feasibility rules as the anti-FOMO optimizer (conferge/agents/antifomo): an event
+    needs an end time, and two kept events must not overlap once the travel time between
+    them (antifomo.travel.travel_minutes) is added. Score order is unchanged. Rejected
+    candidates become anti-FOMO conflicts with a verdict and the people the user misses.
     """
+    from conferge.agents.antifomo.models import Constraints
+    from conferge.agents.antifomo.travel import compatible
+
     skipped = skipped or set()
     attended = attended or set()
     # Graph-derived scores when given (API graph mode); Python scores only as degraded fallback.
@@ -200,7 +205,7 @@ def build_plan(
     available = [
         e for e in data.events
         if e.start_at and e.status not in {"cancelled", "sold_out"} and e.id not in skipped
-        and in_trip(data, e) and e.id not in off_hours
+        and in_trip(data, e) and e.id not in off_hours and e.end_at
     ]
     excluded = [
         {"event_id": e.id, "title": e.title, "reason": e.status if e.status in {"cancelled", "sold_out"} else "skipped"}
@@ -216,7 +221,14 @@ def build_plan(
         for e in data.events
         if e.id in off_hours and e.status not in {"cancelled", "sold_out"} and e.id not in skipped
         and in_trip(data, e)
+    ] + [
+        {"event_id": e.id, "title": e.title, "reason": "no_end_time",
+         "detail": "no end time in the source: cannot check overlap or travel, not scheduled"}
+        for e in data.events
+        if e.start_at and not e.end_at and e.status not in {"cancelled", "sold_out"}
+        and e.id not in skipped and in_trip(data, e) and e.id not in off_hours
     ]
+    constraints = Constraints(timezone=tz)
     unscheduled = [{"event_id": e.id, "title": e.title} for e in data.events if not e.start_at]
     days: dict[str, list[Event]] = {}
     for event in available:
@@ -228,7 +240,7 @@ def build_plan(
         candidates = sorted(days[day], key=lambda e: (-(scores.get(e.id, 0) + (1000 if e.id in attended else 0)), e.id))
         chosen: list[Event] = []
         for event in candidates:
-            clash = next((c for c in chosen if _overlaps(c, event)), None)
+            clash = next((c for c in chosen if not compatible(c, event, constraints)), None)
             if clash is None:
                 chosen.append(event)
                 continue
@@ -467,10 +479,8 @@ def travel_view(
                 "arrival_at": last.arrival_at.isoformat() if last.arrival_at else None,
                 "carrier": first.marketing_carrier, "price_status": flight.price_status,
                 "total_price": flight.total_price, "currency": flight.currency,
-                "price_label": None,
-                **({k: v for k, v in rt_display(flight).items()
-                    if k in {"price_status", "total_price", "currency", "price_label",
-                             "return_slice_collected"}}),
+                "price_label": rt_display(flight).get("price_label"),
+                "return_slice_collected": flight.return_slice_collected,
                 "source_mode": _mode_of(flight.evidence),
                 "source": source_of(flight.evidence),
             })
@@ -514,7 +524,7 @@ def travel_view(
             "budget_source": BUDGET_SOURCE,
             "source_mode": user.get("source_mode", "fixture"),
             "flights_usd": flight_total, "lodging_usd": stay_total,
-            "flights_price_status": [rt_display(f).get("price_status", f.price_status) for f in trip],
+            "flights_price_status": [f.price_status for f in trip],
             "lodging_price_status": stay.price_status if stay else None,
             "lodging_stay": {"id": stay.id, "name": stay.name} if stay else None,
             "spend_basis": ("flights of the itinerary + the stay it shows "

@@ -298,7 +298,13 @@ class FlightOffer(CoreModel):
     raw_price_text: str | None = None
     price_scope: Literal["total_all_passengers", "per_adult", "unknown"] = "unknown"
     currency: str | None = Field(default=None, pattern=r"^[A-Z]{3}$")
-    price_status: Literal["observed_live", "cached", "revalidated", "sandbox", "unknown"] = "unknown"
+    price_status: Literal[
+        "observed_live", "quoted_total", "cached", "revalidated", "sandbox", "unknown",
+    ] = "unknown"
+    """``quoted_total``: a total shown by the source for the whole trip (e.g. the round-trip
+    total on a Google Flights page), stored as observed, never split into legs."""
+    return_slice_collected: bool | None = None
+    """False for a round trip whose total was observed but whose return slice was not listed."""
     collected_at: AwareDatetime
     booking_url: HttpUrl | None = None
     booking_url_type: Literal["google_flights_booking", "google_flights_search", "seller_deeplink", "airline", "unknown"] = "unknown"
@@ -325,8 +331,11 @@ class FlightOffer(CoreModel):
             raise ValueError("price_status requires an actual price")
         if self.total_price is not None and self.currency is None:
             raise ValueError("currency required when price exists")
-        if self.trip_type == "round_trip" and len(self.slices) != 2:
-            raise ValueError("round_trip must have exactly 2 slices")
+        if self.trip_type == "round_trip":
+            expected = 1 if self.return_slice_collected is False else 2
+            if len(self.slices) != expected:
+                raise ValueError("round_trip must have exactly 2 slices "
+                                 "(1 when return_slice_collected is False)")
         return self
 
 

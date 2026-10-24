@@ -77,21 +77,11 @@ def offer_from_pair(outbound: Any, inbound: Any, *, url: str, collected_at: date
         price_scope="total_all_passengers" if total else "unknown",
         booking_url=url, booking_url_type="google_flights_search", evidence=evidence,
     )
-    offer = build_offer(raw, collected_at)
+    # The round-trip total fli returns is stored as quoted_total (no display rewrite).
+    offer = build_offer(raw, collected_at, price_status="quoted_total")
     if total is None and out_price is not None:
         offer = offer.model_copy(update={"raw_price_text": f"{INDICATIVE_PREFIX}{out_price} {currency}"})
     return offer
-
-
-def display_status(offer: FlightOffer) -> str | None:
-    """``quoted_total`` / ``indicative`` for a fli offer, None for any other provider."""
-    if not offer.evidence or offer.evidence[0].provider != PROVIDER:
-        return None
-    if offer.total_price is not None:
-        return "quoted_total"
-    if offer.raw_price_text and offer.raw_price_text.startswith(INDICATIVE_PREFIX):
-        return "indicative"
-    return "unknown"
 
 
 _RPC_ERROR = re.compile(r'\["wrb\.fr",null(?:,null)*,\[(\d+)\]')
@@ -185,4 +175,4 @@ async def search_round_trip(origin: str = "JFK", destination: str = "SFO", *,
                           [] if offers else [why_empty or "fli returned no usable itinerary"], warnings)
 
 
-__all__ = ["PROVIDER", "display_status", "offer_from_pair", "search_round_trip", "search_url"]
+__all__ = ["PROVIDER", "offer_from_pair", "search_round_trip", "search_url"]

@@ -72,12 +72,21 @@ def _same_stay(a: Lodging, b: Lodging) -> bool:
 
 def pick_stays(stays: Iterable[Lodging], limit: int = STAY_LIMIT) -> list[Lodging]:
     """Order by source tier (stable on the service order), drop cross-provider duplicates
-    keeping the lowest tier, keep ``limit``."""
+    keeping the lowest tier, keep up to ``limit`` per source (site): Booking and Airbnb from
+    the same tier are both shown instead of the first source filling every slot."""
     kept: list[Lodging] = []
     for stay in sorted(stays, key=_tier):
         if not any(_same_stay(stay, k) for k in kept):
             kept.append(stay)
-    return kept[:limit]
+    per_source: Counter[tuple[str, str | None]] = Counter()
+    shown: list[Lodging] = []
+    for stay in kept:
+        src = source_of(stay.evidence)
+        key = (src["provider"], src.get("site"))
+        if per_source[key] < limit:
+            per_source[key] += 1
+            shown.append(stay)
+    return shown
 
 
 @dataclass

@@ -145,6 +145,20 @@ def worst_status(statuses: Iterable[RunStatus]) -> RunStatus:
     return "degraded"
 
 
+def no_peers_status(status: RunStatus, errors: list[str] | None,
+                    warnings: list[str] | None) -> tuple[RunStatus, list[str]]:
+    """Bright Data out of peers is a degraded source, shown as ``brightdata_no_peers``."""
+    from conferge.core.brightdata import NO_PEERS
+
+    out = list(warnings or [])
+    if any("no_peers" in t or "cooldown" in t.lower() for t in [*(errors or []), *out]):
+        if NO_PEERS not in out:
+            out.append(NO_PEERS)
+        if status == "failed":
+            status = "degraded"
+    return status, out
+
+
 def report(
     provider: str, started_at: datetime, *, status: RunStatus, termination: Termination,
     source_mode: SourceMode = "live", fetched: int = 0, unique: int = 0, pages: int = 0,
@@ -153,6 +167,7 @@ def report(
 ) -> RunReport:
     if status == "ok" and termination not in {"exhausted", "not_applicable"}:
         status = "degraded"
+    status, warnings = no_peers_status(status, errors, warnings)
     return RunReport(
         provider=provider, started_at=started_at,
         finished_at=max(finished_at or now_utc(), started_at),

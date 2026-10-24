@@ -29,6 +29,8 @@ probes/*.ndjson
 data/probes/linkedin_*.json
 # Bright Data Crunchbase raw rows (make probe-crunchbase); data/cache/crunchbase_public.json stays tracked
 data/probes/crunchbase_*.json
+# Bright Data Google Maps raw rows (scripts/probes/venues_google_maps.py); data/cache/venues.json stays tracked
+data/probes/venues_google_maps_*.json
 
 # Worker logs, PIDs, and snapshots (never upload provider responses or secrets)
 /logs/
@@ -39,3 +41,6 @@ data/snapshots/
 # Local drafts: never committed
 *.draft
 *.draft.md
+
+# Refresh button: raw SERP answers (scraped bodies, never committed)
+data/probes/refresh_serp_*.json

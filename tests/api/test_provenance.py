@@ -14,7 +14,7 @@ from conferge.api.providers import Providers
 from conferge.core.schemas import FlightOffer, Lodging, SourceEvidence
 
 NOW = datetime(2026, 10, 24, 17, 0, tzinfo=timezone.utc)
-KEYS = {"provider", "api", "id", "site", "snapshot_id", "tier", "label"}
+KEYS = {"provider", "api", "id", "site", "snapshot_id", "tier", "label", "collected_at"}
 
 
 def ev(provider: str, raw_ref: str | None = None, mode: str = "live") -> list[SourceEvidence]:
@@ -31,7 +31,8 @@ def test_booking_dataset_with_snapshot_and_detail_evidence() -> None:
     assert set(src) == KEYS
     assert src == {"provider": "brightdata", "api": "dataset", "id": "gd_m4bf7a917zfezv9d5",
                    "site": "booking", "snapshot_id": "s_m9abc123", "tier": 0,
-                   "label": "Bright Data dataset gd_m4bf7a917zfezv9d5 (Booking)"}
+                   "label": "Bright Data dataset gd_m4bf7a917zfezv9d5 (Booking)",
+                   "collected_at": NOW.isoformat()}
 
 
 def test_google_hotels_dataset_without_snapshot() -> None:
@@ -47,14 +48,16 @@ def test_airbnb_brightdata_vs_pyairbnb_by_raw_ref() -> None:
         "brightdata", "dataset", "gd_ld7ll037kqy322v05", "s_airbnb42", 0)
     py = source_of(ev("airbnb", None))
     assert py == {"provider": "pyairbnb", "api": "fallback", "id": None, "site": "airbnb",
-                  "snapshot_id": None, "tier": 2, "label": "Fallback pyairbnb"}
+                  "snapshot_id": None, "tier": 2, "label": "Fallback pyairbnb",
+                  "collected_at": py["collected_at"]}
 
 
 def test_lodging_unlocker_zone_and_site() -> None:
     src = source_of(ev("unlocker", "unlocker:web_unlocker1:hilton"))
     assert src == {"provider": "brightdata", "api": "unlocker", "id": "web_unlocker1",
                    "site": "hilton", "snapshot_id": None, "tier": 1,
-                   "label": "Bright Data Web Unlocker web_unlocker1 (Hilton)"}
+                   "label": "Bright Data Web Unlocker web_unlocker1 (Hilton)",
+                   "collected_at": src["collected_at"]}
 
 
 def test_flight_providers() -> None:

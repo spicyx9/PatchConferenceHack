@@ -3395,3 +3395,13 @@ dialog .eyebrow {
 .artwork-credit { position: absolute; right: 6px; bottom: 6px; font-size: 0.65rem; padding: 1px 6px; border-radius: 6px; background: #000a; color: #fff; }
 .event-artwork { position: relative; }
 .hero-image-credit { position: absolute; right: 12px; bottom: 10px; z-index: 2; font-size: 0.7rem; padding: 2px 8px; border-radius: 6px; background: #0009; color: #fff; }
+
+/* "Why?" answer on a person card: long evidence URLs wrap inside the card. */
+.people-why {
+  overflow-wrap: anywhere;
+}
+
+.pipeline-refresh { margin: 0.6rem 0; }
+.pipeline-refresh .refresh-head { font-weight: 600; margin-top: 0.4rem; }
+.pipeline-refresh .refresh-error { color: #fff; background: var(--red); padding: 0.3rem 0.5rem; margin-top: 0.3rem; border-radius: 4px; }
+.pipeline-refresh .refresh-slow { color: #3b2a00; background: #f0b429; padding: 0.3rem 0.5rem; margin-top: 0.3rem; border-radius: 4px; }
