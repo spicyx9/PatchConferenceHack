@@ -190,14 +190,27 @@ def build_plan(
     attended = attended or set()
     scores = event_scores(data, goals, opportunities)
     opp_by_person = {pid: o for o in opportunities for pid in o.person_ids}
+    # Only the days the user is in town (user depart_date..return_date, when known).
+    first, last = data.user.get("depart_date"), data.user.get("return_date")
+
+    def in_trip(e: Event) -> bool:
+        day = str(_local_day(e))
+        return (not first or day >= str(first)) and (not last or day <= str(last))
+
     available = [
         e for e in data.events
         if e.start_at and e.status not in {"cancelled", "sold_out"} and e.id not in skipped
+        and in_trip(e)
     ]
     excluded = [
         {"event_id": e.id, "title": e.title, "reason": e.status if e.status in {"cancelled", "sold_out"} else "skipped"}
         for e in data.events
         if e.status in {"cancelled", "sold_out"} or e.id in skipped
+    ] + [
+        {"event_id": e.id, "title": e.title, "reason": "outside_trip"}
+        for e in data.events
+        if e.start_at and e.status not in {"cancelled", "sold_out"} and e.id not in skipped
+        and not in_trip(e)
     ]
     unscheduled = [{"event_id": e.id, "title": e.title} for e in data.events if not e.start_at]
     days: dict[str, list[Event]] = {}
@@ -536,6 +549,60 @@ def roi_view(
         "opportunities": sum(1 for o in opportunities if o.score >= 30),
         "budget_usd": travel["budget"]["budget_usd"],
     }
+
+
+_SKIP_CATEGORY = {"time_conflict": "conflit horaire", "travel": "trajet trop long",
+                  "low_score": "score faible"}
+
+
+def antifomo_skips(decisions: list[dict[str, Any]], data: DemoData, limit: int = 3,
+                   planned: set[str] | None = None) -> list[dict[str, Any]]:
+    """The anti-FOMO agent's most tempting rejections, with a category and what skipping gains.
+
+    One per category first (time conflict, travel, low score), then by utility, so the demo
+    shows the different reasons instead of three variations of the same one. Events kept by
+    the displayed plan (``planned``) are left out so the two views never contradict.
+    """
+    kept = {d["event_id"]: d for d in decisions if d.get("type") == "plan_item"}
+    out = []
+    for r in decisions:
+        if r.get("type") != "rejected" or r.get("code") not in {"conflict", "low_utility", "day_full"}:
+            continue
+        if planned and r["event_id"] in planned:
+            continue
+        event, block_item = data.event(r["event_id"]), kept.get(r.get("blocking_event_id") or "")
+        block = data.event(block_item["event_id"]) if block_item else None
+        utility = r.get("utility") or 0.0
+        if r["code"] == "conflict" and event and block:
+            category = "time_conflict" if _overlaps(event, block) else "travel"
+            names = [p.name for pid in block_item.get("targets_confirmed", [])
+                     if (p := data.person(pid))]
+            kept_u = block_item["utility"]
+            gain = (f"you keep '{block_item['title']}' (+{kept_u - utility:.0f} utility)"
+                    if kept_u >= utility else
+                    f"the day's best combination keeps '{block_item['title']}'")
+            if names:
+                gain += f", where you meet {', '.join(names[:2])}"
+            if category == "travel":
+                gain += "; no rush across town between the two"
+        else:
+            category = "low_score"
+            minutes = (int((event.end_at - event.start_at).total_seconds() // 60)
+                       if event and event.start_at and event.end_at else None)
+            gain = (f"{minutes} min freed for higher-value meetings" if minutes
+                    else "time freed for higher-value meetings")
+        out.append({
+            "event_id": r["event_id"], "title": r["title"], "utility": utility,
+            "start_at": event.start_at.isoformat() if event and event.start_at else None,
+            "category": category, "category_label": _SKIP_CATEGORY[category],
+            "reason": r["reason"], "gain": gain,
+            "blocking_event_id": block_item["event_id"] if block_item else None,
+        })
+    out.sort(key=lambda s: (-s["utility"], s["event_id"]))
+    picked = [next(s for s in out if s["category"] == c)
+              for c in _SKIP_CATEGORY if any(s["category"] == c for s in out)]
+    picked += [s for s in out if s not in picked]
+    return picked[:limit]
 
 
 TOP_PLAN_EVENT = "top_plan_event"

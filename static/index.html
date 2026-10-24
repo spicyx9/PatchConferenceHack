@@ -44,7 +44,8 @@
   </section>
 
   <nav class="tabs" role="tablist">
-    <button class="tab active" data-tab="dashboard" role="tab">Tableau de bord</button>
+    <button class="tab active" data-tab="story" role="tab">Demo</button>
+    <button class="tab" data-tab="dashboard" role="tab">Tableau de bord</button>
     <button class="tab" data-tab="travel" role="tab">Voyage</button>
     <button class="tab" data-tab="events" role="tab">Evenements</button>
     <button class="tab" data-tab="graph" role="tab">Graphe</button>
@@ -52,7 +53,39 @@
   </nav>
 
   <main>
-    <section id="tab-dashboard" class="tab-panel active">
+    <section id="tab-story" class="tab-panel active story">
+      <div class="step" id="step-goal">
+        <h2><span class="num">1</span>Objectif</h2>
+        <p id="story-goal" class="story-goal"></p>
+        <div id="story-goals" class="chips"></div>
+      </div>
+      <div class="step" id="step-opps">
+        <h2><span class="num">2</span>Qui rencontrer, et pourquoi (chemin du graphe)</h2>
+        <div id="story-opps"></div>
+      </div>
+      <div class="step" id="step-plan">
+        <h2><span class="num">3</span>Plan</h2>
+        <div class="grid two">
+          <div id="story-plan"></div>
+          <div id="story-map" class="map story-map"></div>
+        </div>
+      </div>
+      <div class="step" id="step-antifomo">
+        <h2><span class="num">4</span>Anti-FOMO : ce qu'on saute, et ce qu'on y gagne</h2>
+        <div id="story-antifomo"></div>
+      </div>
+      <div class="step" id="step-change">
+        <h2><span class="num">5</span>Changement en direct</h2>
+        <button id="story-simulate" class="primary big-btn">Simuler : l'evenement n&deg;1 du plan est complet</button>
+        <div id="story-diff"></div>
+      </div>
+      <div class="step" id="step-met">
+        <h2><span class="num">6</span>Rencontre enregistree</h2>
+        <div id="story-met"></div>
+      </div>
+    </section>
+
+    <section id="tab-dashboard" class="tab-panel">
       <div class="grid two">
         <div class="panel">
           <h2>Objectifs analyses</h2>

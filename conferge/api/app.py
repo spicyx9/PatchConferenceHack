@@ -239,6 +239,30 @@ def create_app(
     def plan() -> dict[str, Any]:
         return _envelope(state, ["events", "people"], _plan_payload(), extra_warnings=_plan_warnings())
 
+    @api.get("/antifomo")
+    async def antifomo() -> dict[str, Any]:
+        agent = state.providers.agents.get("antifomo")
+        if agent is None:
+            return _envelope(state, ["events"], {"skips": [], "computed_by": None},
+                             extra_warnings=["anti-FOMO agent not available"])
+        mode = _envelope(state, ["events", "people"], {})["data_source"]
+        ctx = AgentContext(
+            conference=state.data.conference, goals=state.goals, user_id="demo-user",
+            data_mode=mode if mode in {"live", "cached", "fixture"} else "mixed",
+            events=state.data.events, people=state.data.people,
+            opportunities=state.opportunities(),
+        )
+        try:
+            result = await providers.run_agent(agent, ctx)
+        except Exception as exc:  # noqa: BLE001 - visible degradation, not a 500
+            return _envelope(state, ["events"], {"skips": [], "computed_by": None},
+                             extra_warnings=[f"anti-FOMO agent error {type(exc).__name__}"])
+        planned = {i["event_id"] for d in state.plan()["days"] for i in d["items"]}
+        skips = logic.antifomo_skips(result.decisions, state.data, planned=planned)
+        return _envelope(state, ["events", "people"], {
+            "skips": skips, "computed_by": result.agent, "status": result.status,
+        }, extra_warnings=[f"{result.agent}: {e}" for e in result.errors])
+
     @api.get("/people")
     def people(limit: int = Query(10, ge=1, le=100)) -> dict[str, Any]:
         opps = state.opportunities()[:limit]

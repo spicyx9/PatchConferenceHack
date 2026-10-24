@@ -586,6 +586,165 @@
     });
   }
 
+  // Demo story: goal -> opportunities -> plan -> anti-FOMO -> change -> meeting
+
+  var storyMap = null;
+  var storyMapLayer = null;
+  var storyTop = null;
+
+  function pathHtml(steps) {
+    var nodes = (steps || []).filter(function (s) { return s.node; }).map(function (s) {
+      return '<span class="path-node t-' + esc(s.node.type || "Node") + '">' + esc(s.node.label || s.node.id) + "</span>";
+    });
+    return '<div class="path">' + nodes.join('<span class="path-arrow">&rarr;</span>') + "</div>";
+  }
+
+  function renderStoryGoal(plan) {
+    $("story-goal").textContent = (plan && plan.goal_text) || "";
+    $("story-goals").innerHTML = ((plan && plan.goals) || []).map(function (g) {
+      return '<span class="chip">' + esc(g.description || g.id) + (g.priority ? " (" + esc(g.priority) + ")" : "") + "</span>";
+    }).join("");
+  }
+
+  function renderStoryOpps(people) {
+    var cards = ((people && people.items) || []).filter(function (c) { return c.person; }).slice(0, 3);
+    storyTop = cards.length ? cards[0].person : null;
+    $("story-opps").innerHTML = cards.map(function (c, i) {
+      var p = c.person;
+      return '<div class="opp"><div class="opp-name">' + (i + 1) + ". " + esc(p.name) +
+        (p.title ? ' <span class="muted">' + esc(p.title) + "</span>" : "") + "</div>" +
+        '<div id="story-path-' + i + '" class="muted">chemin...</div></div>';
+    }).join("") || '<p class="muted">Aucune personne.</p>';
+    return Promise.all(cards.map(function (c, i) {
+      return api("/graph/path?person=" + encodeURIComponent(c.person.id), null, "graph_path").then(function (res) {
+        $("story-path-" + i).innerHTML = pathHtml(res.path) +
+          (res.explanation ? '<div class="explain">' + esc(res.explanation) + "</div>" : "") +
+          '<div class="explain">source: ' + esc(res.backend || "graph") + " / " + esc(res.data_source) + "</div>";
+      }).catch(function () { $("story-path-" + i).textContent = "pas de chemin dans le graphe"; });
+    }));
+  }
+
+  function renderStoryPlan(plan, mapData) {
+    var days = ((plan && plan.plan && plan.plan.days) || []).filter(function (d) { return (d.items || []).length; });
+    $("story-plan").innerHTML = days.map(function (d) {
+      return '<div class="story-plan-day"><h3>' + esc(fmtDay(d.day)) + "</h3><ul>" + d.items.slice(0, 4).map(function (i) {
+        return "<li><b>" + esc(fmtHour(i.start_at, EVENT_TZ)) + "</b> " + esc(i.title) + "</li>";
+      }).join("") + (d.items.length > 4 ? '<li class="muted">+ ' + (d.items.length - 4) + " autres</li>" : "") + "</ul></div>";
+    }).join("") || '<p class="muted">Plan vide.</p>';
+    if (typeof L === "undefined") return;
+    if (!storyMap) {
+      storyMap = L.map($("story-map")).setView([37.79, -122.42], 13);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19, attribution: "&copy; OpenStreetMap contributors"
+      }).addTo(storyMap);
+    }
+    if (storyMapLayer) storyMapLayer.remove();
+    storyMapLayer = L.layerGroup().addTo(storyMap);
+    var bounds = [];
+    ((mapData && mapData.markers) || []).forEach(function (mk) {
+      if (mk.kind === "stay" || (mk.kind !== "conference" && !mk.planned)) return;
+      if (typeof mk.lat !== "number" || typeof mk.lng !== "number") return;
+      bounds.push([mk.lat, mk.lng]);
+      L.circleMarker([mk.lat, mk.lng], {
+        radius: mk.kind === "conference" ? 14 : 11, color: "#0d1117", weight: 2,
+        fillColor: markerColor(mk.kind, true), fillOpacity: 0.95
+      }).bindTooltip(esc(mk.label), { permanent: bounds.length <= 6, direction: "top" }).addTo(storyMapLayer);
+    });
+    setTimeout(function () {
+      storyMap.invalidateSize();
+      if (bounds.length) storyMap.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+    }, 50);
+  }
+
+  function renderStoryAntifomo(res) {
+    var skips = (res && res.skips) || [];
+    $("story-antifomo").innerHTML = skips.map(function (s) {
+      return '<div class="skip"><div class="cat">' + esc(s.category_label) + "</div>" +
+        "<div><b>On saute :</b> " + esc(s.title) + " " + '<span class="muted">(' + esc(fmtTime(s.start_at)) + ")</span></div>" +
+        '<div class="muted">' + esc(s.reason) + "</div>" +
+        '<div class="gain">On y gagne : ' + esc(s.gain) + "</div></div>";
+    }).join("") || '<p class="muted">Aucun evenement ecarte' + (res && res.computed_by ? "" : " (agent anti-FOMO indisponible)") + ".</p>";
+  }
+
+  function renderStoryDiff(res) {
+    var replan = (res && res.replan) || [];
+    var d = (res && res.diff) || {};
+    var rows = replan.map(function (r) {
+      var html = '<div class="diff-row removed"><span class="tag-r">RETIRE</span> ' + esc(r.removed.title) + "</div>";
+      if (r.replacement) {
+        html += '<div class="diff-row added"><span class="tag-a">AJOUTE</span> ' + esc(r.replacement.title) +
+          ' <span class="muted">(' + esc(fmtTime(r.replacement.start_at)) + ")</span></div>";
+      }
+      html += '<div class="explain"><b>Raison :</b> ' + esc(r.reason) + "</div>";
+      if (r.graph_path) {
+        html += pathHtml(r.graph_path.nodes.map(function (n, i) {
+          return { node: { label: n, type: i === r.graph_path.nodes.length - 1 ? "Person" : (i === 0 ? "Goal" : "Opportunity") } };
+        }));
+      }
+      return html;
+    });
+    var added = (d.added || []).filter(function (a) {
+      return !replan.some(function (r) { return r.replacement && r.replacement.event_id === a.event_id; });
+    });
+    rows = rows.concat(added.map(function (a) {
+      return '<div class="diff-row added"><span class="tag-a">AJOUTE</span> ' + esc(a.title) + "</div>";
+    }));
+    $("story-diff").innerHTML = "<p><b>" + esc(res.scenario && res.scenario.label) + "</b></p>" + rows.join("") +
+      '<p class="muted small-text">Changement simule, pas une mise a jour reelle de la source.</p>';
+  }
+
+  function renderStoryMet(before, res, after) {
+    var names = function (p) {
+      return ((p && p.items) || []).filter(function (c) { return c.person; }).slice(0, 3)
+        .map(function (c) { return esc(c.person.name); }).join(", ");
+    };
+    $("story-met").innerHTML = '<p class="met-ok">Rencontre avec ' + esc(res.person_name) + " enregistree (" +
+      esc(res.persisted === "falkordb" ? "FalkorDB" : "memoire") + ")</p>" +
+      "<p><b>Top 3 avant :</b> " + names(before) + "</p><p><b>Top 3 apres :</b> " + names(after) + "</p>";
+  }
+
+  function storyMetButton() {
+    if (!storyTop) { $("story-met").innerHTML = '<p class="muted">Aucune personne.</p>'; return; }
+    $("story-met").innerHTML = '<button id="story-met-btn" class="primary big-btn">J\'ai rencontre ' +
+      esc(storyTop.name) + "</button>";
+  }
+
+  function loadStory() {
+    return Promise.all([api("/plan", null, "plan"), api("/travel/map", null, "map"), api("/people?limit=3", null, "people")])
+      .then(function (r) {
+        renderStoryGoal(r[0]);
+        renderStoryPlan(r[0], r[1]);
+        var opps = renderStoryOpps(r[2]);
+        storyMetButton();
+        var fomo = api("/antifomo", null, "antifomo").then(renderStoryAntifomo);
+        return Promise.all([opps, fomo]);
+      }).catch(function (e) { showError("Demo: " + e.message); });
+  }
+
+  function storySimulate() {
+    return api("/scenarios", null, "scenarios").then(function (s) {
+      var items = (s && s.items) || [];
+      var pick = items.filter(function (it) { return /sold/i.test(it.id); })[0] || items[0];
+      if (!pick) throw new Error("Aucun scenario disponible.");
+      return api("/simulate-change", { method: "POST", body: { scenario_id: pick.id } }, "plan");
+    }).then(function (res) {
+      renderStoryDiff(res);
+      return api("/plan", null, "plan").then(function (plan) {
+        return api("/travel/map", null, "map").then(function (m) { renderStoryPlan(plan, m); });
+      });
+    });
+  }
+
+  function storyMet() {
+    var person = storyTop;
+    return api("/people?limit=3", null, "people").then(function (before) {
+      return api("/met", { method: "POST", body: { person_id: person.id, note: "demo" } }, "plan").then(function (res) {
+        res.person_name = person.name;
+        return api("/people?limit=3", null, "people").then(function (after) { renderStoryMet(before, res, after); });
+      });
+    });
+  }
+
   // Wiring
 
   function initTabs() {
@@ -601,6 +760,7 @@
     Array.prototype.forEach.call(document.querySelectorAll(".tab-panel"), function (p) {
       p.classList.toggle("active", p.id === "tab-" + name);
     });
+    if (name === "story" && storyMap) setTimeout(function () { storyMap.invalidateSize(); }, 50);
     if (name === "travel" && map) {
       setTimeout(function () { map.invalidateSize(); if (lastMapData) renderMap(lastMapData); }, 50);
     }
@@ -641,7 +801,7 @@
     $("btn-goal").addEventListener("click", function () {
       var text = $("goal-text").value.trim();
       if (!text) { showError("Objectif vide."); return; }
-      withBusy($("btn-goal"), function () { return mutate("/goal", { text: text }); });
+      withBusy($("btn-goal"), function () { return mutate("/goal", { text: text }).then(loadStory); });
     });
 
     $("btn-simulate").addEventListener("click", function () {
@@ -655,12 +815,20 @@
     $("btn-reset").addEventListener("click", function () {
       withBusy($("btn-reset"), function () {
         $("diff-panel").classList.add("hidden");
-        return mutate("/reset", {}).then(function () {
+        $("story-diff").innerHTML = "";
+        return mutate("/reset", {}).then(loadStory).then(function () {
           return api("/conference", null, "conference").then(function (c) {
             if (c && c.demo_goal_text) $("goal-text").value = c.demo_goal_text;
           });
         });
       });
+    });
+
+    $("story-simulate").addEventListener("click", function () {
+      withBusy($("story-simulate"), storySimulate);
+    });
+    document.addEventListener("click", function (e) {
+      if (e.target && e.target.id === "story-met-btn") withBusy(e.target, storyMet);
     });
 
     $("btn-close-diff").addEventListener("click", function () { $("diff-panel").classList.add("hidden"); });
@@ -674,7 +842,7 @@
       }
     }).catch(function (e) { showError("Conference: " + e.message); });
 
-    refreshAll().then(function () {
+    refreshAll().then(loadStory).then(function () {
       var tab = (window.location.hash || "").replace("#", "");
       if (document.getElementById("tab-" + tab)) switchTab(tab);
     });

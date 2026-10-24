@@ -198,3 +198,37 @@ th { color: var(--muted); font-weight: 600; }
 .footer ul { margin: 0.3rem 0; }
 
 .leaflet-container { font-size: 0.85rem; }
+
+/* Demo story tab: readable from two metres */
+.story { font-size: 1.15rem; }
+.story .step { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.3rem; margin-bottom: 1.1rem; }
+.story h2 { font-size: 1.6rem; display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.8rem; }
+.story .num { display: inline-flex; width: 2.1rem; height: 2.1rem; border-radius: 50%; background: var(--accent); color: var(--bg); align-items: center; justify-content: center; font-weight: 700; }
+.story-goal { font-size: 1.35rem; font-style: italic; margin: 0 0 0.6rem; }
+.chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.chip { background: var(--panel-2); border: 1px solid var(--border); border-radius: 999px; padding: 0.3rem 0.9rem; font-size: 1.1rem; }
+.opp { border-top: 1px solid var(--border); padding: 0.8rem 0; }
+.opp:first-child { border-top: 0; }
+.opp-name { font-size: 1.4rem; font-weight: 700; }
+.path { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; margin: 0.5rem 0; }
+.path-node { border-radius: 8px; padding: 0.35rem 0.8rem; font-size: 1.2rem; font-weight: 600; color: var(--bg); }
+.path-node.t-Goal { background: var(--accent); }
+.path-node.t-Person { background: var(--green); }
+.path-node.t-Event { background: var(--amber); }
+.path-node.t-Opportunity, .path-node.t-Company, .path-node.t-Topic, .path-node.t-User, .path-node.t-Node { background: var(--violet); }
+.path-arrow { font-size: 1.4rem; color: var(--muted); }
+.explain { color: var(--muted); font-size: 1rem; }
+.story-plan-day { margin-bottom: 0.7rem; }
+.story-plan-day h3 { font-size: 1.2rem; color: var(--accent); }
+.story-plan-day li { margin: 0.15rem 0; }
+.story-map { height: 420px; }
+.skip { border-left: 6px solid var(--amber); padding: 0.4rem 0.9rem; margin: 0.6rem 0; background: var(--panel-2); border-radius: 6px; }
+.skip .cat { font-weight: 700; text-transform: uppercase; font-size: 0.95rem; color: var(--amber); }
+.skip .gain { color: var(--green); font-weight: 600; }
+.big-btn { font-size: 1.25rem; padding: 0.6rem 1.2rem; }
+.diff-row { padding: 0.5rem 0.9rem; border-radius: 6px; margin: 0.5rem 0; font-size: 1.2rem; }
+.diff-row.removed { background: rgba(248, 81, 73, 0.18); border-left: 6px solid var(--red); }
+.diff-row.added { background: rgba(63, 185, 80, 0.18); border-left: 6px solid var(--green); }
+.diff-row .tag-r { color: var(--red); font-weight: 700; }
+.diff-row .tag-a { color: var(--green); font-weight: 700; }
+.met-ok { color: var(--green); font-weight: 700; font-size: 1.3rem; }
