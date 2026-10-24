@@ -71,7 +71,8 @@ def test_plan_keeps_only_trip_days() -> None:
     data.events.append(late)
     plan = logic.build_plan(data, [], [])
     planned = {i["event_id"] for d in plan["days"] for i in d["items"]}
-    assert "late" not in planned and "keep" in planned
+    # 'dull' is alone in its slot; 'keep' vs 'far' is now a travel conflict (10 min gap, unknown travel 20 min).
+    assert "late" not in planned and "dull" in planned
     assert {"event_id": "late", "title": "LATE", "reason": "outside_trip"} in plan["excluded"]
 
 
@@ -132,3 +133,29 @@ def test_antifomo_endpoint_gains_only_cite_the_served_plan() -> None:
         if skip["blocking_event_id"] is not None:
             assert skip["blocking_event_id"] in titles
             assert f"'{titles[skip['blocking_event_id']]}'" in skip["gain"]
+
+
+def test_plan_uses_the_optimizer_feasibility_rules() -> None:
+    """End time required, no overlap, and travel (antifomo.travel_minutes) must fit between kept events."""
+    from conferge.agents.antifomo.models import Constraints
+    from conferge.agents.antifomo.travel import travel_minutes
+
+    data = _data()
+    no_end = Event(id="noend", title="NOEND", start_at=T0 + timedelta(minutes=700),
+                   venue=Venue(name="v-noend", latitude=37.80, longitude=-122.42))
+    data.events.append(no_end)
+    plan = logic.build_plan(data, [], [], scores={"keep": 50.0, "overlap": 40.0, "far": 30.0, "dull": 10.0,
+                                                   "planned": 5.0, "noend": 99.0})
+    items = [i for d in plan["days"] for i in d["items"]]
+    planned = [i["event_id"] for i in items]
+    assert planned[0] == "keep" and "overlap" not in planned and "far" not in planned and "noend" not in planned
+    assert any(x["event_id"] == "noend" and x["reason"] == "no_end_time" for x in plan["excluded"])
+    assert {c["loser"]["event_id"] for c in plan["conflicts"]} >= {"overlap", "far"}
+    by_id = {e.id: e for e in data.events}
+    for day in plan["days"]:
+        seq = sorted(day["items"], key=lambda i: i["start_at"])
+        for a, b in zip(seq, seq[1:], strict=False):
+            ea, eb = by_id[a["event_id"]], by_id[b["event_id"]]
+            assert ea.end_at is not None
+            minutes, _ = travel_minutes(ea, eb, Constraints())
+            assert ea.end_at + timedelta(minutes=minutes) <= eb.start_at
