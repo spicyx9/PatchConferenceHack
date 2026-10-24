@@ -25,6 +25,7 @@ from conferge.api import logic, providers
 from conferge.api.data import DemoData, load_fixture
 from conferge.api.provenance import source_of
 from conferge.extras.router import router as calendar_router
+from conferge.extras.travel_search import router as travel_search_router
 from conferge.flights.round_trip_total import display as rt_display
 from conferge.core.schemas import AgentContext, Goal, Opportunity
 
@@ -848,6 +849,7 @@ def create_app(
 
     app.include_router(api)
     app.include_router(calendar_router)
+    app.include_router(travel_search_router)
 
     if STATIC_DIR.is_dir():
         app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")

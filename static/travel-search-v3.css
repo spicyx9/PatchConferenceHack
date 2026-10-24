@@ -1,0 +1,805 @@
+#tab-travel {
+  --travel-ink: #22201f;
+  --travel-line: #e2dfdc;
+  --travel-soft: #f5f3f0;
+  color: var(--travel-ink);
+}
+.travel-heading {
+  padding: 36px 0 25px;
+}
+.travel-heading h1 {
+  font-size: 40px;
+  letter-spacing: -1.7px;
+  margin: 12px 0 0;
+  font-weight: 600;
+}
+.travel-conference {
+  color: #716a64;
+  font-size: 13px;
+  margin: 0;
+}
+.travel-category {
+  display: flex;
+  gap: 28px;
+  border-bottom: 1px solid var(--travel-line);
+  margin-bottom: 23px;
+}
+.travel-category button {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 13px 3px 16px;
+  font: inherit;
+  font-weight: 600;
+  color: #77716b;
+  border-bottom: 3px solid transparent;
+  box-shadow: none;
+}
+.travel-category button[aria-selected="true"] {
+  color: #222;
+  border-bottom-color: #222;
+}
+.travel-category .icon {
+  width: 19px;
+  height: 19px;
+}
+.travel-search-v3 {
+  margin-bottom: 28px;
+  padding: 0;
+}
+.travel-search-options {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 15px;
+}
+.travel-search-options label {
+  margin: 0;
+}
+.travel-search-options select {
+  border: 0;
+  background: transparent;
+  width: auto;
+  padding: 6px 21px 6px 0;
+  font: inherit;
+  font-size: 13px;
+  color: #36322f;
+}
+.travel-search-fields {
+  display: grid;
+  grid-template-columns: 1.2fr 1.2fr 1fr 1fr auto;
+  gap: 8px;
+}
+.travel-search-fields > label {
+  background: #fff;
+  border: 1px solid #d6d1cc;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 12px 15px;
+  margin: 0;
+  min-width: 0;
+  transition: border-color 0.15s;
+}
+.travel-search-fields > label:focus-within {
+  border-color: #292321;
+  box-shadow: 0 0 0 1px #292321;
+}
+.travel-search-fields label > span {
+  font-size: 11px;
+  font-weight: 500;
+  color: #766d66;
+}
+.travel-search-fields input {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  min-width: 0;
+  color: #272320;
+  font: inherit;
+  font-size: 15px;
+  box-shadow: none;
+}
+.travel-search-button {
+  border: 0;
+  background: #282320;
+  color: white;
+  border-radius: 10px;
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: none;
+}
+.travel-search-button:hover {
+  background: #48403a;
+}
+.travel-search-button .icon {
+  width: 19px;
+  height: 19px;
+}
+.travel-search-button:disabled {
+  opacity: 0.6;
+}
+.travel-search-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  font-size: 11px;
+  color: #81776e;
+  padding: 12px 0;
+}
+.travel-search-foot button {
+  font-size: 11px;
+  color: #6a6058;
+}
+.travel-search-fields.is-stays {
+  grid-template-columns: 2fr 1fr 1fr auto;
+}
+.travel-result-status {
+  font-size: 12px;
+  color: #756c65;
+  padding: 0 0 19px;
+  margin: 0;
+  border-bottom: 1px solid var(--travel-line);
+}
+.travel-results-workspace {
+  display: grid;
+  grid-template-columns: 205px minmax(0, 1fr);
+  gap: 30px;
+  padding-top: 23px;
+}
+.travel-filter-sidebar {
+  padding-right: 22px;
+  border-right: 1px solid var(--travel-line);
+}
+.travel-filter-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.travel-filter-title h2 {
+  font-size: 16px;
+  margin: 0;
+}
+.travel-filter-title button {
+  font-size: 11px;
+}
+.travel-filter-sidebar fieldset {
+  border: 0;
+  border-top: 1px solid var(--travel-line);
+  padding: 20px 0;
+  margin: 0;
+  min-width: 0;
+}
+.travel-filter-sidebar legend {
+  float: left;
+  width: 100%;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 14px;
+  padding: 0;
+}
+.travel-filter-sidebar fieldset > label {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  font-size: 12px;
+  color: #655c55;
+  margin: 10px 0;
+}
+.travel-filter-sidebar input[type="radio"] {
+  accent-color: #39312a;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+}
+.travel-filter-sidebar .travel-price-filter {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  clear: both;
+  font-size: 11px;
+}
+.travel-price-filter input,
+.travel-price-filter select {
+  width: 100%;
+  font: inherit;
+  font-size: 13px;
+  border: 1px solid #d9d3ce;
+  border-radius: 7px;
+  background: #fff;
+  padding: 10px;
+}
+.travel-filter-note {
+  font-size: 11px;
+  line-height: 1.8;
+  color: #8a7c71;
+  margin-top: 20px;
+}
+.travel-results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 17px;
+  gap: 15px;
+}
+.travel-results-header h2 {
+  font-size: 20px;
+  margin: 0 0 6px;
+  letter-spacing: -0.6px;
+}
+.travel-results-header span {
+  font-size: 11px;
+  color: #81766c;
+}
+.travel-results-header > label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: #776b61;
+  white-space: nowrap;
+  margin: 0;
+}
+.travel-results-header select {
+  font: inherit;
+  border: 1px solid #dcd7d1;
+  border-radius: 7px;
+  background: #fff;
+  padding: 9px;
+  max-width: 180px;
+  width: auto;
+}
+#tab-travel .travel-comparison,
+#tab-travel .trip-stays-section {
+  margin: 0;
+}
+#tab-travel .travel-offer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px;
+  gap: 0;
+  padding: 0;
+  margin: 0 0 12px;
+  border-radius: 12px;
+  border-color: #ddd8d2;
+  overflow: hidden;
+  background: #fff;
+}
+.flight-journey {
+  padding: 23px 22px 18px;
+  display: grid;
+  grid-template-columns: 38px 1fr 1.2fr 1fr;
+  gap: 13px;
+  align-items: center;
+}
+.airline-mark {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #ddd5cc;
+  background: #faf6ef;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+.flight-time strong {
+  display: block;
+  font-size: 22px;
+  letter-spacing: -0.8px;
+  font-weight: 600;
+}
+.flight-time span {
+  font-size: 11px;
+  color: #8c7e71;
+  margin-top: 6px;
+  display: block;
+}
+.flight-time.arrival {
+  text-align: right;
+}
+.flight-duration {
+  text-align: center;
+}
+.flight-duration > span {
+  font-size: 11px;
+  color: #6d6258;
+  display: block;
+}
+.flight-duration i {
+  display: block;
+  height: 1px;
+  background: #d2c6b9;
+  margin: 9px 6px;
+  position: relative;
+}
+.flight-duration i:after {
+  content: "";
+  width: 5px;
+  height: 5px;
+  position: absolute;
+  right: 0;
+  top: -2px;
+  border: 1px solid #c9bbac;
+  background: white;
+  border-radius: 50%;
+}
+.flight-duration small {
+  font-size: 10px;
+  color: #918171;
+}
+.flight-caption {
+  padding: 0 22px 16px;
+  font-size: 10px;
+  color: #86796d;
+}
+.flight-caption b {
+  font-weight: 500;
+  color: #655a50;
+}
+.travel-offer .flight-fare {
+  grid-column: 2;
+  grid-row: 1/4;
+  border-left: 1px solid #eee8e1;
+  background: #fcfbf9;
+  padding: 22px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 7px;
+  text-align: right;
+}
+.flight-fare strong {
+  font-size: 27px;
+  letter-spacing: -1px;
+  font-weight: 600;
+}
+.flight-fare > span {
+  font-size: 10px;
+  color: #87796c;
+}
+.flight-fare a {
+  padding: 9px 15px;
+  border-radius: 7px;
+  background: #2d2823;
+  color: white;
+  text-decoration: none;
+  font-size: 12px;
+  margin-top: 7px;
+}
+.travel-offer details {
+  grid-column: 1 !important;
+  padding: 0 22px 15px;
+  font-size: 11px;
+}
+.travel-offer summary {
+  font-size: 10px !important;
+}
+.travel-offer details p {
+  font-size: 11px !important;
+}
+.travel-offer .badge {
+  font-size: 10px;
+}
+.travel-search-empty {
+  padding: 38px 28px;
+  background: white;
+  border: 1px solid #e5ddd4;
+  border-radius: 12px;
+  text-align: center;
+}
+.travel-search-empty h3 {
+  font-size: 21px;
+  letter-spacing: -0.6px;
+  margin: 0 0 12px;
+}
+.travel-search-empty p {
+  font-size: 13px;
+  color: #84766a;
+  line-height: 1.8;
+  max-width: 430px;
+  margin: 0 auto 18px;
+}
+.travel-search-empty a {
+  display: inline-block;
+  text-decoration: none;
+  background: #302922;
+  color: white;
+  padding: 11px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+#travel-search-feedback {
+  font-size: 13px;
+  color: #8b432c;
+  margin: 12px 0;
+}
+#travel-search-feedback:empty {
+  display: none;
+}
+#travel-local-note {
+  background: #fff;
+  border: 1px solid #e3dcd5;
+  border-radius: 12px;
+  padding: 28px;
+  margin-bottom: 24px;
+}
+#travel-local-note h2 {
+  font-size: 24px;
+}
+#travel-local-note p {
+  font-size: 14px;
+  color: #776a5d;
+}
+#tab-travel #budget,
+#tab-travel .trip-suggestions-section {
+  display: none;
+}
+#tab-travel .travel-map-panel {
+  margin-top: 35px;
+}
+#tab-travel .trip-stay {
+  margin-top: 0;
+  margin-bottom: 12px;
+  border: 1px solid #ddd8d2;
+  border-radius: 12px;
+  background: #fff;
+  padding: 24px;
+}
+#tab-travel .trip-stay h3 {
+  font-size: 20px;
+  letter-spacing: -0.5px;
+}
+#tab-travel .trip-stay-price strong {
+  font-size: 25px;
+  letter-spacing: -1px;
+}
+#tab-travel .trip-stay-price a {
+  background: #2d2823;
+  color: #fff;
+  border: 0;
+  font-size: 12px;
+}
+#tab-travel [hidden] {
+  display: none !important;
+}
+@media (max-width: 1000px) {
+  .travel-search-fields {
+    grid-template-columns: 1fr 1fr;
+  }
+  .travel-search-button {
+    min-height: 48px;
+    grid-column: 1/-1;
+  }
+  .travel-search-fields.is-stays {
+    grid-template-columns: 2fr 1fr 1fr;
+  }
+  .travel-results-workspace {
+    grid-template-columns: 165px minmax(0, 1fr);
+    gap: 18px;
+  }
+  .travel-filter-sidebar {
+    padding-right: 15px;
+  }
+  .flight-journey {
+    grid-template-columns: 28px 1fr 1fr 1fr;
+    padding: 18px 15px;
+    gap: 8px;
+  }
+  .airline-mark {
+    width: 27px;
+    height: 30px;
+  }
+  .flight-time strong {
+    font-size: 19px;
+  }
+  .travel-offer .flight-fare {
+    padding: 18px 12px;
+  }
+  .travel-offer details,
+  .flight-caption {
+    padding-left: 15px;
+  }
+  .travel-search-fields.is-stays .travel-search-button {
+    grid-column: 1/-1;
+  }
+}
+@media (max-width: 650px) {
+  .travel-heading {
+    padding: 25px 0 20px;
+  }
+  .travel-heading h1 {
+    font-size: 32px;
+    letter-spacing: -1.2px;
+  }
+  .travel-conference {
+    font-size: 11px;
+  }
+  .travel-category {
+    margin-bottom: 15px;
+    gap: 25px;
+  }
+  .travel-search-options {
+    gap: 13px;
+  }
+  .travel-search-options select {
+    font-size: 12px;
+  }
+  .travel-search-fields,
+  .travel-search-fields.is-stays {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .travel-search-fields.is-stays .search-destination {
+    grid-column: 1/-1;
+  }
+  .travel-search-fields > label {
+    padding: 11px;
+  }
+  .travel-search-fields input {
+    font-size: 13px;
+  }
+  .travel-search-foot {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .travel-search-foot button {
+    text-align: left;
+    padding-left: 0;
+  }
+  .travel-results-workspace {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding-top: 16px;
+  }
+  .travel-filter-sidebar {
+    border-right: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .travel-filter-title {
+    display: none;
+  }
+  .travel-filter-sidebar fieldset {
+    border: 0;
+    padding: 0;
+    display: flex;
+    gap: 9px;
+    align-items: center;
+  }
+  .travel-filter-sidebar legend,
+  .travel-filter-sidebar .travel-price-filter {
+    font-size: 11px;
+  }
+  .travel-filter-sidebar legend {
+    display: none;
+  }
+  .travel-filter-sidebar fieldset > label {
+    font-size: 10px;
+    gap: 5px;
+  }
+  .travel-filter-sidebar .travel-price-filter {
+    flex-direction: row;
+    align-items: center;
+    gap: 9px;
+  }
+  .travel-price-filter input {
+    max-width: 100px;
+    padding: 7px;
+  }
+  .travel-filter-note {
+    display: none;
+  }
+  .travel-results-header {
+    margin-bottom: 14px;
+    align-items: flex-end;
+  }
+  .travel-results-header h2 {
+    font-size: 18px;
+  }
+  .travel-results-header label {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+  .travel-results-header select {
+    font-size: 10px;
+    max-width: 130px;
+    padding: 7px;
+  }
+  #tab-travel .travel-offer {
+    grid-template-columns: minmax(0, 1fr) 105px;
+  }
+  .flight-journey {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 7px;
+    padding: 17px 12px 13px;
+  }
+  .airline-mark {
+    display: none;
+  }
+  .flight-time strong {
+    font-size: 18px;
+  }
+  .flight-time span {
+    font-size: 10px;
+  }
+  .flight-duration > span {
+    font-size: 10px;
+  }
+  .flight-duration small {
+    font-size: 9px;
+  }
+  .flight-duration i {
+    margin: 7px 0;
+  }
+  .travel-offer .flight-fare {
+    padding: 12px 10px;
+  }
+  .flight-fare strong {
+    font-size: 23px;
+  }
+  .flight-fare a {
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+  .flight-fare > span {
+    font-size: 9px;
+  }
+  .flight-caption {
+    padding: 0 12px 13px;
+    line-height: 1.7;
+  }
+  .travel-offer details {
+    padding-left: 12px;
+    padding-right: 7px;
+  }
+  .travel-offer summary {
+    font-size: 9px !important;
+  }
+  #tab-travel .trip-stay {
+    padding: 19px;
+  }
+  #tab-travel .trip-stay h3 {
+    font-size: 18px;
+  }
+}
+.travel-search-options {
+  flex-wrap: wrap;
+}
+.travel-filter-sidebar legend {
+  float: none;
+  display: block;
+  width: auto;
+}
+#tab-travel .trip-stay-price a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border-radius: 7px;
+  text-decoration: none;
+  line-height: 1.2;
+}
+@media (max-width: 650px) {
+  .travel-search-options {
+    gap: 8px 14px;
+  }
+  .travel-search-options select {
+    max-width: 145px;
+  }
+  .travel-filter-sidebar legend {
+    display: none;
+  }
+  .travel-search-v3 {
+    margin-bottom: 14px;
+  }
+  .travel-results-header {
+    align-items: center;
+  }
+}
+.travel-search-fields.is-oneway {
+  grid-template-columns: 1.2fr 1.2fr 1fr auto;
+}
+@media (max-width: 1000px) {
+  .travel-search-fields.is-oneway {
+    grid-template-columns: 1fr 1fr;
+  }
+  .travel-search-fields.is-oneway .search-depart {
+    grid-column: 1/-1;
+  }
+}
+#travel-mobile-filters {
+  display: none;
+}
+@media (max-width: 650px) {
+  #travel-mobile-filters {
+    display: inline-flex;
+    background: white;
+    border: 1px solid #d9d2c9;
+    border-radius: 7px;
+    padding: 8px 14px;
+    font-size: 12px;
+    box-shadow: none;
+  }
+  .travel-filter-sidebar:not(.filters-open) fieldset {
+    display: none;
+  }
+  .travel-filter-sidebar.filters-open {
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e0d9d1;
+  }
+  .travel-filter-sidebar.filters-open #travel-mobile-filters {
+    background: #eee8e1;
+  }
+}
+.travel-prices-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--travel-line);
+  gap: 15px;
+  padding-bottom: 17px;
+}
+.travel-prices-bar .travel-result-status {
+  border: 0;
+  padding: 0;
+}
+.travel-prices-bar > button {
+  white-space: nowrap;
+  font-size: 12px;
+  color: #51473e;
+}
+.travel-prices-bar #travel-offer-context {
+  font-size: 11px;
+  color: #75665a;
+}
+#travel-search-feedback p {
+  font-size: 12px;
+  line-height: 1.7;
+}
+#travel-search-feedback button {
+  font-size: 12px;
+}
+@media (max-width: 650px) {
+  .travel-prices-bar {
+    align-items: flex-start;
+    gap: 9px;
+  }
+  .travel-prices-bar > button {
+    font-size: 11px;
+    padding: 0;
+  }
+  .travel-prices-bar #travel-offer-context {
+    line-height: 1.6;
+  }
+}
+#tab-travel {
+  animation: none;
+}
+.flight-direction {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 26px 0 12px;
+  color: #65594e;
+  letter-spacing: 0;
+}
+#tab-travel .travel-category button,#tab-travel #travel-search-hint,#tab-travel .travel-filter-note,#tab-travel #flight-result-count,#tab-travel #stay-result-count,#tab-travel .travel-search-empty p,#tab-travel .flight-time span,#tab-travel .flight-duration small,#tab-travel .flight-caption,#tab-travel .flight-fare>span{color:#6d6259}
+#tab-travel .travel-category button[aria-selected=true]{color:#22201f}
+#tab-travel .travel-place-row strong{color:#34302d}
