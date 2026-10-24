@@ -36,3 +36,19 @@ def test_index_status_reads_db_indexes() -> None:
         "label": "Person", "properties": ["id", "name"],
         "types": {"id": ["RANGE"], "name": ["FULLTEXT"]}, "status": "OPERATIONAL"}]
     graph.query.assert_called_once_with("CALL db.indexes()")
+
+
+def test_agent_state_labels_and_edges_are_allowed() -> None:
+    calls: list[str] = []
+
+    class Recorder:
+        def query(self, q: str, params: dict[str, object] | None = None) -> None:
+            calls.append(q)
+
+    store = GraphStore(Recorder())
+    store.merge_node("User", "demo-user", {"source": "user"})
+    store.merge_node("Change", "change:1", {"written_by": "replanner"})
+    for rel, frm, to in (("PLANS", "User", "Event"), ("SKIPS", "User", "Event"), ("AFFECTS", "Change", "Event")):
+        store.merge_edge(frm, "a", rel, to, "b", {"written_by": "x"})
+    assert sum("MERGE" in q for q in calls) == 5
+    assert "CREATE INDEX FOR (n:User) ON (n.id)" in INDEX_STATEMENTS
