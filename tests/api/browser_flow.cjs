@@ -534,7 +534,7 @@ function pass(name) {
     await settle();
     assert.equal(await page.locator("#error-banner").isVisible(), false);
     pass("Partial network failure remains visible and reload retry recovers");
-    await page.route("https://unpkg.com/**", (route) => route.abort());
+    await page.route("**/static/vendor/cytoscape-*/**", (route) => route.abort());
     await page.reload({ waitUntil: "domcontentloaded" });
     await page
       .locator(".person-preview")
