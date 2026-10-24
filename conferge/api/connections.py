@@ -310,4 +310,18 @@ def router(state: Any) -> APIRouter:
         except (httpx.HTTPError, ValueError, KeyError):
             raise HTTPException(503, "Search could not finish. Check the OpenAI configuration and retry.") from None
 
+    @api.post("/agent-search")
+    async def agent_search(req: SearchRequest) -> dict:
+        if not env_value("TRUEFORGE_BASE_URL"):
+            return await search(req)
+        from conferge.api.trueforge import search as run_agent
+
+        items = filter_people(eligible(state, req.scope), req)
+        if not items:
+            return {"items": [], "summary": "No people match these filters.", "mode": "empty", "scope": req.scope}
+        try:
+            return await run_agent(req.model_dump(), {p["id"]: p for p in items})
+        except (httpx.HTTPError, ValueError, KeyError):
+            raise HTTPException(503, "The agent could not finish. Please retry.") from None
+
     return api

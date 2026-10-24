@@ -23,12 +23,12 @@ async def request(path: str, *, params: dict | None = None, body: dict | None = 
 
 
 @mcp.tool(annotations=READ)
-async def search_connections(query: str, company: str = "", role: str = "", topic: str = "") -> dict:
+async def search_connections(query: str, company: str = "", role: str = "", topic: str = "", scope: str = "all") -> dict:
     """Find people by meaning in Conferge. Returns sourced profiles, not confirmed attendance.
 
     Uses OpenAI and FalkorDB; may populate the embedding cache but never changes user records.
     """
-    result = await request("connections/search", body=dict(query=query, company=company, role=role, topic=topic))
+    result = await request("connections/search", body=dict(query=query, company=company, role=role, topic=topic, scope=scope))
     # Photos are large metadata with no value for the reasoning context.
     for item in result.get("items", []):
         item.pop("photo", None)

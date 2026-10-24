@@ -117,7 +117,7 @@
     const ticket=++request;busy=true;$('connection-submit').disabled=true;$('connection-submit').textContent='Searching…';
     $('connection-summary').textContent='Searching this list…';$('graph-detail').innerHTML='';
     try {
-      const result=await api('connections/search',{query,scope,...filters});if(ticket!==request)return;
+      const result=await api('connections/agent-search',{query,scope,...filters});if(ticket!==request)return;
       shown=result.items;selected=null;personRows(shown);
       $('connection-results-title').textContent=`${shown.length} matches`;
       $('connection-summary').textContent=result.summary;
