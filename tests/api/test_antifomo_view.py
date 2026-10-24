@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
 
+import pytest
 from fastapi.testclient import TestClient
 
 from conferge.api import logic
@@ -159,3 +160,19 @@ def test_plan_uses_the_optimizer_feasibility_rules() -> None:
             assert ea.end_at is not None
             minutes, _ = travel_minutes(ea, eb, Constraints())
             assert ea.end_at + timedelta(minutes=minutes) <= eb.start_at
+
+
+@pytest.mark.parametrize(("change", "reason"), [
+    ({"status": "postponed"}, "postponed"),
+    ({"conference_relation": "unrelated"}, "unrelated"),
+    ({"status": "cancelled"}, "cancelled"),
+    ({"status": "sold_out"}, "sold_out"),
+])
+def test_unplannable_events_never_enter_the_plan(change: dict, reason: str) -> None:
+    data = _data()
+    # 'dull' is alone in its slot, so it is planned unless the filter drops it.
+    assert "dull" in {i["event_id"] for d in logic.build_plan(data, [], [])["days"] for i in d["items"]}
+    data.events[3] = data.events[3].model_copy(update=change)
+    plan = logic.build_plan(data, [], [], scores={"dull": 999.0})
+    assert "dull" not in {i["event_id"] for d in plan["days"] for i in d["items"]}
+    assert [x["reason"] for x in plan["excluded"] if x["event_id"] == "dull"] == [reason]

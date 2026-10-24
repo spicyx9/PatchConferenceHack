@@ -37,6 +37,17 @@ def test_proposals_declare_they_book_nothing() -> None:
     res = client.post("/api/v1/proposal/accept", json={"proposal_id": proposals[0]["id"]}).json()
     noted = next(p for p in res["proposals"] if p["id"] == proposals[0]["id"])
     assert noted["accepted"] is True and noted["books"] is False
+    assert noted["status_label"] == "Noted as preferred"
+
+
+def test_noting_a_proposal_changes_no_flight_or_stay() -> None:
+    client = _client()
+    before = client.get("/api/v1/travel").json()
+    pid = before["proposals"][0]["id"]
+    assert before["proposals"][0]["status_label"] is None
+    after = client.post("/api/v1/proposal/accept", json={"proposal_id": pid}).json()
+    assert after["itinerary"] == before["itinerary"] and after["budget"] == before["budget"]
+    assert next(p for p in after["proposals"] if p["id"] == pid)["status_label"] == "Noted as preferred"
 
 
 def test_map_routes_are_declared_straight_lines() -> None:
@@ -50,5 +61,5 @@ def test_ui_shows_the_decor_labels() -> None:
     html = open("static/index.html", encoding="utf-8").read()
     assert "Straight lines, not routes" in js
     assert "sourceModeBadge(b.source_mode)" in js
-    assert ">Save suggestion</button>" in js and ">Accept</button>" not in js
+    assert ">Noted</button>" in js and ">Noted as preferred</span>" in js and ">Accept</button>" not in js
     assert 'id="map-kind"' in html

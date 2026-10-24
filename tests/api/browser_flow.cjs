@@ -419,9 +419,9 @@ function pass(name) {
       await submit('button[data-action="accept"]', "/proposal/accept");
       assert.match(
         await page.locator("#proposals").textContent(),
-        /Suggestion saved/i,
+        /Noted as preferred/i,
       );
-      pass("Travel suggestion is saved without presenting it as a booking");
+      pass("Travel suggestion is noted as preferred without presenting it as a booking");
     }
     await nav("story");
     await page.locator('#tab-story [data-open="goal-dialog"]').first().click();
@@ -534,7 +534,7 @@ function pass(name) {
     await settle();
     assert.equal(await page.locator("#error-banner").isVisible(), false);
     pass("Partial network failure remains visible and reload retry recovers");
-    await page.route("https://unpkg.com/**", (route) => route.abort());
+    await page.route("**/static/vendor/cytoscape-*/**", (route) => route.abort());
     await page.reload({ waitUntil: "domcontentloaded" });
     await page
       .locator(".person-preview")
