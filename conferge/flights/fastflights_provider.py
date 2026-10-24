@@ -1,9 +1,8 @@
 """fast-flights (AWeirdDev/flights, MIT) provider: public Google Flights page.
 
 Verified 2026-10-24 against fast-flights 3.1.0 at commit 7c105db installed
-locally (it is not a project dependency; pyproject is owned by window 0, a
-dependency proposal is in the PR). Without the package every call returns a
-failed RunReport.
+locally; pinned in pyproject (fast-flights==3.1.0). Without the package every
+call returns a failed RunReport.
 
 Facts observed on the live page: a round-trip query only lists outbound
 options (with a round-trip price) and no flight numbers. A round trip cannot
@@ -33,7 +32,7 @@ from conferge.flights.normalize import (
 )
 
 PROVIDER = "fast_flights_google_flights"
-NOT_INSTALLED = "fast-flights not installed; dependency proposal pending window 0"
+NOT_INSTALLED = "fast-flights not installed; run make install"
 
 
 def _now() -> datetime:
