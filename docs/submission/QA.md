@@ -1,8 +1,8 @@
 # Judge Q&A
 
 Fifteen questions a judge may ask, each answered in at most two sentences. Every answer points
-to code (`file:line`, on `main`) or to an endpoint you can open during the demo. Figures are
-`{{placeholders}}`: read them live from the endpoint given in the table at the end. Never say
+to code (`file:line`, on `main`) or to an endpoint you can open during the demo. Figures were measured on dfca2bf at 15:33 PDT (`STATUS.md`); the table at the end says
+where each one is read. Never say
 a number the screen does not show.
 
 ### 1. Is this live or cached?
@@ -15,9 +15,8 @@ Bright Data live, and `/api/v1/pipeline` then says `cached`, `live` or `mixed` f
 
 ### 2. What did Bright Data cost?
 We cannot tell you the bill: no Bright Data response we captured carried a cost
-(`conferge/core/cost.py:17`). `/api/v1/pipeline` shows a list-price estimate of
-`{{estimated_cost_usd}}` labelled "estimate, not billed", and `/api/v1/brightdata` shows the
-`{{requests_at_collection}}` requests and `{{cached_records}}` records behind it.
+(`conferge/core/cost.py:17`). `/api/v1/brightdata` shows the 39 requests and 81 records behind our cache;
+we do not quote a dollar figure.
 
 ### 3. Why a graph and not Postgres?
 The ranking is a traversal (user → goal → person → event) where every edge carries its
@@ -56,9 +55,9 @@ listing him as met.
 The Web Unlocker refuses Kayak, Hotels.com, Expedia and Marriott until the account is KYC
 approved, and the client raises that refusal (`conferge/core/brightdata.py:404-406`); the
 Google Hotels dataset answered `no_peers`, and the Google Flights dataset ran past our time
-budget. `/api/v1/pipeline` → `reachability` lists all `{{sites_total}}` sites:
-`{{reachable_without_brightdata}}` reachable without Bright Data,
-`{{reachable_with_brightdata}}` with it.
+budget. `/api/v1/pipeline` → `reachability` lists all 21 sites:
+10 reachable without Bright Data,
+14 with it.
 
 ### 9. How is the score computed?
 For each goal, a person's path contributions are combined per source (the best per source,
@@ -73,7 +72,7 @@ No. It is a labelled simulation, "SIMULATION (not observed)"
 
 ### 11. Can I run it on my laptop?
 Yes: `make up`, `make install`, `make demo` (`Makefile:25`, `:9`, `:39`), first screen in
-`{{first_screen_seconds}}` without any key. A busy port fails fast with the command to run
+3 without any key. A busy port fails fast with the command to run
 instead (`Makefile:25`), and without FalkorDB the demo still serves, degraded, with "FalkorDB
 unreachable on host:port" in the Data pipeline panel (`scripts/run_demo.py:194`).
 
@@ -99,21 +98,20 @@ labelled snapshot of the public collection, not a live read; check `/api/v1/sour
 ### 15. What is next?
 Three gaps the code already reports:
 - the Unlocker sites waiting for KYC (`/api/v1/pipeline` → `reachability`,
-  `{{reachable_with_brightdata_if_kyc_approved}}` sites if approved);
+  18 sites if approved);
 - a Google Flights dataset snapshot with prices, which takes over from the Unlocker totals once
   one arrives (`conferge/flights/snapshot_provider.py:35`);
 - Google Hotels direct, whose page renders Google's default dates, so its prices are discarded
   (`conferge/lodging/google_hotels_direct.py:191`).
 
-## Placeholders: where to read them
+## Where each figure is read
 
-| Placeholder | Endpoint and field |
+| Value | Endpoint and field |
 |---|---|
-| `{{estimated_cost_usd}}` | `/api/v1/pipeline` → `totals.estimated_cost_usd` |
-| `{{requests_at_collection}}` | `/api/v1/brightdata` → `cache_summary.requests_at_collection_time` |
-| `{{cached_records}}` | `/api/v1/brightdata` → `cache_summary.records` |
-| `{{sites_total}}` | `/api/v1/pipeline` → `reachability.counts.n` |
-| `{{reachable_without_brightdata}}` | `/api/v1/pipeline` → `reachability.counts.reachable_without_brightdata` |
-| `{{reachable_with_brightdata}}` | `/api/v1/pipeline` → `reachability.counts.reachable_with_brightdata` |
-| `{{reachable_with_brightdata_if_kyc_approved}}` | `/api/v1/pipeline` → `reachability.counts.reachable_with_brightdata_if_kyc_approved` |
-| `{{first_screen_seconds}}` | `make predemo` → "up in N s" |
+| 39 | `/api/v1/brightdata` → `cache_summary.requests_at_collection_time` |
+| 81 | `/api/v1/brightdata` → `cache_summary.records` |
+| 21 | `/api/v1/pipeline` → `reachability.counts.n` |
+| 10 | `/api/v1/pipeline` → `reachability.counts.reachable_without_brightdata` |
+| 14 | `/api/v1/pipeline` → `reachability.counts.reachable_with_brightdata` |
+| 18 | `/api/v1/pipeline` → `reachability.counts.reachable_with_brightdata_if_kyc_approved` |
+| 3 | `make predemo` → "up in N s" |

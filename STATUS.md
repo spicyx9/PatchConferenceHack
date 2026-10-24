@@ -7,14 +7,14 @@
 5. Interface: Data pipeline panel and Reachability in "Sources and how it works", provenance badges on stays and travel legs, LinkedIn company (and SERP headline when found) on people cards.
 6. Bright Data products used: SERP API, Web Unlocker, Datasets (Booking, Airbnb, LinkedIn, Crunchbase).
 
-## Measured on c6c4d7d at 15:18 PDT
+## Measured on dfca2bf at 15:33 PDT
 
 Every value below was read by command on this checkout after `make predemo` (fresh demo on a reset graph).
 
 | Measure | Value | Read from |
 |---|---|---|
 | Events in the demo fixture | 194: 161 catalogue slots (142 official sessions outside Social, 19 catalogue Social items classed `confirmed_side_event`) + 33 external side events (Luma 12, Eventbrite 8, conferenceparties 7, Partiful 6) | `GET /api/v1/events` (`conference_relation`, first evidence provider) |
-| FalkorDB `conferge_demo` | 691 nodes, 2213 edges | `GRAPH.RO_QUERY conferge_demo "MATCH (n) RETURN count(n)"` and `"MATCH ()-[r]->() RETURN count(r)"` |
+| FalkorDB `conferge_demo` | 690 nodes, 2184 edges | `GRAPH.RO_QUERY conferge_demo "MATCH (n) RETURN count(n)"` and `"MATCH ()-[r]->() RETURN count(r)"` |
 | Agenda items (`GET /api/v1/plan`) | 25 | `GET /api/v1/plan` |
 | Sold-out event (labelled simulation) | Agentic engineering past the pilot: An enterprise playbook | `POST /api/v1/simulate-change` (scenario `w15-simulated-sold-out`), then `POST /api/v1/reset` |
 | Replacement event | How one open source project turned funding into security at scale | same call, `diff.added` |
@@ -27,5 +27,5 @@ Every value below was read by command on this checkout after `make predemo` (fre
 | Crunchbase | 2/10 companies normalized | `probes/crunchbase.md` |
 | Google Maps | 4/9 venues found (snapshot `sd_mvmvwe7c2bqi2xcka6`) | `data/cache/venues.json` |
 | Reachability (21 sites, block matrix) | 10 without Bright Data, 12 with Web Unlocker alone, 14 with Bright Data; 18 projected once KYC is approved | `GET /api/v1/pipeline` `reachability` |
-| `make check` | 1457 passed, 29 skipped on `c6c4d7d` (1461 passed, 29 skipped with this PR's 4 predemo tests) | local run |
-| HEAD | `c6c4d7d` | `git rev-parse --short HEAD`, `/health` `git_sha` |
+| `make check` | 1470 passed, 26 skipped | local run |
+| HEAD | `dfca2bf` | `git rev-parse --short HEAD`, `/health` `git_sha` |

@@ -47,7 +47,7 @@ non-zero exit. Then continue with step 3 below (browser, Reset session).
 
 ## Script
 
-Values measured on `c6c4d7d` at 15:18 PDT (`STATUS.md`); labels as they read in `static/` on that commit.
+Values measured on `dfca2bf` at 15:33 PDT (`STATUS.md`); labels as they read in `static/` on that commit.
 
 | Time | Say | Do (exact UI) | On screen |
 |---|---|---|---|

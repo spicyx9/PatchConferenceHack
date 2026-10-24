@@ -1,6 +1,6 @@
 # Judging guide: criterion → what to click
 
-Every figure below comes from [STATUS.md](../STATUS.md) (measured on c6c4d7d at 15:18 PDT); nothing here is new.
+Every figure below comes from [STATUS.md](../STATUS.md) (measured on dfca2bf at 15:33 PDT); nothing here is new.
 Start the demo with `make demo` and open http://127.0.0.1:8000.
 
 Every recommendation carries its evidence path or an explicit fallback rationale: people matched on role alone, without a complete event path, stay ranked with that fallback reason shown.
@@ -9,14 +9,14 @@ Every recommendation carries its evidence path or an explicit fallback rationale
 
 | Criterion | What to click to prove it | What you see |
 |---|---|---|
-| The graph is at the core | **People** tab, any card → **View connection** | The ranking comes from FalkorDB traversals (STATUS: "Rankings of people and events come from FalkorDB 6.0.3 traversals"); the graph holds 691 nodes and 2213 edges. |
+| The graph is at the core | **People** tab, any card → **View connection** | The ranking comes from FalkorDB traversals (STATUS: "Rankings of people and events come from FalkorDB 6.0.3 traversals"); the graph holds 690 nodes and 2184 edges. |
 | Answers are explainable (every recommendation carries its evidence path or an explicit fallback rationale) | **Connections** tab after **View connection** → **Show in FalkorDB Browser** | The goal → topic → event → person path, the literal Cypher, and each edge with its source. |
 | Gaps are shown, not hidden | **Connections** tab → block **No path in our graph** | "No recorded path found, and that's the answer: the graph has no evidence linking this goal to anyone at the conference. It does not prove the person or event is absent." It lists goals without a recorded path, companies of the goals with no presence at an event, goal topics no event is about, each with its copyable Cypher and the graph's source mode ("No gaps for these goals" when there is none). |
 | How the score is computed | Footer → **How scoring works** | The formula written from the constants of the code: path weights, weakest-edge confidence, noisy-OR corroboration across sources, goal priority, cap at 100, presence labels, marked uncalibrated. |
 | A real problem | **Discover** tab | One goal sentence becomes an agenda of 25 items and the top 50 people ranked from FalkorDB traversals (top 3 Ryan Hecht 56, Camila Maia 47, Nick Liffen 40). |
 | The demo runs | **Discover** → **Explore a sold-out scenario**, then **I met …** | The agenda is replanned with the reason and the path; the meeting is written to the graph (MET memory survives restarts, `POST /reset` clears it). |
 | Provenance | **Sources and how it works** (header) → **Data pipeline** | One row per collection run from its RunReport: provider, Bright Data API, records, collected_at, outcome. Events: 194: 161 catalogue slots (142 official sessions outside Social, 19 catalogue Social items classed `confirmed_side_event`) and 33 external side events (Luma 12, Eventbrite 8, conferenceparties 7, Partiful 6). |
-| A judge can run it | `make up`, `make install`, `make demo` | Same screens on the judge's machine; `make check`: 1457 passed, 29 skipped. |
+| A judge can run it | `make up`, `make install`, `make demo` | Same screens on the judge's machine; `make check`: 1470 passed, 26 skipped. |
 
 ## Bright Data
 
