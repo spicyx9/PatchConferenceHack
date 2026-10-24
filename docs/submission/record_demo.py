@@ -1,11 +1,12 @@
 """Record the 6-step demo backup video. Run: uv run --no-project --with playwright python docs/submission/record_demo.py docs/submission/demo-backup.webm"""
+import os
 import shutil
 import sys
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 OUT = Path(sys.argv[1])
-BASE = "http://127.0.0.1:8000"
+BASE = os.environ.get("CONFERGE_URL", "http://127.0.0.1:8000")
 PAUSE = 2000
 tmp = OUT.parent / "_video_tmp"
 log = []
