@@ -145,3 +145,21 @@ def test_demo_goals_are_fixture_typed_goals_are_live(monkeypatch) -> None:  # ty
     client.get("/api/v1/people?limit=3")
     typed = [p for k, _, p in store.nodes if k == "Goal"]
     assert typed and {p["source_mode"] for p in typed} == {"live"}
+
+
+# -- 6. is_investor: "venture" alone is not enough ----------------------------------------
+
+def test_venture_alone_is_not_an_investor() -> None:
+    from conferge.core.schemas import Company
+    from conferge.events.official.normalize import infer_roles as roles_from_title
+    from conferge.people.enrich import investor_flag
+
+    assert "investor" not in roles_from_title("Venture Lead, Developer Tools")
+    assert "investor" not in roles_from_title("partner marketing")  # not an investing partner
+    for title in ("Investor", "General Partner", "VC Associate", "Partner, Seed Capital", "Fund Manager"):
+        assert "investor" in roles_from_title(title), title
+    assert investor_flag(Company(id="c1", name="Example Ventures")).is_investor is None
+    assert investor_flag(Company(id="c2", name="Example Capital")).is_investor is True
+    # the Crunchbase flag stays authoritative: never overwritten by the heuristic
+    flagged = Company(id="c3", name="Example Ventures", is_investor=True)
+    assert investor_flag(flagged).is_investor is True

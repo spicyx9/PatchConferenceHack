@@ -263,7 +263,7 @@ async def enrich_topics(
 
 
 _INVESTOR_RE = re.compile(
-    r"(?<![a-z0-9])(?:venture capital|ventures?|capital|vc fund|venture fund|vc)(?![a-z0-9])"
+    r"(?<![a-z0-9])(?:investors?|vc|capital|partners?|funds?)(?![a-z0-9])"
 )
 INVESTOR_CATEGORY = "investor_heuristic"
 
@@ -272,7 +272,8 @@ def investor_flag(company: Company, evidence_text: str | None = None) -> Company
     """Heuristic: mark a company as an investor from name/categories/evidence keywords.
 
     Sets `is_investor=True` and adds the `investor_heuristic` category only when
-    venture/capital/vc keywords appear on word boundaries (e.g. "Example Ventures").
+    investor/VC/capital/partner/fund appears on word boundaries ("venture" alone, as in
+    "Example Ventures", is not enough; the Crunchbase flag is the other way in).
     Never sets False and never overwrites an existing non-null `is_investor`.
     This is a guess, not verified fund data; "capital" can produce false positives.
     """
