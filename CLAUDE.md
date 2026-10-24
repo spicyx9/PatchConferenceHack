@@ -1,3 +1,13 @@
+## CANONICAL STRUCTURE — READ THIS FIRST (updated 2026-10-23 PT)
+
+Window 00 is already completed on the **actual** Python package `conferge/` with green CI.
+Authoritative instructions, in order: `CLAUDE.md` → `docs/CONTRACTS.md` → `docs/WORKSTREAMS.md` → `docs/prompts/wNN-<slug>.md`.
+The `docs/knowledge/` directory is a research/reference library, **not a source of repo paths or schemas**.
+The alternate `docs/prompts/wNN.md` and `docs/prompts/_common.md` were authored for an old `backend/app/` proposal and are **legacy, not executable**. Do not follow their branch names, directory names, signature requirements, or instructions to unzip a starter.
+Do not recreate the repository, re-unzip files, rename packages, or change `conferge/core` contracts. Use the exact existing `scripts/create_worktrees.sh`.
+The orchestrator's final instructions are `docs/ORCHESTRATOR_CANONICAL.md` and the progress ledger is `STATUS.md`.
+Never run unattended with `--dangerously-skip-permissions`. Keep CI, permissions and path ownership enforced. Qodo reviews, if available, are auxiliary; sponsor tracks are Bright Data and FalkorDB.
+
 # Conferge — Claude Code multi-window rules
 
 ## Context
