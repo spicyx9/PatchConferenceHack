@@ -14,7 +14,7 @@ Every value below was read by command on this checkout after `make predemo` (fre
 | Measure | Value | Read from |
 |---|---|---|
 | Events in the demo fixture | 194: 161 catalogue slots (142 official sessions outside Social, 19 catalogue Social items classed `confirmed_side_event`) + 33 external side events (Luma 12, Eventbrite 8, conferenceparties 7, Partiful 6) | `GET /api/v1/events` (`conference_relation`, first evidence provider) |
-| FalkorDB `conferge_demo` | 690 nodes, 2184 edges | `GRAPH.RO_QUERY conferge_demo "MATCH (n) RETURN count(n)"` and `"MATCH ()-[r]->() RETURN count(r)"` |
+| FalkorDB `conferge_demo` | 690 nodes / 2 184 edges loaded from the catalogue; 691 / 2 213 once the plan is written (1 User node, 25 PLANS edges, 4 SKIPS edges for the anti-FOMO skips); the graph then grows with every meeting you record | `GRAPH.RO_QUERY conferge_demo "MATCH (n) RETURN count(n)"` and `"MATCH ()-[r]->() RETURN count(r)"` |
 | Agenda items (`GET /api/v1/plan`) | 25 | `GET /api/v1/plan` |
 | Sold-out event (labelled simulation) | Agentic engineering past the pilot: An enterprise playbook | `POST /api/v1/simulate-change` (scenario `w15-simulated-sold-out`), then `POST /api/v1/reset` |
 | Replacement event | How one open source project turned funding into security at scale | same call, `diff.added` |

@@ -115,6 +115,30 @@ def graph_counts(graph: str = "conferge_demo") -> tuple[int, int]:
     return int(nodes), int(edges)
 
 
+def graph_breakdown(graph: str = "conferge_demo") -> dict[str, dict[str, int]]:
+    """Node count per label and edge count per type."""
+    from falkordb import FalkorDB
+
+    host, port = falkordb_address()
+    g = FalkorDB(host=host, port=port).select_graph(graph)
+    return {"labels": {str(r[0]): int(r[1]) for r in g.ro_query("MATCH (n) RETURN labels(n)[0], count(n)").result_set},
+            "edges": {str(r[0]): int(r[1]) for r in g.ro_query("MATCH ()-[r]->() RETURN type(r), count(r)").result_set}}
+
+
+def graph_counts_row(before: dict[str, dict[str, int]], after: dict[str, dict[str, int]]) -> tuple[str, bool, str]:
+    """Pure, information only (no threshold): counts when loaded, then after the page wrote its plan."""
+    def total(b: dict[str, dict[str, int]], key: str) -> int:
+        return sum(b.get(key, {}).values())
+
+    delta = [f"+{after[k].get(n, 0) - before[k].get(n, 0)} {n}"
+             for k in ("labels", "edges") for n in sorted(set(after.get(k, {})) | set(before.get(k, {})))
+             if after[k].get(n, 0) != before[k].get(n, 0)]
+    return ("Graph counts (info)", True,
+            f"loaded {total(before, 'labels')} nodes / {total(before, 'edges')} edges; "
+            f"after plan {total(after, 'labels')} / {total(after, 'edges')}"
+            + (f" ({', '.join(delta)})" if delta else ""))
+
+
 def evaluate(data: dict[str, Any], exp: dict[str, Any]) -> list[tuple[str, bool, str]]:
     """Pure check of collected facts -> (check, ok, detail) rows."""
     rows: list[tuple[str, bool, str]] = []
@@ -148,8 +172,10 @@ def _get(url: str, timeout: float = 30.0) -> Any:
         return json.loads(r.read())
 
 
-def collect(base: str, counts: Callable[[], tuple[int, int]] = graph_counts) -> dict[str, Any]:
+def collect(base: str, counts: Callable[[], tuple[int, int]] = graph_counts,
+            breakdown: Callable[[], dict[str, dict[str, int]]] | None = None) -> dict[str, Any]:
     api = base.rstrip("/") + "/api/v1"
+    loaded = breakdown() if breakdown else None  # before the page's first calls write the plan
     # Same order as the page: plan, people and pipeline load before /antifomo is called.
     plan = _get(api + "/plan")
     agenda = sum(len(d.get("items") or []) for d in (plan.get("plan") or {}).get("days") or [])
@@ -161,7 +187,7 @@ def collect(base: str, counts: Callable[[], tuple[int, int]] = graph_counts) -> 
     except Exception:  # noqa: BLE001 - reported as a FAIL line
         antifomo = None
     return {"graph": counts(), "pipeline": pipeline, "people": people, "antifomo_seconds": antifomo,
-            "agenda_items": agenda}
+            "agenda_items": agenda, "graph_loaded": loaded}
 
 
 def table(rows: list[tuple[str, bool, str]]) -> str:
@@ -181,8 +207,9 @@ def main(argv: list[str]) -> int:
         print(f"FalkorDB answers on {host}:{port} ({len(graphs)} graphs)")
         return 0
     if argv[:1] == ["api"] and len(argv) == 2:
-        data = collect(argv[1])
+        data = collect(argv[1], breakdown=graph_breakdown)
         rows = evaluate(data, expected())
+        rows.append(graph_counts_row(data["graph_loaded"], graph_breakdown()))
         sold, replacement = scenario(argv[1])
         rows += stage_rows(data.get("agenda_items"), sold, replacement, status_values())
         print(table(rows))
