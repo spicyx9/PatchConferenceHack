@@ -3,7 +3,7 @@
   'use strict';
   const $ = id => document.getElementById(id);
   const esc = value => String(value == null ? '' : value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const colors = {Person:'#5485da', Company:'#a27ad7', Event:'#d99b62', Topic:'#47a99d', Goal:'#be9a45', User:'#be9a45'};
+  const colors = {Person:'#638574', Company:'#94879f', Event:'#b89c7d', Topic:'#8c9c82', Goal:'#454e46', User:'#454e46'};
   const labels = {WORKS_AT:'works at', SPEAKS_AT:'speaks at', ABOUT:'about', HOSTS:'hosts', HAS_GOAL:'prioritizes', ATTENDS_CONFIRMED:'attends'};
   let scope='all', all=[], shown=[], cy=null, request=0, selected=null, busy=false;
   const filters={company:'',role:'',topic:''};
@@ -13,8 +13,10 @@
   function filterControls(data) {
     Object.keys(filters).forEach(k=>{
       const options=data.filters[k]||[];
-      $('filter-'+k).innerHTML=`<option value="">${filterNames[k]}</option>`+options.map(v=>`<option value="${esc(v)}">${esc(k==='role'?(roleNames[v]||v):v)}</option>`).join('');
-      $('filter-'+k).value=filters[k];
+      $('filter-'+k+'-options').innerHTML=['',...options].map(v=>`<button type="button" data-filter-value="${esc(v)}" aria-pressed="${filters[k]===v}">${esc(v?(k==='role'?(roleNames[v]||v):v):filterNames[k])}<span aria-hidden="true">${filters[k]===v?'✓':''}</span></button>`).join('');
+      $('filter-'+k+'-value').textContent=filters[k]?(k==='role'?(roleNames[filters[k]]||filters[k]):filters[k]):filterNames[k];
+      $('filter-'+k).querySelector('input').value='';
+      $('filter-'+k).querySelector('.filter-no-options').hidden=true;
     });
     $('filter-count').textContent=`${data.count} of ${data.total} people`;
     $('filter-reset').hidden=!Object.values(filters).some(Boolean);
@@ -85,7 +87,6 @@
       if(ticket!==request)return;
       filterControls(data);all=data.items;const visible=new Set(data.graph.nodes.filter(n=>n.type==='Person').map(n=>n.id));shown=[...all.filter(p=>visible.has(p.id)),...all.filter(p=>!visible.has(p.id))];selected=null;
       $('connections-count').textContent=`${all.length} people in ${scope==='met'?'your recorded meetings':'the conference directory'}`;
-      $('connection-ai-status').textContent=data.ai_configured?'AI search ready':'Keyword search · OpenAI not connected';
       $('connection-results-title').textContent='People';$('connection-clear').hidden=!Object.values(filters).some(Boolean);$('network-all').hidden=!Object.values(filters).some(Boolean);
       $('connection-summary').textContent='';
       $('graph-detail').innerHTML='';personRows(shown);draw(data.graph);
@@ -101,7 +102,6 @@
       shown=result.items;selected=null;personRows(shown);
       $('connection-results-title').textContent=`${shown.length} matches`;
       $('connection-summary').textContent=result.summary;$('connection-clear').hidden=false;$('network-all').hidden=false;
-      $('connection-ai-status').textContent=result.mode==='semantic'?'OpenAI + FalkorDB vectors':result.mode==='keyword'?'Keyword search':'No matches';
       if(!shown.length)draw({nodes:[],edges:[],backend:'falkordb'});
       if(shown.length){const data=await api('connections?'+params({focus:shown[0].id}));if(ticket===request)draw(data.graph);}
     }catch(e){if(ticket===request)$('connection-summary').textContent=e.message;}
@@ -116,7 +116,14 @@
   document.querySelectorAll('[data-connection-query]').forEach(button=>button.addEventListener('click',()=>{$('connection-query').value=button.dataset.connectionQuery;search();}));
   $('connection-results').addEventListener('click',e=>{const b=e.target.closest('[data-person]');if(b)focus(b.dataset.person);});
   function resetSearch() {Object.keys(filters).forEach(k=>filters[k]='');$('connection-query').value='';render();}
-  Object.keys(filters).forEach(k=>$('filter-'+k).addEventListener('change',()=>{filters[k]=$('filter-'+k).value;$('connection-query').value='';render();}));
+  Object.keys(filters).forEach(k=>{
+    const menu=$('filter-'+k),input=menu.querySelector('input'),summary=menu.querySelector('summary');
+    menu.addEventListener('toggle',()=>{if(menu.open){document.querySelectorAll('.filter-menu').forEach(other=>{if(other!==menu)other.open=false;});}});
+    input.addEventListener('input',()=>{let count=0;menu.querySelectorAll('[data-filter-value]').forEach(b=>{b.hidden=!b.textContent.toLowerCase().includes(input.value.toLowerCase());if(!b.hidden)count++;});menu.querySelector('.filter-no-options').hidden=count>0;});
+    menu.addEventListener('click',e=>{const button=e.target.closest('[data-filter-value]');if(!button)return;filters[k]=button.dataset.filterValue;menu.open=false;summary.focus();$('connection-query').value='';render();});
+    menu.addEventListener('keydown',e=>{if(e.key==='Escape'){menu.open=false;summary.focus();}});
+  });
+  document.addEventListener('pointerdown',e=>{document.querySelectorAll('.filter-menu[open]').forEach(menu=>{if(!menu.contains(e.target))menu.open=false;});});
   $('filter-reset').addEventListener('click',resetSearch);
   $('connection-clear').addEventListener('click',resetSearch);
   $('network-all').addEventListener('click',resetSearch);

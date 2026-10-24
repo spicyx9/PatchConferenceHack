@@ -556,12 +556,28 @@
             </div><span class="connection-source">Demo snapshot</span>
           </div>
           <div class="connection-filters" role="group" aria-label="Filter connections">
-            <label>Company<select id="filter-company"><option value="">All companies</option></select></label>
-            <label>Role<select id="filter-role"><option value="">All roles</option></select></label>
-            <label>Profile / session topic<select id="filter-topic"><option value="">All topics</option></select></label>
+            <div class="connection-filter"><span id="filter-company-label">Company</span>
+              <details class="filter-menu" id="filter-company">
+                <summary aria-labelledby="filter-company-label filter-company-value"><span id="filter-company-value">All companies</span><span aria-hidden="true">⌄</span></summary>
+                <div class="filter-popover"><input type="search" aria-label="Search company options" placeholder="Search options…" autocomplete="off" />
+                  <div class="filter-options" id="filter-company-options"></div><p class="filter-no-options" hidden>No matching options</p></div>
+              </details></div>
+            <div class="connection-filter"><span id="filter-role-label">Role</span>
+              <details class="filter-menu" id="filter-role">
+                <summary aria-labelledby="filter-role-label filter-role-value"><span id="filter-role-value">All roles</span><span aria-hidden="true">⌄</span></summary>
+                <div class="filter-popover"><input type="search" aria-label="Search role options" placeholder="Search options…" autocomplete="off" />
+                  <div class="filter-options" id="filter-role-options"></div><p class="filter-no-options" hidden>No matching options</p></div>
+              </details></div>
+            <div class="connection-filter"><span id="filter-topic-label">Profile / session topic</span>
+              <details class="filter-menu" id="filter-topic">
+                <summary aria-labelledby="filter-topic-label filter-topic-value"><span id="filter-topic-value">All topics</span><span aria-hidden="true">⌄</span></summary>
+                <div class="filter-popover"><input type="search" aria-label="Search profile / session topic options" placeholder="Search options…" autocomplete="off" />
+                  <div class="filter-options" id="filter-topic-options"></div><p class="filter-no-options" hidden>No matching options</p></div>
+              </details></div>
             <div class="filter-feedback"><span id="filter-count" role="status" aria-live="polite"></span>
               <button type="button" id="filter-reset" hidden>Reset filters</button></div>
           </div>
+          <div class="connection-chat">
           <label class="connection-query-label" for="connection-query">Ask about your connections</label>
           <form id="connection-search" class="connection-search">
             <span class="search-spark" aria-hidden="true">✳</span>
@@ -572,7 +588,6 @@
           <section class="connection-examples" aria-labelledby="connection-examples-title">
             <div class="connection-examples-heading">
               <div><h2 id="connection-examples-title">Try an example</h2><p>Click a question to search the people matching your filters.</p></div>
-              <span id="connection-ai-status"></span>
             </div>
             <div class="connection-prompt-grid">
               <button type="button" data-connection-query="Who works on AI agents?">
@@ -586,6 +601,7 @@
               </button>
             </div>
           </section>
+          </div>
           <div class="connection-workspace">
             <div class="network-pane">
               <div class="network-toolbar"><span>3D network <span id="network-count"></span></span>
