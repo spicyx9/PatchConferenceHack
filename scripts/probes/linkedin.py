@@ -89,6 +89,8 @@ def main() -> int:
     hosts_with_url = [h for h in li.fixture_hosts() if h.linkedin_url]
     res = asyncio.run(li.enrich(targets, assembly.companies, store,
                                 allow_collect=not args.no_collect))
+    if res.enrichments:  # keep the committed public cache in step with a fresh run
+        li.write_public(res.enrichments)
     after = people_for_goal(store, "demo-user", goal.id, 5)["rows"]
     tagged = store.graph.query(
         "MATCH (p:Person {provider: 'brightdata:linkedin'}) RETURN count(p)").result_set[0][0]

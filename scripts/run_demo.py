@@ -59,9 +59,10 @@ def linkedin_enrichment(args: argparse.Namespace, assembly: Any, goals: list[Any
                         ranked: list[str] | None = None) -> None:
     """Bright Data LinkedIn profiles onto the best ranked speakers (+ fixture hosts).
 
-    Profiles come only from data/probes/linkedin_*.json younger than 24 h (downloaded
-    snapshots first): startup never calls Bright Data. ``make probe-linkedin`` refreshes the
-    files. Writes go through GraphStore only.
+    Profiles come from data/probes/linkedin_*.json younger than 24 h (downloaded snapshots
+    first), else from the committed public cache data/cache/linkedin_public.json: startup
+    never calls Bright Data. ``make probe-linkedin`` refreshes both. Writes go through
+    GraphStore only.
     """
     from conferge.integration import people_linkedin as li
     from conferge.integration.pipeline_view import row
@@ -77,8 +78,8 @@ def linkedin_enrichment(args: argparse.Namespace, assembly: Any, goals: list[Any
     res = asyncio.run(li.enrich([p for p in targets if p.id in known], assembly.companies, store,
                                 allow_collect=False))
     if not res.enrichments:
-        print(f"  linkedin: {len(targets)} targets, no usable profile in data/probes "
-              f"(make probe-linkedin fills them) {res.errors[:1]}")
+        print(f"  linkedin: {len(targets)} targets, no usable profile in data/probes or "
+              f"data/cache (make probe-linkedin fills them) {res.errors[:1]}")
         return
     assembly.demo.people = li.apply_to_people(assembly.demo.people, res.enrichments)
     assembly.demo.linkedin = li.cards(res.enrichments)
