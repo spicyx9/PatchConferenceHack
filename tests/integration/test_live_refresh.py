@@ -77,8 +77,8 @@ def test_endpoint_without_key_reports_and_changes_nothing(monkeypatch: pytest.Mo
     client = TestClient(create_app(data=demo, found=Providers(), graph_probe=False))
     before = client.get("/api/v1/flights").json()
     body = client.post("/api/v1/pipeline/refresh").json()
-    assert body["refresh"]["ok"] is False and body["refresh"]["requests"] in (1, 2)
-    assert all("not configured" in e or "key missing" in e for e in body["refresh"]["errors"])
+    assert body["refresh"]["ok"] is False and body["refresh"]["requests"] == 0  # nothing sent
+    assert body["refresh"]["errors"] == ["BRIGHTDATA_API_KEY missing: nothing sent, cache kept"]
     after = client.get("/api/v1/flights").json()
     assert after["items"] == before["items"] and after["data_source"] == "cached"
     js = client.get("/static/app.js").text
@@ -123,3 +123,47 @@ def test_slow_unlocker_is_amber_cache_kept(tmp_path: Path, monkeypatch: pytest.M
     assert result["slow"] and result["slow"][0].startswith("Bright Data slow, cache kept")
     assert result["errors"] == [] and result["ok"] is False and demo.flights == before
     assert "no profile in SERP (0 organic results)" in result["lines"][-1]
+
+
+def test_key_without_zones_uses_default_zones_and_counts_sent_requests(
+        monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    from conferge.integration import live_refresh
+
+    monkeypatch.setenv("BRIGHTDATA_API_KEY", "k")
+    monkeypatch.setenv("BRIGHTDATA_UNLOCKER_ZONE", "")
+    monkeypatch.setenv("BRIGHTDATA_SERP_ZONE", "")
+    zones: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        zones.append(json.loads(request.content)["zone"])
+        return httpx.Response(200, text=SAMPLE) if zones[-1] == "web_unlocker1" \
+            else httpx.Response(200, json={"organic": []})
+
+    real = live_refresh.make_client
+    monkeypatch.setattr(live_refresh, "make_client", lambda http=None: real(httpx.AsyncClient(
+        base_url="https://api.brightdata.test", transport=httpx.MockTransport(handler))))
+    result = asyncio.run(live_refresh.refresh(_demo(), ("Jane Doe", "Acme"), now=lambda: NOW,
+                                              probe_dir=tmp_path))
+    assert sorted(zones) == ["serp_api1", "web_unlocker1"] and result["requests"] == 2
+    assert result["notes"] == ["default zones: web_unlocker1, serp_api1"]
+
+
+def test_pipeline_requests_per_product_and_live_counter_apart_from_cache(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("BRIGHTDATA_API_KEY", "")
+    client = TestClient(create_app(data=_demo(), found=Providers(), graph_probe=False))
+    req = client.get("/api/v1/pipeline").json()["requests"]
+    products = {p["product"]: p for p in req["at_collection_time"]}
+    assert products["Booking"]["requests"] >= 1 and products["Booking"]["records"] == 15
+    assert products["Google Flights"]["requests"] == 1 and products["Google Flights"]["records"] == 34
+    from conferge.core.cost import snapshot
+
+    assert req["since_start"] == snapshot()["by_api"]  # this process's calls, nothing cached
+    assert "at collection time" in req["note"]
+    bd = client.get("/api/v1/brightdata").json()
+    assert bd["live"]["key_missing"] is True and bd["live"]["label"] == "key missing"
+    assert bd["live"]["requests"] == snapshot()["requests"]  # live only, cache never added
+    assert bd["cache_summary"]["records"] >= 72
+    assert bd["cache_summary"]["requests_at_collection_time"] >= 1
+    js = client.get("/static/app.js").text
+    assert "Bright Data live: " in js and "Served from cache: " in js and "(key missing)" in js

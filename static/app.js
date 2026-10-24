@@ -3989,9 +3989,24 @@
     var notReady = ["datasets", "web_unlocker", "serp"].filter(function (k) {
       return !ready[k];
     });
+    var live = (res && res.live) || { requests: 0, records: 0 };
+    var cs = (res && res.cache_summary) || {};
+    function collectedPhrase(first, last) {
+      if (!last) return "collection time unknown";
+      var l = new Date(last), f = new Date(first || last), now = new Date();
+      var sameDay = l.toDateString() === now.toDateString();
+      var hour = Number(new Intl.DateTimeFormat("en-US", { timeZone: EVENT_TZ, hour: "numeric", hour12: false }).format(l));
+      if (sameDay && hour < 12) return "collected this morning";
+      return "collected " + fmtTime(f.toISOString()) + (first && first !== last ? " to " + fmtTime(last) : "");
+    }
+    var cacheLine = cs.records
+      ? '<div class="bd-cache-line">Served from cache: ' + esc(cs.records) + " records, " +
+        esc(collectedPhrase(cs.collected_first, cs.collected_last)) + " (" +
+        esc(cs.requests_at_collection_time || 0) + " requests at collection time)</div>"
+      : "";
     $("bd-counter").innerHTML =
-      "<b>Bright Data: " + esc(res && res.requests != null ? res.requests : 0) +
-      " requests, " + esc(res && res.records != null ? res.records : 0) + " records</b>" +
+      "<b>Bright Data live: " + esc(live.requests || 0) + " requests, " + esc(live.records || 0) +
+      " records" + (live.key_missing ? " (key missing)" : "") + "</b>" + cacheLine +
       ' <span class="bd-detail">(a request is one API call; one Web Unlocker page can yield many records). ' +
       "Cost: " + esc((res && res.cost_note) || "not read from any Bright Data response") + "." +
       (u.requests && u.requests.total
@@ -4013,6 +4028,7 @@
     $("pipeline-refresh-result").innerHTML =
       '<div class="refresh-head">' + head + "</div>" +
       (r.lines || []).map(function (l) { return '<div class="refresh-line">' + esc(l) + "</div>"; }).join("") +
+      (r.notes || []).map(function (n) { return '<div class="refresh-line muted">' + esc(n) + "</div>"; }).join("") +
       (r.slow || []).map(function (e) { return '<div class="refresh-slow">' + esc(e) + "</div>"; }).join("") +
       (r.errors || []).map(function (e) { return '<div class="refresh-error">' + esc(e) + "</div>"; }).join("");
   }
@@ -4088,7 +4104,21 @@
         "</p>";
     var t = (res && res.totals) || {},
       calls = (res && res.brightdata_calls) || [];
+    var req = (res && res.requests) || {};
+    var atc = req.at_collection_time || [];
+    var since = req.since_start || {};
+    var reqLine =
+      "<div><b>Requests at collection time:</b> " +
+      (atc.length
+        ? atc.map(function (p) { return esc(p.product) + " " + esc(p.requests) + " req / " + esc(p.records) + " rec"; }).join(" · ")
+        : "none") +
+      "</div><div><b>Requests since start:</b> " +
+      ["dataset", "unlocker", "serp"].map(function (k) {
+        var v = since[k] || since[k === "dataset" ? "datasets" : k] || { requests: 0 };
+        return esc(k) + " " + esc(v.requests || 0);
+      }).join(" · ") + "</div>";
     $("pipeline-calls").innerHTML =
+      reqLine +
       "Bright Data records in these runs: " +
       esc(t.brightdata_records || 0) +
       ". Cost: " +
