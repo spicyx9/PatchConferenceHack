@@ -341,8 +341,12 @@ def _tokens(text: str, drop: frozenset[str] | set[str] = frozenset()) -> list[st
 
 
 def name_matches(person_name: str, profile_name: str | None) -> bool:
-    """Same first and last name tokens (accents, case and middle names ignored)."""
-    a, b = _tokens(person_name), _tokens(profile_name or "")
+    """Same first and last name tokens (accents, case, middle names and initials ignored).
+
+    An abbreviated last name ("Kaush G.") does not confirm "Kaush Ganguly".
+    """
+    a = [t for t in _tokens(person_name) if len(t) > 1]
+    b = [t for t in _tokens(profile_name or "") if len(t) > 1]
     return bool(a and b) and a[0] == b[0] and a[-1] == b[-1]
 
 

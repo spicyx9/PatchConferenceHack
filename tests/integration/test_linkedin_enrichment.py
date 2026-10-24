@@ -179,6 +179,8 @@ def test_fixture_hosts_carry_no_linkedin_url_today() -> None:
     ("Avery Sample", "AgentWorks Inc.", 1.0),   # name + company
     ("Avery  SAMPLE", "Other Corp", 0.7),       # name only
     ("Ávery J. Sample", None, 0.7),             # accents, middle initial
+    ("A. Avery Sample", None, 0.7),             # leading initial
+    ("Avery S.", "AgentWorks", 0.42),           # abbreviated last name: unchanged
     ("Someone Else", "AgentWorks", 0.42),       # unchanged
 ])
 def test_identity_confidence(name: str, company: str | None, expected: float) -> None:

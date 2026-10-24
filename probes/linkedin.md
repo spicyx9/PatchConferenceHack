@@ -1,6 +1,6 @@
 # Probe: LinkedIn enrichment (Bright Data dataset gd_l1viktl72bvl7bjuj0)
 
-- run at: 2026-10-24T19:16:37.391326+00:00 (122.0 s)
+- run at: 2026-10-24T19:26:11.048081+00:00 (1.8 s)
 - graph: conferge_linkedin_probe (demo data, fixture sources); goal: goal-seed-investors
 - targets: 10 (10 speakers; hosts of fixtures/people.json with a linkedin_url: 0)
 
@@ -8,21 +8,20 @@
 
 - sd_mvmpuno1cydgpjvik: kept data/probes/linkedin_sd_mvmpuno1cydgpjvik.json (already downloaded)
 - sd_mvmpunm2ess6r1ual: kept data/probes/linkedin_sd_mvmpunm2ess6r1ual.json (already downloaded)
+- sd_mvms2ssrh1bjodbs9: kept data/probes/linkedin_sd_mvms2ssrh1bjodbs9.json (already downloaded)
 
 ## Profiles
 
-- from saved files (cached): 0/10
-- missing before collection: 10 (new collection only when > 3)
-- new collection: POST /datasets/v3/scrape, 10 inputs, 12 HTTP responses, last HTTP 202, status failed, snapshot sd_mvms2ssrh1bjodbs9, 0 records -> data/probes/linkedin_20261024T191436Z.json
-- cost returned by the API: none (no cost header in the responses)
-- collection errors: ['/datasets/v3/scrape (10 inputs): snapshot sd_mvms2ssrh1bjodbs9 not ready after 120s']
-- matched (name confirmed): 0; name mismatch: 0; still missing: 10
-- identity_confidence 1.0: 0, 0.7: 0
+- from saved files (cached): 10/10
+- missing before collection: 0 (new collection only when > 3)
+- new collection: none
+- matched (name confirmed): 9; name mismatch: 1; still missing: 0
+- identity_confidence 1.0: 6, 0.7: 3
 
 ## FalkorDB writes (GraphStore MERGE)
 
-- Person nodes written: 0; nodes with provider brightdata:linkedin: 0
-- WORKS_AT edges: 0; Company nodes created: 0
+- Person nodes written: 9; nodes with provider brightdata:linkedin: 9
+- WORKS_AT edges: 8; Company nodes created: 2
 - no ATTENDS edge, no presence_confidence change (identity only)
 
 ## people_for_goal top 5
