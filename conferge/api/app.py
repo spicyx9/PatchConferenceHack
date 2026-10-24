@@ -211,6 +211,13 @@ def _pipeline_mode(rows: list[dict[str, Any]]) -> str:
     return "cached" if collected else "fixture"
 
 
+def _records_mode(live_records: int, cached_records: int) -> str:
+    """The mode of the records themselves, never of the configuration (a key or a zone)."""
+    if live_records and cached_records:
+        return "mixed"
+    return "live" if live_records else "cached" if cached_records else "fixture"
+
+
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -502,7 +509,7 @@ def create_app(
                               "collected_last": max(lasts, default=None)},
             "ready": ready,
             "not_ready_reason": {api: client.not_ready(api) for api in apis},
-        }, extra_warnings=notes, mode_override="live" if any(ready.values()) else "unknown")
+        }, extra_warnings=notes, mode_override=_records_mode(live["records"], cached["total"]))
 
     @api.get("/search")
     def search(q: str = Query(..., min_length=2, max_length=100),

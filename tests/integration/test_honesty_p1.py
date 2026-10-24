@@ -80,3 +80,22 @@ def test_stay_card_says_adults_and_nights_next_to_the_price() -> None:
                          capture_output=True, text=True, timeout=30)
     assert out.returncode == 0, out.stderr
     assert "2 adults · 3 nights" in out.stdout
+
+
+# -- 4. data_source from the records, not from a key --------------------------------------
+
+def test_brightdata_and_pipeline_data_source_follow_the_records(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    from conferge.api.app import _pipeline_mode, _records_mode
+
+    monkeypatch.setenv("BRIGHTDATA_API_KEY", "a-key-is-not-a-record")
+    monkeypatch.setenv("BRIGHTDATA_SERP_ZONE", "serp_api1")
+    body = _client().get("/api/v1/brightdata").json()
+    assert body["ready"]["serp"] is True  # configured...
+    assert body["live"]["records"] == 0  # ...but nothing collected in this process
+    expected = "cached" if body["cached"]["total"] else "fixture"
+    assert body["data_source"] == expected != "live"
+    assert (_records_mode(0, 0), _records_mode(3, 0), _records_mode(0, 5), _records_mode(2, 5)) == (
+        "fixture", "live", "cached", "mixed")
+    rows = [{"kind": "brightdata", "records": 9, "cached": True}]
+    assert _pipeline_mode(rows) == "cached"
+    assert _pipeline_mode([{"kind": "fallback", "records": 5}]) == "fixture"
