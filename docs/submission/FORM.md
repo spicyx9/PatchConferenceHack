@@ -12,11 +12,11 @@ Tell it why you're going to a conference; it tells you who to meet, where, and w
 
 ## Description
 
-Big conferences bury the people who matter to you under hundreds of sessions and side events. Conferge starts from your goal, not the agenda: one sentence such as "meet seed investors, AI agent founders, Copilot PMs" becomes weighted priorities, then who to meet and why, a day-by-day plan, what to skip, and a new plan when an event sells out.
+Big conferences bury the people who matter to you. Conferge starts from your goal, not the agenda: one sentence ("meet seed investors, AI agent founders, Copilot PMs") becomes who to meet and why, a day-by-day plan, what to skip, and a new plan when an event sells out.
 
-Bright Data is at the core of the data. Its datasets (Booking, Airbnb, LinkedIn, Crunchbase, Google Maps), Web Unlocker (Google Flights) and SERP API collected what a plain request cannot reach: 21 stays, 34 flight itineraries, 17 LinkedIn profiles. Every record keeps its source URL and collection time, and the demo replays that timestamped collection.
+Bright Data is at the core of the data. Its datasets (Booking, Airbnb, LinkedIn, Crunchbase, Google Maps), Web Unlocker and SERP API collected what a plain request cannot reach: 21 stays, 34 flight itineraries, 17 LinkedIn profiles. The demo replays that timestamped collection.
 
-FalkorDB is at the core of the reasoning. 194 events with their speakers, companies and topics form a graph of 690 nodes and 2184 edges. FalkorDB ranks the connections, returns the goal-to-person path behind each one as evidence, and remembers who you met. A rule-based planner builds the 25-item itinerary from them. No LLM decides a price, a ranking or an attendance: FalkorDB ranks, Python plans. The optional semantic search uses OpenAI embeddings on FalkorDB's vector index and labels its summary as generated.
+FalkorDB is at the core of the reasoning. 194 events with their speakers, companies and topics form a graph: 690 nodes / 2 184 edges loaded from the catalogue; 691 / 2 213 once the plan is written (1 User node, 25 PLANS edges, 4 SKIPS edges for the anti-FOMO skips); the graph then grows with every meeting you record. FalkorDB returns the goal-to-person path behind each connection as evidence. A rule-based planner builds the 25-item itinerary. No LLM decides a price, a ranking or an attendance: FalkorDB ranks, Python plans. The optional semantic search uses OpenAI embeddings on FalkorDB's vector index and labels its summary as generated.
 
 ## Tracks
 

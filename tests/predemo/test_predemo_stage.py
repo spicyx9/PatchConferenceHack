@@ -50,3 +50,12 @@ def test_missing_status_value_is_a_fail(tmp_path: Path) -> None:
 
 def test_repo_status_md_has_the_three_values() -> None:
     assert None not in predemo.status_values().values()
+
+
+def test_graph_counts_row_is_information_only() -> None:
+    before = {"labels": {"Person": 215, "Event": 194}, "edges": {"ABOUT": 1257}}
+    after = {"labels": {"Person": 215, "Event": 194, "User": 1},
+             "edges": {"ABOUT": 1257, "PLANS": 25, "SKIPS": 4}}
+    name, ok, detail = predemo.graph_counts_row(before, after)
+    assert ok is True and name == "Graph counts (info)"
+    assert detail == "loaded 409 nodes / 1257 edges; after plan 410 / 1286 (+1 User, +25 PLANS, +4 SKIPS)"
