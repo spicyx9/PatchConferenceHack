@@ -600,8 +600,8 @@ def roi_view(
     }
 
 
-_SKIP_CATEGORY = {"outside_hours": "hors plage horaire", "other_timezone": "autre fuseau, en presentiel",
-                  "time_conflict": "conflit horaire", "travel": "trajet trop long", "low_score": "score faible"}
+_SKIP_CATEGORY = {"outside_hours": "outside hours", "other_timezone": "other time zone, in person",
+                  "time_conflict": "time conflict", "travel": "travel too long", "low_score": "low score"}
 
 
 def antifomo_skips(decisions: list[dict[str, Any]], data: DemoData, limit: int = 4,

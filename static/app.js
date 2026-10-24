@@ -552,14 +552,7 @@
       .replace(/participation unknown/g, "attendance unconfirmed");
   }
   function displayGoalText(text) {
-    var value = String(text || "");
-    if (
-      /^fondateur d.un outil dev ia, je vais a github universe pour rencontrer des investisseurs seed, des fondateurs d.agents ia et des pm copilot\.$/.test(
-        fold(value),
-      )
-    )
-      return "I'm an AI developer tools founder attending GitHub Universe to meet seed investors, AI agent founders, and Copilot product managers.";
-    return value;
+    return String(text || "");
   }
   function fold(text) {
     return String(text || "")

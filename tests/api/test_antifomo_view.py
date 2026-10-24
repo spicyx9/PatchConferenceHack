@@ -48,7 +48,7 @@ def test_skips_cover_each_reason_with_a_gain_and_skip_planned_events() -> None:
     skips = logic.antifomo_skips(_decisions(), _data(), planned={"planned"})
     assert [(s["event_id"], s["category"]) for s in skips] == [
         ("overlap", "time_conflict"), ("far", "travel"), ("dull", "low_score")]
-    assert {s["category_label"] for s in skips} == {"conflit horaire", "trajet trop long", "score faible"}
+    assert {s["category_label"] for s in skips} == {"time conflict", "travel too long", "low score"}
     assert skips[0]["gain"] == "you keep 'KEEP' (+30 utility)"
     assert skips[2]["gain"].startswith("90 min freed")
 
@@ -89,7 +89,7 @@ def test_in_person_event_abroad_at_night_is_skipped_as_outside_hours() -> None:
     assert "03:00 America/Los_Angeles in person in Asia/Singapore (18:00 local)" in excluded["detail"]
     assert data.events[-1].start_at == datetime(2026, 10, 28, 18, 0, tzinfo=sgt)
     skips = logic.antifomo_skips(_decisions(), data, planned={"planned"})
-    assert skips[0]["event_id"] == "sg" and skips[0]["category_label"] == "hors plage horaire"
+    assert skips[0]["event_id"] == "sg" and skips[0]["category_label"] == "outside hours"
     assert skips[0]["timezone"] == "Asia/Singapore"
 
 
