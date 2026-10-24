@@ -129,13 +129,7 @@ CREATE FULLTEXT INDEX FOR (e:Event) ON (e.title)
 
 Fort Mason Center, San Francisco, October 28 and 29. Fictional traveller from New York, in town October 27 to 30.
 
-| Measure | Value |
-|---|---|
-| Live collection, 2026-10-24, public endpoints, no API key | 161 official sessions, 183 speakers, 122 companies, 194 Luma events, 19 Eventbrite events, 11 Partiful events, 7 aggregator parties |
-| Demo dataset (snapshot of that collection, deduplicated) | 207 events, 183 people, 122 companies |
-| FalkorDB graph | 697 nodes, 2,195 edges (49 HOSTS edges from event organizers), loaded in about 1 s |
-| API response times on the demo graph | goal 61 ms, events 8 ms, people 2 ms, graph path 11 ms, plan 8 ms, simulate-change 26 ms, meeting 17 ms, anti-FOMO agent about 1.1 s |
-| Tests | 1,062 passed, 22 skipped (`uv run pytest -q`, branch `w21-risk5-submission` on main 933cc72, 2026-10-24; main alone: 1,057 passed) |
+Measured numbers (dataset, graph, Bright Data runs, reachability, tests) are kept in one place: [SUBMISSION.md](SUBMISSION.md), read from the running app.
 
 | 1. Goal | 2. Who to meet, and why |
 |---|---|
