@@ -12,5 +12,6 @@
 | D008 | Repository: `PatchConferenceHack`; product: `Conferge` | Project naming |
 | D009 | FastAPI route implementation owned by window 12 | Window 0 builds contracts only; no shared route edits |
 | D010 | Core contract version 0.1 | All parallel windows branch only once these contracts are on main |
+| D011 | `GraphStore.merge_edge` attaches a rule-based `rationale` and `evidence_ids` (source URL, snapshot id; app-owned records cite `record:<Kind>:<id>`) to every edge and refuses an edge without evidence; ids accumulate across MERGEs | Every graph claim cites existing evidence, without an LLM |
 
 Changes require a small, dedicated window-0 PR. Append decisions; do not rewrite history.

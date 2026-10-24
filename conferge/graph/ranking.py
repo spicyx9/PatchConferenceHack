@@ -23,6 +23,14 @@ def _person_path(paths: list[dict[str, Any]], person_id: str) -> dict[str, Any] 
     return next((p for p in paths if p["nodes"] and p["nodes"][-1]["id"] == person_id), None)
 
 
+def edge_why(path: dict[str, Any] | None) -> list[dict[str, Any]]:
+    """The rationale and evidence ids of each edge of a serialized path, in path order."""
+    return [{"edge": e["type"], "source": e["source"], "target": e["target"],
+             "rationale": e["props"].get("rationale"),
+             "evidence_ids": [str(x) for x in e["props"].get("evidence_ids") or []]}
+            for e in (path or {}).get("edges", [])]
+
+
 def rank_people(target: Any, user_id: str, goals: list[Goal], limit: int = 50) -> list[Opportunity]:
     totals: dict[str, float] = {}
     rows: dict[str, dict[str, Any]] = {}
@@ -51,6 +59,7 @@ def rank_people(target: Any, user_id: str, goals: list[Goal], limit: int = 50) -
             goal_ids=goal_ids[pid], event_id=event["id"] if event else None, person_ids=[pid],
             score=round(min(100.0, 100.0 * totals[pid]), 1),
             rationale=path_to_text(path) if path else "graph match: " + ", ".join(row["reasons"]),
+            path=edge_why(path),
             where=(event["props"].get("title") if event else None),
             presence=presence,  # a public speaker is announced, not confirmed present
             warnings=["unknown_confidence"] if row.get("unknown_confidence") else [],

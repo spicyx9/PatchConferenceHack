@@ -506,6 +506,13 @@ def create_app(
             card["evidence"] = [*card.get("evidence", []), view["evidence"]]
         return card
 
+    def _why(opp: Opportunity) -> dict[str, Any]:
+        """Edge rationales and evidence ids of the graph path behind this suggestion."""
+        edges = [e for e in opp.path if "rationale" in e and "evidence_ids" in e]
+        ids = list(dict.fromkeys(i for e in edges for i in e["evidence_ids"]))
+        return {"edges": edges, "evidence_ids": ids,
+                "source": "falkordb" if edges else None}
+
     @api.get("/people")
     def people(limit: int = Query(10, ge=1, le=100)) -> dict[str, Any]:
         from conferge.people import crunchbase
@@ -523,6 +530,7 @@ def create_app(
                 "met": bool(person and person.id in state.met),
                 "met_note": state.met.get(person.id) if person else None,
                 "linkedin": state.data.linkedin.get(person.id) if person else None,
+                "why": _why(opp),
             })
         return _envelope(state, ["people", "companies"], {"items": cards, "count": len(cards),
                                                                "total": len(state.opportunities())},
@@ -655,6 +663,7 @@ def create_app(
                     "evidence_source": e["props"].get("source"),
                     "confidence": e["props"].get("confidence"),
                     "observed_at": e["props"].get("observed_at"),
+                    "rationale": e.get("rationale"), "evidence_ids": e.get("evidence_ids") or [],
                 }})
         modes = {s["node"]["source_mode"] for s in steps if "node" in s}
         cypher = graph_queries.literal_cypher(
