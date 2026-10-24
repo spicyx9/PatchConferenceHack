@@ -132,7 +132,7 @@ Fort Mason Center, San Francisco, October 28 and 29. Fictional traveller from Ne
 | Demo dataset (snapshot of that collection, deduplicated) | 207 events, 183 people |
 | FalkorDB graph | 697 nodes, 2,195 edges (49 HOSTS edges from event organizers), loaded in about 1 s |
 | API response times on the demo graph | goal 61 ms, events 8 ms, people 2 ms, graph path 11 ms, plan 8 ms, simulate-change 26 ms, meeting 17 ms, anti-FOMO agent about 1.1 s |
-| Tests | 926 passing (`make check`) |
+| Tests | 957 passing (`make check`) |
 
 | 1. Goal | 2. Who to meet, and why |
 |---|---|
