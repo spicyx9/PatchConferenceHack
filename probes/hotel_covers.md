@@ -3,7 +3,9 @@
 The historical Bright Data Booking cache contained 15 hotels with no photo metadata.
 All 15 now retain a real property photograph as optional `card_details` alongside the
 original, unchanged room record and Bright Data price provenance. Photo source URLs and
-timezone-aware collection timestamps are independent fields and are exposed in the card.
+timezone-aware collection timestamps are independent fields retained in the API for internal diagnostics. Customer cards show the
+property, booking site and price-check date; collection tools and image-source URLs are
+not shown in the Travel interface.
 Images remain public remote URLs; they are not generated, stock substitutes, or evidence
 of room type, current availability or today's price.
 

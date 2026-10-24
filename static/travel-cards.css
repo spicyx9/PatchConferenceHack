@@ -184,21 +184,6 @@
   outline: 3px solid #8c75ab;
   outline-offset: 3px;
 }
-#tab-travel .offer-evidence {
-  grid-column: 1/-1;
-  border-top: 1px solid #eeebe7;
-  padding: 11px 20px;
-  font-size: 12px;
-}
-.offer-evidence summary {
-  width: fit-content;
-  min-height: 24px;
-  display: list-item;
-  line-height: 24px;
-}
-.offer-evidence p {
-  margin-bottom: 0;
-}
 .offer-unconfirmed {
   color: #726454;
   font-size: 11px;
@@ -208,7 +193,7 @@
   display: grid;
   grid-template-columns: 182px minmax(0, 1fr) 205px;
   gap: 20px;
-  padding: 18px 18px 0;
+  padding: 18px;
   margin: 14px 0;
   background: #fff;
   border: 1px solid #dedbd7;
@@ -339,19 +324,6 @@
 .stay-price > span {
   font-size: 11px;
 }
-.stay-card > .stay-source {
-  grid-column: 1/-1;
-  margin: 0 -18px;
-  width: calc(100% + 36px);
-  box-sizing: border-box;
-  border-top: 1px solid #eeebe7;
-  padding: 12px 18px;
-  font-size: 11px;
-}
-.stay-source .offer-evidence {
-  border-top: 0 !important;
-  padding: 8px 0 0 !important;
-}
 @media (max-width: 1000px) {
   #tab-travel .stay-card {
     grid-template-columns: 145px minmax(0, 1fr) 180px;
@@ -438,7 +410,7 @@
   #tab-travel .stay-card {
     grid-template-columns: 96px minmax(0, 1fr);
     gap: 14px;
-    padding: 14px 14px 0;
+    padding: 14px;
   }
   .stay-photo {
     min-height: 120px;
@@ -506,10 +478,6 @@
   }
   .stay-price > .offer-deal {
     font-size: 11px;
-  }
-  .stay-card > .stay-source {
-    margin: 0 -14px;
-    width: calc(100% + 28px);
   }
 }
 

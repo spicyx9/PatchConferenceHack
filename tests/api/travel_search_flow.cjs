@@ -75,11 +75,11 @@ const pass = (name) => {
   pass("Search criteria return 34 collected flight alternatives");
   assert.match(
     await page.locator("#travel-offer-context").innerText(),
-    /Collected prices/i,
+    /Prices checked/i,
   );
-  assert.match(
-    await page.locator("#travel-offer-context").innerText(),
-    /Bright Data|Google Flights/i,
+  assert.doesNotMatch(
+    await page.locator("#tab-travel").innerText(),
+    /Bright Data|dataset|Web Unlocker|Property photo/,
   );
   let liveRequest;
   const mockLive = async (route) => {
@@ -106,7 +106,7 @@ const pass = (name) => {
   assert.equal(await page.locator("#flights .fare-card").count(), 0);
   assert.match(
     await page.locator("#travel-search-feedback").innerText(),
-    /Test provider unavailable/,
+    /couldn’t update prices/,
   );
   await page.unroute("**/api/v1/travel/search", mockLive);
   const restored = await search("#travel-use-collected");
@@ -229,7 +229,7 @@ const pass = (name) => {
     .getAttribute("aria-busy") === "false");
   assert.equal(collectionPolls, 1);
   assert.equal(await page.locator("#stays .trip-stay").count(), stays.items.length);
-  assert.match(await page.locator("#travel-offer-context").innerText(), /Freshly collected/);
+  assert.match(await page.locator("#travel-offer-context").innerText(), /Prices checked/);
   await page.unroute("**/api/v1/travel/search", pendingStay);
   pass("Pending hotel collection is polled and its completed offers replace the loading state (mock provider)");
   await page.locator("#research-adults").selectOption("1");

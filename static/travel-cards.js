@@ -186,13 +186,6 @@
       "</small></div></div>"
     );
   }
-  function details(html) {
-    return (
-      '<details class="offer-evidence"><summary>Source & offer details</summary>' +
-      html +
-      "</details>"
-    );
-  }
   function deal(link, label) {
     return (
       '<a class="offer-deal" href="' +
@@ -202,7 +195,7 @@
       '<span aria-hidden="true"> ↗</span></a>'
     );
   }
-  function flight(flight, evidence, badge) {
+  function flight(flight, badge) {
     var card = flight.card_details || {},
       link = url(flight.booking_url),
       provider = site(flight);
@@ -248,7 +241,7 @@
         })
         .join("") +
       (flight.return_slice_collected === false
-        ? '<p class="fare-return-missing">Return itinerary not collected. Confirm return times with the provider.</p>'
+        ? '<p class="fare-return-missing">Return times unavailable. Confirm both flights on the booking site.</p>'
         : "") +
       '<p class="fare-inclusions">' +
       esc(
@@ -273,12 +266,15 @@
               : "View deal on ") + provider,
           )
         : '<span class="offer-unconfirmed">Booking link unavailable</span>') +
-      "<small>Price and availability may change</small></div>" +
-      details(evidence) +
+      "<small>" + esc(flight.price_status === "indicative"
+        ? "Estimated price · confirm on the booking site"
+        : flight.price_status === "unavailable"
+          ? "Unavailable for these dates"
+          : "Price and availability may change") + "</small></div>" +
       "</article>"
     );
   }
-  function stay(stay, evidence, badge) {
+  function stay(stay, badge) {
     var card = stay.card_details || {},
       link = url(stay.booking_url),
       provider = site(stay),
@@ -433,18 +429,7 @@
               provider,
           )
         : "<small>Booking link unavailable</small>") +
-      '</div></div><div class="stay-source">' +
-      evidence +
-      (url(card.image_source_url)
-        ? '<p class="small-text">Property photo: <a href="' +
-          esc(url(card.image_source_url)) +
-          '" target="_blank" rel="noopener noreferrer">' +
-          esc(new URL(card.image_source_url).hostname.replace(/^www\./, "")) +
-          '</a>' +
-          (card.image_collected_at ? ' · collected ' + esc(date(card.image_collected_at)) : '') +
-          '</p>'
-        : '') +
-      "</div></article>"
+      '</div></div></article>'
     );
   }
   window.TravelCards = { flight: flight, stay: stay };

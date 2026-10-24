@@ -30,7 +30,9 @@ assert(['127.0.0.1', 'localhost'].includes(new URL(base).hostname));
     for (const hotel of hotels) {
       const card = page.locator('#stays article').filter({ has: page.getByRole('heading', { name: hotel.name, exact: true }) });
       assert.equal(await card.locator('.offer-deal').getAttribute('href'), hotel.booking_url);
-      assert.equal(await card.locator('.stay-source a').getAttribute('href'), hotel.card_details.image_source_url);
+      assert.equal(await card.locator('.stay-source, .offer-evidence').count(), 0);
+      assert.doesNotMatch(await card.innerText(), /Bright Data|Property photo|dataset|Cached/);
+      assert.match(await card.locator('.badge').innerText(), /Checked/);
     }
     if (process.env.EVIDENCE_DIR) {
       fs.mkdirSync(process.env.EVIDENCE_DIR, { recursive: true });
