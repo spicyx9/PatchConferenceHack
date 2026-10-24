@@ -239,3 +239,5 @@ th { color: var(--muted); font-weight: 600; }
 .degraded-banner { background: var(--red); color: #fff; font-weight: 700; font-size: 1.3rem; padding: 0.8rem 1.2rem; text-align: center; }
 .bd-counter { font-size: 1.35rem; padding: 0.7rem 1.1rem; margin-bottom: 1rem; border: 2px solid var(--accent); border-radius: 10px; background: var(--panel); }
 .bd-counter .bd-detail { font-size: 1.05rem; color: var(--muted); margin-left: 0.6rem; }
+
+.followup-text { white-space: pre-wrap; font: inherit; font-size: 0.9rem; margin: 0.25rem 0; padding: 0.5rem; background: var(--panel, #f6f6f6); border-radius: 6px; }
