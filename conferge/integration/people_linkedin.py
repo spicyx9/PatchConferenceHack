@@ -434,14 +434,34 @@ def _tokens(text: str, drop: frozenset[str] | set[str] = frozenset()) -> list[st
     return [w for w in re.findall(r"[a-z0-9]+", fold(text)) if w not in drop]
 
 
+# Common English short forms of a first name ("Nick Liffen" is LinkedIn's "Nicholas Liffen").
+_NICKNAMES = {
+    "nick": "nicholas", "nic": "nicholas", "mike": "michael", "mick": "michael",
+    "chris": "christopher", "matt": "matthew", "alex": "alexander", "dave": "david",
+    "dan": "daniel", "danny": "daniel", "jim": "james", "jamie": "james", "bob": "robert",
+    "rob": "robert", "bobby": "robert", "bill": "william", "will": "william", "tom": "thomas",
+    "tony": "anthony", "ben": "benjamin", "sam": "samuel", "joe": "joseph", "kate": "katherine",
+    "katie": "katherine", "liz": "elizabeth", "beth": "elizabeth", "jen": "jennifer",
+    "jenny": "jennifer", "andy": "andrew", "drew": "andrew", "steve": "stephen",
+    "greg": "gregory", "jon": "jonathan", "nate": "nathan", "pat": "patrick", "ed": "edward",
+    "ted": "edward", "rick": "richard", "rich": "richard", "dick": "richard", "ron": "ronald",
+    "tim": "timothy", "jeff": "jeffrey", "fred": "frederick", "josh": "joshua", "zach": "zachary",
+}
+
+
+def _first(token: str) -> str:
+    return _NICKNAMES.get(token, token)
+
+
 def name_matches(person_name: str, profile_name: str | None) -> bool:
-    """Same first and last name tokens (accents, case, middle names and initials ignored).
+    """Same first and last name tokens (accents, case, middle names and initials ignored);
+    a common short form of the first name counts ("Nick" = "Nicholas").
 
     An abbreviated last name ("Kaush G.") does not confirm "Kaush Ganguly".
     """
     a = [t for t in _tokens(person_name) if len(t) > 1]
     b = [t for t in _tokens(profile_name or "") if len(t) > 1]
-    return bool(a and b) and a[0] == b[0] and a[-1] == b[-1]
+    return bool(a and b) and _first(a[0]) == _first(b[0]) and a[-1] == b[-1]
 
 
 def company_matches(known: str | None, profile_company: str | None) -> bool:

@@ -174,7 +174,7 @@ def main() -> int:
     parser.add_argument("--linkedin", choices=["cached", "off"], default="cached",
                         help="LinkedIn enrichment from data/probes/linkedin_*.json (< 24 h), never "
                              "a Bright Data call; refresh with make probe-linkedin")
-    parser.add_argument("--linkedin-speakers", type=int, default=10,
+    parser.add_argument("--linkedin-speakers", type=int, default=12,
                         help="best ranked speakers with a linkedin_url to enrich")
     parser.add_argument("--linkedin-hosts", type=int, default=5,
                         help="hosts of fixtures/people.json with a linkedin_url to enrich")

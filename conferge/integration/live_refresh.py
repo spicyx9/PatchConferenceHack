@@ -50,12 +50,23 @@ DEPART, RETURN = date(2026, 10, 27), date(2026, 10, 30)
 LOCAL = ZoneInfo("America/Los_Angeles")
 
 
+DEFAULT_UNLOCKER_ZONE = "web_unlocker1"
+DEFAULT_SERP_ZONE = "serp_api1"
+
+
+def default_zones_used() -> list[str]:
+    """Zones the refresh falls back to because .env leaves them empty."""
+    return [name for name, var in (("web_unlocker1", "BRIGHTDATA_UNLOCKER_ZONE"),
+                                   ("serp_api1", "BRIGHTDATA_SERP_ZONE"))
+            if not env_value(var)]
+
+
 def make_client(http: httpx.AsyncClient | None = None) -> BrightDataClient:
-    """One attempt, 20 s: retries=0 and an HTTP client timeout of TIMEOUT."""
+    """One attempt: retries=0. With a key but no zone, the account's default zone names."""
     return BrightDataClient(
         env_value("BRIGHTDATA_API_KEY") or None,
-        serp_zone=env_value("BRIGHTDATA_SERP_ZONE") or None,
-        unlocker_zone=env_value("BRIGHTDATA_UNLOCKER_ZONE") or None,
+        serp_zone=env_value("BRIGHTDATA_SERP_ZONE") or DEFAULT_SERP_ZONE,
+        unlocker_zone=env_value("BRIGHTDATA_UNLOCKER_ZONE") or DEFAULT_UNLOCKER_ZONE,
         client=http or httpx.AsyncClient(base_url="https://api.brightdata.com",
                                          timeout=UNLOCKER_TIMEOUT + 5),
         retries=0)
@@ -155,8 +166,23 @@ async def refresh(data: DemoData, speaker: tuple[str, str | None] | None, *,
                   ) -> dict[str, Any]:
     """Run both calls, update ``data`` only with what succeeded, return the panel result."""
     own = client is None
+    notes = [f"default zones: {', '.join(default_zones_used())}"] if own and default_zones_used() else []
     client = client or make_client()
     started, t0 = now(), time.perf_counter()
+    if not getattr(client, "_api_key", None):
+        if own:
+            await client.aclose()
+        # Checked before any zone: without a key nothing is sent.
+        return {"ok": False, "requests": 0, "records": 0, "seconds": 0.0, "lines": [],
+                "errors": ["BRIGHTDATA_API_KEY missing: nothing sent, cache kept"], "slow": [],
+                "notes": [], "cached_price": None, "live_price": None}
+    sent: list[str] = []
+
+    async def count(request: httpx.Request) -> None:
+        sent.append(request.url.path)
+
+    http = client._client
+    http.event_hooks = {**http.event_hooks, "request": [*http.event_hooks.get("request", []), count]}
     cached = _cheapest(list(data.flights))
     calls: list[Any] = [_flights(client, now)]
     if speaker:
@@ -227,8 +253,9 @@ async def refresh(data: DemoData, speaker: tuple[str, str | None] | None, *,
             data.pipeline.append(row("people", _report(
                 "brightdata_serp", started, now(), ok=True, records=len(links), error=None,
                 warnings=["refresh button", f"raw answer kept in data/probes/{found['saved']}"])))
-    return {"ok": not errors and not slow, "requests": len(calls), "records": records,
-            "seconds": seconds, "lines": lines, "errors": errors, "slow": slow,
+    # requests: HTTP requests actually sent to Bright Data, not the calls attempted.
+    return {"ok": not errors and not slow, "requests": len(sent), "records": records,
+            "seconds": seconds, "lines": lines, "errors": errors, "slow": slow, "notes": notes,
             "cached_price": str(trip_price(cached)) if cached and trip_price(cached) else None,
             "live_price": (str(trip_price(_cheapest(results[0])))
                            if not isinstance(results[0], BaseException) and results[0]

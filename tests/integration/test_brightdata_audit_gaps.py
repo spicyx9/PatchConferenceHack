@@ -74,7 +74,8 @@ def test_gap3_flight_shown_says_what_the_graph_stores(no_network: None) -> None:
     GraphIngestor(store, default_mode="fixture").ingest_flights(demo.flights)
     nodes = {c.args[1]: c.args[2] for c in store.merge_node.call_args_list if c.args[0] == "FlightOffer"}
     client = TestClient(create_app(data=demo, found=Providers(), graph_probe=False))
-    items = {i["id"]: i for i in client.get("/api/v1/flights").json()["items"]}
+    # The kept itinerary is the one in the graph; cached alternatives are listed, not ingested.
+    items = {i["id"]: i for i in client.get("/api/v1/flights").json()["items"] if i["kept"]}
     assert set(items) <= set(nodes) and items
     for fid, item in items.items():
         node = nodes[fid]
