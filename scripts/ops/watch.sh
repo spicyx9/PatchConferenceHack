@@ -7,6 +7,13 @@ INTERVAL="${1:-600}"
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 CONF="${ROOT}/scripts/ops/workers.conf"; LOGS="${ROOT}/logs"; mkdir -p "$LOGS"
 MAX_ACTIVE=6; MAX_ATTEMPTS=3
+# A single watcher must own merging and status commits.
+LOCK="$LOGS/.watch.lock"
+if ! mkdir "$LOCK" 2>/dev/null; then
+  echo "Another watcher is running (or lock is stale): $LOCK" >&2
+  exit 1
+fi
+trap 'rmdir "$LOCK" 2>/dev/null || true' EXIT
 WAVE2="04 09 10 11"; WAVE2_STARTED="$LOGS/.wave2"
 alive() { [[ -f "$LOGS/w$1.pid" ]] && kill -0 "$(cat "$LOGS/w$1.pid")" 2>/dev/null; }
 pr_number() { gh pr list --repo "$(git -C "$ROOT" remote get-url origin | sed -E 's#.*github.com[:/]##; s#\.git$##')" --head "w$1-$2" --state open --json number --jq '.[0].number' 2>/dev/null; }
@@ -18,7 +25,7 @@ owned_ok() { # $1 pr number, $2 owned prefixes csv
 }
 while true; do
   cd "$ROOT"; git fetch origin --quiet 2>/dev/null
-  ACTIVE=0; ROWS=""; MERGED_WAVE1=0; MERGED_WAVE2=0
+  ACTIVE=0; ROWS=""; MERGED_WAVE1=0; MERGED_WAVE2=0; DONE_WAVE1=0; DONE_WAVE2=0
   while IFS='|' read -r ID SLUG TOOL OWNED; do
     [[ -z "$ID" || "$ID" == \#* ]] && continue
     STATE="queued"; PR=""; CI=""; NOTE=""
@@ -32,7 +39,17 @@ while true; do
         if owned_ok "$PRN" "$OWNED"; then
           if gh pr merge "$PRN" --squash --delete-branch=false >> "$LOGS/watch.log" 2>&1; then STATE="merged"; touch "$LOGS/w${ID}.merged"; NOTE="merged $(date -u +%H:%M)"; else NOTE="merge failed, see watch.log"; fi
         else NOTE="CI green but files out of scope: needs integrator"; fi
-      elif [[ "$CI" == *FAILURE* ]]; then NOTE="CI red"; if ! alive "$ID" && [[ $(cat "$LOGS/w${ID}.attempts" 2>/dev/null || echo 0) -lt $MAX_ATTEMPTS ]]; then bash "$ROOT/scripts/ops/launch_worker.sh" "$ID" "$SLUG" "$TOOL" >> "$LOGS/watch.log" 2>&1; NOTE="CI red, worker relaunched"; fi; fi
+      elif [[ "$CI" == *FAILURE* ]]; then
+        NOTE="CI red"
+        if ! alive "$ID"; then
+          if [[ $(cat "$LOGS/w${ID}.attempts" 2>/dev/null || echo 0) -lt $MAX_ATTEMPTS ]]; then
+            bash "$ROOT/scripts/ops/launch_worker.sh" "$ID" "$SLUG" "$TOOL" >> "$LOGS/watch.log" 2>&1
+            NOTE="CI red, worker relaunched"
+          else
+            STATE="failed"; NOTE="CI red after 3 attempts; integration will flag missing module"
+          fi
+        fi
+      fi
     elif alive "$ID"; then STATE="running"
     elif [[ -f "$LOGS/w${ID}.pid" ]] && [[ ! -f "$LOGS/w${ID}.merged" ]]; then
       ATT=$(cat "$LOGS/w${ID}.attempts" 2>/dev/null || echo 0)
@@ -42,6 +59,10 @@ while true; do
     [[ "$STATE" == "running" || "$STATE" == "pr_open" ]] && ACTIVE=$((ACTIVE+1))
     case " 01 02 03 08 12 13 " in *" $ID "*) [[ "$STATE" == "merged" ]] && MERGED_WAVE1=$((MERGED_WAVE1+1)) ;; esac
     case " 04 09 10 11 " in *" $ID "*) [[ "$STATE" == "merged" ]] && MERGED_WAVE2=$((MERGED_WAVE2+1)) ;; esac
+    if [[ "$STATE" == "merged" || "$STATE" == "failed" ]]; then
+      case " 01 02 03 08 12 13 " in *" $ID "*) DONE_WAVE1=$((DONE_WAVE1+1)) ;; esac
+      case " 04 09 10 11 " in *" $ID "*) DONE_WAVE2=$((DONE_WAVE2+1)) ;; esac
+    fi
     ROWS+="| w${ID} | ${SLUG} | ${TOOL} | ${STATE} | ${LAST} | ${PR:--} | ${CI:--} | ${NOTE:--} |\n"
   done < <(grep -v '^#' "$CONF")
   # wave 2 when slots free and at least 3 of wave 1 merged
@@ -54,14 +75,15 @@ while true; do
     fi
   fi
   # w15 is automatically launched once both fixture waves are merged.
-  if [[ $MERGED_WAVE1 -eq 6 && $MERGED_WAVE2 -eq 4 && ! -f "$LOGS/w15.pid" ]]; then
+  # Launch integration even if some upstream workers failed: it must report gaps.
+  if [[ $DONE_WAVE1 -eq 6 && $DONE_WAVE2 -eq 4 && $((MERGED_WAVE1+MERGED_WAVE2)) -ge 5 && ! -f "$LOGS/w15.pid" ]]; then
     bash "$ROOT/scripts/ops/launch_worker.sh" 15 integration claude >> "$LOGS/watch.log" 2>&1 || true
   fi
   {
     echo "# STATUS (auto, $(date -u +%FT%TZ)) active=${ACTIVE} wave1_merged=${MERGED_WAVE1}/6 wave2_merged=${MERGED_WAVE2}/4"
     echo
     echo "## Morning summary"
-    echo "- Wave 1: $MERGED_WAVE1/6 merged; wave 2: $MERGED_WAVE2/4 merged."
+    echo "- Wave 1: $MERGED_WAVE1/6 merged ($DONE_WAVE1/6 finished); wave 2: $MERGED_WAVE2/4 merged ($DONE_WAVE2/4 finished)."
     echo "- w15 integration: $([[ -f "$LOGS/w15.merged" ]] && echo merged || [[ -f "$LOGS/w15.pid" ]] && echo started || echo pending)."
     echo "- Pending live credentials and probes: w05 lodging, w06 flights, w07 people and w04 Bright Data live."
     echo "- Morning checklist: verify GitHub CI and PRs, inspect fixture labels, configure Bright Data and OpenAI keys locally, test real FalkorDB traversal, rehearse the 3-minute scenario."
@@ -71,7 +93,9 @@ while true; do
     printf "%b" "$ROWS"
     echo; echo "Logs: logs/wNN.log, logs/watch.log. Relaunch a worker: bash scripts/ops/launch_worker.sh NN slug. Launch wave 3 (needs keys in .env of each worktree): bash scripts/ops/launch_wave.sh 3"
   } > "$ROOT/STATUS.md"
-  cd "$ROOT" && git add STATUS.md >/dev/null 2>&1 && git commit -qm "status: auto $(date -u +%H:%M)" >/dev/null 2>&1 && git pull --rebase --quiet origin main >/dev/null 2>&1 && git push --quiet origin main >/dev/null 2>&1
+  if ! (cd "$ROOT" && git add STATUS.md >/dev/null 2>&1 && git commit -qm "status: auto $(date -u +%H:%M)" >/dev/null 2>&1 && git pull --rebase --quiet origin main >/dev/null 2>&1 && git push --quiet origin main >/dev/null 2>&1); then
+    echo "$(date -u +%FT%TZ) WARNING: STATUS.md could not be committed/pushed; check local git state" >> "$LOGS/watch.log"
+  fi
   if [[ -f "$LOGS/w15.merged" ]]; then
     echo "$(date -u +%FT%TZ) integration merged; watchdog finished" >> "$LOGS/watch.log"
     break
