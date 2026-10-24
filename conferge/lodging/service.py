@@ -29,6 +29,7 @@ from conferge.lodging.normalize import normalize, refresh_status, sort_key
 logger = logging.getLogger(__name__)
 
 DISCOVERY_TTL = timedelta(hours=6)
+PROVIDER_TIMEOUT = 120.0  # one slow source becomes a failed report, never a dead search
 VERIFY_TTL = timedelta(minutes=30)
 
 
@@ -82,7 +83,9 @@ class LodgingService:
     def __init__(
         self, sources: dict[str, Any] | None = None, *, clock: Callable[[], datetime] = now_utc,
         fallback_sources: dict[str, Any] | None = None,
+        provider_timeout: float = PROVIDER_TIMEOUT,
     ) -> None:
+        self.provider_timeout = provider_timeout
         self._sources = sources if sources is not None else default_sources()
         if fallback_sources is None:
             fallback_sources = default_fallback_sources() if sources is None else {}
@@ -109,18 +112,29 @@ class LodgingService:
             if disc and now - disc.at <= DISCOVERY_TTL:
                 result = disc.result
             else:
-                result = await src.search(q)
+                result = await asyncio.wait_for(src.search(q), self.provider_timeout)
                 if result.items:
                     self._discovery[key] = _Entry(self._clock(), result)
             verify_report = None
             verify = getattr(src, "verify", None)
             if verify is not None and result.items and q.verify_top > 0:
-                items, verify_report = await verify(list(result.items), q)
+                try:
+                    items, verify_report = await asyncio.wait_for(
+                        verify(list(result.items), q), self.provider_timeout)
+                except (asyncio.TimeoutError, TimeoutError):
+                    # Discovery results stand; the re-check is reported as failed.
+                    return result, report(f"{name}_verify", started, status="failed",
+                                          termination="error",
+                                          errors=[f"verify timeout after {self.provider_timeout:.0f}s"])
                 result = DiscoveryResult(items=items, run_report=result.run_report,
                                          errors=list(result.errors))
                 if verify_report.status != "failed":
                     self._verified[key] = _Entry(self._clock(), result, verify_report)
             return result, verify_report
+        except (asyncio.TimeoutError, TimeoutError):
+            rep = report(name, started, status="failed", termination="error",
+                         errors=[f"timeout: no answer within {self.provider_timeout:.0f}s"])
+            return DiscoveryResult(run_report=rep, errors=list(rep.errors)), None
         except Exception as exc:  # noqa: BLE001 - a broken provider is reported, not raised
             logger.warning("lodging.provider_failed", extra={"provider": name,
                                                              "error": type(exc).__name__})

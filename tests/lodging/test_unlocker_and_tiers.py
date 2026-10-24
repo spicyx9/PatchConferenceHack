@@ -90,3 +90,21 @@ def test_fallback_runs_only_when_bright_data_found_nothing() -> None:
                                       fallback_sources={"pyairbnb": fallback}).search(Q))
     assert fallback.calls == 1 and empty.calls == 1
     assert used.warnings[0].startswith("fallback used")
+
+
+class _Slow:
+    async def search(self, q: LodgingQuery) -> DiscoveryResult:
+        await asyncio.sleep(5)
+        raise AssertionError("not reached")
+
+
+def test_one_slow_provider_is_a_failed_report_not_a_dead_search() -> None:
+    import time
+
+    hilton = _Fixed([])
+    t0 = time.monotonic()
+    found = asyncio.run(LodgingService({"slow": _Slow(), "other": hilton}, fallback_sources={},
+                                       provider_timeout=0.2).search(Q))
+    assert time.monotonic() - t0 < 2
+    slow = next(r for r in found.envelope.reports if r.provider == "slow")
+    assert slow.status == "failed" and "timeout" in slow.errors[0]
