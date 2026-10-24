@@ -644,6 +644,7 @@
     $("roi-note").textContent =
       "Indicative budget: " +
       fmtUsd(roi.budget_usd) +
+      (roi.budget_source ? " (" + roi.budget_source + ")" : "") +
       (roi.spend_note ? " · " + roi.spend_note : "");
     [ ["roi-spend", roi.spend_usd == null ? null : fmtUsd(roi.spend_usd)], ["roi-meetings", roi.meetings], ["roi-qualified", roi.qualified_contacts], ["roi-opportunities", roi.opportunities] ].forEach(function (pair) {
       var element = $(pair[0]);
@@ -988,7 +989,7 @@
     $("budget").innerHTML =
       "<table><tbody>" +
       "<tr><th>Budget</th><td>" +
-      esc(fmtUsd(b.budget_usd)) +
+      esc(fmtUsd(b.budget_usd) + (b.budget_source ? " (" + b.budget_source + ")" : "")) +
       "</td></tr>" +
       "<tr><th>Flights</th><td>" +
       esc(fmtUsd(b.flights_usd) + priceStatusText(b.flights_price_status)) +

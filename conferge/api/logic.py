@@ -443,6 +443,10 @@ def stays_view(data: DemoData) -> list[dict[str, Any]]:
     return out
 
 
+# The budget is the demo persona's configuration (fixtures/api.json user), never typed by the user.
+BUDGET_SOURCE = "demo persona assumption (fixtures/api.json), not entered by you"
+
+
 def travel_view(
     data: DemoData, plan: dict[str, Any], accepted: set[str]
 ) -> dict[str, Any]:
@@ -503,6 +507,7 @@ def travel_view(
         "proposals": proposals,
         "budget": {
             "budget_usd": str(budget),
+            "budget_source": BUDGET_SOURCE,
             "flights_usd": flight_total, "lodging_usd": stay_total,
             "flights_price_status": [rt_display(f).get("price_status", f.price_status) for f in trip],
             "lodging_price_status": stay.price_status if stay else None,
@@ -585,6 +590,7 @@ def roi_view(
         "qualified_contacts": len(qualified),
         "opportunities": sum(1 for o in opportunities if o.score >= 30),
         "budget_usd": travel["budget"]["budget_usd"],
+        "budget_source": travel["budget"]["budget_source"],
     }
 
 

@@ -77,3 +77,13 @@ def test_fix5_every_amount_in_the_ui_shows_its_price_status() -> None:
     assert "priceStatusText(b.flights_price_status)" in travel
     assert "priceStatusText(b.lodging_price_status)" in travel
     assert "spend_price_status" in _js_function("renderRoi")
+
+
+def test_fix6_budget_is_labelled_as_a_demo_assumption() -> None:
+    data = load_fixture()
+    budget = logic.travel_view(data, {"days": []}, set())["budget"]
+    assert budget["budget_usd"] == str(data.user["budget_usd"])
+    assert "demo persona assumption" in budget["budget_source"]
+    assert logic.roi_view(data, [], [], {})["budget_source"] == budget["budget_source"]
+    assert "b.budget_source" in _js_function("renderTravel")
+    assert "roi.budget_source" in _js_function("renderRoi")
