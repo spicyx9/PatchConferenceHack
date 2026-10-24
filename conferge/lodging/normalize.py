@@ -192,12 +192,13 @@ def normalize(
     now: datetime | None = None,
 ) -> Lodging | None:
     """Dispatch to the provider adapter. Returns None when the record is not a stay."""
-    from conferge.lodging import airbnb, booking, google_hotels
+    from conferge.lodging import airbnb, booking, google_hotels, unlocker
 
     adapters = {
         booking.PROVIDER: booking.to_lodging,
         google_hotels.PROVIDER: google_hotels.to_lodging,
         airbnb.PROVIDER: airbnb.to_lodging,
+        unlocker.PROVIDER: unlocker.to_lodging,
     }
     adapter = adapters.get(record.provider)
     if adapter is None:
