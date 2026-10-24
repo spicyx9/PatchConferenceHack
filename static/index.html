@@ -149,13 +149,7 @@
           >
         </nav>
         <div class="header-tools">
-          <button
-            class="text-button"
-            data-open="sources-dialog"
-            aria-label="Sources and how it works"
-          >
-            <svg class="icon"><use href="#i-info" /></svg></button
-          ><button class="replan-button" data-open="simulation-dialog">
+          <button class="replan-button" data-open="simulation-dialog">
             <span>Replan</span></button
           ><button
             class="profile-avatar"
@@ -394,10 +388,6 @@
                 <svg class="icon"><use href="#i-info" /></svg
                 ><span>Graph unavailable · fallback ranking active.</span>
               </div>
-              <button class="sources-link" data-open="sources-dialog">
-                <svg class="icon"><use href="#i-info" /></svg>How are
-                suggestions made?
-              </button>
             </aside>
           </div>
         </section>
@@ -569,12 +559,6 @@
             <div><h1 id="connections-title">Connections<span class="title-dot">.</span></h1>
               <p id="connections-count">Loading people…</p></div>
           </div>
-          <div class="connections-controls">
-            <div class="scope-tabs" role="group" aria-label="Connection list">
-              <button type="button" data-connection-scope="all" aria-pressed="true">All people</button>
-              <button type="button" data-connection-scope="met" aria-pressed="false">People I’ve met</button>
-            </div>
-          </div>
           <div class="connection-filters" role="group" aria-label="Filter connections">
             <div class="connection-filter"><span id="filter-company-label">Company</span>
               <details class="filter-menu" id="filter-company">
@@ -647,14 +631,7 @@
               <div id="graph-detail" class="graph-detail" role="status" aria-live="polite"></div>
             </aside>
           </div>
-          <details class="graph-text"><summary>Network data</summary><div id="graph-fallback"></div></details>
-          <details class="panel">
-            <summary>
-              How your planning agents coordinate
-              <span>Version <span id="agents-plan-version">—</span></span>
-            </summary>
-            <div id="agents-state"></div>
-          </details>
+          <div hidden><div id="graph-fallback"></div><span id="agents-plan-version"></span><div id="agents-state"></div></div>
         </section>
 
         <section
@@ -686,13 +663,7 @@
             <ol id="next-actions" class="next-actions"></ol>
           </div>
         </section>
-        <footer class="footer">
-          <span>Conferge</span
-          ><a href="#dashboard" data-nav="dashboard">View your progress</a
-          ><button class="text-button" data-open="sources-dialog">
-            Sources and details
-          </button>
-        </footer>
+        <footer class="footer"><span>Conferge</span></footer>
       </main>
     </div>
 
@@ -792,54 +763,7 @@
         ><button id="btn-reset" class="danger-solid">Reset session</button>
       </div>
     </dialog>
-    <dialog id="sources-dialog" aria-labelledby="sources-title">
-      <div class="dialog-head">
-        <button
-          class="icon-button"
-          data-close="sources-dialog"
-          aria-label="Close"
-        >
-          <svg class="icon"><use href="#i-close" /></svg>
-        </button>
-      </div>
-      <h2 id="sources-title">Sources and how it works</h2>
-      <p id="conf-name" class="muted"></p>
-      <div class="source-summary">
-        <span>Data provenance</span>
-        <span id="badge-source" class="badge fixture">Loading data</span>
-      </div>
-      <div class="source-summary">
-        <span>Source status</span
-        ><span id="badge-status" class="badge neutral">Loading</span>
-      </div>
-      <div class="source-summary">
-        <span>Last collected</span
-        ><span id="collected-at" class="small-text">—</span>
-      </div>
-      <p class="small-text muted">
-        Fixture data is replayed or fictional; live data comes from a real
-        collection. Availability and prices may have changed since collection.
-        Speaker listings do not guarantee a meeting. Conference affiliation and
-        attendance evidence are shown on individual records.
-      </p>
-      <p class="small-text muted">
-        The ranking uses your selected profiles and priorities, with a fallback
-        when the graph is unavailable. Map lines show the order of visits, not
-        calculated routes, and some location coordinates are approximate.
-      </p>
-      <p class="small-text muted">
-        Saving a travel suggestion does not make a booking. Change scenarios
-        affect this session and are not source updates. Resetting clears this demo user’s meeting and planning state.
-      </p>
-      <div id="source-domains"></div>
-      <div id="bd-counter" class="bd-counter"></div>
-      <details id="warnings-box">
-        <summary>
-          Details and warnings <span id="warnings-count">0</span>
-        </summary>
-        <ul id="warnings-list"></ul>
-      </details>
-    </dialog>
+    <div hidden aria-hidden="true"><div id="conf-name"></div><div id="badge-source"></div><div id="badge-status"></div><div id="collected-at"></div><div id="source-domains"></div><div id="bd-counter"></div><div id="warnings-box"></div><div id="warnings-count"></div><div id="warnings-list"></div></div>
     <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
     <script
       src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"

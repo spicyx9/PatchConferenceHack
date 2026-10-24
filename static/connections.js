@@ -110,17 +110,11 @@
   }
   $('connection-results').addEventListener('error',e=>{if(e.target.classList.contains('connection-avatar'))e.target.remove();},true);
   $('connection-search').addEventListener('submit',search);
-  document.querySelectorAll('[data-connection-scope]').forEach(button=>button.addEventListener('click',()=>{
-    scope=button.dataset.connectionScope;Object.keys(filters).forEach(k=>filters[k]='');$('connection-query').value='';
-    document.querySelectorAll('[data-connection-scope]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
-    render();
-  }));
   document.querySelectorAll('[data-connection-query]').forEach(button=>button.addEventListener('click',()=>{$('connection-query').value=button.dataset.connectionQuery;search();}));
   $('connection-results').addEventListener('click',e=>{const b=e.target.closest('[data-person]');if(b)focus(b.dataset.person);});
   function readySearch() {busy=false;$('connection-submit').disabled=false;$('connection-submit').innerHTML='Find people <span aria-hidden="true">↗</span>';}
   function resetSearch() {
     scope='all';
-    document.querySelectorAll('[data-connection-scope]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.connectionScope==='all')));
     Object.keys(filters).forEach(k=>filters[k]='');
     document.querySelectorAll('.filter-menu').forEach(menu=>menu.open=false);
     $('connection-query').value='';readySearch();render();
