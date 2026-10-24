@@ -12,11 +12,15 @@ from typing import Any, Protocol
 _ALLOWED_NODE_LABELS = frozenset({
     "Conference", "Event", "Person", "Company", "Goal", "Opportunity", "Venue",
     "Topic", "Lodging", "FlightOffer", "Session", "Meeting",
+    # Shared agent state (conferge/graph/agent_state.py): the user, and plan changes.
+    "User", "Change",
 })
 _ALLOWED_EDGES = frozenset({
     "PART_OF", "SPEAKS_AT", "HOSTS", "WORKS_AT", "ATTENDS_CONFIRMED",
     "ABOUT", "LOCATED_AT", "HAS_GOAL", "SERVES_GOAL", "NEAR", "INVOLVES",
     "EVIDENCED_BY", "MET", "LED_TO", "CONNECTED_TO", "EXHIBITS_AT",
+    # Shared agent state: (User)-[:PLANS|SKIPS]->(Event), (Change)-[:AFFECTS]->(Event).
+    "PLANS", "SKIPS", "AFFECTS",
 })
 _PROP_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 # DDL only (FalkorDB 6.x): range index on id for every allowed label, full-text for search.
