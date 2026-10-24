@@ -167,6 +167,9 @@ def _envelope(
     if state.rank_mode == DEGRADED_NO_GRAPH and {"people", "events"} & set(domains) and not mode_override:
         data_source, status = DEGRADED_NO_GRAPH, "degraded"
     warnings = {w for s in slices for w in s.warnings} | set(extra_warnings or [])
+    shared = payload.get("plan_graph")
+    if isinstance(shared, dict) and shared.get("error"):  # a 200 must not hide a failed graph write
+        warnings.add(f"plan not written to FalkorDB: {shared['error']}; served from the API process only")
     if state.scenario_id:  # every response served while a simulation is in force says so
         warnings.add(f"simulated change active: scenario {state.scenario_id!r} rewrote "
                      f"{len(state.simulated_events)} event(s); not an update from the source (POST /reset clears it)")
@@ -402,7 +405,7 @@ def create_app(
         if store is not None:
             skips_written = publish_skips(store, USER_ID, skips)
         return _envelope(state, ["events", "people"], {
-            "skips": skips, "computed_by": result.agent, "status": result.status,
+            "skips": skips, "computed_by": result.agent, "agent_status": result.status,
             "plan_source": "falkordb" if store is not None else "process",
             "plan_version": plan_version, "skips_graph": skips_written,
         }, extra_warnings=notes)
@@ -602,7 +605,10 @@ def create_app(
         payload = _plan_payload()
         payload.update({"person_id": person.id, "persisted": persisted,
                         "memory_id": memory_id if persisted == "falkordb" else None})
-        return _envelope(state, ["people", "events"], payload, extra_warnings=_plan_warnings())
+        notes = _plan_warnings()
+        if persisted == "memory":
+            notes.append("meeting kept in process memory only: not written to FalkorDB")
+        return _envelope(state, ["people", "events"], payload, extra_warnings=notes)
 
     @api.get("/followup")
     def followup(person: str) -> dict[str, Any]:
@@ -622,7 +628,9 @@ def create_app(
             note=state.met.get(found.id) or None,
             path_text=opp.rationale if opp else None, met_at=state.met_at.get(found.id),
         )
-        return _envelope(state, ["people"], draft.model_dump(mode="json"))
+        payload = draft.model_dump(mode="json")
+        payload["draft_status"] = payload.pop("status")  # "status" belongs to the envelope
+        return _envelope(state, ["people"], payload)
 
     def _event_or_404(event_id: str) -> None:
         if state.data.event(event_id) is None:
@@ -652,7 +660,10 @@ def create_app(
                 persisted = "memory"
         payload = _plan_payload()
         payload.update({"event_id": req.event_id, "reason": req.reason, "persisted": persisted})
-        return _envelope(state, ["events", "people"], payload, extra_warnings=_plan_warnings())
+        notes = _plan_warnings()
+        if persisted == "memory":
+            notes.append("skip kept in process memory only: not written to FalkorDB")
+        return _envelope(state, ["events", "people"], payload, extra_warnings=notes)
 
     @api.get("/scenarios")
     def scenarios() -> dict[str, Any]:
