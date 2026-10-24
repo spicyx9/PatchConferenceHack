@@ -400,7 +400,10 @@
       "</strong><span>" +
       esc(
         stay.total_price != null
-          ? "for " + nights + " nights"
+          ? (stay.adults
+              ? stay.adults + " adult" + (stay.adults === 1 ? "" : "s") + " · "
+              : "") +
+            nights + " night" + (nights === 1 ? "" : "s")
           : stay.price_status === "indicative"
             ? "per night · indicative"
             : "for these dates",

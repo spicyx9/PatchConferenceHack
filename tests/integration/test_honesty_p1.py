@@ -63,3 +63,20 @@ def test_meet_only_for_confirmed_speakers_or_hosts() -> None:
             assert logic.confirmed_at(data, ev, attendee.id) is False
     assert 'Possibly: " + names(maybe) + " (not confirmed)"' in APP_JS
     assert "var who = meetLine(i.people);" in APP_JS and "meetLine(r.people)" in APP_JS
+
+
+# -- 3. stay cards: guests and nights next to the price -----------------------------------
+
+def test_stay_card_says_adults_and_nights_next_to_the_price() -> None:
+    import subprocess
+
+    js = (ROOT / "static" / "travel-cards.js").read_text(encoding="utf-8")
+    script = js + """
+    ;var html = window.TravelCards.stay({name: "Chelsea Inn", check_in: "2026-10-27",
+      check_out: "2026-10-30", adults: 2, rooms: 1, total_price: "500.00", currency: "USD",
+      price_status: "quoted_total", venue: {}}, "");
+    console.log(html);"""
+    out = subprocess.run(["node", "-e", "var window = {}; var document = {};" + script],
+                         capture_output=True, text=True, timeout=30)
+    assert out.returncode == 0, out.stderr
+    assert "2 adults · 3 nights" in out.stdout
