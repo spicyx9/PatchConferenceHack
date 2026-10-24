@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping
+from functools import lru_cache
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -47,6 +48,17 @@ def load_fixture_covers(path: Path | None = None) -> dict[str, str]:
     return covers
 
 
+@lru_cache(maxsize=1)
+def fixture_captured_at(path: Path | None = None) -> str | None:
+    """When the Luma capture the covers come from was taken (its ``captured_at``)."""
+    try:
+        raw = json.loads((path or FIXTURE_PATH).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    value = raw.get("captured_at") if isinstance(raw, dict) else None
+    return value if isinstance(value, str) else None
+
+
 def event_artwork(event: Event, covers: Mapping[str, str]) -> dict[str, str]:
     """Fixture artwork never implies a live record or an official-session cover."""
     if event.conference_relation == "official" or event.event_type == "session":
@@ -56,4 +68,10 @@ def event_artwork(event: Event, covers: Mapping[str, str]) -> dict[str, str]:
     if not any(e.provider == "luma" for e in event.evidence):
         return {}
     cover = covers.get(event.id)
-    return {"cover_url": cover, "cover_source_mode": "fixture"} if cover else {}
+    if not cover:
+        return {}
+    out = {"cover_url": cover, "cover_source_mode": "fixture"}
+    captured = fixture_captured_at()
+    if captured:
+        out["cover_captured_at"] = captured  # artwork is from a capture, not from the live run
+    return out

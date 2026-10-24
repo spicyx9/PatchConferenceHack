@@ -291,6 +291,25 @@
     }).format(d);
   }
 
+  // Every amount shown carries the price_status of what it is made of (audit fix 5).
+  function priceStatusText(statuses) {
+    var list = (Array.isArray(statuses) ? statuses : [statuses]).filter(function (x) { return x != null; });
+    return list.length ? " (price " + list.join(", ") + ")" : " (price status unknown)";
+  }
+
+  // What the draft is based on, and its warnings, under every draft (audit fix 2).
+  function followupFacts(draft) {
+    var labels = { goal: "Goal", event: "Met at", person_event: "Where they speak or host",
+      company: "Company", shared_topic: "Shared topic", note: "Your note", path: "Graph path" };
+    var b = draft.based_on || {};
+    var facts = Object.keys(labels).filter(function (k) { return b[k]; }).map(function (k) {
+      return "<li><b>" + esc(labels[k]) + ":</b> " + esc(b[k]) + "</li>";
+    }).join("");
+    var warns = (draft.warnings || []).map(function (w) { return '<li class="warn">' + esc(w) + "</li>"; }).join("");
+    return (facts ? '<p class="small-text muted">Based on</p><ul class="small-text followup-facts">' + facts + "</ul>" : "") +
+      (warns ? '<ul class="small-text followup-warnings">' + warns + "</ul>" : "");
+  }
+
   function fmtUsd(value) {
     if (value === null || value === undefined) return "Not provided";
     var n = Number(value);
@@ -723,17 +742,23 @@
       ) +
       roiTile("Meetings recorded", roi.meetings) +
       roiTile("Qualified contacts", roi.qualified_contacts) +
-      roiTile("Opportunities scoring 30+", roi.opportunities);
+      roiTile("Opportunities scoring " + (roi.opportunity_threshold == null ? "?" : roi.opportunity_threshold) + "+", roi.opportunities);
     $("roi-note").textContent =
       "Indicative budget: " +
       fmtUsd(roi.budget_usd) +
+      (roi.budget_source ? " (" + roi.budget_source + ")" : "") +
       (roi.spend_note ? " · " + roi.spend_note : "");
     [ ["roi-spend", roi.spend_usd == null ? null : fmtUsd(roi.spend_usd)], ["roi-meetings", roi.meetings], ["roi-qualified", roi.qualified_contacts], ["roi-opportunities", roi.opportunities] ].forEach(function (pair) {
       var element = $(pair[0]);
       element.textContent = pair[1] == null ? "Not provided" : String(pair[1]);
       element.classList.toggle("unknown", pair[1] == null);
     });
-    $("roi-spend-note").textContent = roi.spend_usd == null ? "Prices are not available yet." : "";
+    if (roi.opportunity_threshold != null)
+      $("roi-opportunities-label").textContent = "Opportunities scoring " + roi.opportunity_threshold + "+";
+    var spendStatus = roi.spend_price_status || {};
+    $("roi-spend-note").textContent = (roi.spend_usd == null ? "Prices are not available yet." : "") +
+      priceStatusText([].concat(spendStatus.flights || [], spendStatus.lodging == null ? [] : [spendStatus.lodging])) +
+      (roi.spend_basis ? " · " + roi.spend_basis : "");
     $("stat-met").textContent = roi.meetings == null ? "—" : roi.meetings;
   }
 
@@ -1007,7 +1032,9 @@
                 "</span>" +
                 sourceBadge(leg.source_mode) +
                 sourceApiBadge(leg.source) +
-                "</li>"
+                '<span class="badge neutral">' +
+                esc(orUnknown(leg.price_status)) +
+                "</span></li>"
               );
             }
             var selected = !isPlaceholderStay(leg.name);
@@ -1072,18 +1099,18 @@
     $("budget").innerHTML =
       "<table><tbody>" +
       "<tr><th>Budget</th><td>" +
-      esc(fmtUsd(b.budget_usd)) +
+      esc(fmtUsd(b.budget_usd) + (b.budget_source ? " (" + b.budget_source + ")" : "")) +
       " " +
       sourceModeBadge(b.source_mode) +
       "</td></tr>" +
       "<tr><th>Flights</th><td>" +
-      esc(fmtUsd(b.flights_usd)) +
+      esc(fmtUsd(b.flights_usd) + priceStatusText(b.flights_price_status)) +
       "</td></tr>" +
       "<tr><th>Stay</th><td>" +
-      esc(fmtUsd(b.lodging_usd)) +
+      esc(fmtUsd(b.lodging_usd) + priceStatusText(b.lodging_price_status)) +
       "</td></tr>" +
       "<tr><th>Remaining</th><td>" +
-      esc(fmtUsd(b.remaining_usd)) +
+      esc(fmtUsd(b.remaining_usd) + priceStatusText([].concat(b.flights_price_status || [], b.lodging_price_status == null ? [] : [b.lodging_price_status]))) +
       "</td></tr>" +
       "</tbody></table>" +
       (b.note
@@ -1736,7 +1763,9 @@
         esc(cover) +
         '" alt="Artwork for ' +
         esc(event.title) +
-        '" loading="lazy" referrerpolicy="no-referrer"></div>'
+        '" title="' +
+        esc("Luma artwork from a capture" + (event.cover_captured_at ? " taken " + shortDate(String(event.cover_captured_at).slice(0, 10)) : "") + "; live events have no artwork yet") +
+        '" loading="lazy" referrerpolicy="no-referrer"><span class="artwork-credit">Luma capture</span></div>'
       );
     var kind =
       {
@@ -1857,7 +1886,7 @@
         ).indexOf(needle) >= 0
       );
     });
-    $("stat-people").textContent = all.length;
+    $("stat-people").textContent = p && p.total != null ? p.total : all.length;  // all ranked people, not the page shown
     $("people-result-count").textContent =
       items.length + " suggestion" + (items.length !== 1 ? "s" : "");
     $("people-cards").innerHTML = items.length
@@ -2834,7 +2863,7 @@
         return api("/followup?person=" + encodeURIComponent(id), null, "people").then(function (draft) {
           var box = $("followup-" + id), next = draft.next_action || {}, link = safeUrl(next.url);
           if (!box) return;
-          box.innerHTML = '<p class="small-text muted">Your draft · review before sending</p><pre class="followup-text">' + esc(draft.message) + '</pre><p class="small-text">' + esc(next.label || "") + (link ? ' <a href="' + esc(link) + '" target="_blank" rel="noopener noreferrer">Open profile</a>' : "") + (next.due_at ? ' · ' + esc(shortDate(String(next.due_at).slice(0,10))) : "") + '</p><button class="secondary" data-action="copy-followup" data-id="' + esc(id) + '">Copy draft</button>';
+          box.innerHTML = '<p class="small-text muted">Your draft · review before sending</p><pre class="followup-text">' + esc(draft.message) + '</pre><p class="small-text">' + esc(next.label || "") + (link ? ' <a href="' + esc(link) + '" target="_blank" rel="noopener noreferrer">Open profile</a>' : "") + (next.due_at ? ' · ' + esc(shortDate(String(next.due_at).slice(0,10))) : "") + '</p>' + followupFacts(draft) + '<button class="secondary" data-action="copy-followup" data-id="' + esc(id) + '">Copy draft</button>';
         });
       });
     } else if (action === "copy-followup") {
