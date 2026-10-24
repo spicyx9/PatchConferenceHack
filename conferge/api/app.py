@@ -767,6 +767,35 @@ def create_app(
             notes.append("no goal-to-person path in the graph for this person")
         return _envelope(state, ["people", "events"], why, extra_warnings=notes)
 
+    @api.get("/graph/gaps")
+    def graph_gaps() -> dict[str, Any]:
+        """No recorded path in our graph for the user's goals (read-only); not proof of absence."""
+        store = state.store()
+        if store is None:
+            return _envelope(state, ["people", "events"], {"backend": None, "gaps": None},
+                             extra_warnings=["FalkorDB not reachable: no graph to query"])
+        state.opportunities()  # the user's current goals are synced into the graph first
+        from conferge.graph.queries import graph_gaps as gaps_query
+
+        gaps = gaps_query(store, USER_ID)
+        modes = {k: v for k, v in gaps.pop("source_modes").items() if k != "None"}
+        mode = max(modes, key=lambda k: modes[k]) if modes else "unknown"
+        return _envelope(state, ["people", "events"], {
+            "backend": "falkordb", "user_id": USER_ID, "gaps": gaps, "graph_source_modes": modes,
+            "graph_source_mode": "mixed" if len(modes) > 1 else mode,
+            "empty": all(g["count"] == 0 for g in gaps.values()),
+        })
+
+    @api.get("/how-it-works")
+    def how_it_works(format: str = "json") -> Any:  # noqa: A002 - public query name
+        """The scoring formula, written from the constants the ranking code uses."""
+        from fastapi.responses import PlainTextResponse
+
+        from conferge.graph.scoring_doc import how_it_works as explain
+
+        doc = explain()
+        return PlainTextResponse(doc["text"]) if format == "text" else doc
+
     @api.get("/graph/path")
     def graph_path(person: str, user: str = "demo-user") -> dict[str, Any]:
         live = _falkordb_path(person, user)
