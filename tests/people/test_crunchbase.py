@@ -362,3 +362,14 @@ def test_write_raw(tmp_path) -> None:
                         directory=tmp_path)
     assert path.name == "crunchbase_2026-10-24.json"
     assert json.loads(path.read_text())["records"] == [{"name": "X"}]
+
+
+def test_lone_candidate_must_agree_with_the_company_name() -> None:
+    from conferge.people.crunchbase import pick_candidate
+
+    base = "https://www.crunchbase.com/organization/"
+    assert pick_candidate("Momentic", [base + "momentic-ai"]) == base + "momentic-ai"
+    assert pick_candidate("GitHub", [base + "github"]) == base + "github"
+    assert pick_candidate("Overmind", [base + "acme-robotics"]) is None
+    assert pick_candidate("Acme", [base + "acme-labs", base + "acme-ai"]) is None
+    assert pick_candidate("Acme", [base + "acme", base + "acme-ai"]) == base + "acme"

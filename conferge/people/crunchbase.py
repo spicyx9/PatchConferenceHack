@@ -140,14 +140,25 @@ def parse_serp(text: str) -> list[str]:
     return out
 
 
+def _agrees(target: str, slug: str) -> bool:
+    """Slug and company name agree: equal, or one is the other plus a suffix (momentic-ai)."""
+    return bool(target and slug) and (slug == target or slug.startswith(target)
+                                      or target.startswith(slug))
+
+
 def pick_candidate(name: str, urls: Iterable[str]) -> str | None:
-    """One distinct slug, or exactly one slug equal to the normalized name; else None."""
+    """The one slug that agrees with the company name; None when none or several do.
+
+    Decision: a lone SERP result whose slug does not match the name is rejected; funding
+    attached to the wrong organisation would be an invented relation.
+    """
     distinct = list(dict.fromkeys(urls))
-    if len(distinct) == 1:
-        return distinct[0]
     target = norm(name)
-    exact = [u for u in distinct if target and norm(u.rsplit("/", 1)[-1]) == target]
-    return exact[0] if len(exact) == 1 else None
+    exact = [u for u in distinct if norm(u.rsplit("/", 1)[-1]) == target]
+    if len(exact) == 1:
+        return exact[0]
+    agreeing = [u for u in distinct if _agrees(target, norm(u.rsplit("/", 1)[-1]))]
+    return agreeing[0] if len(agreeing) == 1 and not exact else None
 
 
 async def serp_json(client: BrightDataClient, query: str, *, country: str = "us") -> str:
