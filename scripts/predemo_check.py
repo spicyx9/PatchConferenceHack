@@ -30,7 +30,7 @@ def expected() -> dict[str, Any]:
         "top3": [n.strip() for n in os.environ.get("PREDEMO_TOP3", DEFAULT_TOP3).split(",") if n.strip()],
         "stays_bd": int(os.environ.get("PREDEMO_STAYS_BD", "21")),
         "flights_bd": int(os.environ.get("PREDEMO_FLIGHTS_BD", "34")),
-        "linkedin_min": int(os.environ.get("PREDEMO_LINKEDIN_MIN", "9")),
+        "linkedin_min": int(os.environ.get("PREDEMO_LINKEDIN_MIN", "12")),
     }
 
 
