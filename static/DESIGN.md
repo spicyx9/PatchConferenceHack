@@ -91,7 +91,7 @@ availability and engine details are in Sources, not the discovery sidebar.
 Agenda uses a day rail and source-poster cards, with a conference-day default.
 People uses illustrated profiles with one matching priority, a linked session,
 and clear conversation actions. Generated avatars are decorative fictional art.
-Travel centers on a selectable map and place list; unknown offers remain empty.
+Travel compares flights and stays; geographic context remains in the Discover agenda map. Unknown offers remain empty.
 Connections starts with a person, their matching priority, and a real linked event.
 The full network and raw evidence remain available through secondary disclosures.
 
@@ -101,11 +101,11 @@ Travel begins with editable origin/dates and provider search links. These links 
 
 ### Travel search implementation
 
-Flights and Stays are separate tasks with visible destination, dates and occupancy. Search submits one structured request; changing criteria clears stale offers. Flights use a time–duration–arrival row with a separate total-fare column, filters for stops and price, and actual sorting. Stay searches use check-in/out, guests, rooms and venue radius; the map reflects searched stay coordinates. Local/already-arranged travelers can skip the search. Search is against attributed collected offers, with an exact-criteria provider fallback when no collection covers the query. Reference: https://www.kayak.com/flights and https://www.airbnb.com/help/article/479.
+Flights and Stays are separate tasks with visible destination, dates and occupancy. Search submits one structured request; changing criteria clears stale offers. Flights use a time–duration–arrival row with a separate total-fare column, filters for stops and price, and actual sorting. Stay searches use check-in/out, guests, rooms and venue radius; hotel cards retain their observed distance to the venue. Local/already-arranged travelers can skip the search. Search is against attributed collected offers, with an exact-criteria provider fallback when no collection covers the query. Reference: https://www.kayak.com/flights and https://www.airbnb.com/help/article/479.
 
 ### Travel search interactions
 
-Search groups route, date range and party beside a single submit action. City and airport suggestions name the location and show IATA codes; city selections keep the collector’s actual city expansion. A shared range calendar guides departure/check-in then return/check-out, with one-way support. A party picker edits supported adult, cabin and room criteria. Children and daily fare estimates are not offered without collector support. Common real sorts and a nearby map action precede the results. Popovers support keyboard navigation, Escape, outside dismissal and viewport-aware placement; the underlying visible fields remain usable. Booking and Kayak public search interactions were reviewed on October 24, 2026.
+Search groups route, date range and party beside a single submit action. City and airport suggestions name the location and show IATA codes; city selections keep the collector’s actual city expansion. A shared range calendar guides departure/check-in then return/check-out, with one-way support. A party picker edits supported adult, cabin and room criteria. Children and daily fare estimates are not offered without collector support. Common real sorts precede the results; Travel does not duplicate the agenda map. Popovers support keyboard navigation, Escape, outside dismissal and viewport-aware placement; the underlying visible fields remain usable. Booking and Kayak public search interactions were reviewed on October 24, 2026.
 
 ### Shared softer Travel / Connections surfaces
 

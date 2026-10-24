@@ -644,7 +644,7 @@
           <div id="travel-local-note" hidden>
             <h2>Travel not needed</h2>
             <p>
-              View your venues and agenda on the map.
+              You can search for flights or stays whenever you need them.
             </p>
             <button type="button" id="travel-resume" class="secondary">
               Search travel
@@ -817,7 +817,6 @@
                   >
                     Lowest price
                   </button>
-                  <button type="button" id="travel-show-map">Show map</button>
                 </div>
                 <div id="stays"></div>
               </section>
@@ -837,63 +836,6 @@
             >Search stays with provider</a
           >
           <aside id="budget" aria-label="Trip budget"></aside>
-          <section
-            class="travel-map-panel panel"
-            id="travel-map-panel"
-            hidden
-            aria-labelledby="travel-map-title"
-          >
-            <div class="travel-map-heading">
-              <div>
-
-                <h2 id="travel-map-title" tabindex="-1">Places</h2>
-                <p id="travel-map-count" class="muted">Loading places…</p>
-              </div>
-              <button id="travel-back-results" type="button" class="secondary" hidden>
-                Back to stays
-              </button>
-              <button id="travel-map-fit" type="button" class="secondary">
-                Fit places
-              </button>
-            </div>
-            <div class="travel-map-filters">
-              <label
-                >Show<select id="travel-map-scope">
-                  <option value="planned">Your agenda</option>
-                  <option value="nearby">Nearby events</option>
-                </select></label
-              ><label
-                >Day<select id="travel-map-day">
-                  <option value="all">All days</option>
-                </select></label
-              ><span class="travel-map-key"
-                ><i></i> Conference <i></i> Events &amp; stays</span
-              >
-            </div>
-            <div class="travel-map-workspace">
-              <div
-                class="travel-place-list"
-                id="map-places"
-                aria-label="Places shown on the map"
-              ></div>
-              <div class="travel-map-canvas">
-                <div
-                  id="map"
-                  class="map"
-                  aria-label="Interactive map of conference and events"
-                ></div>
-                <div
-                  id="travel-place-detail"
-                  class="travel-place-detail"
-                  aria-live="polite"
-                ></div>
-              </div>
-            </div>
-            <p id="map-kind" class="small-text muted"></p>
-            <p class="map-note" id="travel-map-note">
-              Choose a day to see your visits in order.
-            </p>
-          </section>
           <section
             class="trip-suggestions-section"
             aria-labelledby="trip-suggestions-title"

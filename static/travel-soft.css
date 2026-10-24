@@ -269,7 +269,6 @@
   border-radius: 999px;
   font-weight: 500;
 }
-#tab-travel .travel-map-panel,
 #tab-travel .travel-search-empty {
   border-color: var(--travel-line);
   border-radius: 24px;

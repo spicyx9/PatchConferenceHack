@@ -698,7 +698,6 @@
   }
   function sync() {
     arrangeFilters();
-    if (flights()) $("travel-back-results").hidden = true;
     $("travel-swap-route").hidden = !flights();
     $("research-adults-label").textContent = flights() ? "Travelers" : "Guests";
     document.querySelectorAll("[data-travel-sort]").forEach(function (b) {
@@ -730,20 +729,8 @@
     close(false);
     sync();
   });
-  $("travel-show-map").onclick = function () {
-    close(false);
-    $("travel-back-results").hidden = false;
-    $("travel-map-title").scrollIntoView({ block: "start" });
-    $("travel-map-title").focus({ preventScroll: true });
-  };
-  $("travel-back-results").onclick = function () {
-    $("trip-stays-title").scrollIntoView({ block: "start" });
-    $("trip-stays-title").focus({ preventScroll: true });
-    this.hidden = true;
-  };
   $("travel-local-toggle").addEventListener("click", function () {
     close(false);
-    $("travel-back-results").hidden = true;
   });
   window.addEventListener("resize", function () {
     close(false);
