@@ -1,26 +1,12 @@
-# STATUS (auto, 2026-10-24T16:52:23Z) active=0 wave1_merged=6/6 wave2_merged=4/4
+# Status (2026-10-24)
 
-## Morning summary
-- Wave 1: 6/6 merged (6/6 finished); wave 2: 4/4 merged (4/4 finished).
-- w15 integration: merged.
-- Pending live credentials and probes: w05 lodging, w06 flights, w07 people and w04 Bright Data live.
-- Morning checklist: verify GitHub CI and PRs, inspect fixture labels, configure Bright Data and OpenAI keys locally, test real FalkorDB traversal, rehearse the 3-minute scenario.
-
-| window | slug | tool | state | last commit | PR | CI | note |
-|---|---|---|---|---|---|---|---|
-| w01 | luma-partiful | claude | merged | f8ae05f 10 hours ago | - | - | - |
-| w02 | eventbrite-aggregators | claude | merged | - | - | - | - |
-| w03 | official | claude | merged | b161748 10 hours ago | - | - | - |
-| w04 | discovery | claude | merged | 459702a 9 hours ago | - | - | - |
-| w05 | lodging | claude | merged | dd7128c 9 minutes ago | #14 | SUCCESS | merged 16:52 |
-| w06 | flights | claude | merged | cb127c2 11 minutes ago | #13 | SUCCESS | merged 16:52 |
-| w07 | people | claude | merged | 4d4fa32 17 minutes ago | - | - | - |
-| w08 | graph | claude | merged | 101e871 10 hours ago | - | - | - |
-| w09 | planner | claude | merged | 25a7b3c 9 hours ago | - | - | - |
-| w10 | antifomo | claude | merged | 8df341d 9 hours ago | - | - | - |
-| w11 | travel | claude | merged | 6bb993e 9 hours ago | - | - | - |
-| w12 | api | claude | merged | - | - | - | - |
-| w13 | demo | claude | merged | - | - | - | - |
-| w15 | integration | claude | merged | 38a8511 9 hours ago | - | - | - |
-
-Logs: logs/wNN.log, logs/watch.log. Relaunch a worker: bash scripts/ops/launch_worker.sh NN slug. Launch wave 3 (needs keys in .env of each worktree): bash scripts/ops/launch_wave.sh 3
+1. Conferge: goal-first planner for GitHub Universe 2026 (Fort Mason, SF): who to meet, why, where and when.
+2. Rankings of people and events come from FalkorDB 6.0.3 traversals; without FalkorDB the API is labelled `degraded_no_graph`. Demo graph: 697 nodes, 2,195 edges.
+3. Sources (probe reports in `probes/`): 161 official sessions (RainFocus), 1,092 Luma events (194 kept after filters), 85 Partiful events.
+4. Bright Data travel run: 21 stays and 34 Google Flights itineraries through Web Unlocker (`probes/brightdata-travel.md`); fast-flights and Airbnb as fallbacks.
+5. Bright Data LinkedIn: 10 speaker profiles saved, 9 matched by name (identity_confidence 1.0 for 6, 0.7 for 3); presence is never inferred from LinkedIn.
+6. Reachability (`data/block_matrix.json`): 10 of 21 sites without Bright Data, 12 with Web Unlocker alone, 14 with Bright Data (Web Unlocker or dataset).
+7. Demo (`make demo`): goal, who to meet and why (graph path), plan and map, anti-FOMO, live replanning, meeting memory, follow-up drafts and ROI panel.
+8. Memory (MET, SKIPPED) lives in FalkorDB with one id per occurrence, survives restarts and is cleared by `POST /reset`.
+9. Tests: `make check` 1,147 passed; `make e2e` 16 passed against the real API and FalkorDB.
+10. Interface: Data pipeline panel and Reachability in "Sources and how it works", provenance badges on stays and travel legs, LinkedIn headline and company on people cards.

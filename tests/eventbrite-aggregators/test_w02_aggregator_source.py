@@ -18,7 +18,6 @@ from conferge.events.eventbrite import normalize as eb_normalize
 from conferge.events.eventbrite import source as eb_source
 
 GH_URL = "https://conferenceparties.com/github26/"
-RD_LEGACY_URL = "https://www.raidandev.org/vegas/reinvent2026/"
 
 
 def _gh_client() -> httpx.AsyncClient:
@@ -123,7 +122,6 @@ async def test_fetch_details_rereads_row() -> None:
 async def test_run_two_targets_one_failing_degraded() -> None:
     routes = {
         GH_URL: httpx.Response(200, text=read_fixture("conferenceparties_github26.html")),
-        RD_LEGACY_URL: httpx.Response(200, text=read_fixture("raidandev_legacy_slug_home.html")),
     }
 
     def factory(site, slug):
@@ -133,7 +131,7 @@ async def test_run_two_targets_one_failing_degraded() -> None:
         domain="events", conference_id="github-universe-2026", city="San Francisco",
         filters={"aggregators": [
             {"site": "conferenceparties", "slug": "github26"},
-            {"site": "raidandev", "slug": "reinvent2026"},
+            {"site": "conferenceparties", "slug": "nope"},
         ]},
     )
     envelope = await agg_source.run(query, source_factory=factory)
@@ -142,7 +140,7 @@ async def test_run_two_targets_one_failing_degraded() -> None:
     assert len(envelope.items) == 7
     statuses = sorted(r.status for r in envelope.reports)
     assert statuses == ["failed", "ok"]
-    assert any("no event cards" in e for e in envelope.errors)
+    assert any("404" in e for e in envelope.errors)
     for event in envelope.items:
         assert event.conference_id == "github-universe-2026"
         assert event.conference_relation == "candidate"

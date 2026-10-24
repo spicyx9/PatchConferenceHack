@@ -1,7 +1,7 @@
 """Conference-party aggregator sources implementing the core Source protocol.
 
-Sites: conferenceparties.com/<slug>/, raidandev.org/vegas/<slug>/ and
-reinventradar.com/schedule. Pages are public, fetched with httpx; when the
+Site: conferenceparties.com/<slug>/ (raidandev and reinventradar were removed:
+Las Vegas re:Invent only, nothing for the anchor conference). Pages are public, fetched with httpx; when the
 site blocks us and a Bright Data client with an unlocker zone is configured,
 the page is retried through Web Unlocker. Failures return degraded/failed
 reports; fixtures are never substituted here.
@@ -28,7 +28,7 @@ from conferge.core.schemas import (
     SourceRecord,
     SourceRef,
 )
-from conferge.events.aggregators import conferenceparties, raidandev, reinventradar
+from conferge.events.aggregators import conferenceparties
 from conferge.events.aggregators.common import (
     BROWSER_UA,
     ParseOutcome,
@@ -37,7 +37,7 @@ from conferge.events.aggregators.common import (
 )
 from conferge.events.aggregators.normalize import normalize_records
 
-Site = Literal["conferenceparties", "raidandev", "reinventradar"]
+Site = Literal["conferenceparties"]
 FIXTURE_PATH = Path(__file__).resolve().parents[3] / "fixtures" / "eventbrite-aggregators.json"
 
 # Default listing pages for the demo anchor conference.
@@ -47,23 +47,13 @@ DEFAULT_TARGETS: dict[str, list[dict[str, str]]] = {
 
 
 def _url_for(site: Site, slug: str) -> str:
-    if site == "conferenceparties":
-        return conferenceparties.page_url(slug)
-    if site == "raidandev":
-        return raidandev.page_url(slug)
-    return reinventradar.PAGE_URL
+    return conferenceparties.page_url(slug)
 
 
 def _parse(site: Site, html: str, slug: str, collected_at: datetime, url: str) -> ParseOutcome:
-    if site == "conferenceparties":
-        return conferenceparties.parse_page(
-            html, slug=slug, collected_at=collected_at, source_mode="live", url=url
-        )
-    if site == "raidandev":
-        return raidandev.parse_page(
-            html, slug=slug, collected_at=collected_at, source_mode="live", url=url
-        )
-    return reinventradar.parse_page(html, collected_at=collected_at, source_mode="live", url=url)
+    return conferenceparties.parse_page(
+        html, slug=slug, collected_at=collected_at, source_mode="live", url=url
+    )
 
 
 class AggregatorSource:
@@ -73,7 +63,7 @@ class AggregatorSource:
         self, site: Site, slug: str, *, client: httpx.AsyncClient | None = None,
         brightdata: BrightDataClient | None = None, timeout: float = 30.0,
     ) -> None:
-        if site not in {"conferenceparties", "raidandev", "reinventradar"}:
+        if site != "conferenceparties":
             raise ValueError(f"unknown aggregator site: {site}")
         self.site: Site = site
         self.slug = slug

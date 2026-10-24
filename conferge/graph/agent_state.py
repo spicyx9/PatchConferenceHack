@@ -7,7 +7,8 @@ Agents coordinate through the graph, not through Python objects:
     (Change {label, scenario_id, from_version, to_version, written_by, at_ms})-[:AFFECTS]->(Event)
 
 ``state`` is ``locked`` (user confirmed) or ``tentative`` for a planned event, and
-``invalidated`` once a later plan drops it. Nothing is ever deleted: an invalidated
+``invalidated`` once a later plan drops it. Replanning never deletes (``POST /reset``, a hard
+demo reset, is the one exception: it wipes the demo user's state). An invalidated
 ``PLANS`` edge keeps the ``plan_version`` it last belonged to, and ``versions`` lists every
 plan version that contained the event. Writes go through ``GraphStore`` MERGE only and are
 idempotent: re-writing the same plan or the same skips changes nothing, not even ``at_ms``.
@@ -17,6 +18,7 @@ Reads use ``GRAPH.RO_QUERY`` when the client has it.
 from __future__ import annotations
 
 import time
+from datetime import datetime, timezone
 from typing import Any, Literal
 
 from conferge.core.store import GraphStore
@@ -53,6 +55,12 @@ Q_SHOW_STATE = (
 
 def now_ms() -> int:
     return int(time.time() * 1000)
+
+
+def _provenance(at_ms: int) -> dict[str, Any]:
+    """Edge provenance required by conferge/graph/schema.py: the agent decided it at ``at_ms``."""
+    return {"source": "agent", "source_mode": "live", "confidence": 1.0, "verification": "agent_decision",
+            "observed_at": datetime.fromtimestamp(at_ms / 1000, tz=timezone.utc).isoformat()}
 
 
 def ensure_user(store: GraphStore, user_id: str) -> None:
@@ -110,8 +118,7 @@ def write_plan(store: GraphStore, user_id: str, items: list[dict[str, Any]], *,
         versions = list(edges.get(event_id, {}).get("versions") or [])
         store.merge_edge("User", user_id, "PLANS", "Event", event_id, {
             "state": item["state"], "score": _score(item.get("score")), "plan_version": version,
-            "versions": [*versions, version], "written_by": written_by, "at_ms": at,
-            "source": "agent", "source_mode": "live",
+            "versions": [*versions, version], "written_by": written_by, "at_ms": at, **_provenance(at),
         })
     return {"plan_version": version, "changed": True, "invalidated": dropped}
 
@@ -142,7 +149,7 @@ def write_skips(store: GraphStore, user_id: str, skips: list[dict[str, Any]], *,
             continue
         store.merge_edge("User", user_id, "SKIPS", "Event", event_id, {
             "state": "active", "reason": skip["reason"], "detail": skip.get("detail"),
-            "written_by": written_by, "at_ms": at, "source": "agent", "source_mode": "live",
+            "written_by": written_by, "at_ms": at, **_provenance(at),
         })
         written += 1
     for event_id in current.keys() - wanted.keys():
@@ -166,7 +173,7 @@ def write_change(store: GraphStore, user_id: str, *, label: str, scenario_id: st
     })
     for event_id in event_ids:
         store.merge_edge("Change", change_id, "AFFECTS", "Event", event_id, {
-            "written_by": written_by, "at_ms": at, "source": "agent", "source_mode": "live",
+            "written_by": written_by, "at_ms": at, **_provenance(at),
         })
     return change_id
 

@@ -64,3 +64,9 @@ waterfront pier and pale warehouse; modern glass/concrete architecture; dusk cit
 street and cable car silhouette; sunlight through palms and cream architecture.
 Subtle analog grain, natural physical texture, warm coral/blue/cream palette.
 No claim to documentary event or venue coverage.
+
+## Neutral profile placeholders
+
+`people-neutral-v3.jpg` is an Imagine-generated 4×2 atlas of eight non-human gouache characters. It replaces randomly assigned human portraits when no verified profile photo exists. These are decorative identity placeholders, not depictions of the named people.
+
+Prompt: Eight distinct gender-neutral non-human cartoon characters in a precisely aligned 4-column, 2-row atlas: lavender rounded creature, terracotta bird, ochre robot, pale-blue cloud, coral bean, sage pear, cream star, muted-indigo creature. Centered head and shoulders, matte gouache, paper grain, restrained pastel backgrounds, tiny expressive eyes, no text or gender cues.

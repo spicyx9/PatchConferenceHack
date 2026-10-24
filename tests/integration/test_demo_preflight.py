@@ -18,10 +18,22 @@ def _free_port() -> int:
         return s.getsockname()[1]
 
 
-def _run_demo(port: int) -> subprocess.CompletedProcess[str]:
+def _run_demo(port: int, ui_port: int | None = None) -> subprocess.CompletedProcess[str]:
     env = {**os.environ, "FALKORDB_HOST": "127.0.0.1", "FALKORDB_PORT": str(port)}
-    return subprocess.run([sys.executable, str(ROOT / "scripts" / "run_demo.py"), "--port", "1"],
+    ui = str(ui_port if ui_port is not None else _free_port())
+    return subprocess.run([sys.executable, str(ROOT / "scripts" / "run_demo.py"), "--port", ui],
                           env=env, capture_output=True, text=True, timeout=60, cwd=ROOT)
+
+
+def test_busy_ui_port_stops_before_collecting() -> None:
+    with socket.socket() as busy:
+        busy.bind(("127.0.0.1", 0))
+        busy.listen()
+        ui = busy.getsockname()[1]
+        proc = _run_demo(_free_port(), ui)
+    assert proc.returncode == 2
+    assert f"port {ui} is already in use, run `make demo DEMO_PORT={ui + 1}`" in proc.stderr
+    assert "Traceback" not in proc.stderr + proc.stdout and "assembled" not in proc.stdout
 
 
 def _plain_redis(server: socket.socket) -> None:

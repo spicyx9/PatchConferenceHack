@@ -94,3 +94,7 @@ and clear conversation actions. Generated avatars are decorative fictional art.
 Travel centers on a selectable map and place list; unknown offers remain empty.
 Connections starts with a person, their matching priority, and a real linked event.
 The full network and raw evidence remain available through secondary disclosures.
+
+### Travel research and identity corrections
+
+Travel begins with editable origin/dates and provider search links. These links research current offers externally; editing dates does not relabel the collected API offers. Flight and lodging cards compare collected offers, preserve observed prices and collection provenance, and never imply a booking or a selected itinerary. Map includes real geolocated stays alongside conference/events. Neutral illustrated placeholders avoid inventing a person's appearance when no verified portrait is provided.

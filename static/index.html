@@ -474,17 +474,86 @@
             <div>
               <span class="eyebrow">A LITTLE LESS LOGISTICS</span>
               <h1 id="travel-title">Your trip to San Francisco.</h1>
-              <p>Your dates, your events, and the places between them.</p>
+              <p>Compare the journey. Stay close to the conversations.</p>
             </div>
           </div>
-          <div class="trip-overview">
-            <div class="trip-destination">
-              <span class="eyebrow">YOUR JOURNEY</span>
-              <h2 id="trip-route">Your conference trip</h2>
-              <p id="travel-trip-dates">Loading your dates…</p>
+          <form
+            id="travel-research-form"
+            class="travel-research"
+            aria-label="Trip research"
+          >
+            <label
+              >Flying from<input
+                id="research-origin"
+                type="text"
+                maxlength="80"
+                value="JFK"
+                required
+            /></label>
+            <label
+              >Departure<input id="research-depart" type="date" required
+            /></label>
+            <label
+              >Return<input id="research-return" type="date" required
+            /></label>
+            <div class="research-actions">
+              <a
+                id="research-flights-link"
+                class="primary"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Search flights</a
+              ><a
+                id="research-stays-link"
+                class="secondary"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Find a stay</a
+              >
             </div>
-            <ol id="itinerary" class="itinerary"></ol>
-          </div>
+            <p class="small-text muted">
+              Search opens with a travel provider. Nothing is booked or selected
+              here.
+            </p>
+          </form>
+          <p id="travel-offer-context" class="small-text muted"></p>
+          <section
+            class="travel-comparison"
+            aria-labelledby="flight-compare-title"
+          >
+            <div class="section-heading">
+              <h2 id="flight-compare-title">Compare flights.</h2>
+              <label
+                >Sort by
+                <select id="flight-sort">
+                  <option value="route">Route</option>
+                  <option value="price">Price within currency</option>
+                </select></label
+              >
+            </div>
+            <div id="flights"></div>
+          </section>
+          <section
+            class="trip-stays-section"
+            aria-labelledby="trip-stays-title"
+          >
+            <div class="section-heading">
+              <div>
+                <span class="eyebrow">CLOSE TO YOUR PLANS</span>
+                <h2 id="trip-stays-title">Find your base.</h2>
+              </div>
+              <label
+                >Sort by
+                <select id="stay-sort">
+                  <option value="recommended">Recommended</option>
+                  <option value="distance">Distance to conference</option>
+                  <option value="price">Price within currency</option>
+                </select></label
+              >
+            </div>
+            <div id="stays"></div>
+          </section>
+          <aside id="budget" aria-label="Trip budget"></aside>
           <section
             class="travel-map-panel panel"
             aria-labelledby="travel-map-title"
@@ -510,7 +579,7 @@
                   <option value="all">All days</option>
                 </select></label
               ><span class="travel-map-key"
-                ><i></i> Conference <i></i> Events</span
+                ><i></i> Conference <i></i> Events &amp; stays</span
               >
             </div>
             <div class="travel-map-workspace">
@@ -536,21 +605,6 @@
               Choose a day to see your visits in order.
             </p>
           </section>
-          <div class="trip-practical">
-            <section
-              class="trip-stays-section"
-              aria-labelledby="trip-stays-title"
-            >
-              <div class="section-heading">
-                <div>
-                  <span class="eyebrow">SOMEWHERE TO RECHARGE</span>
-                  <h2 id="trip-stays-title">A place to stay.</h2>
-                </div>
-              </div>
-              <div id="stays"></div>
-            </section>
-            <aside id="budget" aria-label="Trip budget"></aside>
-          </div>
           <section
             class="trip-suggestions-section"
             aria-labelledby="trip-suggestions-title"
@@ -877,6 +931,13 @@
       </div>
       <div id="source-domains"></div>
       <div id="bd-counter" class="bd-counter"></div>
+      <details id="pipeline-panel" class="pipeline-panel">
+        <summary>Data pipeline</summary>
+        <p id="pipeline-headline" class="pipeline-headline"></p>
+        <div id="pipeline-table"></div>
+        <div id="pipeline-calls" class="small-text muted"></div>
+        <div id="pipeline-reach" class="pipeline-reach"></div>
+      </details>
       <details id="warnings-box">
         <summary>
           Details and warnings <span id="warnings-count">0</span>

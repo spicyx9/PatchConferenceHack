@@ -1,6 +1,6 @@
 # Règles d'ingénierie (non négociables)
 
-## Execution Rules (dans CLAUDE.md, AGENTS.md et chaque prompt)
+## Execution Rules (reprises dans CLAUDE.md)
 
 - Subagents en parallèle pour toute tâche indépendante (2 ou plus). Séquentiel uniquement si B dépend de la sortie de A ou d'un fichier partagé. Codex : activer multi_agent dans la config.
 - Commits petits et fréquents, un par changement logique, messages conventionnels (feat:, fix:, docs:, test:). Push dès qu'une étape est verte.

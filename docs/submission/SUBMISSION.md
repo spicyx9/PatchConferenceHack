@@ -1,6 +1,6 @@
 # Conferge
 
-**Don't just attend conferences. Be in the right place, with the right people, at the right time.**
+**Plan a conference trip in minutes and maximize the professional opportunities you get out of it.**
 
 ## Problem
 

@@ -338,6 +338,8 @@ class Goal(CoreModel):
     topics: list[str] = Field(default_factory=list)
     target_roles: list[str] = Field(default_factory=list)
     target_count: int | None = Field(default=None, ge=0)
+    stated_at: AwareDatetime | None = None
+    """When the user stated this goal (POST /goal); None for configured demo goals."""
 
 
 class Opportunity(CoreModel):

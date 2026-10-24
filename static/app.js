@@ -31,6 +31,7 @@
     "people",
     "travel",
     "stays",
+    "flights",
     "map",
     "graph",
     "roi",
@@ -144,6 +145,104 @@
           .replace(/^Meet /i, "")
           .replace(/\s*\(([^)]+)\)/, " · $1")
       : "Suggested for your priorities";
+  }
+
+  var PROVIDER_LABELS = {
+    brightdata: "Bright Data",
+    pyairbnb: "pyairbnb",
+    "fast-flights": "fast-flights",
+    serpapi: "SerpApi",
+  };
+  var BD_API_LABELS = {
+    dataset: "dataset",
+    unlocker: "Web Unlocker",
+    serp: "SERP API",
+  };
+
+  function sourceApiText(src) {
+    var prov = src.provider || "unknown";
+    if (prov === "fixture" || src.api === "fixture") return "Sample data";
+    if (prov === "brightdata")
+      return (
+        "Bright Data · " + (BD_API_LABELS[src.api] || src.api || "unknown")
+      );
+    if (src.api === "fallback")
+      return "Fallback " + (PROVIDER_LABELS[prov] || prov);
+    return (
+      (PROVIDER_LABELS[prov] || prov) +
+      (src.api && src.api !== "unknown" ? " · " + src.api : "")
+    );
+  }
+
+  // How a travel record was collected (Bright Data API, fallback or sample data).
+  function sourceApiBadge(src) {
+    if (!src || typeof src !== "object") return "";
+    var tier = Number(src.tier);
+    var cls =
+      tier === 0 || tier === 1
+        ? "src-bd"
+        : tier === 2
+          ? "src-fallback"
+          : tier === 3
+            ? "src-fixture"
+            : "neutral";
+    var tip = [];
+    if (src.label) tip.push(src.label);
+    if (src.id) tip.push("id: " + src.id);
+    if (src.site) tip.push("site: " + src.site);
+    if (src.snapshot_id) tip.push("snapshot: " + src.snapshot_id);
+    return (
+      '<span class="badge src ' +
+      cls +
+      '" title="' +
+      esc(tip.join(" | ")) +
+      '">' +
+      esc(sourceApiText(src)) +
+      "</span>"
+    );
+  }
+
+  // Observed price only: total_price as given, else the raw scraped text. Never computed.
+  function flightPriceText(f) {
+    if (f.total_price !== null && f.total_price !== undefined) {
+      return (
+        f.total_price +
+        " " +
+        (f.currency || "") +
+        (f.price_label ? " (" + f.price_label + ")" : "") +
+        (f.return_slice_collected === false ? ", return not collected" : "")
+      );
+    }
+    if (f.raw_price_text) return "observed price: " + f.raw_price_text;
+    return "price not available";
+  }
+
+  // LinkedIn evidence collected through Bright Data: headline and company only, never presence.
+  function linkedinField(li) {
+    if (!li) return "";
+    var tip = [
+      "dataset: " + li.dataset_id,
+      "snapshot: " + orUnknown(li.snapshot_id),
+      "collected_at: " + li.collected_at,
+      "identity_confidence: " + orUnknown(li.identity_confidence),
+    ];
+    var url = safeUrl(li.source_url);
+    return (
+      '<div class="field field-linkedin"><b>LINKEDIN</b>' +
+      esc(orUnknown(li.headline)) +
+      (li.company ? " · " + esc(li.company) : "") +
+      " " +
+      (url
+        ? '<a href="' +
+          esc(url) +
+          '" target="_blank" rel="noopener noreferrer">profile</a> '
+        : "") +
+      '<span class="badge src src-bd" title="' +
+      esc(tip.join(" | ")) +
+      '">' +
+      esc(li.provider || "brightdata:linkedin") +
+      "</span></div>"
+    );
   }
 
   function sourceBadge(mode) {
@@ -1018,61 +1117,15 @@
       return leg.kind === "flight";
     });
     var outbound = flights[0],
-      inbound = flights.length > 1 ? flights[flights.length - 1] : null;
-    $("trip-route").textContent = outbound
-      ? outbound.from + " → " + outbound.to
-      : "Your conference trip";
-    $("travel-trip-dates").textContent = outbound
-      ? shortDate(outbound.date) +
-        (inbound ? " – " + shortDate(inbound.date) : "")
-      : "Dates to be confirmed";
-    $("itinerary").innerHTML = legs.length
-      ? legs
-          .map(function (leg) {
-            if (leg.kind === "flight") {
-              var booked =
-                leg.source_mode !== "fixture" &&
-                (leg.departure_at || leg.carrier);
-              return (
-                '<li class="trip-leg"><span class="trip-leg-icon" aria-hidden="true">↗</span><div><span class="trip-leg-date">' +
-                esc(shortDate(leg.date)) +
-                "</span><h3>" +
-                esc(leg.from) +
-                ' <span aria-hidden="true">→</span> ' +
-                esc(leg.to) +
-                "</h3><p>" +
-                esc(
-                  booked
-                    ? [
-                        leg.carrier,
-                        leg.departure_at ? fmtHour(leg.departure_at) : null,
-                      ]
-                        .filter(Boolean)
-                        .join(" · ")
-                    : "Flight not selected",
-                ) +
-                "</p></div></li>"
-              );
-            }
-            var selected = !isPlaceholderStay(leg.name);
-            return (
-              '<li class="trip-leg"><span class="trip-leg-icon" aria-hidden="true">⌂</span><div><span class="trip-leg-date">' +
-              esc(shortDate(leg.check_in)) +
-              " – " +
-              esc(shortDate(leg.check_out)) +
-              "</span><h3>" +
-              esc(selected ? leg.name : "Stay in San Francisco") +
-              "</h3><p>" +
-              esc(
-                selected
-                  ? "Check the offer for availability"
-                  : "Choose a place near your plans",
-              ) +
-              "</p></div></li>"
-            );
-          })
-          .join("")
-      : '<li class="muted">Your travel details will appear here.</li>';
+      inbound = flights[flights.length - 1];
+    var form = $("travel-research-form");
+    if (!form.dataset.initialized) {
+      $("research-origin").value = outbound ? outbound.from : "JFK";
+      $("research-depart").value = (outbound && outbound.date) || "2026-10-27";
+      $("research-return").value = (inbound && inbound.date) || "2026-10-30";
+      form.dataset.initialized = "true";
+    }
+    updateResearchLinks();
     var props = t.proposals || [];
     $("proposals").innerHTML = props.length
       ? props
@@ -1109,30 +1162,139 @@
           })
           .join("")
       : '<p class="muted">No timing suggestions for your current agenda.</p>';
-    var b = t.budget || {},
-      known = [];
-    if (b.flights_usd != null) known.push("Flights " + fmtUsd(b.flights_usd));
-    if (b.lodging_usd != null) known.push("Stay " + fmtUsd(b.lodging_usd));
-    $("budget").innerHTML =
-      '<div class="trip-budget"><span>Trip budget</span><strong>' +
-      esc(b.budget_usd == null ? "Not set" : fmtUsd(b.budget_usd)) +
-      '</strong><span class="muted">' +
-      esc(
-        known.length
-          ? known.join(" · ")
-          : "Flight and stay prices not available yet",
-      ) +
-      "</span>" +
-      (b.remaining_usd != null
-        ? "<span>Remaining " + esc(fmtUsd(b.remaining_usd)) + "</span>"
-        : "") +
-      "</div>";
+    var b = t.budget || {};
+    $("budget").textContent =
+      b.budget_usd == null ? "" : "Your budget · " + fmtUsd(b.budget_usd);
+  }
+
+  function updateResearchLinks() {
+    var origin = $("research-origin").value.trim(),
+      depart = $("research-depart").value,
+      back = $("research-return").value;
+    $("research-return").min = depart;
+    $("research-return").setCustomValidity(
+      back < depart ? "Return must be after departure." : "",
+    );
+    $("research-flights-link").href =
+      "https://www.google.com/travel/flights?q=" +
+      encodeURIComponent(
+        "Flights from " +
+          origin +
+          " to San Francisco on " +
+          depart +
+          " returning " +
+          back,
+      );
+    $("research-stays-link").href =
+      "https://www.booking.com/searchresults.html?ss=San+Francisco&checkin=" +
+      encodeURIComponent(depart) +
+      "&checkout=" +
+      encodeURIComponent(back) +
+      "&group_adults=1&no_rooms=1";
+    var changed = $("travel-research-form").dataset.changed;
+    $("travel-offer-context").textContent = changed
+      ? "Search links use your dates. Collected offers below retain their original dates."
+      : "Collected offers for your conference trip. Check current prices with the provider.";
+  }
+
+  function renderFlights(res) {
+    var items = ((res && res.items) || []).filter(function (offer) {
+      return !(
+        offer.source &&
+        offer.source.provider === "fixture" &&
+        offer.total_price == null &&
+        !offer.booking_url
+      );
+    });
+    var sort = $("flight-sort").value;
+    items.sort(function (a, b) {
+      if (sort === "price" && a.currency === b.currency)
+        return (
+          (a.total_price == null ? Infinity : Number(a.total_price)) -
+          (b.total_price == null ? Infinity : Number(b.total_price))
+        );
+      return String(a.id).localeCompare(String(b.id));
+    });
+    $("flights").innerHTML = items.length
+      ? items
+          .map(function (leg) {
+            var slice = (leg.slices || [])[0] || {},
+              segments = slice.segments || [],
+              first = segments[0] || {},
+              last = segments[segments.length - 1] || first;
+            var link = safeUrl(leg.booking_url),
+              from = first.origin_iata || "Departure",
+              to = last.destination_iata || "SFO";
+            return (
+              '<article class="travel-offer"><div><span class="eyebrow">' +
+              esc(
+                (leg.slices || []).length > 1 ||
+                  leg.return_slice_collected === false
+                  ? "Round-trip quote"
+                  : "One-way",
+              ) +
+              "</span><h3>" +
+              esc(from) +
+              " → " +
+              esc(to) +
+              "</h3><p>" +
+              esc(
+                [
+                  first.marketing_carrier,
+                  first.departure_at
+                    ? fmtTime(first.departure_at)
+                    : "Time to be confirmed",
+                  segments.length
+                    ? segments.length === 1
+                      ? "Nonstop"
+                      : segments.length - 1 + " stop(s)"
+                    : null,
+                ]
+                  .filter(Boolean)
+                  .join(" · "),
+              ) +
+              '</p></div><div class="travel-offer-price"><strong>' +
+              esc(flightPriceText(leg)) +
+              "</strong>" +
+              (link
+                ? '<a class="secondary" href="' +
+                  esc(link) +
+                  '" target="_blank" rel="noopener noreferrer">View flight</a>'
+                : '<span class="muted small-text">Search the airline for this route</span>') +
+              "</div><details><summary>Offer details</summary>" +
+              sourceBadge(leg.source_mode) +
+              sourceApiBadge(leg.source) +
+              "<p>Collected " +
+              esc(
+                leg.collected_at
+                  ? fmtTime(leg.collected_at)
+                  : "date unavailable",
+              ) +
+              "</p></details></article>"
+            );
+          })
+          .join("")
+      : '<p class="travel-empty">No flight offers collected yet. Search flights above to compare current options.</p>';
   }
 
   function renderStays(s) {
     var items = ((s && s.items) || []).filter(function (stay) {
       return !isPlaceholderStay(stay.name);
     });
+    if ($("stay-sort").value === "distance")
+      items.sort(function (a, b) {
+        return (
+          (a.distance_to_venue_m == null ? Infinity : a.distance_to_venue_m) -
+          (b.distance_to_venue_m == null ? Infinity : b.distance_to_venue_m)
+        );
+      });
+    else if ($("stay-sort").value === "price")
+      items.sort(function (a, b) {
+        return a.currency === b.currency
+          ? (a.total_price == null ? Infinity : Number(a.total_price)) -
+              (b.total_price == null ? Infinity : Number(b.total_price))
+          : 0;
+      });
     $("stays").innerHTML = items.length
       ? items
           .map(function (st) {
@@ -1172,7 +1334,21 @@
                   esc(link) +
                   '" target="_blank" rel="noopener noreferrer">View stay</a>'
                 : "") +
-              "</div></article>"
+              "</div><details><summary>Offer details</summary>" +
+              sourceApiBadge(st.source) +
+              "<p>" +
+              esc(
+                [
+                  st.availability,
+                  st.price_status,
+                  st.collected_at
+                    ? "Collected " + fmtTime(st.collected_at)
+                    : null,
+                ]
+                  .filter(Boolean)
+                  .join(" · "),
+              ) +
+              "</p></details></article>"
             );
           })
           .join("")
@@ -1259,8 +1435,11 @@
     var candidates = local.filter(function (place) {
       return (
         place.kind === "conference" ||
-        ((travelMapState.scope === "nearby" || place.planned) &&
-          (travelMapState.day === "all" ||
+        ((place.kind === "stay" ||
+          travelMapState.scope === "nearby" ||
+          place.planned) &&
+          (place.kind === "stay" ||
+            travelMapState.day === "all" ||
             eventDay(place) === travelMapState.day))
       );
     });
@@ -1305,9 +1484,11 @@
         esc(
           selected.kind === "conference"
             ? "CONFERENCE"
-            : selected.planned
-              ? "IN YOUR AGENDA"
-              : "NEARBY EVENT",
+            : selected.kind === "stay"
+              ? "STAY OPTION"
+              : selected.planned
+                ? "IN YOUR AGENDA"
+                : "NEARBY EVENT",
         ) +
         "</span><h3>" +
         esc(selected.label) +
@@ -1315,7 +1496,9 @@
         esc(
           event
             ? fmtTime(event.start_at, event.timezone)
-            : "Your conference venue",
+            : selected.kind === "stay"
+              ? "A place to stay · check the offer for your dates"
+              : "Your conference venue",
         ) +
         '</p><p class="small-text muted">' +
         esc(
@@ -1367,7 +1550,9 @@
                   ? shortDate(eventDay(place)) +
                       " · " +
                       fmtHour(event.start_at, event.timezone)
-                  : "Conference venue",
+                  : place.kind === "stay"
+                    ? "Stay option"
+                    : "Conference venue",
               ) +
               "</small></span></button>"
             );
@@ -2471,7 +2656,9 @@
                 : "") +
               '<p class="people-presence">' +
               presenceBadge(person, opportunity) +
-              "</p><ul>" +
+              "</p>" +
+              linkedinField(card.linkedin) +
+              "<ul>" +
               sources +
               "</ul></details>" +
               (card.met
@@ -2602,6 +2789,21 @@
       });
   }
 
+  $("travel-research-form").addEventListener("input", function () {
+    this.dataset.changed = "true";
+    updateResearchLinks();
+  });
+  ["research-flights-link", "research-stays-link"].forEach(function (id) {
+    $(id).onclick = function (event) {
+      if (!$("travel-research-form").reportValidity()) event.preventDefault();
+    };
+  });
+  $("flight-sort").onchange = function () {
+    renderFlights(envelopes.flights);
+  };
+  $("stay-sort").onchange = function () {
+    renderStays(envelopes.stays);
+  };
   function refreshAll() {
     clearError();
     var errors = [];
@@ -2627,6 +2829,12 @@
       settle(api("/events", null, "events"), "events", renderEvents, errors),
       settle(api("/travel", null, "travel"), "travel", renderTravel, errors),
       settle(api("/stays", null, "stays"), "stays", renderStays, errors),
+      settle(
+        api("/flights", null, "flights"),
+        "flights",
+        renderFlights,
+        errors,
+      ),
       settle(api("/travel/map", null, "map"), "map", renderMap, errors),
       settle(api("/graph", null, "graph"), "connections", renderGraph, errors),
       settle(
@@ -2651,6 +2859,12 @@
         api("/brightdata", null, null),
         "collection",
         renderBrightData,
+        errors,
+      ),
+      settle(
+        api("/pipeline", null, null),
+        "data pipeline",
+        renderPipeline,
         errors,
       ),
     ])
@@ -3089,9 +3303,41 @@
       "</button>";
   }
 
-  function renderBrightData(res) {
+  // "X/Y" of items whose source.provider is brightdata; null when the list was not loaded.
+  function bdShare(res) {
+    if (!res || !Array.isArray(res.items)) return null;
+    var n = res.items.filter(function (it) {
+      return it && it.source && it.source.provider === "brightdata";
+    }).length;
+    return n + "/" + res.items.length;
+  }
+
+  function renderBrightData(res, stays, flights) {
+    if (stays === undefined && flights === undefined) {
+      // Null keys: these reads must not feed the global source badge.
+      Promise.all([
+        api("/stays", null, null).catch(function () {
+          return null;
+        }),
+        api("/flights", null, null).catch(function () {
+          return null;
+        }),
+      ]).then(function (r) {
+        renderBrightData(res, r[0], r[1]);
+      });
+    }
     var u = (res && res.usage) || {},
       ready = (res && res.ready) || {};
+    var sShare = bdShare(stays),
+      fShare = bdShare(flights);
+    var travel =
+      sShare !== null || fShare !== null
+        ? '<div class="bd-travel">' +
+          (sShare !== null ? "Stays via Bright Data: " + esc(sShare) : "") +
+          (sShare !== null && fShare !== null ? " · " : "") +
+          (fShare !== null ? "Flights via Bright Data: " + esc(fShare) : "") +
+          "</div>"
+        : "";
     function part(api, label) {
       return (
         esc(label) +
@@ -3110,7 +3356,145 @@
       part("web_unlocker", "Web Unlocker") +
       " | " +
       part("serp", "SERP API") +
-      "</span>";
+      "</span>" +
+      travel;
+  }
+
+  function renderPipeline(res) {
+    $("pipeline-headline").textContent = (res && res.headline) || "";
+    var rows = (res && res.rows) || [];
+    $("pipeline-table").innerHTML = rows.length
+      ? '<table class="pipeline-table"><thead><tr>' +
+        "<th>Source</th><th>Provider</th><th>Mode</th><th>Bright Data API</th><th>Records</th>" +
+        "<th>Collected</th><th>Run report</th><th>Est. cost</th></tr></thead><tbody>" +
+        rows
+          .map(function (r) {
+            var outcome =
+              r.status === "failed"
+                ? "failed: " + (r.reason || r.termination)
+                : (r.termination || r.status) +
+                  (r.reason ? " (" + r.reason + ")" : "");
+            return (
+              '<tr class="kind-' +
+              esc(r.kind) +
+              '"><td>' +
+              esc(r.source) +
+              "</td><td>" +
+              esc(r.provider) +
+              "</td><td>" +
+              esc(r.kind) +
+              "</td><td>" +
+              esc(r.brightdata_api || "—") +
+              "</td><td>" +
+              esc(r.records === null ? "—" : r.records) +
+              "</td><td>" +
+              esc(r.collected_at ? fmtTime(r.collected_at) : "—") +
+              "</td><td>" +
+              esc(outcome) +
+              "</td><td>" +
+              esc(
+                r.estimated_cost_usd !== null
+                  ? "$" + r.estimated_cost_usd + " (estimate)"
+                  : "—",
+              ) +
+              "</td></tr>"
+            );
+          })
+          .join("") +
+        "</tbody></table>"
+      : '<p class="muted">' +
+        esc((res && res.note) || "No collection run in this session.") +
+        "</p>";
+    var t = (res && res.totals) || {},
+      calls = (res && res.brightdata_calls) || [];
+    $("pipeline-calls").innerHTML =
+      "Bright Data records: " +
+      esc(t.brightdata_records || 0) +
+      ", estimated cost $" +
+      esc(t.estimated_cost_usd || "0") +
+      " (estimate: records × 1.5 / 1000). Bright Data calls: " +
+      (calls.length
+        ? calls
+            .map(function (c) {
+              return (
+                esc(c.api) +
+                (c.dataset_id ? " " + esc(c.dataset_id) : "") +
+                (c.snapshot_id ? " snapshot " + esc(c.snapshot_id) : "") +
+                " (" +
+                esc(c.rows) +
+                " rows)"
+              );
+            })
+            .join("; ")
+        : "none");
+    renderReachability(res && res.reachability);
+  }
+
+  function renderReachability(r) {
+    var box = $("pipeline-reach");
+    if (!box) return;
+    if (!r) {
+      box.innerHTML =
+        '<h3>Reachability: plain fetch vs Bright Data</h3><p class="muted">Block matrix not run yet (scripts/probes/block_matrix.py).</p>';
+      return;
+    }
+    var c = r.counts || {};
+    var cell = function (v) {
+      return '<span class="reach-' + esc(v) + '">' + esc(v) + "</span>";
+    };
+    box.innerHTML =
+      "<h3>Reachability: plain fetch vs Bright Data</h3><p><b>" +
+      esc(c.reachable_without_brightdata) +
+      " of " +
+      esc(c.n) +
+      " sites reachable without Bright Data, " +
+      esc(c.reachable_with_brightdata) +
+      " of " +
+      esc(c.n) +
+      " with</b> (Web Unlocker or dataset; Web Unlocker alone " +
+      esc(c.reachable_with_unlocker_only) +
+      " of " +
+      esc(c.n) +
+      ') <span class="muted">(run ' +
+      esc(fmtTime(r.run_at)) +
+      ", Web Unlocker zone " +
+      esc(r.zone) +
+      ")</span></p>" +
+      (c.kyc_pending && c.kyc_pending.length
+        ? "<p><b>KYC pending:</b> " +
+          esc(c.kyc_pending.join(", ")) +
+          ' <span class="muted">(refused by Web Unlocker until KYC is approved; then ' +
+          esc(c.reachable_with_brightdata_if_kyc_approved) +
+          " of " +
+          esc(c.n) +
+          " with Bright Data, projection)</span></p>"
+        : "") +
+      '<table class="pipeline-table"><thead><tr><th>Site</th><th>Plain fetch</th><th>Plain fetch, browser UA</th>' +
+      "<th>Web Unlocker</th><th>Bright Data dataset</th></tr></thead><tbody>" +
+      (r.sites || [])
+        .map(function (s) {
+          return (
+            "<tr><td>" +
+            esc(s.site) +
+            "</td><td>" +
+            cell(s.plain_default_ua) +
+            "</td><td>" +
+            cell(s.plain_browser_ua) +
+            '</td><td title="' +
+            esc(s.detail) +
+            '">' +
+            cell(s.brightdata_unlocker) +
+            '</td><td title="' +
+            esc(s.dataset_detail || "") +
+            '">' +
+            (s.brightdata_dataset === "not_run"
+              ? '<span class="muted">—</span>'
+              : cell(s.brightdata_dataset)) +
+            "</td></tr>"
+          );
+        })
+        .join("") +
+      "</tbody></table>";
   }
 
   function loadStory() {

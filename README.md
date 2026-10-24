@@ -1,6 +1,6 @@
 # Conferge
 
-**Don't just attend conferences. Be in the right place, with the right people, at the right time.**
+**Plan a conference trip in minutes and maximize the professional opportunities you get out of it.**
 
 ![Conferge demo overview](docs/demo/screens/0-overview.png)
 
@@ -50,6 +50,7 @@ Most attendees go home with a few business cards and the feeling they were in th
 ```
 
 - **Bright Data** is the acquisition layer for everything a plain HTTP request cannot reach: long-tail event discovery through SERP, flights and hotels through Web Scraper datasets, LinkedIn profiles for people matching, and unblocking dynamic pages.
+  Agents never fetch the web at query time: all reasoning runs on the stored, deduplicated, provenance-tagged graph.
 - **FalkorDB** is the opportunity graph: every relation carries its evidence, the "why this person" explanation is a real graph path query, and the user's memory (who they met) lives in the same graph.
 
 ## Graph model and Cypher queries
@@ -147,14 +148,19 @@ Fort Mason Center, San Francisco, October 28 and 29. Fictional traveller from Ne
 ## Quickstart
 
 ```bash
-make up        # FalkorDB in Docker on 127.0.0.1:6379, Browser on :3000
+git clone https://github.com/spicyx9/PatchConferenceHack.git && cd PatchConferenceHack
+make up        # FalkorDB 6.0.3 in Docker on 127.0.0.1:6379, Browser on :3000
 make install   # Python deps with uv
 make demo      # API + UI on http://127.0.0.1:8000, demo data loaded into FalkorDB
 ```
 
-No `.env` is needed. Port: if 6379 is already taken by a local Redis, run `FALKORDB_PORT=6380 make up` and `FALKORDB_PORT=6380 make demo` (or put `FALKORDB_PORT=6380` in `.env`); `make demo` stops with "port 6379 is a plain Redis, set FALKORDB_PORT to the FalkorDB port" when it finds a Redis without the FalkorDB module.
+No `.env` is needed for the demo. Ports:
+- If 6379 is already taken by a local Redis, run `FALKORDB_PORT=6380 make up` and `FALKORDB_PORT=6380 make demo` (or put `FALKORDB_PORT=6380` in `.env`). When `make demo` finds a Redis without the FalkorDB module, it stops with "port 6379 is a plain Redis, set FALKORDB_PORT to the FalkorDB port".
+- If 8000 is taken, run `make demo DEMO_PORT=8001`. `make demo` checks this before loading anything.
 
-`uv run python scripts/run_demo.py --mode live` collects from the public sources instead of the snapshot. Copy `.env.example` to `.env` and add `BRIGHTDATA_API_KEY` to enable the Bright Data connectors.
+By default `make demo` makes no Bright Data call at startup: travel comes from labelled fixtures and LinkedIn from cached probe files. `make demo DEMO_ARGS="--travel live"` adds the live stays and flights searches. With a key, these took 2 to 3 min on 2026-10-24, because each Bright Data source is capped at 120 s.
+
+`uv run python scripts/run_demo.py --mode live` collects from the public sources instead of the snapshot. Copy `.env.example` to `.env` and set `BRIGHTDATA_API_KEY` (plus `BRIGHTDATA_UNLOCKER_ZONE` and `BRIGHTDATA_SERP_ZONE`) to enable the Bright Data connectors.
 
 ## Tracks
 

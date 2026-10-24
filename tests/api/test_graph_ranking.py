@@ -56,6 +56,9 @@ class FakeFalkor:
     def query(self, query: str, params: dict[str, Any] | None = None) -> Any:
         if "[r:MET]" in query and params:
             self.met.append(params["to_id"])
+        if query.startswith("MATCH (m:Meeting {user_id: $user_id}) DETACH DELETE m"):
+            deleted, self.met = len(self.met), []
+            return SimpleNamespace(result_set=[], nodes_deleted=deleted, relationships_deleted=deleted)
         return SimpleNamespace(result_set=[[1]])
 
 
@@ -97,3 +100,13 @@ def test_met_is_reread_from_the_graph(monkeypatch) -> None:  # type: ignore[no-u
     assert after == ["per-fx-04", "per-fx-10"]  # excluded by the graph memory query
     restarted, _ = _top(_client(monkeypatch, graph))  # fresh app state, same graph
     assert restarted == after
+
+
+def test_reset_clears_graph_memory(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    graph = FakeFalkor(GRAPH_ORDER)
+    client = _client(monkeypatch, graph)
+    client.post("/api/v1/met", json={"person_id": "per-fx-12"})
+    assert _top(client)[0][0] != "per-fx-12"
+    body = client.post("/api/v1/reset").json()
+    assert body["graph_memory_cleared"]["nodes_deleted"] == 1 and graph.met == []
+    assert _top(client)[0] == GRAPH_ORDER  # back: the graph no longer remembers the meeting

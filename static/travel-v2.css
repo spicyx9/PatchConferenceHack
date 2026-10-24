@@ -649,3 +649,200 @@
     min-height: 350px;
   }
 }
+/* Research and comparison */
+.travel-research {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 18px;
+  padding: 26px;
+  border: 1px solid #e5e1df;
+  border-radius: 16px;
+  background: #fff;
+  margin: 0 0 18px;
+}
+.travel-research label {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin: 0;
+  font-size: 12px;
+  color: #605753;
+}
+.travel-research input {
+  min-width: 0;
+  width: 100%;
+  border: 1px solid #ded9d5;
+  border-radius: 9px;
+  padding: 12px;
+  background: #faf9f7;
+  color: #292521;
+  font: inherit;
+  font-size: 14px;
+}
+.research-actions {
+  grid-column: 1/-1;
+  display: flex;
+  gap: 10px;
+}
+.research-actions a {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  border-radius: 9px;
+  padding: 12px 19px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.travel-research p {
+  grid-column: 1/-1;
+  margin: 0;
+}
+.travel-comparison,
+.trip-stays-section {
+  margin: 30px 0 38px;
+}
+#tab-travel .section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+#tab-travel .section-heading h2 {
+  font-size: 25px;
+  letter-spacing: -0.7px;
+  margin: 7px 0;
+}
+#tab-travel .section-heading label {
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+}
+#tab-travel .section-heading select {
+  width: auto;
+  max-width: 190px;
+  border: 1px solid #ded9d5;
+  padding: 9px;
+  border-radius: 8px;
+  color: #514b47;
+  background: white;
+  font: inherit;
+}
+.travel-offer {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  padding: 22px;
+  background: white;
+  border: 1px solid #e5e1df;
+  border-radius: 12px;
+  margin: 12px 0;
+}
+.travel-offer h3 {
+  font-size: 21px;
+  margin: 9px 0;
+  letter-spacing: -0.6px;
+}
+.travel-offer p {
+  font-size: 13px;
+  color: #68615b;
+  margin: 8px 0;
+}
+.travel-offer-price {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-end;
+  max-width: 290px;
+  text-align: right;
+}
+.travel-offer-price strong {
+  font-size: 15px;
+  font-weight: 500;
+}
+.travel-offer-price a {
+  text-decoration: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+}
+.travel-offer details {
+  grid-column: 1/-1;
+  font-size: 12px;
+  color: #68615b;
+}
+.travel-offer summary,
+.trip-stay summary {
+  cursor: pointer;
+  font-size: 12px;
+  color: #68615b;
+}
+.trip-stay {
+  flex-wrap: wrap;
+}
+.trip-stay details {
+  flex-basis: 100%;
+}
+.trip-stay details p {
+  margin-top: 10px;
+}
+#budget {
+  color: #68615b;
+  font-size: 13px;
+  margin-bottom: 24px;
+}
+.travel-empty {
+  background: white;
+  border: 1px solid #e5e1df;
+  border-radius: 12px;
+  padding: 24px;
+  color: #68615b;
+  font-size: 14px;
+}
+@media (max-width: 700px) {
+  .travel-research {
+    grid-template-columns: 1fr 1fr;
+    padding: 18px;
+    gap: 15px;
+  }
+  .travel-research label:first-child {
+    grid-column: 1/-1;
+  }
+  .research-actions a {
+    padding: 12px;
+    flex: 1;
+  }
+  #tab-travel .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .travel-offer {
+    grid-template-columns: 1fr;
+    padding: 18px;
+  }
+  .travel-offer-price {
+    align-items: flex-start;
+    text-align: left;
+    max-width: none;
+  }
+}
+.travel-research {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.travel-research label {
+  min-width: 0;
+}
+@media (max-width: 700px) {
+  .travel-research {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .research-actions {
+    flex-wrap: wrap;
+  }
+  .research-actions a {
+    white-space: normal;
+    min-width: 0;
+    font-size: 13px;
+  }
+}

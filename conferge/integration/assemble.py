@@ -18,6 +18,7 @@ from conferge.api.data import load_fixture as load_api_fixture
 from conferge.core.schemas import Company, Conference, Event, Person, RunStatus
 from conferge.integration.sources import SourceSlice
 from conferge.integration.stays_flights import LiveDomain, usable
+from conferge.integration.pipeline_view import build_rows
 
 _RANK: dict[str, int] = {"ok": 0, "degraded": 1, "failed": 2}
 
@@ -176,6 +177,7 @@ def assemble(slices: list[SourceSlice],
         flights=picked["flights"],
         scenarios=_scenarios(api_fixture.scenarios, events),
         domains=domains,
+        pipeline=build_rows(slices, travel, {n: not usable(travel.get(n)) for n in ("stays", "flights")}),
     )
     return Assembly(conference, origin, events, people, companies, slices, demo,
                     duplicates, warnings)

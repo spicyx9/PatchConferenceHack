@@ -1,0 +1,58 @@
+from __future__ import annotations
+
+from datetime import datetime, timezone
+
+from conferge.core.schemas import RunReport
+from conferge.integration.pipeline_view import HEADLINE, build_rows, totals
+from conferge.integration.sources import SourceSlice
+from conferge.integration.stays_flights import LiveDomain
+
+AT = datetime(2026, 10, 24, 18, 0, tzinfo=timezone.utc)
+
+
+def _report(provider: str, n: int, status: str = "ok", mode: str = "live", **kw) -> RunReport:  # type: ignore[no-untyped-def]
+    return RunReport(provider=provider, started_at=AT, finished_at=AT, status=status,
+                     termination="exhausted" if status == "ok" else "error", source_mode=mode,
+                     fetched_count=n, unique_count=n, **kw)
+
+
+def test_rows_come_from_reports_with_kind_api_and_estimate() -> None:
+    slices = [
+        SourceSlice("official", "03", "live", "live", "ok", reports=[_report(
+            "rainfocus:github-universe-2026", 466,
+            warnings=["transport: githubuniverse.com via Web Unlocker 2x, direct 9x"])]),
+        SourceSlice("luma", "01", "fixture", "fixture", "ok", reports=[_report("luma", 12, mode="fixture")]),
+        SourceSlice("discovery", "04", "live", "live", "failed", reports=[_report(
+            "brightdata_serp", 0, status="failed", errors=["BRIGHTDATA_SERP_ZONE not configured"])]),
+    ]
+    travel = {"stays": LiveDomain("stays", reports=[_report("google_hotels", 40), _report("airbnb", 5)]),
+              "flights": LiveDomain("flights", reports=[_report("brightdata_google_flights", 0, status="failed",
+                                                                 errors=["Bright Data /datasets/v3/scrape: HTTP 401"])])}
+    rows = build_rows(slices, travel, {"stays": False, "flights": True})
+    by = {(r["source"], r["provider"]): r for r in rows}
+    assert by[("official", "rainfocus:github-universe-2026")]["brightdata_api"] == "unlocker"
+    assert by[("luma", "luma")]["kind"] == "fallback"
+    serp = by[("discovery", "brightdata_serp")]
+    assert serp["status"] == "failed" and serp["reason"] == "BRIGHTDATA_SERP_ZONE not configured"
+    assert serp["estimated_cost_usd"] is None  # failed runs cost nothing here
+    hotels = by[("stays", "google_hotels")]
+    assert (hotels["kind"], hotels["brightdata_api"], hotels["estimated_cost_usd"]) == ("brightdata", "dataset", "0.0600")
+    assert by[("stays", "airbnb")]["kind"] == "direct"
+    assert by[("flights", "api fixture")]["kind"] == "fallback"
+    t = totals(rows)
+    assert t["brightdata_records_by_api"] == {"unlocker": 466, "dataset": 40}
+    assert t["estimate"] is True and "fetch the web" in HEADLINE
+
+
+def test_pipeline_endpoint_serves_rows_and_headline() -> None:
+    from fastapi.testclient import TestClient
+
+    from conferge.api.app import create_app
+    from conferge.api.data import load_fixture
+    from conferge.api.providers import Providers
+
+    data = load_fixture()
+    data.pipeline = build_rows([], {"stays": LiveDomain("stays", reports=[_report("booking", 3)])}, {})
+    body = TestClient(create_app(data=data, found=Providers(), graph_probe=False)).get("/api/v1/pipeline").json()
+    assert body["headline"].startswith("Agents never fetch the web at query time")
+    assert body["rows"][0]["provider"] == "booking" and body["totals"]["brightdata_records"] == 3
