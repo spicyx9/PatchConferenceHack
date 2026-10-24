@@ -249,4 +249,4 @@ th { color: var(--muted); font-weight: 600; }
 .pipeline-reach h3 { margin: 1rem 0 0.3rem; }
 .reach-ok { color: var(--ok, #3fb950); font-weight: 700; }
 .reach-blocked { color: var(--danger, #f85149); font-weight: 700; }
-.reach-shell_js, .reach-error { color: var(--warn, #d29922); }
+.reach-shell_js, .reach-error, .reach-pending { color: var(--warn, #d29922); }

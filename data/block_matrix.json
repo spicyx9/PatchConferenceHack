@@ -28,6 +28,13 @@
      "http_status": 200,
      "detail": "marker found",
      "duration_s": 17.1
+    },
+    "brightdata_dataset": {
+     "class": "not_run",
+     "http_status": null,
+     "detail": "no snapshot for this site",
+     "duration_s": 0.0,
+     "snapshots": []
     }
    }
   },
@@ -56,6 +63,13 @@
      "http_status": 200,
      "detail": "HTTP 200, marker absent",
      "duration_s": 2.9
+    },
+    "brightdata_dataset": {
+     "class": "not_run",
+     "http_status": null,
+     "detail": "no snapshot for this site",
+     "duration_s": 0.0,
+     "snapshots": []
     }
    }
   },
@@ -84,6 +98,13 @@
      "http_status": 200,
      "detail": "marker found",
      "duration_s": 4.0
+    },
+    "brightdata_dataset": {
+     "class": "not_run",
+     "http_status": null,
+     "detail": "no snapshot for this site",
+     "duration_s": 0.0,
+     "snapshots": []
     }
    }
   },
@@ -112,6 +133,13 @@
      "http_status": null,
      "detail": "timeout 20s",
      "duration_s": 20.0
+    },
+    "brightdata_dataset": {
+     "class": "not_run",
+     "http_status": null,
+     "detail": "no snapshot for this site",
+     "duration_s": 0.0,
+     "snapshots": []
     }
    }
   },
@@ -140,6 +168,13 @@
      "http_status": 200,
      "detail": "marker found",
      "duration_s": 13.3
+    },
+    "brightdata_dataset": {
+     "class": "not_run",
+     "http_status": null,
+     "detail": "no snapshot for this site",
+     "duration_s": 0.0,
+     "snapshots": []
     }
    }
   },
@@ -168,6 +203,13 @@
      "http_status": 200,
      "detail": "marker found",
      "duration_s": 3.1
+    },
+    "brightdata_dataset": {
+     "class": "not_run",
+     "http_status": null,
+     "detail": "no snapshot for this site",
+     "duration_s": 0.0,
+     "snapshots": []
     }
    }
   },
@@ -196,6 +238,13 @@
      "http_status": 200,
      "detail": "marker found",
      "duration_s": 2.6
+    },
+    "brightdata_dataset": {
+     "class": "not_run",
+     "http_status": null,
+     "detail": "no snapshot for this site",
+     "duration_s": 0.0,
+     "snapshots": []
     }
    }
   },
@@ -224,6 +273,13 @@
      "http_status": 200,
      "detail": "marker found",
      "duration_s": 17.0
+    },
+    "brightdata_dataset": {
+     "class": "not_run",
+     "http_status": null,
+     "detail": "no snapshot for this site",
+     "duration_s": 0.0,
+     "snapshots": []
     }
    }
   },
@@ -252,6 +308,13 @@
      "http_status": 200,
      "detail": "marker found",
      "duration_s": 14.2
+    },
+    "brightdata_dataset": {
+     "class": "not_run",
+     "http_status": null,
+     "detail": "no snapshot for this site",
+     "duration_s": 0.0,
+     "snapshots": []
     }
    }
   },
@@ -280,6 +343,29 @@
      "http_status": null,
      "detail": "timeout 20s",
      "duration_s": 20.0
+    },
+    "brightdata_dataset": {
+     "class": "ok",
+     "http_status": null,
+     "detail": "sd_mvmpuno1cydgpjvik ready, 1 records; sd_mvmpunm2ess6r1ual ready, 1 records",
+     "records": 2,
+     "duration_s": 1.3,
+     "snapshots": [
+      {
+       "snapshot_id": "sd_mvmpuno1cydgpjvik",
+       "status": "ready",
+       "records": 1,
+       "error_codes": [],
+       "dataset_id": "gd_l1viktl72bvl7bjuj0"
+      },
+      {
+       "snapshot_id": "sd_mvmpunm2ess6r1ual",
+       "status": "ready",
+       "records": 1,
+       "error_codes": [],
+       "dataset_id": "gd_l1viktl72bvl7bjuj0"
+      }
+     ]
     }
    }
   },
@@ -308,6 +394,13 @@
      "http_status": 200,
      "detail": "marker found",
      "duration_s": 2.9
+    },
+    "brightdata_dataset": {
+     "class": "not_run",
+     "http_status": null,
+     "detail": "no snapshot for this site",
+     "duration_s": 0.0,
+     "snapshots": []
     }
    }
   },
@@ -336,6 +429,22 @@
      "http_status": 200,
      "detail": "marker found",
      "duration_s": 13.4
+    },
+    "brightdata_dataset": {
+     "class": "ok",
+     "http_status": null,
+     "detail": "sd_mvmq28k3vcsg9t28n ready, 5 records",
+     "records": 5,
+     "duration_s": 1.0,
+     "snapshots": [
+      {
+       "snapshot_id": "sd_mvmq28k3vcsg9t28n",
+       "status": "ready",
+       "records": 5,
+       "error_codes": [],
+       "dataset_id": "gd_mdy9ld3p1e0oqlj9g4"
+      }
+     ]
     }
    }
   },
@@ -364,6 +473,25 @@
      "http_status": 200,
      "detail": "marker found",
      "duration_s": 18.7
+    },
+    "brightdata_dataset": {
+     "class": "error",
+     "http_status": null,
+     "detail": "sd_mvmqtmqu2f5qp48xvg ready, 0 records, errors: no_peers (Bright Data provider outage at 18:12 UTC, confirmed by Bright Data email)",
+     "records": 0,
+     "duration_s": 0.6,
+     "snapshots": [
+      {
+       "snapshot_id": "sd_mvmqtmqu2f5qp48xvg",
+       "status": "ready",
+       "records": 0,
+       "error_codes": [
+        "no_peers"
+       ],
+       "dataset_id": "gd_mg3gjfmg12tc2n5d4d",
+       "note": "Bright Data provider outage at 18:12 UTC, confirmed by Bright Data email"
+      }
+     ]
     }
    }
   },
@@ -392,6 +520,24 @@
      "http_status": 200,
      "detail": "HTTP 200, marker absent",
      "duration_s": 3.4
+    },
+    "brightdata_dataset": {
+     "class": "ok",
+     "http_status": null,
+     "detail": "sd_mvmpvf5hy3yeo7ffq ready, 5 records, errors: aborted_page",
+     "records": 5,
+     "duration_s": 2.4,
+     "snapshots": [
+      {
+       "snapshot_id": "sd_mvmpvf5hy3yeo7ffq",
+       "status": "ready",
+       "records": 5,
+       "error_codes": [
+        "aborted_page"
+       ],
+       "dataset_id": "gd_ld7ll037kqy322v05"
+      }
+     ]
     }
    }
   },
@@ -420,6 +566,13 @@
      "http_status": null,
      "detail": "Bright Data: Web Unlocker refused Residential Failed (bad_endpoint) (KYC required for this site)",
      "duration_s": 2.8
+    },
+    "brightdata_dataset": {
+     "class": "not_run",
+     "http_status": null,
+     "detail": "no snapshot for this site",
+     "duration_s": 0.0,
+     "snapshots": []
     }
    }
   },
@@ -448,6 +601,13 @@
      "http_status": null,
      "detail": "Bright Data: Web Unlocker refused Residential Failed (bad_endpoint) (KYC required for this site)",
      "duration_s": 4.8
+    },
+    "brightdata_dataset": {
+     "class": "not_run",
+     "http_status": null,
+     "detail": "no snapshot for this site",
+     "duration_s": 0.0,
+     "snapshots": []
     }
    }
   },
@@ -476,6 +636,13 @@
      "http_status": null,
      "detail": "Bright Data: Web Unlocker refused Residential Failed (bad_endpoint) (KYC required for this site)",
      "duration_s": 1.3
+    },
+    "brightdata_dataset": {
+     "class": "not_run",
+     "http_status": null,
+     "detail": "no snapshot for this site",
+     "duration_s": 0.0,
+     "snapshots": []
     }
    }
   },
@@ -504,6 +671,13 @@
      "http_status": null,
      "detail": "Bright Data: Web Unlocker refused Residential Failed (bad_endpoint) (KYC required for this site)",
      "duration_s": 2.8
+    },
+    "brightdata_dataset": {
+     "class": "not_run",
+     "http_status": null,
+     "detail": "no snapshot for this site",
+     "duration_s": 0.0,
+     "snapshots": []
     }
    }
   },
@@ -532,6 +706,13 @@
      "http_status": 200,
      "detail": "marker found",
      "duration_s": 16.4
+    },
+    "brightdata_dataset": {
+     "class": "not_run",
+     "http_status": null,
+     "detail": "no snapshot for this site",
+     "duration_s": 0.0,
+     "snapshots": []
     }
    }
   },
@@ -560,6 +741,22 @@
      "http_status": 200,
      "detail": "marker found",
      "duration_s": 8.2
+    },
+    "brightdata_dataset": {
+     "class": "pending",
+     "http_status": null,
+     "detail": "sd_mvmr6icq29xwep13p7 running",
+     "records": 0,
+     "duration_s": 0.4,
+     "snapshots": [
+      {
+       "snapshot_id": "sd_mvmr6icq29xwep13p7",
+       "status": "running",
+       "records": null,
+       "error_codes": [],
+       "dataset_id": "gd_mhng7wen1rw0a3gvpf"
+      }
+     ]
     }
    }
   },
@@ -588,6 +785,13 @@
      "http_status": null,
      "detail": "Bright Data: Web Unlocker refused Residential Failed (bad_endpoint) (KYC required for this site)",
      "duration_s": 4.8
+    },
+    "brightdata_dataset": {
+     "class": "not_run",
+     "http_status": null,
+     "detail": "no snapshot for this site",
+     "duration_s": 0.0,
+     "snapshots": []
     }
    }
   }
@@ -617,7 +821,16 @@
  "counts": {
   "n": 21,
   "reachable_without_brightdata": 10,
-  "reachable_with_brightdata": 12,
-  "reachable_any_path": 15
- }
+  "reachable_with_brightdata": 14,
+  "reachable_with_unlocker_only": 12,
+  "reachable_any_path": 16,
+  "kyc_pending": [
+   "Kayak",
+   "Hotels.com",
+   "Expedia",
+   "Marriott"
+  ],
+  "reachable_with_brightdata_if_kyc_approved": 18
+ },
+ "datasets_read_at": "2026-10-24T19:16:51+00:00"
 }

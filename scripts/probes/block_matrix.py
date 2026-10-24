@@ -14,8 +14,14 @@ Classification:
   error     timeout, network error, other HTTP status
 The marker is a precise string or pattern per site, never the page size.
 
+Column (d) "Bright Data dataset" is filled only from snapshots that already exist (no new
+trigger): ``GET /datasets/v3/progress/<id>`` then, when ready, ``GET /datasets/v3/snapshot/<id>``
+to count records (rows carrying ``error``/``error_code`` are not records). Nothing but counts and
+error codes is kept. ok when records > 0; pending while the snapshot is still running.
+
 Writes docs/BLOCK_MATRIX.md and data/block_matrix.json (read by the Data pipeline panel).
 Run: ``uv run python scripts/probes/block_matrix.py`` (BRIGHTDATA_API_KEY from env or .env).
+``--datasets-only`` keeps the last fetch results and only re-reads the dataset snapshots.
 """
 
 from __future__ import annotations
@@ -132,6 +138,20 @@ def sites() -> list[Site]:
     ]
 
 
+# Existing snapshots per site (triggered earlier by the connectors); read-only here.
+DATASET_SNAPSHOTS: dict[str, list[str]] = {
+    "Booking": ["sd_mvmq28k3vcsg9t28n"],
+    "Airbnb": ["sd_mvmpvf5hy3yeo7ffq"],
+    "LinkedIn public profile": ["sd_mvmpuno1cydgpjvik", "sd_mvmpunm2ess6r1ual"],
+    "Google Hotels": ["sd_mvmqtmqu2f5qp48xvg"],
+    "Google Flights": ["sd_mvmr6icq29xwep13p7"],
+}
+# Context the API does not carry, reported by the team (Bright Data email).
+DATASET_NOTES = {
+    "sd_mvmqtmqu2f5qp48xvg": "Bright Data provider outage at 18:12 UTC, confirmed by Bright Data email",
+}
+KYC_PENDING = ("Kayak", "Hotels.com", "Expedia", "Marriott")
+
 NOT_CALLED = [
     {"site": "X (x.com)", "where": "conferge/events/discovery/router.py, conferge/events/official/sessionize.py",
      "why": "only used to classify social URLs, no connector fetches it"},
@@ -198,27 +218,82 @@ async def _unlocker(site: Site, client: BrightDataClient) -> dict[str, Any]:
                 "duration_s": round(time.perf_counter() - t0, 1)}
 
 
+async def dataset_cell(snapshots: list[str], client: BrightDataClient | None) -> dict[str, Any]:
+    """Existing snapshots only: progress, then a record count when ready. Never triggers."""
+    if not snapshots:
+        return {"class": "not_run", "http_status": None, "detail": "no snapshot for this site", "duration_s": 0.0,
+                "snapshots": []}
+    if client is None:
+        return {"class": "error", "http_status": None, "detail": "BRIGHTDATA_API_KEY not set", "duration_s": 0.0,
+                "snapshots": []}
+    t0 = time.perf_counter()
+    found = []
+    for sid in snapshots:
+        entry: dict[str, Any] = {"snapshot_id": sid, "status": None, "records": None, "error_codes": []}
+        try:
+            progress = await asyncio.wait_for(client.snapshot_progress(sid), TIMEOUT)
+            entry["status"] = progress.get("status")
+            entry["dataset_id"] = progress.get("dataset_id")
+            if entry["status"] == "ready":
+                out = await asyncio.wait_for(client.snapshot_results(sid), TIMEOUT)
+                rows = out.data if isinstance(out.data, list) else ([] if out.data is None else [out.data])
+                errors = [r for r in rows if isinstance(r, dict) and (r.get("error") or r.get("error_code"))]
+                entry["records"] = len(rows) - len(errors)
+                entry["error_codes"] = sorted({str(r.get("error_code") or "error") for r in errors})
+        except (asyncio.TimeoutError, httpx.HTTPError, BrightDataError) as exc:
+            entry["status"] = f"read failed: {type(exc).__name__}"
+        if sid in DATASET_NOTES:
+            entry["note"] = DATASET_NOTES[sid]
+        found.append(entry)
+    records = sum(e["records"] or 0 for e in found)
+    if records > 0:
+        cls = "ok"
+    elif any(e["status"] in {"running", "starting", "building"} for e in found):
+        cls = "pending"
+    else:
+        cls = "error"
+    parts = []
+    for e in found:
+        text = f"{e['snapshot_id']} {e['status']}"
+        if e["records"] is not None:
+            text += f", {e['records']} records"
+        if e["error_codes"]:
+            text += f", errors: {', '.join(e['error_codes'])}"
+        if e.get("note"):
+            text += f" ({e['note']})"
+        parts.append(text)
+    return {"class": cls, "http_status": None, "detail": "; ".join(parts), "records": records,
+            "duration_s": round(time.perf_counter() - t0, 1), "snapshots": found}
+
+
 async def probe(site: Site, client: BrightDataClient | None) -> dict[str, Any]:
     async def no_key() -> dict[str, Any]:
         return {"class": "error", "http_status": None, "detail": "BRIGHTDATA_API_KEY not set", "duration_s": 0.0}
 
-    a, b, c = await asyncio.gather(_plain(site, None), _plain(site, BROWSER_UA),
-                                   _unlocker(site, client) if client else no_key())
+    a, b, c, d = await asyncio.gather(_plain(site, None), _plain(site, BROWSER_UA),
+                                      _unlocker(site, client) if client else no_key(),
+                                      dataset_cell(DATASET_SNAPSHOTS.get(site.name, []), client))
     return {"site": site.name, "connector": site.connector, "url": site.url, "bright_data": site.bright_data,
             "marker": site.marker, "marker_desc": site.marker_desc,
-            "attempts": {"plain_default_ua": a, "plain_browser_ua": b, "brightdata_unlocker": c}}
+            "attempts": {"plain_default_ua": a, "plain_browser_ua": b, "brightdata_unlocker": c,
+                         "brightdata_dataset": d}}
 
 
 def counts(rows: list[dict[str, Any]]) -> dict[str, int]:
     def ok(r: dict[str, Any], *keys: str) -> bool:
-        return any(r["attempts"][k]["class"] == "ok" for k in keys)
+        return any(r["attempts"].get(k, {}).get("class") == "ok" for k in keys)
 
+    with_bd = [r for r in rows if ok(r, "brightdata_unlocker", "brightdata_dataset")]
+    kyc_gain = [r["site"] for r in rows if r["site"] in KYC_PENDING and r not in with_bd]
     return {
         "n": len(rows),
         "reachable_without_brightdata": sum(ok(r, "plain_default_ua", "plain_browser_ua") for r in rows),
-        "reachable_with_brightdata": sum(ok(r, "brightdata_unlocker") for r in rows),
-        "reachable_any_path": sum(ok(r, "plain_default_ua", "plain_browser_ua", "brightdata_unlocker")
-                                  for r in rows),
+        "reachable_with_brightdata": len(with_bd),
+        "reachable_with_unlocker_only": sum(ok(r, "brightdata_unlocker") for r in rows),
+        "reachable_any_path": sum(ok(r, "plain_default_ua", "plain_browser_ua", "brightdata_unlocker",
+                                     "brightdata_dataset") for r in rows),
+        "kyc_pending": list(KYC_PENDING),
+        "reachable_with_brightdata_if_kyc_approved": len(with_bd) + len(kyc_gain),
     }
 
 
@@ -231,8 +306,15 @@ def markdown(report: dict[str, Any]) -> str:
         f"Bright Data Web Unlocker zone `{report['zone']}`. Generated by `scripts/probes/block_matrix.py`.",
         "",
         f"**{c['reachable_without_brightdata']} of {c['n']} sites reachable without Bright Data, "
-        f"{c['reachable_with_brightdata']} of {c['n']} with** (Web Unlocker alone; "
-        f"{c['reachable_any_path']} of {c['n']} by any path).",
+        f"{c['reachable_with_brightdata']} of {c['n']} with** (Web Unlocker or dataset; Web Unlocker alone "
+        f"{c['reachable_with_unlocker_only']} of {c['n']}; {c['reachable_any_path']} of {c['n']} by any path).",
+        "",
+        f"**KYC pending** ({', '.join(c['kyc_pending'])}): Web Unlocker refuses these sites until the account "
+        f"KYC is approved. Once approved, and if the Unlocker then returns their marker (projection, not "
+        f"measured): {c['reachable_with_brightdata_if_kyc_approved']} of {c['n']} with Bright Data.",
+        "",
+        f"Dataset column (d): existing snapshots only, read {report.get('datasets_read_at', report['run_at'])} "
+        "(UTC), no new trigger; ok when records > 0.",
         "",
         "Classes: `ok` HTTP 200 and the content marker found; `shell_js` HTTP 200 without the marker; "
         "`blocked` 401/403/429/999, captcha or bot wall, redirect to login, Bright Data refusal; "
@@ -248,8 +330,9 @@ def markdown(report: dict[str, Any]) -> str:
     lines += ["", "Referenced but not tested:", ""]
     lines += [f"- {n['site']} ({n['where']}): {n['why']}" for n in report["not_called"]]
     lines += ["", "## Matrix", "",
-              "| Site | (a) httpx default UA | (b) httpx browser UA | (c) Bright Data Unlocker | Marker | Duration a / b / c (s) |",
-              "|---|---|---|---|---|---|"]
+              "| Site | (a) httpx default UA | (b) httpx browser UA | (c) Bright Data Unlocker "
+              "| (d) Bright Data dataset | Marker | Duration a / b / c (s) |",
+              "|---|---|---|---|---|---|---|"]
     for r in report["sites"]:
         at = r["attempts"]
 
@@ -258,7 +341,8 @@ def markdown(report: dict[str, Any]) -> str:
 
         lines.append(
             f"| {r['site']} | {cell(at['plain_default_ua'])} | {cell(at['plain_browser_ua'])} | "
-            f"{cell(at['brightdata_unlocker'])} | {r['marker_desc']} | "
+            f"{cell(at['brightdata_unlocker'])} | {cell(at['brightdata_dataset']) if 'brightdata_dataset' in at else '-'} "
+            f"| {r['marker_desc']} | "
             f"{at['plain_default_ua']['duration_s']} / {at['plain_browser_ua']['duration_s']} / "
             f"{at['brightdata_unlocker']['duration_s']} |")
     blocked = [r["site"] for r in report["sites"]
@@ -271,19 +355,32 @@ async def main() -> int:
     key = env_value("BRIGHTDATA_API_KEY")
     client = BrightDataClient(api_key=key, unlocker_zone=ZONE, retries=0) if key else None
     run_at = datetime.now(timezone.utc)
+    out_json = ROOT / "data" / "block_matrix.json"
     try:
-        rows = list(await asyncio.gather(*(probe(s, client) for s in sites())))
+        if "--datasets-only" in sys.argv:
+            report = json.loads(out_json.read_text())
+            rows = report["sites"]
+            cells = await asyncio.gather(*(dataset_cell(DATASET_SNAPSHOTS.get(r["site"], []), client) for r in rows))
+            for r, d in zip(rows, cells, strict=True):
+                r["attempts"]["brightdata_dataset"] = d
+            report["datasets_read_at"] = run_at.isoformat(timespec="seconds")
+            report["counts"] = counts(rows)
+        else:
+            rows = list(await asyncio.gather(*(probe(s, client) for s in sites())))
+            report = {"run_at": run_at.isoformat(timespec="seconds"), "zone": ZONE, "timeout_s": TIMEOUT,
+                      "datasets_read_at": run_at.isoformat(timespec="seconds"),
+                      "sites": rows, "not_called": NOT_CALLED, "counts": counts(rows)}
     finally:
         if client:
             await client.aclose()
-    report = {"run_at": run_at.isoformat(timespec="seconds"), "zone": ZONE, "timeout_s": TIMEOUT,
-              "sites": rows, "not_called": NOT_CALLED, "counts": counts(rows)}
     (ROOT / "data").mkdir(exist_ok=True)
-    (ROOT / "data" / "block_matrix.json").write_text(json.dumps(report, indent=1) + "\n")
+    out_json.write_text(json.dumps(report, indent=1) + "\n")
     (ROOT / "docs" / "BLOCK_MATRIX.md").write_text(markdown(report))
     c = report["counts"]
     print(f"{c['reachable_without_brightdata']} of {c['n']} reachable without Bright Data, "
-          f"{c['reachable_with_brightdata']} of {c['n']} with (any path {c['reachable_any_path']})")
+          f"{c['reachable_with_unlocker_only']} with Web Unlocker alone, "
+          f"{c['reachable_with_brightdata']} with Web Unlocker or dataset "
+          f"(any path {c['reachable_any_path']}; {c['reachable_with_brightdata_if_kyc_approved']} if KYC approved)")
     return 0
 
 
