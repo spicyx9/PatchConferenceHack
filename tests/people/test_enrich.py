@@ -269,7 +269,8 @@ async def test_enrich_topics_fake_extractor_clipped_to_taxonomy():
 
 
 @pytest.mark.parametrize("name,cats,text,expected", [
-    ("Example Ventures", [], None, True),
+    ("Example Ventures", [], None, None),  # "venture" alone is not enough
+    ("Example Venture Partners", [], None, True),
     ("Example Capital", [], None, True),
     ("Example Labs", ["vc"], None, True),
     ("Example Labs", [], "Example Labs is a seed-stage VC fund", True),

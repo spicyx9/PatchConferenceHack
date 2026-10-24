@@ -166,14 +166,16 @@ def write_change(store: GraphStore, user_id: str, *, label: str, scenario_id: st
     """Record a plan change and the events it affects; returns the ``Change`` id."""
     at = at_ms if at_ms is not None else now_ms()
     change_id = f"change:{user_id}:{at}"
+    # A change from a /simulate-change scenario is a simulation, never a live observation.
+    mode = "simulated" if scenario_id else "live"
     store.merge_node("Change", change_id, {
         "user_id": user_id, "label": label, "scenario_id": scenario_id,
         "from_version": from_version, "written_by": written_by, "at_ms": at,
-        "overrides_skips": overrides_skips or [], "source": "agent", "source_mode": "live",
+        "overrides_skips": overrides_skips or [], "source": "agent", "source_mode": mode,
     })
     for event_id in event_ids:
         store.merge_edge("Change", change_id, "AFFECTS", "Event", event_id, {
-            "written_by": written_by, "at_ms": at, **_provenance(at),
+            "written_by": written_by, "at_ms": at, **_provenance(at), "source_mode": mode,
         })
     return change_id
 

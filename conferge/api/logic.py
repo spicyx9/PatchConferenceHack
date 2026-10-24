@@ -245,7 +245,8 @@ def build_plan(
                 chosen.append(event)
                 continue
             missed = [
-                {"person_id": pid, "name": opp_by_person[pid].title, "score": opp_by_person[pid].score}
+                {"person_id": pid, "name": opp_by_person[pid].title, "score": opp_by_person[pid].score,
+                 "confirmed": confirmed_at(data, event, pid)}
                 for pid in _event_people(data, event) if pid in opp_by_person
             ]
             conflicts.append({
@@ -278,7 +279,8 @@ def build_plan(
                     "room": e.room, "status": e.status, "score": scores.get(e.id, 0),
                     "attended": e.id in attended,
                     "people": [
-                        {"person_id": pid, "name": opp_by_person[pid].title}
+                        {"person_id": pid, "name": opp_by_person[pid].title,
+                         "confirmed": confirmed_at(data, e, pid)}
                         for pid in _event_people(data, e) if pid in opp_by_person
                     ],
                     "source_mode": _mode_of(e.evidence),
@@ -291,6 +293,19 @@ def build_plan(
         "days": plan_days, "conflicts": conflicts, "excluded": excluded,
         "unscheduled": unscheduled, "computed_by": FALLBACK,
     }
+
+
+_ROLE_EDGE = {"confirmed_speaker", "confirmed_organizer"}
+
+
+def confirmed_at(data: DemoData, event: Event, person_id: str) -> bool:
+    """True only when the graph has SPEAKS_AT or HOSTS from the person to the event: the event's
+    speaker/organizer lists, or a speaker/organizer whose own record names the event (the same
+    rules as GraphIngestor.link_participation). Anything else is a possible, unconfirmed match."""
+    if person_id in event.speaker_ids or person_id in event.organizer_ids:
+        return True
+    person = data.person(person_id)
+    return bool(person and event.id in person.event_ids and person.participation in _ROLE_EDGE)
 
 
 def _event_people(data: DemoData, event: Event) -> list[str]:
@@ -665,7 +680,7 @@ def _served_block(event: Event | None, decision: dict[str, Any], data: DemoData,
         if item is None:
             return None
         agent_item = kept.get(event_id)
-        names = [p["name"] for p in item.get("people", []) if p.get("name")]
+        names = [p["name"] for p in item.get("people", []) if p.get("name") and p.get("confirmed")]
         if agent_item:
             names = [p.name for pid in agent_item.get("targets_confirmed", [])
                      if (p := data.person(pid))] or names

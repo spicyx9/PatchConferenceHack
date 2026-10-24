@@ -143,7 +143,10 @@ class DemoState:
 
             ids = tuple((g.id, g.stated_at) for g in self.goals)
             if self._synced_goals != ids:  # goals live in the graph, written through GraphStore
-                GraphIngestor(store, default_mode="live").ingest_goals(USER_ID, self.goals)
+                # The demo persona's goals are fixture data; only goals the user typed are live.
+                demo = {g.id for g in logic.parse_goals(self.data.demo_goal_text)}
+                mode = "fixture" if {g.id for g in self.goals} == demo else "live"
+                GraphIngestor(store, default_mode=mode).ingest_goals(USER_ID, self.goals)
                 self._synced_goals = ids
             known = {p.id for p in self.data.people}
             people = [o for o in ranking.rank_people(store, USER_ID, self.goals)
@@ -209,6 +212,13 @@ def _pipeline_mode(rows: list[dict[str, Any]]) -> str:
     if live:
         return "live" if len(live) == len(collected) else "mixed"
     return "cached" if collected else "fixture"
+
+
+def _records_mode(live_records: int, cached_records: int) -> str:
+    """The mode of the records themselves, never of the configuration (a key or a zone)."""
+    if live_records and cached_records:
+        return "mixed"
+    return "live" if live_records else "cached" if cached_records else "fixture"
 
 
 def _now() -> str:
@@ -502,7 +512,7 @@ def create_app(
                               "collected_last": max(lasts, default=None)},
             "ready": ready,
             "not_ready_reason": {api: client.not_ready(api) for api in apis},
-        }, extra_warnings=notes, mode_override="live" if any(ready.values()) else "unknown")
+        }, extra_warnings=notes, mode_override=_records_mode(live["records"], cached["total"]))
 
     @api.get("/search")
     def search(q: str = Query(..., min_length=2, max_length=100),
@@ -935,19 +945,21 @@ def create_app(
         """Why the replacement matters: goal -> person path for the first person it brings."""
         if not replacement or not replacement["people"]:
             return None
-        person = replacement["people"][0]["person_id"]
+        # A confirmed speaker/host of the replacement first; otherwise the path says "not confirmed".
+        pick = next((p for p in replacement["people"] if p.get("confirmed")), replacement["people"][0])
+        person, confirmed = pick["person_id"], bool(pick.get("confirmed"))
         live = _falkordb_path(person, "demo-user")
         if live is not None:
             labels = [s["node"]["label"] for s in live["steps"] if "node" in s]
             return {"backend": "falkordb", "person_id": person, "nodes": labels,
-                    "explanation": live["explanation"]}
+                    "explanation": live["explanation"], "confirmed": confirmed}
         g = logic.build_graph(state.data, state.goals, state.met)
         steps = logic.shortest_path(g, "user:demo-user", person)
         if not steps:
             return None
         return {"backend": logic.FALLBACK, "person_id": person,
                 "nodes": [s["node"].get("label", s["node"]["id"]) for s in steps if "node" in s],
-                "explanation": None}
+                "explanation": None, "confirmed": confirmed}
 
     @api.post("/simulate-change")
     def simulate_change(req: ScenarioRequest) -> dict[str, Any]:

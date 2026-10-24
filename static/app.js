@@ -665,6 +665,26 @@
       "</div>"
     );
   }
+  // "Meet: X" only for a confirmed speaker/host (SPEAKS_AT / HOSTS); else "Possibly: X (not confirmed)".
+  function meetLine(people) {
+    var sure = (people || []).filter(function (p) { return p.confirmed; }),
+      maybe = (people || []).filter(function (p) { return !p.confirmed; });
+    var names = function (list) { return list.map(function (p) { return p.name; }).join(", "); };
+    return (sure.length ? "Meet: " + names(sure) : "") +
+      (sure.length && maybe.length ? " · " : "") +
+      (maybe.length ? "Possibly: " + names(maybe) + " (not confirmed)" : "");
+  }
+  // Events whose status comes from a /simulate-change scenario (API flag ``simulated``).
+  var simulatedIds = {};
+  function markSimulated(ids) {
+    (ids || []).forEach(function (id) {
+      simulatedIds[id] = true;
+    });
+  }
+  function statusLabel(status, id) {
+    if (status === "sold_out" && simulatedIds[id]) return "Sold out (simulated scenario)";
+    return eventStatus(status);
+  }
   function eventStatus(status) {
     return (
       {
@@ -961,11 +981,7 @@
     $("next-actions").innerHTML = items.length
       ? items
           .map(function (i) {
-            var who = (i.people || [])
-              .map(function (p) {
-                return p.name;
-              })
-              .join(", ");
+            var who = meetLine(i.people);
             return (
               "<li><b>" +
               esc(fmtTime(i.start_at, i.timezone)) +
@@ -975,7 +991,7 @@
               esc(orUnknown(i.venue)) +
               ")</span>" +
               (who
-                ? '<div class="muted small-text">Meet: ' + esc(who) + "</div>"
+                ? '<div class="muted small-text">' + esc(who) + "</div>"
                 : "") +
               "</li>"
             );
@@ -1149,7 +1165,8 @@
             "<li><span>" +
             esc(item.title) +
             '</span><span class="muted">' +
-            esc(orUnknown(item.reason)) +
+            esc(item.reason === "sold_out" ? statusLabel("sold_out", item.event_id)
+                                           : orUnknown(item.reason)) +
             "</span></li>"
           );
         })
@@ -1164,6 +1181,7 @@
   function renderEvents(ev) {
     lastEvents = ev;
     var all = (ev && ev.items) || [];
+    markSimulated(all.filter(function (e) { return e.simulated; }).map(function (e) { return e.id; }));
     document.dispatchEvent(new CustomEvent("conferge:events", { detail: all }));
     $("stat-events").textContent = all.length;
     renderDiscoverEvents(all);
@@ -1216,7 +1234,7 @@
             var status =
               event.status !== "scheduled"
                 ? '<span class="agenda-event-status">' +
-                  esc(eventStatus(event.status)) +
+                  esc(statusLabel(event.status, event.id)) +
                   "</span>"
                 : "";
             return (
@@ -3119,6 +3137,7 @@
   }
 
   function renderDiff(res) {
+    markSimulated(res.changed_events);
     var d = res.diff || {};
     function section(name, cls, list, fmt) {
       return (
@@ -3154,11 +3173,11 @@
           ": " +
           esc(fmtTime(b.start_at)) +
           " (" +
-          esc(b.status) +
+          esc(b.status === "sold_out" ? statusLabel(b.status, x.event_id) : b.status) +
           ") to " +
           esc(fmtTime(a.start_at)) +
           " (" +
-          esc(a.status) +
+          esc(a.status === "sold_out" ? statusLabel(a.status, x.event_id) : a.status) +
           ")</li>"
         );
       }) +
@@ -3173,13 +3192,15 @@
               esc(r.title) +
               " (" +
               esc(fmtTime(r.start_at)) +
-              ")"
+              ")" +
+              (meetLine(r.people) ? "<br>" + esc(meetLine(r.people)) : "")
             : "") +
           "<br><b>Reason:</b> " +
           esc(x.reason) +
           (p
             ? "<br><b>Path:</b> " +
               esc(p.nodes.join(" > ")) +
+              (p.confirmed === false ? " (not confirmed)" : "") +
               (p.explanation
                 ? '<br><span class="muted">' + esc(p.explanation) + "</span>"
                 : "")
@@ -4477,6 +4498,7 @@
     });
     $("btn-reset").addEventListener("click", function () {
       withBusy($("btn-reset"), function () {
+        simulatedIds = {};
         return mutate("/reset", {}).then(function () {
           document.querySelectorAll("dialog[open]").forEach(function (d) {
             d.close();

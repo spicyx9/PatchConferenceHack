@@ -45,7 +45,10 @@ _TOPIC_ATTRIBUTES = ("Topic", "Track", "GitHubproduct")
 _STREET_RE = re.compile(r"(^|,\s*)\d+\s+\w")
 _ROLE_KEYWORDS: list[tuple[str, tuple[str, ...]]] = [
     ("founder", ("founder", "co-founder", "cofounder")),
-    ("investor", ("investor", "venture", "general partner", "managing partner")),
+    # "venture" alone is not enough ("Venture Lead, Developer Tools"): an investor title says
+    # investor, VC, capital, fund, or an investing partner ("partner marketing" is not one).
+    ("investor", ("investor", "investors", "vc", "capital", "fund", "general partner",
+                  "managing partner", "venture partner")),
     ("pm", ("product manager", "product management", "product lead", "head of product",
             "vp of product", "vp, product", "director of product", "product director")),
     ("devrel", ("developer advocate", "developer relations", "devrel", "evangelist")),
