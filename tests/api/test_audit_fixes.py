@@ -87,3 +87,12 @@ def test_fix6_budget_is_labelled_as_a_demo_assumption() -> None:
     assert logic.roi_view(data, [], [], {})["budget_source"] == budget["budget_source"]
     assert "b.budget_source" in _js_function("renderTravel")
     assert "roi.budget_source" in _js_function("renderRoi")
+
+
+def test_fix9_conference_name_and_dates_come_from_the_data() -> None:
+    from pathlib import Path
+
+    html = (Path(__file__).resolve().parents[2] / "static" / "index.html").read_text()
+    assert "GitHub Universe 2026" not in html and "October 28" not in html  # no hard-coded fact
+    render = _js_function("renderConference")
+    assert "conf.name" in render and "conf.start_date" in render and "conf.end_date" in render
