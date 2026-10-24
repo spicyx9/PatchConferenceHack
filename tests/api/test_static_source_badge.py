@@ -4,16 +4,10 @@ from __future__ import annotations
 
 import re
 
-import pytest
 from fastapi.testclient import TestClient
 
 from conferge.api.app import create_app
 from conferge.api.providers import Providers
-
-
-# These assertions target the previous UI; the current interface gets the travel source badges in
-# the follow-up UI port, which restores them in English.
-pytestmark = pytest.mark.skip(reason="travel source badges not yet ported to the current interface")
 
 
 def _app_js() -> str:
@@ -36,18 +30,38 @@ def test_source_api_badge_helper_is_used_on_stays_and_itinerary() -> None:
     assert "title=" in helper and "snapshot_id" in helper and "esc(" in helper
     assert "sourceApiBadge(st.source)" in _body(js, "renderStays")
     travel = _body(js, "renderTravel")
-    assert travel.count("sourceApiBadge(l.source)") == 2  # flight and stay legs
-    assert "sourceBadge(l.source_mode)" in travel  # existing badge kept
-    assert "sourceApiBadge(fl.source)" in _body(js, "renderFlights")
+    assert travel.count("sourceApiBadge(leg.source)") == 2  # flight and stay legs
+    assert "sourceBadge(leg.source_mode)" in travel  # existing badge kept
+    assert "flightPriceText(leg)" in travel
 
 
 def test_flight_price_falls_back_to_raw_text_without_computing() -> None:
     body = _body(_app_js(), "flightPriceText")
-    assert "f.raw_price_text" in body and "prix observ" in body
-    assert not re.search(r"[*/]|parseFloat|Number\(", body)
+    assert "f.raw_price_text" in body and "observed price" in body
+    assert not re.search(r"[*/]|parseFloat|Number\(", body.replace("// ", ""))
 
 
 def test_home_counter_reports_brightdata_share_of_stays_and_flights() -> None:
     js = _app_js()
     assert 'it.source.provider === "brightdata"' in _body(js, "bdShare")
-    assert "Vols via Bright Data" in _body(js, "renderBrightData")
+    assert "Flights via Bright Data" in _body(js, "renderBrightData")
+
+
+def test_data_pipeline_panel_with_reachability_reads_the_api() -> None:
+    js = _app_js()
+    client = TestClient(create_app(found=Providers(), graph_probe=False))
+    html = client.get("/").text
+    for element_id in ("pipeline-panel", "pipeline-headline", "pipeline-table", "pipeline-calls", "pipeline-reach"):
+        assert f'id="{element_id}"' in html
+    assert 'api("/pipeline", null, null)' in js
+    assert "renderReachability(res && res.reachability)" in _body(js, "renderPipeline")
+    reach = _body(js, "renderReachability")
+    assert "reachable_without_brightdata" in reach and "kyc_pending" in reach
+
+
+def test_people_cards_show_linkedin_headline_and_company() -> None:
+    js = _app_js()
+    assert "linkedinField(c.linkedin)" in _body(js, "renderPeople")
+    field = _body(js, "linkedinField")
+    assert "li.headline" in field and "li.company" in field and "identity_confidence" in field
+    assert "presence" not in field.replace("never presence", "")  # LinkedIn never claims presence
