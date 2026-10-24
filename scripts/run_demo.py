@@ -74,8 +74,22 @@ def linkedin_enrichment(args: argparse.Namespace, assembly: Any, goals: list[Any
         from conferge.graph import ranking
 
         ranked = [pid for o in ranking.rank_people(store, "demo-user", goals) for pid in o.person_ids]
+    # LinkedIn URLs found by SERP (make probe-serp_linkedin), read from the committed cache:
+    # applied to those speakers, who are then enriched from the same cache. No call.
+    serp = li.serp_urls(li.load_public())
+    if serp:
+        def with_url(people: list[Any]) -> list[Any]:
+            return [p.model_copy(update={"linkedin_url": serp[p.id]})
+                    if p.id in serp and not p.linkedin_url else p for p in people]
+        assembly.people, assembly.demo.people = with_url(assembly.people), with_url(assembly.demo.people)
+        if store is not None:  # only people of this demo: a MERGE must never create a stub
+            demo_ids = {p.id for p in assembly.people}
+            for pid, url in ((k, v) for k, v in serp.items() if k in demo_ids):
+                store.merge_node("Person", pid, {"linkedin_url": url,
+                                                 "linkedin_url_provider": "brightdata:serp"})
     targets = li.select_targets(ranked, assembly.people, li.fixture_hosts(),
                                 speakers=args.linkedin_speakers, host_count=args.linkedin_hosts)
+    targets += [p for p in assembly.people if p.id in serp and p not in targets]
     known = {p.id for p in assembly.people}
     res = asyncio.run(li.enrich([p for p in targets if p.id in known], assembly.companies, store,
                                 allow_collect=False))

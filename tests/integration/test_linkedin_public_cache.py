@@ -24,7 +24,8 @@ def test_write_public_keeps_only_public_fields(tmp_path: Path) -> None:
     path = li.write_public([_enrichment("https://www.linkedin.com/in/ada/", headline=None)],
                            tmp_path / "public.json")
     entry = json.loads(path.read_text())["profiles"][0]
-    assert set(entry) == ALLOWED - {"headline"}  # headline only when present
+    # headline, its source and the SERP provenance only when present
+    assert set(entry) == ALLOWED - {"headline", "headline_source", "person_id", "url_provider"}
     assert entry["provider"] == "brightdata:linkedin" and entry["dataset_id"] == li.DATASET_ID
     with_headline = li.write_public([_enrichment("https://www.linkedin.com/in/ada/", headline="Builder")],
                                     tmp_path / "public2.json")

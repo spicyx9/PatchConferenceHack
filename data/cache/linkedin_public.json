@@ -10,6 +10,19 @@
       "provider": "brightdata:linkedin"
     },
     {
+      "name": "Michael Beemer",
+      "headline": "Dynatrace",
+      "headline_source": "serp:title",
+      "company": "Dynatrace",
+      "linkedin_url": "https://www.linkedin.com/in/beeme1mr/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": "sd_mvmutz2i1k1pjc4l66",
+      "collected_at": "2026-10-24T20:32:04.087Z",
+      "provider": "brightdata:linkedin",
+      "person_id": "person:rainfocus:1792785179320001iUwm_1768417809universe26",
+      "url_provider": "brightdata:serp"
+    },
+    {
       "name": "Camila Maia",
       "company": "Latitude.sh",
       "linkedin_url": "https://www.linkedin.com/in/cmaiacd/",
@@ -17,6 +30,19 @@
       "snapshot_id": "sd_mvms2ssrh1bjodbs9",
       "collected_at": "2026-10-24T19:14:49.187Z",
       "provider": "brightdata:linkedin"
+    },
+    {
+      "name": "David Slater",
+      "headline": "Staff Researcher @ GitHub Next",
+      "headline_source": "serp:title",
+      "company": "GitHub",
+      "linkedin_url": "https://www.linkedin.com/in/david-slater-75b71525/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": "sd_mvmutz2i1k1pjc4l66",
+      "collected_at": "2026-10-24T20:33:15.156Z",
+      "provider": "brightdata:linkedin",
+      "person_id": "person:rainfocus:1699463104853001mRhk_1768417809universe26",
+      "url_provider": "brightdata:serp"
     },
     {
       "name": "Dylan McCarthy",
@@ -37,6 +63,32 @@
       "provider": "brightdata:linkedin"
     },
     {
+      "name": "Madelyn Tarr",
+      "headline": "Product @ Amplitude + Statsig",
+      "headline_source": "serp:title",
+      "company": "Amplitude",
+      "linkedin_url": "https://www.linkedin.com/in/madelyn-tarr/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": "sd_mvmutz2i1k1pjc4l66",
+      "collected_at": "2026-10-24T20:31:55.159Z",
+      "provider": "brightdata:linkedin",
+      "person_id": "person:rainfocus:1791556328441001Fwsh_1768417809universe26",
+      "url_provider": "brightdata:serp"
+    },
+    {
+      "name": "Martin Woodward",
+      "headline": "Vice President of Developer Relations",
+      "headline_source": "serp:title",
+      "company": "GitHub",
+      "linkedin_url": "https://www.linkedin.com/in/martinwoodward/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": "sd_mvmv717h1u6buxciol",
+      "collected_at": "2026-10-24T20:42:04.840Z",
+      "provider": "brightdata:linkedin",
+      "person_id": "person:rainfocus:1687465756038001t5oT_1768417809universe26",
+      "url_provider": "brightdata:serp"
+    },
+    {
       "name": "Mina Tawadrous",
       "company": "SiriusXM",
       "linkedin_url": "https://www.linkedin.com/in/mina-tawadrous/",
@@ -53,6 +105,32 @@
       "snapshot_id": "sd_mvms2ssrh1bjodbs9",
       "collected_at": "2026-10-24T19:16:17.584Z",
       "provider": "brightdata:linkedin"
+    },
+    {
+      "name": "Parker Johnston",
+      "headline": "Frontier Transformation Engineer (TITAN ...",
+      "headline_source": "serp:title",
+      "company": "Insight",
+      "linkedin_url": "https://www.linkedin.com/in/parker-johnston-420143297/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": "sd_mvmv717h1u6buxciol",
+      "collected_at": "2026-10-24T20:43:10.110Z",
+      "provider": "brightdata:linkedin",
+      "person_id": "person:rainfocus:1746145404906001CkyS_1768417809universe26",
+      "url_provider": "brightdata:serp"
+    },
+    {
+      "name": "Philip Holleran",
+      "headline": "Technologist | Strategist | Geographer",
+      "headline_source": "serp:title",
+      "company": "GitHub",
+      "linkedin_url": "https://www.linkedin.com/in/philipholleran/",
+      "dataset_id": "gd_l1viktl72bvl7bjuj0",
+      "snapshot_id": "sd_mvmv717h1u6buxciol",
+      "collected_at": "2026-10-24T20:42:04.599Z",
+      "provider": "brightdata:linkedin",
+      "person_id": "person:rainfocus:1745520780302001vyrp_1768417809universe26",
+      "url_provider": "brightdata:serp"
     },
     {
       "name": "Pierre Tempel",
