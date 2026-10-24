@@ -208,6 +208,10 @@ class Person(CoreModel):
     ] = "unknown"
     event_ids: list[str] = Field(default_factory=list)
     match_confidence: float | None = Field(default=None, ge=0, le=1)
+    identity_confidence: float | None = Field(default=None, ge=0, le=1)
+    """Confidence (0-1) that the linked profiles really belong to this person."""
+    presence_confidence: float | None = Field(default=None, ge=0, le=1)
+    """Confidence (0-1) that this person is linked to the event."""
     evidence: list[SourceEvidence] = Field(default_factory=list)
 
 
