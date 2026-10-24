@@ -44,7 +44,7 @@ non-zero exit. Then continue with step 3 below (browser, Reset session).
    **Reset session**. Reload the page.
 5. **Check the starting state** on **Discover**, "People to connect with":
    **Ryan Hecht 56**, **Camila Maia 47**, **Nick Liffen 40**; right column shows
-   **207** events to explore, **32** on your agenda, **0** conversations saved.
+   **194** events to explore, **32** on your agenda, **0** conversations saved.
    If the top 3 differs, repeat steps 1 and 4.
 6. After a rehearsal, repeat step 4: the rehearsal's "I met" is saved in FalkorDB.
 
@@ -54,8 +54,8 @@ non-zero exit. Then continue with step 3 below (browser, Reset session).
 |---|---|---|---|
 | 0:00 | "Every conference, you miss the three people who mattered. Conferge finds them before you land." | Stay on **Discover**. | Hero "Your week in **San Francisco**", "GitHub Universe 2026 · Oct 28 — Oct 29". |
 | 0:10 | "I tell it why I'm going: I build AI developer tools and I want seed investors, agent founders and Copilot PMs." | Click the **V** avatar (top right). The goal is prefilled. Click **Update your agenda**. | Toast "Goal updated. Your agenda and suggested people have been recalculated." Chips **Meet seed investors (developer tools) · 45 %**, **Meet founders (ai agents) · 35 %**, **Meet product managers (copilot) · 20 %**. |
-| 0:20 | "That goal became an agenda." | Point at the right column. | **207** events to explore, **32** on your agenda, **50** suggested connections. |
-| 0:25 | "Where does the data come from? The official catalog, Luma, Partiful, and Bright Data for what is hard to reach." | Click **How are suggestions made?** (right column), then scroll to **Data pipeline**. | official **210**, luma **12**, partiful **6**, eventbrite **8**, aggregators **20** records. |
+| 0:20 | "That goal became an agenda." | Point at the right column. | **194** events to explore, **32** on your agenda, **50** suggested connections. |
+| 0:25 | "Where does the data come from? The official catalog, Luma, Partiful, and Bright Data for what is hard to reach." | Click **How are suggestions made?** (right column), then scroll to **Data pipeline**. | official **210**, luma **12**, partiful **6**, eventbrite **8**, aggregators **7** records. |
 | 0:35 | "Bright Data collected the stays, the flights and the LinkedIn profiles. Here is what it took: no call at query time." | Stay in the dialog; point at the counter and the pipeline rows. | "Records collected through Bright Data: **64**", "Stays via Bright Data: **6/6** · Flights via Bright Data: **1/1**", linkedin row **9** records, "Bright Data calls: none". Reachability: **10 of 21** sites without Bright Data, **14 of 21** with. Close the dialog. |
 | 0:45 | "My first match is Ryan Hecht. His LinkedIn profile, collected by Bright Data, confirms he works at GitHub." | Tab **People**. Hover the green **brightdata:linkedin** badge on Ryan Hecht's card. | Card **Ryan Hecht**, Product Manager · GitHub, relevance **56**, "LINKEDIN · Not provided · GitHub profile **brightdata:linkedin**". Tooltip: dataset gd_l1viktl72bvl7bjuj0, snapshot sd_mvms2ssrh1bjodbs9, identity_confidence 1. |
 | 0:55 | "And this is why he's on my list: a path in the graph, from my goal to the session where he speaks." | Tab **Discover** → **See why** under Ryan Hecht. | Tab **Connections**, "**FalkorDB connected**". Path: Meet founders (ai agents) → ai agents → GitHub Copilot and Windows: Bringing local models into the workflow → Ryan Hecht. |
