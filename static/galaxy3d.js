@@ -14,6 +14,7 @@
       this.edges.forEach(e=>{this.byId.get(e.source).degree++;this.byId.get(e.target).degree++;});
       this.radius=Math.max(220,...this.nodes.map(n=>Math.hypot(n.x,n.y,n.z)));
       this.dense=this.nodes.length>40;
+      if(!this.dense)this.nodes.forEach(n=>{if(n.photo_url){const img=new Image();img.onload=()=>{n.photo=img;this.schedule();};img.src=n.photo_url;}});
       this.canvas=document.createElement('canvas');this.canvas.tabIndex=0;
       this.canvas.setAttribute('role','img');
       this.canvas.setAttribute('aria-label','3D connections. Drag or use arrow keys to rotate. Scroll or use plus and minus to zoom. Select people in the adjacent list for details.');
@@ -68,6 +69,7 @@
         const halo=ctx.createRadialGradient(n.sx,n.sy,0,n.sx,n.sy,n.size*4);halo.addColorStop(0,color+'40');halo.addColorStop(1,color+'00');ctx.fillStyle=halo;ctx.beginPath();ctx.arc(n.sx,n.sy,n.size*4,0,Math.PI*2);ctx.fill();
         const sphere=ctx.createRadialGradient(n.sx-n.size*.35,n.sy-n.size*.4,0,n.sx,n.sy,n.size);sphere.addColorStop(0,'#ffffff');sphere.addColorStop(.35,color);sphere.addColorStop(1,color);ctx.fillStyle=sphere;
         ctx.beginPath();ctx.arc(n.sx,n.sy,n.size,0,Math.PI*2);ctx.fill();
+        if(n.photo){ctx.save();ctx.beginPath();ctx.arc(n.sx,n.sy,n.size,0,Math.PI*2);ctx.clip();ctx.drawImage(n.photo,n.sx-n.size,n.sy-n.size,n.size*2,n.size*2);ctx.restore();}
         if(active&&n.id===active.id){ctx.strokeStyle=color;ctx.lineWidth=1;ctx.beginPath();ctx.arc(n.sx,n.sy,n.size+4,0,Math.PI*2);ctx.stroke();}
         const label=!this.dense||(active&&nearby.has(n.id))||(!active&&n.featured);
         if(label&&lit){ctx.font=`${n.type==='Person'?600:400} ${active||!this.dense?12:10}px Inter, Arial, sans-serif`;ctx.textAlign='center';

@@ -32,3 +32,15 @@ Company, role and profile/session-topic filters combine with AND semantics. Opti
 come from the current scope, and filtering happens before keyword or vector retrieval.
 All connections / Reset filters clear the query and all filters within the current scope.
 Changing a filter returns to the filtered overview without making a paid AI call.
+
+## Profile photos
+
+Run `FALKORDB_PORT=6380 FALKORDB_GRAPH=conferge_demo uv run python -m conferge.api.photos`
+against the local server to enrich the current directory through Bright Data Web Unlocker.
+Only existing LinkedIn profile links on those Person nodes are used; no name-only searches.
+The collector accepts LinkedIn profile-photo CDN URLs, downloads images immediately with
+a 5 MB cap, and caches files and source metadata under Git-ignored `raw/connection-photos/`.
+FalkorDB receives photo location/provenance through GraphStore. Existing cached people are
+skipped on reruns. Missing or inaccessible photos retain initials. Images are displayed in
+the sidebar and focused 3D views, with separate live photo provenance from fixture profiles.
+The photo cache is local data and is not included in a Git-based deployment.

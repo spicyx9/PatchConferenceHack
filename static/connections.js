@@ -30,7 +30,7 @@
   const initials = name => name.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('');
   function personRows(items) {
     $('connection-results').innerHTML = items.length ? items.map(p=>`<button class="connection-person ${selected===p.id?'selected':''}" data-person="${esc(p.id)}">
-      <span class="person-monogram">${esc(initials(p.name))}</span><span class="person-row-copy"><b>${esc(p.name)}</b>
+      <span class="person-monogram">${esc(initials(p.name))}${p.photo?`<img class="connection-avatar" src="${esc(p.photo.url)}" alt="" loading="lazy" />`:""}</span><span class="person-row-copy"><b>${esc(p.name)}</b>
       <small>${esc(p.title || p.company || 'Profile')}</small>${p.reason?`<span class="match-reason">${esc(p.reason)}</span>`:''}</span><span class="person-arrow">↗</span></button>`).join('') : '<div class="connection-empty">No people found.<p>Try a different query or list.</p></div>';
   }
   function fit() { if(cy && $('graph').clientWidth) {cy.resize();cy.fit(undefined,45);} }
@@ -60,11 +60,12 @@
   function details(p,path) {
     const sources=p.sources.filter(s=>s.source_url && /^https?:\/\//.test(s.source_url));
     $('graph-detail').innerHTML=`<div class="connection-detail"><span class="detail-kicker">${p.met?'RECORDED MEETING':'PROFILE'} · ${esc(p.source_mode)}</span>
-      <h3>${esc(p.name)}</h3><p>${esc([p.title,p.company].filter(Boolean).join(' · '))}</p>
+      ${p.photo?`<img class="connection-profile-photo" src="${esc(p.photo.url)}" alt="${esc(p.name)}" />`:""}<h3>${esc(p.name)}</h3><p>${esc([p.title,p.company].filter(Boolean).join(' · '))}</p>
       ${p.bio?`<p class="detail-bio">${esc(p.bio.slice(0,420))}</p>`:''}
       <div class="topic-pills">${p.topics.slice(0,5).map(t=>`<span>${esc(t)}</span>`).join('')}</div>
       ${path && path.path && path.path.length?`<h4>Connection path</h4><ol class="connection-path">${path.path.filter(x=>x.node).map(x=>`<li>${esc(x.node.label)}</li>`).join('')}</ol>`:'<p class="muted">No goal path recorded.</p>'}
       ${p.events.length?`<h4>Sessions</h4><ul class="connection-sessions">${p.events.slice(0,3).map(e=>`<li>${esc(e.title)}</li>`).join('')}</ul>`:''}
+      ${p.photo?`<a class="connection-source-link" href="${esc(p.photo.source_url)}" target="_blank" rel="noopener noreferrer">Photo: LinkedIn · via Bright Data ↗</a>`:""}
       ${sources.length?`<h4>Sources</h4>${sources.slice(0,3).map(s=>`<a class="connection-source-link" href="${esc(s.source_url)}" target="_blank" rel="noopener noreferrer">${esc(s.provider)} ↗</a>`).join('')}`:''}</div>`;
   }
   async function focus(id) {
@@ -107,6 +108,7 @@
     }catch(e){if(ticket===request)$('connection-summary').textContent=e.message;}
     finally{busy=false;$('connection-submit').disabled=false;$('connection-submit').innerHTML='Find people <span aria-hidden="true">↗</span>';}
   }
+  $('connection-results').addEventListener('error',e=>{if(e.target.classList.contains('connection-avatar'))e.target.remove();},true);
   $('connection-search').addEventListener('submit',search);
   document.querySelectorAll('[data-connection-scope]').forEach(button=>button.addEventListener('click',()=>{
     scope=button.dataset.connectionScope;Object.keys(filters).forEach(k=>filters[k]='');$('connection-query').value='';

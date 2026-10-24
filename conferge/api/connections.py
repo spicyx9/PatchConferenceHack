@@ -10,6 +10,9 @@ from typing import Any, Literal
 
 import httpx
 from fastapi import APIRouter, HTTPException, Query
+from fastapi.responses import FileResponse
+
+from conferge.api.photos import CACHE, manifest
 from pydantic import BaseModel, Field
 
 from conferge.api.providers import _entity
@@ -57,7 +60,9 @@ def key() -> str | None:
 def card(state: Any, person: Any) -> dict[str, Any]:
     company = state.data.company(person.company_id) if person.company_id else None
     events = [state.data.event(i) for i in person.event_ids]
+    photo = manifest().get(person.id)
     return {
+        "photo": {**photo, "url": "/api/v1/connections/photos/" + photo["filename"]} if photo else None,
         "id": person.id, "name": person.name, "title": person.title or person.role or "",
         "company": company.name if company else "", "bio": person.bio or "",
         "topics": person.topics, "roles": person.roles,
@@ -247,12 +252,26 @@ def graph_view(state: Any, items: list[dict], focus: str | None) -> dict:
         if item["id"] in chosen:
             nodes.setdefault(item["id"], {"id": item["id"], "label": item["name"], "type": "Person",
                                           "source_mode": item["source_mode"]})
+    photos = manifest()
+    for node in nodes.values():
+        if node['type'] == 'Person' and node['id'] in photos:
+            node['photo_url'] = '/api/v1/connections/photos/' + photos[node['id']]['filename']
     return {"nodes": list(nodes.values()), "edges": list(edges.values()), "backend": "falkordb"}
 
 
 def router(state: Any) -> APIRouter:
     api = APIRouter(prefix="/api/v1/connections")
     lock = asyncio.Lock()
+
+    @api.get("/photos/{filename}")
+    def photo(filename: str) -> FileResponse:
+        if not re.fullmatch(r"[a-f0-9]{24}\.(jpg|png|webp)", filename):
+            raise HTTPException(404, "Photo not found")
+        record = next((r for r in manifest().values() if r['filename'] == filename), None)
+        path = CACHE / filename
+        if not record or not path.is_file():
+            raise HTTPException(404, "Photo not found")
+        return FileResponse(path, media_type=record['media_type'], headers={"Cache-Control": "public, max-age=86400"})
 
     @api.get("")
     def connections(scope: Literal["all", "met"] = "all", focus: str | None = None,
