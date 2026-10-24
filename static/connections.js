@@ -3,7 +3,7 @@
   'use strict';
   const $ = id => document.getElementById(id);
   const esc = value => String(value == null ? '' : value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const colors = {Person:'#638574', Company:'#94879f', Event:'#b89c7d', Topic:'#8c9c82', Goal:'#454e46', User:'#454e46'};
+  const colors = {Person:'#8196bc', Company:'#ac99bc', Event:'#c5a185', Topic:'#a9a7bd', Goal:'#606776', User:'#606776'};
   const labels = {WORKS_AT:'works at', SPEAKS_AT:'speaks at', ABOUT:'about', HOSTS:'hosts', HAS_GOAL:'prioritizes', ATTENDS_CONFIRMED:'attends'};
   let scope='all', all=[], shown=[], cy=null, request=0, selected=null, busy=false;
   const filters={company:'',role:'',topic:''};
