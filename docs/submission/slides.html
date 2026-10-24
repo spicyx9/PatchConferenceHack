@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conferge slides</title>
+<style>
+  :root { --bg: #0d1117; --panel: #161b22; --line: #30363d; --fg: #e6edf3; --muted: #8b949e;
+          --blue: #58a6ff; --green: #3fb950; --amber: #d29922; --purple: #bc8cff; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg);
+               font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; overflow: hidden; }
+  .slide { position: absolute; inset: 0; padding: 6vh 7vw; display: none; flex-direction: column; justify-content: center; }
+  .slide.active { display: flex; }
+  .kicker { color: var(--blue); font-size: 2.4vw; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; margin: 0 0 2vh; }
+  h1 { font-size: 5.2vw; line-height: 1.1; margin: 0 0 5vh; }
+  ul { margin: 0; padding: 0; list-style: none; }
+  li { font-size: 2.9vw; line-height: 1.35; margin: 0 0 2.6vh; padding-left: 2.6vw; position: relative; }
+  li::before { content: ""; position: absolute; left: 0; top: .5em; width: 1vw; height: 1vw; border-radius: 50%; background: var(--blue); }
+  .muted { color: var(--muted); }
+  .flow { display: flex; align-items: stretch; gap: 1.2vw; }
+  .box { flex: 1; background: var(--panel); border: 2px solid var(--line); border-radius: 1vw; padding: 2.4vh 1.2vw; text-align: center; }
+  .box b { display: block; font-size: 2.4vw; margin-bottom: 1.4vh; }
+  .box span { font-size: 1.5vw; color: var(--muted); line-height: 1.35; }
+  .box.graph { border-color: var(--green); } .box.graph b { color: var(--green); }
+  .box.src { border-color: var(--amber); } .box.src b { color: var(--amber); }
+  .box.agents b { color: var(--purple); }
+  .arrow { align-self: center; font-size: 3vw; color: var(--muted); }
+  .note { margin-top: 5vh; font-size: 2vw; color: var(--muted); }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 3vw; }
+  .cols h2 { font-size: 2.6vw; margin: 0 0 3vh; }
+  .cols li { font-size: 2.2vw; }
+  .live h2 { color: var(--green); } .live li::before { background: var(--green); }
+  .wait h2 { color: var(--amber); } .wait li::before { background: var(--amber); }
+  .pager { position: fixed; right: 3vw; bottom: 3vh; font-size: 1.4vw; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<section class="slide">
+  <p class="kicker">Conferge</p>
+  <h1>Conferences are organised by time slot, not by what you came for.</h1>
+  <ul>
+    <li>GitHub Universe: 2 days, 161 sessions, 231 side events found, thousands of people.</li>
+    <li>The people who matter to you stay invisible.</li>
+    <li>Most attendees go home feeling they were in the wrong room.</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <p class="kicker">Architecture</p>
+  <h1>One graph, explainable end to end.</h1>
+  <div class="flow">
+    <div class="box src"><b>Sources</b><span>RainFocus catalog, Luma, Partiful, Eventbrite, aggregators. Bright Data: SERP, flights, hotels, LinkedIn</span></div>
+    <div class="arrow">&rarr;</div>
+    <div class="box graph"><b>FalkorDB</b><span>697 nodes, 2,195 edges. Every relation keeps its source URL and timestamp</span></div>
+    <div class="arrow">&rarr;</div>
+    <div class="box agents"><b>Agents</b><span>planner and networking, anti-FOMO, minimal-change replanner</span></div>
+    <div class="arrow">&rarr;</div>
+    <div class="box"><b>API</b><span>FastAPI, 2 to 61 ms per call on the demo graph</span></div>
+    <div class="arrow">&rarr;</div>
+    <div class="box"><b>UI</b><span>goal, who to meet and why, plan and map, skips, live change, memory</span></div>
+  </div>
+  <p class="note">Writes go only through GraphStore MERGE. "Why this person" is a real graph path query.</p>
+</section>
+
+<section class="slide">
+  <p class="kicker">What is real today</p>
+  <h1>Live where it can be, labelled where it is not.</h1>
+  <div class="cols">
+    <div class="live">
+      <h2>Live, no key needed</h2>
+      <ul>
+        <li>Official catalog, Luma, Partiful, Eventbrite, aggregators</li>
+        <li>BART fares, OSRM routes</li>
+        <li>FalkorDB graph, 926 tests passing</li>
+      </ul>
+    </div>
+    <div class="wait">
+      <h2>Labelled, not live</h2>
+      <ul>
+        <li>Bright Data connectors built, waiting for a key</li>
+        <li>Demo runs on the 2026-10-24 snapshot, tagged fixture</li>
+        <li>Sold-out change is a labelled simulation</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="pager" id="pager"></div>
+<script>
+  (function () {
+    var slides = document.querySelectorAll(".slide");
+    var i = Math.max(0, Math.min(slides.length - 1, (parseInt(location.hash.slice(1), 10) || 1) - 1));
+    function show(n) {
+      i = Math.max(0, Math.min(slides.length - 1, n));
+      slides.forEach(function (s, k) { s.classList.toggle("active", k === i); });
+      document.getElementById("pager").textContent = (i + 1) + " / " + slides.length;
+      history.replaceState(null, "", "#" + (i + 1));
+    }
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight" || e.key === "ArrowDown" || e.key === " " || e.key === "PageDown") show(i + 1);
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp" || e.key === "PageUp") show(i - 1);
+    });
+    window.addEventListener("hashchange", function () { show((parseInt(location.hash.slice(1), 10) || 1) - 1); });
+    show(i);
+  })();
+</script>
+</body>
+</html>
