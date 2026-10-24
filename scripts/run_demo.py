@@ -11,6 +11,7 @@ A domain that fails or returns nothing falls back to the API fixture, labelled `
 
 Run: ``uv run python scripts/run_demo.py [--mode fixture|live] [--travel live|fixture] [--graph conferge_demo] [--port 8000]``
 FalkorDB address: FALKORDB_HOST / FALKORDB_PORT from the env or .env (default 127.0.0.1:6379).
+Startup check: the port must answer GRAPH.LIST; a plain Redis or a closed port stops with one line.
 """
 
 from __future__ import annotations
@@ -26,6 +27,29 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
+def falkordb_preflight() -> str | None:
+    """None when FALKORDB_HOST:FALKORDB_PORT answers GRAPH.LIST, else a one-line reason."""
+    import redis
+
+    from conferge.core.settings import env_value, falkordb_address
+
+    host, port = falkordb_address()
+    client = redis.Redis(host=host, port=port, password=env_value("FALKORDB_PASSWORD") or None,
+                         socket_timeout=3, socket_connect_timeout=3)
+    try:
+        client.execute_command("GRAPH.LIST")
+    except redis.ResponseError as exc:
+        if "unknown command" in str(exc).lower():
+            return f"port {port} is a plain Redis, set FALKORDB_PORT to the FalkorDB port"
+        return f"FalkorDB at {host}:{port} refused GRAPH.LIST: {str(exc)[:120]}"
+    except redis.RedisError as exc:
+        return (f"nothing answers on {host}:{port} ({type(exc).__name__}); run `make up`, "
+                "or set FALKORDB_PORT to the FalkorDB port")
+    finally:
+        client.close()
+    return None
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--mode", choices=["fixture", "live"], default="fixture")
@@ -39,6 +63,9 @@ def main() -> int:
                         help="stays/flights: live search with fixture fallback, or fixture only")
     args = parser.parse_args()
     os.environ["FALKORDB_GRAPH"] = args.graph  # the API reads the same graph it was loaded into
+    if not args.no_graph and (problem := falkordb_preflight()):
+        print(f"make demo: {problem}", file=sys.stderr)
+        return 2
 
     import uvicorn
 
