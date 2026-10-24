@@ -7,6 +7,12 @@ const base = process.env.BASE_URL || "http://127.0.0.1:8051";
 assert(["127.0.0.1", "localhost"].includes(new URL(base).hostname));
 const evidence = process.env.EVIDENCE_DIR;
 const baseline = process.env.BASELINE_DIR;
+async function showTravel(page, kind) {
+  const tab = page.locator(`#travel-${kind}-tab`);
+  if (!(await tab.count())) return;
+  await tab.click();
+  await page.waitForFunction(() => document.querySelector('#travel-results-workspace')?.getAttribute('aria-busy') === 'false');
+}
 async function capture(page, selector, name) {
   if (!evidence) return;
   fs.mkdirSync(evidence, { recursive: true });
@@ -53,6 +59,7 @@ async function capture(page, selector, name) {
       ["mobile", 390, 844],
     ]) {
       await page.setViewportSize({ width, height });
+      await showTravel(page, "flights");
       if (version === "after") {
         const croppedLogos = await page.locator(".fare-logo img").evaluateAll((images) =>
           images.filter((image) => {
@@ -70,6 +77,7 @@ async function capture(page, selector, name) {
         ["flight", "#flights article"],
         ["stay", "#stays article"],
       ]) {
+        await showTravel(page, kind === "stay" ? "stays" : "flights");
         await capture(page, selector, `${version}-${kind}-${size}`);
       }
     }
@@ -89,6 +97,7 @@ async function capture(page, selector, name) {
         0,
         "Missing stars are not derived from guest scores",
       );
+      await showTravel(page, "flights");
       await page.locator(".fare-logo img").first().scrollIntoViewIfNeeded();
       await page.waitForFunction(() => {
         const i = document.querySelector(".fare-logo img");
@@ -105,6 +114,7 @@ async function capture(page, selector, name) {
         await page.locator("#flights .fare-price .badge").first().isVisible(),
         "Flight collection badge is outside details",
       );
+      await showTravel(page, "stays");
       assert(
         await page.locator("#stays .stay-price .badge").first().isVisible(),
         "Stay collection badge is outside details",
@@ -151,7 +161,7 @@ async function capture(page, selector, name) {
         body: '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="400" height="400" fill="#eee7dd"/><text x="200" y="185" text-anchor="middle" font-family="sans-serif" font-size="23" fill="#726758">Fixture image</text><text x="200" y="225" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#726758">Not a property photograph</text></svg>',
       }),
     );
-    await page.route("**/api/v1/stays", async (r) => {
+    const mockStay = async (r) => {
       const response = await r.fetch(),
         document = await response.json(),
         st = document.items[0];
@@ -185,13 +195,17 @@ async function capture(page, selector, name) {
         },
       ];
       await r.fulfill({ response, json: document });
-    });
+    };
+    await page.route("**/api/v1/stays", mockStay);
+    await page.route("**/api/v1/travel/search", r =>
+      r.request().postDataJSON().kind === "stays" ? mockStay(r) : r.continue());
     await page.goto(base, { waitUntil: "domcontentloaded" });
     await page.waitForFunction(
       () =>
         document.querySelector("#main")?.getAttribute("aria-busy") === "false",
     );
     await page.locator('.main-nav [data-tab="travel"]').click();
+    await showTravel(page, "stays");
     for (const [size, width, height] of [
       ["desktop", 1440, 1000],
       ["mobile", 390, 844],

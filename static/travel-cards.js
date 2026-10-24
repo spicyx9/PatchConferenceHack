@@ -435,6 +435,15 @@
         : "<small>Booking link unavailable</small>") +
       '</div></div><div class="stay-source">' +
       evidence +
+      (url(card.image_source_url)
+        ? '<p class="small-text">Property photo: <a href="' +
+          esc(url(card.image_source_url)) +
+          '" target="_blank" rel="noopener noreferrer">' +
+          esc(new URL(card.image_source_url).hostname.replace(/^www\./, "")) +
+          '</a>' +
+          (card.image_collected_at ? ' · collected ' + esc(date(card.image_collected_at)) : '') +
+          '</p>'
+        : '') +
       "</div></article>"
     );
   }

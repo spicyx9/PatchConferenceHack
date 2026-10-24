@@ -4,6 +4,7 @@ import json
 from datetime import date, datetime, timezone
 
 import httpx
+from pydantic import HttpUrl
 
 from conferge.api.travel_cards import view
 from conferge.core.brightdata import BrightDataClient
@@ -109,6 +110,32 @@ def test_cache_retains_cards_as_optional_sibling_with_same_provenance(tmp_path):
     (tmp_path / "stays.json").write_text(json.dumps(doc))
     legacy = travel_cache.load(tmp_path)["stays"].items[0]
     assert legacy.card_details.image_urls == [] and legacy.card_details.star_rating is None
+
+
+def test_property_photo_provenance_is_separate_from_room_quote(tmp_path):
+    stay = to_lodging(booking_record(), Q)
+    photo_at = NOW.replace(hour=20)
+    stay.card_details.image_source_url = HttpUrl("https://hotel.example.test/gallery")
+    stay.card_details.image_collected_at = photo_at
+    doc = travel_cache.build("stays", [stay], sources=["mocked"], generated_at=photo_at)
+    (tmp_path / "stays.json").write_text(json.dumps(doc))
+    restored = travel_cache.load(tmp_path)["stays"].items[0]
+    assert restored.evidence[0].collected_at == NOW
+    assert restored.total_price == stay.total_price
+    card = view(restored)["card_details"]
+    assert card["image_source_url"] == "https://hotel.example.test/gallery"
+    assert datetime.fromisoformat(card["image_collected_at"]) == photo_at
+
+
+def test_all_cached_booking_hotels_have_traceable_property_photos():
+    doc = json.loads((travel_cache.CACHE_DIR / "stays.json").read_text())
+    hotels = [r for r in doc["records"] if r["record"]["id"].startswith("booking:")]
+    assert len(hotels) == 15
+    for row in hotels:
+        card = row["card_details"]
+        assert compact({"images": card["image_urls"]})["image_urls"] == card["image_urls"]
+        assert card["image_urls"] and card["image_source_url"].startswith("https://")
+        assert datetime.fromisoformat(card["image_collected_at"]).tzinfo is not None
 
 
 def client(handler):

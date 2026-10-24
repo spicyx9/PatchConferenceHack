@@ -21,12 +21,15 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from conferge.api.provenance import source_of
+from conferge.api.travel_cards import view as card_view
 from conferge.core.schemas import FlightOffer, Lodging
 from conferge.core.settings import env_value
 from conferge.flights.airports import airports_for
+from conferge.flights.card_details import FlightWithCard
 from conferge.flights.round_trip_total import display as flight_display
 from conferge.integration import travel_cache
 from conferge.integration.stays_flights import dedupe_flights, pick_stays
+from conferge.lodging.card_details import LodgingWithCard
 
 router = APIRouter(prefix="/api/v1/travel", tags=["travel"])
 
@@ -76,8 +79,9 @@ def _records(kind: str, directory: Path) -> list[FlightOffer | Lodging]:
     document = json.loads(path.read_text(encoding="utf-8"))
     if document.get("kind") != "conferge.travel_cache" or document.get("domain") != kind:
         raise ValueError("Unrecognized travel cache")
-    model = FlightOffer if kind == "flights" else Lodging
-    records = [model.model_validate(row["record"]) for row in document["records"]]
+    model = FlightWithCard if kind == "flights" else LodgingWithCard
+    records = [model.model_validate({**row["record"], "card_details": row.get("card_details") or {}})
+               for row in document["records"]]
     # A fixture cannot become a collected offer simply because it was put in this file.
     return [item.model_copy(update={"evidence": [ev.model_copy(update={"source_mode": "cached"})
             for ev in item.evidence]}) for item in records if item.evidence
@@ -119,7 +123,7 @@ def search_cached(query: TravelSearch, directory: Path | None = None) -> dict:
                         if back.departure_at is None or back.departure_at.date() != query.return_date:
                             continue
                     offers.append(offer)
-                items = [{**offer.model_dump(mode="json"), **flight_display(offer),
+                items = [{**card_view(offer), **flight_display(offer),
                           "source": source_of(offer.evidence), "source_mode": "cached"}
                          for offer in dedupe_flights(offers)]
         else:
@@ -133,7 +137,7 @@ def search_cached(query: TravelSearch, directory: Path | None = None) -> dict:
                            and stay.distance_to_venue_m <= query.radius_km * 1000
                            and stay.venue is not None and stay.venue.city is not None
                            and "san francisco" in stay.venue.city.casefold()]
-                items = [{**stay.model_dump(mode="json"), "source": source_of(stay.evidence),
+                items = [{**card_view(stay), "source": source_of(stay.evidence),
                           "source_mode": "cached"} for stay in pick_stays(matched, limit=200)]
         if query.budget is not None:
             items = [item for item in items if item.get("currency") == "USD"
@@ -274,14 +278,14 @@ async def search_live(query: TravelSearch) -> dict:
         if query.kind == "flights":
             if not _flight_matches(record, query):
                 continue
-            item = {**record.model_dump(mode="json"), **flight_display(record)}
+            item = {**card_view(record), **flight_display(record)}
         else:
             if (record.check_in != query.depart or record.check_out != query.return_date
                     or record.adults != query.adults or record.rooms != query.rooms
                     or record.distance_to_venue_m is None
                     or record.distance_to_venue_m > query.radius_km * 1000):
                 continue
-            item = record.model_dump(mode="json")
+            item = card_view(record)
         modes = {e.source_mode for e in record.evidence}
         item.update(source=source_of(record.evidence),
                     source_mode=next(iter(modes)) if len(modes) == 1 else "mixed")

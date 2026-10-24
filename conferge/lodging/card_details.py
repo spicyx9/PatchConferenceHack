@@ -5,13 +5,16 @@ from __future__ import annotations
 from typing import Any
 from urllib.parse import urlsplit
 
-from pydantic import BaseModel, Field
+from pydantic import AwareDatetime, BaseModel, Field, HttpUrl
 
 from conferge.core.schemas import Lodging, SourceRecord
 
 
 class StayCardDetails(BaseModel):
     image_urls: list[str] = Field(default_factory=list, max_length=5)
+    # Property imagery may be collected separately from a dated room quote.
+    image_source_url: HttpUrl | None = None
+    image_collected_at: AwareDatetime | None = None
     star_rating: int | None = Field(default=None, ge=1, le=5)
     amenities: list[str] = Field(default_factory=list, max_length=6)
     room_type: str | None = Field(default=None, max_length=160)
