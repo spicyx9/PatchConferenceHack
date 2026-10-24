@@ -1,7 +1,11 @@
-"""Stable v0.1 data contracts for every Conferge workstream.
+"""Stable v0.2 data contracts for every Conferge workstream.
 
 All source records preserve provenance; missing details are represented by None,
 never invented. No modules outside window 0 should edit this file.
+
+v0.2: optional fields added for topics, registration counts, price breakdown,
+person enrichment, baggage and graph paths. All additions are optional with
+defaults, so v0.1 payloads remain valid.
 """
 
 from __future__ import annotations
@@ -34,6 +38,7 @@ class SourceEvidence(CoreModel):
     collected_at: AwareDatetime | None = None
     raw_ref: str | None = None
     source_record_id: str | None = None
+    confidence: float | None = Field(default=None, ge=0, le=1)
 
 
 class SourceRef(CoreModel):
@@ -87,6 +92,7 @@ class DiscoveryQuery(CoreModel):
     city: str | None = None
     latitude: float | None = Field(default=None, ge=-90, le=90)
     longitude: float | None = Field(default=None, ge=-180, le=180)
+    radius_km: float | None = Field(default=None, ge=0)
     start_date: date | None = None
     end_date: date | None = None
     keywords: list[str] = Field(default_factory=list)
@@ -128,6 +134,10 @@ class Conference(CoreModel):
     venue_name: str | None = None
     timezone: str
     official_url: HttpUrl | None = None
+    latitude: float | None = Field(default=None, ge=-90, le=90)
+    longitude: float | None = Field(default=None, ge=-180, le=180)
+    topics: list[str] = Field(default_factory=list)
+    sponsor_ids: list[str] = Field(default_factory=list)
     evidence: list[SourceEvidence] = Field(default_factory=list)
 
 
@@ -151,11 +161,23 @@ class Event(CoreModel):
     timezone: str | None = None
     venue: Venue | None = None
     organizer_ids: list[str] = Field(default_factory=list)
+    organizer_names: list[str] = Field(default_factory=list)
     speaker_ids: list[str] = Field(default_factory=list)
+    topics: list[str] = Field(default_factory=list)
+    room: str | None = None
     status: Literal["scheduled", "cancelled", "postponed", "sold_out", "unknown"] = "unknown"
     conference_relation: Literal["official", "confirmed_side_event", "candidate", "unrelated", "unknown"] = "unknown"
+    relation_score: float | None = Field(default=None, ge=0, le=1)
     relation_evidence: list[str] = Field(default_factory=list)
     registration_url: HttpUrl | None = None
+    source_url: HttpUrl | None = None
+    is_free: bool | None = None
+    price_min: MoneyString | None = None
+    price_max: MoneyString | None = None
+    currency: str | None = Field(default=None, pattern=r"^[A-Z]{3}$")
+    capacity: int | None = Field(default=None, ge=0)
+    registered_count: int | None = Field(default=None, ge=0)
+    first_listed_at: AwareDatetime | None = None
     evidence: list[SourceEvidence] = Field(default_factory=list)
 
     @model_validator(mode="after")
@@ -172,12 +194,20 @@ class Person(CoreModel):
     name: str
     company_id: str | None = None
     role: str | None = None
+    title: str | None = None
     public_profile_url: HttpUrl | None = None
+    linkedin_url: HttpUrl | None = None
+    github_url: HttpUrl | None = None
+    x_handle: str | None = None
+    bio: str | None = None
+    topics: list[str] = Field(default_factory=list)
+    roles: list[Literal["founder", "investor", "pm", "engineer", "devrel", "executive", "other"]] = Field(default_factory=list)
     participation: Literal[
         "confirmed_speaker", "confirmed_organizer", "public_attendee_listing",
         "relevant_candidate", "unknown",
     ] = "unknown"
     event_ids: list[str] = Field(default_factory=list)
+    match_confidence: float | None = Field(default=None, ge=0, le=1)
     evidence: list[SourceEvidence] = Field(default_factory=list)
 
 
@@ -185,6 +215,9 @@ class Company(CoreModel):
     id: str
     name: str
     domain: str | None = None
+    linkedin_url: HttpUrl | None = None
+    industry: str | None = None
+    is_investor: bool | None = None
     categories: list[str] = Field(default_factory=list)
     evidence: list[SourceEvidence] = Field(default_factory=list)
 
@@ -193,17 +226,30 @@ class Lodging(CoreModel):
     id: str
     name: str
     provider: str
+    lodging_type: Literal["hotel", "apartment", "hostel", "other"] = "other"
     check_in: date
     check_out: date
     adults: int = Field(ge=1)
     rooms: int = Field(default=1, ge=1)
     venue: Venue | None = None
+    distance_to_venue_m: int | None = Field(default=None, ge=0)
     total_price: Decimal | None = Field(default=None, ge=0)
+    nightly_avg: Decimal | None = Field(default=None, ge=0)
+    base_total: Decimal | None = Field(default=None, ge=0)
+    taxes: Decimal | None = Field(default=None, ge=0)
+    fees_total: Decimal | None = Field(default=None, ge=0)
+    payable_at_property: Decimal | None = Field(default=None, ge=0)
     currency: str | None = None
     price_status: Literal["verified_bookable", "quoted_total", "indicative", "unavailable", "unknown"] = "unknown"
     availability: Literal["verified_available", "unavailable", "unknown"] = "unknown"
+    verified_at: AwareDatetime | None = None
     includes_all_fees: bool | None = None
+    free_cancellation: bool | None = None
+    rating: float | None = Field(default=None, ge=0)
+    rating_scale: int | None = Field(default=None, ge=1)
+    rating_count: int | None = Field(default=None, ge=0)
     booking_url: HttpUrl | None = None
+    dedup_group: str | None = None
     evidence: list[SourceEvidence] = Field(default_factory=list)
 
     @model_validator(mode="after")
@@ -222,25 +268,40 @@ class FlightSegment(CoreModel):
     departure_at: AwareDatetime | None = None
     arrival_at: AwareDatetime | None = None
     marketing_carrier: str | None = None
+    operating_carrier: str | None = None
     flight_number: str | None = None
+    aircraft: str | None = None
+    duration_minutes: int | None = Field(default=None, ge=0)
     connection_type: Literal["managed", "self_transfer", "protected_self_transfer", "unknown"] = "unknown"
 
 
 class FlightSlice(CoreModel):
     segments: list[FlightSegment] = Field(min_length=1)
     duration_minutes: int | None = Field(default=None, ge=0)
+    self_transfer: bool | None = None
+
+    @property
+    def stops(self) -> int:
+        return max(len(self.segments) - 1, 0)
 
 
 class FlightOffer(CoreModel):
     id: str
+    dedup_key: str | None = None
     trip_type: Literal["one_way", "round_trip", "multi_city"]
     slices: list[FlightSlice] = Field(min_length=1)
     total_price: MoneyString | None = None
+    raw_price_text: str | None = None
+    price_scope: Literal["total_all_passengers", "per_adult", "unknown"] = "unknown"
     currency: str | None = Field(default=None, pattern=r"^[A-Z]{3}$")
     price_status: Literal["observed_live", "cached", "revalidated", "sandbox", "unknown"] = "unknown"
     collected_at: AwareDatetime
     booking_url: HttpUrl | None = None
+    booking_url_type: Literal["google_flights_booking", "google_flights_search", "seller_deeplink", "airline", "unknown"] = "unknown"
     baggage_verified: bool | None = None
+    carry_on_included: bool | None = None
+    checked_bags_included: int | None = Field(default=None, ge=0)
+    warnings: list[str] = Field(default_factory=list)
     evidence: list[SourceEvidence] = Field(default_factory=list)
 
     @field_validator("total_price")
@@ -270,6 +331,9 @@ class Goal(CoreModel):
     description: str
     priority: float = Field(default=1.0, ge=0, le=1)
     tags: list[str] = Field(default_factory=list)
+    topics: list[str] = Field(default_factory=list)
+    target_roles: list[str] = Field(default_factory=list)
+    target_count: int | None = Field(default=None, ge=0)
 
 
 class Opportunity(CoreModel):
@@ -281,6 +345,10 @@ class Opportunity(CoreModel):
     company_ids: list[str] = Field(default_factory=list)
     score: float = Field(ge=0, le=100)
     rationale: str
+    path: list[dict[str, Any]] = Field(default_factory=list)
+    where: str | None = None
+    opener: str | None = None
+    presence: Literal["confirmed", "probable", "unknown"] = "unknown"
     evidence: list[SourceEvidence] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
 
@@ -289,10 +357,12 @@ class AgentContext(CoreModel):
     conference: Conference
     goals: list[Goal]
     data_mode: DataMode = "fixture"
+    user_id: str = "demo-user"
     events: list[Event] = Field(default_factory=list)
     people: list[Person] = Field(default_factory=list)
     opportunities: list[Opportunity] = Field(default_factory=list)
     budget_usd: Decimal | None = Field(default=None, ge=0)
+    constraints: dict[str, Any] = Field(default_factory=dict)
 
 
 class AgentResult(CoreModel):
