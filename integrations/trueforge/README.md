@@ -1,8 +1,10 @@
 # Conferge + TrueForge local tooling demo
 
-Tested with TrueForge 0.180.0 on October 24, 2026. This is a working local
-integration against the public Conferge API, not the runtime behind the site's
-Connections search box. The production site continues to call OpenAI directly.
+Tested with TrueForge 0.180.0 on October 24, 2026. Includes a local tooling demo
+and a hosted deployment behind the Connections search box. The browser calls
+`/api/v1/connections/agent-search`; TrueForge invokes MCP tools, which use the
+original `/connections/search` retrieval endpoint and `/graph/path` evidence.
+OpenAI provides the tool-calling model, profile embeddings and match explanations.
 
 ## Run
 
@@ -54,3 +56,28 @@ cited the official catalog and explained Peli's three-hop goal/topic/session/
 speaker path. It explicitly distinguished fixture/catalog evidence from live
 attendance and personal relationships. This is a functional smoke test, not
 a retrieval-quality benchmark.
+
+
+## Hosted deployment
+
+`Dockerfile` and `start.sh` run hosted TrueForge (`STANDALONE=false`) with
+Postgres (`DATABASE_URL`) and a separate loopback Redis on port 6381. FalkorDB
+retains port 6379 and its persisted data directory. TrueForge (8790) and MCP
+(8792) bind only to loopback; their admin/settings/session APIs are not proxied.
+Only Conferge's existing application listens publicly on port 8080.
+
+Required deployment environment: DATABASE_URL, OPENAI_API_KEY, TRUEFORGE_API_KEY
+(a generated internal secret). Provider secrets stay in environment/configuration,
+never the bundle. The startup configures the local provider and MCP connector.
+
+The public bridge creates a bounded eight-iteration session per request. It
+preserves filters in the agent request and independently filters returned person
+IDs against the original scope, using canonical profiles for names/photos. It
+requires a successful search tool response and completed turn; runtime failures
+return 503 rather than silently claiming an agent ran. Without TRUEFORGE_BASE_URL,
+local development keeps the original direct search path. Responses expose compact
+`tool_trace` and `evidence` fields for inspection, not runtime administration.
+
+Local hosted-bridge smoke test: HTTP 200, `agent_runtime: trueforge`, two completed
+MCP calls, six matches all inside the selected engineer role. Tests cover invented
+IDs, altered names, absent tool evidence, tool failures and failed agent turns.
