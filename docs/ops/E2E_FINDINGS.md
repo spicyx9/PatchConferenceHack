@@ -15,11 +15,32 @@ Owners: **graph** = FalkorDB session (`conferge/graph`, ranking in `conferge/api
 
 | Run | main at | Result | Open findings |
 |---|---|---|---|
-| 1 | 73a1f24 | 9 passed, 1 failed (step 10) | F1, F2, F3 |
+| 1 | 8a7d7d4 | 9 passed, 1 failed (step 10) | F1, F2, F3 |
+| 2 | 84dbe8b | 10 passed | F2 |
 
 ## Open
 
+_F1 and F3 moved to Resolved in run 2._
+
+### F2 (c, graph/core): user goals have no timestamp, so goal edges cannot carry `observed_at`
+
+- **Step**: `test_05_top5_paths_in_falkordb_with_provenance` (passes after aligning the test with the contract).
+- **Symptom**: the 5 `(Goal)-[:ABOUT]->(Topic)` edges have `source=user`, `verification=user_goal` but
+  `observed_at=null`; every other edge on the top-5 paths has a timestamp.
+- **Where**: `conferge/graph/ingest.py:307-316` (`ingest_goals` passes `evidence=[]`), contract in
+  `conferge/graph/schema.py:34` ("observed_at None when the source has no timestamp; never the ingest time"),
+  `conferge/core/schemas.py:333` (`Goal` has no `created_at`).
+- **Proposed fix**: window 0 adds an optional `stated_at: AwareDatetime | None` to `Goal`, `POST /goal` sets it,
+  `ingest_goals` writes it as `observed_at`. Until then the e2e test accepts `observed_at=null` only when
+  `evidence_source == "user"`.
+
+## Resolved
+
 ### F1 (b, graph): ranking is lost when the API process restarts
+
+- **Resolved on main by aa488c3 (#19, rankings computed from FalkorDB)**: `/goal` ranks from the graph
+  (`computed_by: falkordb`), which reads the `Meeting` nodes, so the met person stays down after a restart.
+  Run 2 passes step 10. The `/reset` question below is still open.
 
 - **Step**: `test_10_restart_keeps_ranking`.
 - **Symptom**: after `POST /met` the met person drops from rank 0 to rank 9; after restarting the API on the
@@ -34,19 +55,9 @@ Owners: **graph** = FalkorDB session (`conferge/graph`, ranking in `conferge/api
   by a restart would bring the meetings back. Either `/reset` stays process-only (document it) or it invalidates
   the user's `Meeting` nodes through a `GraphStore` method.
 
-### F2 (c, graph/core): user goals have no timestamp, so goal edges cannot carry `observed_at`
-
-- **Step**: `test_05_top5_paths_in_falkordb_with_provenance` (passes after aligning the test with the contract).
-- **Symptom**: the 5 `(Goal)-[:ABOUT]->(Topic)` edges have `source=user`, `verification=user_goal` but
-  `observed_at=null`; every other edge on the top-5 paths has a timestamp.
-- **Where**: `conferge/graph/ingest.py:307-316` (`ingest_goals` passes `evidence=[]`), contract in
-  `conferge/graph/schema.py:34` ("observed_at None when the source has no timestamp; never the ingest time"),
-  `conferge/core/schemas.py:333` (`Goal` has no `created_at`).
-- **Proposed fix**: window 0 adds an optional `stated_at: AwareDatetime | None` to `Goal`, `POST /goal` sets it,
-  `ingest_goals` writes it as `observed_at`. Until then the e2e test accepts `observed_at=null` only when
-  `evidence_source == "user"`.
-
 ### F3 (c, graph): `POST /goal` does not write the new goals to FalkorDB
+
+- **Resolved on main by aa488c3 (#19)**: `conferge/api/app.py:104` now calls `GraphIngestor(...).ingest_goals`.
 
 - **Step**: not failing today; found while reading `/graph/path`.
 - **Symptom**: the "why this person" path is queried from the `Goal` nodes ingested at start-up
