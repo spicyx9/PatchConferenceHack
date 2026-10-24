@@ -357,8 +357,16 @@ def create_app(
         # "live" only when at least one Bright Data API can actually be called from this
         # process; without a key nothing here is live, so the label says "unknown".
         notes = [] if any(ready.values()) else ["Bright Data not configured: no API ready in this process"]
+        cached: dict[str, Any] = {"datasets": 0, "web_unlocker": 0, "serp": 0, "collected_at": {}}
+        api_key = {"dataset": "datasets", "unlocker": "web_unlocker", "serp": "serp"}
+        for r in state.data.pipeline:
+            if r.get("cached") and r["kind"] == "brightdata" and r["brightdata_api"] in api_key:
+                cached[api_key[r["brightdata_api"]]] += r["records"] or 0
+                cached["collected_at"][r["provider"]] = r["collected_at"]
+        cached["total"] = cached["datasets"] + cached["web_unlocker"] + cached["serp"]
         return _envelope(state, [], {
             "usage": bd.usage(),
+            "cached": cached,
             "ready": ready,
             "not_ready_reason": {api: client.not_ready(api) for api in apis},
         }, extra_warnings=notes, mode_override="live" if any(ready.values()) else "unknown")

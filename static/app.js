@@ -2594,9 +2594,17 @@
         (ready[api] ? "" : ' <span class="muted">(not configured)</span>')
       );
     }
+    var c = (res && res.cached) || {};
+    var stamps = Object.keys(c.collected_at || {}).map(function (k) { return c.collected_at[k]; }).sort();
+    var cachedLine = c.total
+      ? '<div class="bd-travel">From the Bright Data cache: ' + esc(c.total) + " records (datasets " +
+        esc(c.datasets || 0) + ", Web Unlocker " + esc(c.web_unlocker || 0) + "), collected " +
+        esc(stamps.length ? fmtTime(stamps[0]) + (stamps.length > 1 ? " to " + fmtTime(stamps[stamps.length - 1]) : "") : "unknown") +
+        "</div>"
+      : "";
     $("bd-counter").innerHTML =
       "<b>Records collected through Bright Data: " +
-      esc(u.total || 0) +
+      esc((u.total || 0) + (c.total || 0)) +
       "</b>" +
       ' <span class="bd-detail">' +
       part("datasets", "datasets") +
@@ -2605,6 +2613,7 @@
       " | " +
       part("serp", "SERP API") +
       "</span>" +
+      cachedLine +
       travel;
   }
 

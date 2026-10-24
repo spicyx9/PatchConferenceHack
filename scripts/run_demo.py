@@ -5,15 +5,17 @@ do not exist in the assembled graph. This launcher assembles events/people/compa
 or live public sources), runs the planner agents, loads that bundle into FalkorDB through
 GraphStore, and serves the API on the same ``DemoData`` so API and graph ids match.
 
-Startup never starts a Bright Data collection. Stays and flights are the API fixture by
-default; ``--travel live`` searches them live (w05, w06) with the fixture as visible fallback.
+Startup never starts a Bright Data collection. Stays and flights come from data/cache/
+(normalized records of earlier Bright Data collections, labelled cached with their own
+collected_at) when it exists, else from the API fixture; ``--travel live`` searches them live
+(w05, w06) with the fixture as visible fallback.
 LinkedIn profiles are read from data/probes/linkedin_*.json (< 24 h), written by
 ``make probe-linkedin`` (scripts/probes/linkedin.py); without those files nothing is enriched.
 
 ``--keep-graph`` serves on the graph as it is (no reset, no reload): restarting the API
 process this way keeps what the session wrote to FalkorDB (meetings, skips).
 
-Run: ``uv run python scripts/run_demo.py [--mode fixture|live] [--travel live|fixture] [--graph conferge_demo] [--port 8000] [--keep-graph]``
+Run: ``uv run python scripts/run_demo.py [--mode fixture|live] [--travel cached|live|fixture] [--graph conferge_demo] [--port 8000] [--keep-graph]``
 FalkorDB address: FALKORDB_HOST / FALKORDB_PORT from the env or .env (default 127.0.0.1:6379).
 Startup check: the port must answer GRAPH.LIST; a plain Redis or a closed port stops with one line.
 """
@@ -117,9 +119,10 @@ def main() -> int:
     parser.add_argument("--no-graph", action="store_true", help="serve without loading FalkorDB")
     parser.add_argument("--keep-graph", action="store_true",
                         help="serve on the existing graph without resetting or reloading it")
-    parser.add_argument("--travel", choices=["live", "fixture"], default="fixture",
-                        help="stays/flights: fixture (default: no Bright Data call at startup), "
-                             "or live search with fixture fallback")
+    parser.add_argument("--travel", choices=["cached", "live", "fixture"], default=None,
+                        help="stays/flights: cached (default when data/cache/ has them: earlier "
+                             "Bright Data records, no call at startup), fixture, or live search "
+                             "with fixture fallback")
     parser.add_argument("--travel-timeout", type=float, default=150.0,
                         help="seconds for live stays/flights (Bright Data snapshots are slow)")
     parser.add_argument("--linkedin", choices=["cached", "off"], default="cached",
@@ -150,7 +153,16 @@ def main() -> int:
     t0 = time.perf_counter()
     report = pipeline.E2EReport(mode=args.mode, started_at=datetime.now(timezone.utc))
     slices = asyncio.run(pipeline._collect(args.mode, False, 90.0, None))
-    travel = asyncio.run(collect_stays_flights(args.travel_timeout)) if args.travel == "live" else None
+    from conferge.integration import travel_cache
+
+    if args.travel is None:
+        args.travel = "cached" if travel_cache.available() else "fixture"
+    if args.travel == "live":
+        travel = asyncio.run(collect_stays_flights(args.travel_timeout))
+    elif args.travel == "cached":
+        travel = travel_cache.load()
+    else:
+        travel = None
     usable_slices = pipeline._usable(slices)
     assembly = assemble(usable_slices, travel)
     goals = parse_goals(assembly.demo.demo_goal_text)

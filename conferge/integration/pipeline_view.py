@@ -45,6 +45,7 @@ def row(source: str, report: RunReport, *, fallback: bool = False) -> dict[str, 
     return {
         "source": source, "provider": report.provider, "kind": kind, "brightdata_api": api,
         "records": records, "collected_at": report.finished_at.isoformat(),
+        "cached": report.source_mode == "cached",
         "status": report.status, "termination": report.termination,
         "reason": report.errors[0] if report.errors else None,
         "estimated_cost_usd": estimate,
