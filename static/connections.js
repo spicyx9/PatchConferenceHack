@@ -70,7 +70,7 @@
       ${sources.length?`<h4>Sources</h4>${sources.slice(0,3).map(s=>`<a class="connection-source-link" href="${esc(s.source_url)}" target="_blank" rel="noopener noreferrer">${esc(s.provider)} ↗</a>`).join('')}`:''}</div>`;
   }
   async function focus(id) {
-    const ticket=++request;selected=id;$('connection-clear').hidden=false;$('network-all').hidden=false;
+    const ticket=++request;readySearch();selected=id;$('connection-clear').hidden=false;$('network-all').hidden=false;
     $('graph-detail').textContent='Loading profile…';
     personRows(shown);
     try {
@@ -83,7 +83,7 @@
     } catch(e){if(ticket===request)$('graph-detail').textContent=e.message;}
   }
   async function render() {
-    const ticket=++request;
+    const ticket=++request;readySearch();
     try {
       const data=await api('connections?'+params());
       if(ticket!==request)return;
@@ -92,7 +92,7 @@
       $('connection-results-title').textContent='People';$('connection-clear').hidden=!Object.values(filters).some(Boolean);$('network-all').hidden=!Object.values(filters).some(Boolean);
       $('connection-summary').textContent='';
       $('graph-detail').innerHTML='';personRows(shown);draw(data.graph);
-    }catch(e){$('connection-summary').textContent=e.message;}
+    }catch(e){if(ticket===request)$('connection-summary').textContent=e.message;}
   }
   async function search(event) {
     if(event)event.preventDefault();
@@ -107,7 +107,7 @@
       if(!shown.length)draw({nodes:[],edges:[],backend:'falkordb'});
       if(shown.length){const data=await api('connections?'+params({focus:shown[0].id}));if(ticket===request)draw(data.graph);}
     }catch(e){if(ticket===request)$('connection-summary').textContent=e.message;}
-    finally{busy=false;$('connection-submit').disabled=false;$('connection-submit').innerHTML='Find people <span aria-hidden="true">↗</span>';}
+    finally{if(ticket===request)readySearch();}
   }
   $('connection-results').addEventListener('error',e=>{if(e.target.classList.contains('connection-avatar'))e.target.remove();},true);
   $('connection-search').addEventListener('submit',search);
@@ -118,7 +118,14 @@
   }));
   document.querySelectorAll('[data-connection-query]').forEach(button=>button.addEventListener('click',()=>{$('connection-query').value=button.dataset.connectionQuery;search();}));
   $('connection-results').addEventListener('click',e=>{const b=e.target.closest('[data-person]');if(b)focus(b.dataset.person);});
-  function resetSearch() {Object.keys(filters).forEach(k=>filters[k]='');$('connection-query').value='';render();}
+  function readySearch() {busy=false;$('connection-submit').disabled=false;$('connection-submit').innerHTML='Find people <span aria-hidden="true">↗</span>';}
+  function resetSearch() {
+    scope='all';
+    document.querySelectorAll('[data-connection-scope]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.connectionScope==='all')));
+    Object.keys(filters).forEach(k=>filters[k]='');
+    document.querySelectorAll('.filter-menu').forEach(menu=>menu.open=false);
+    $('connection-query').value='';readySearch();render();
+  }
   Object.keys(filters).forEach(k=>{
     const menu=$('filter-'+k),input=menu.querySelector('input'),summary=menu.querySelector('summary');
     menu.addEventListener('toggle',()=>{if(menu.open){document.querySelectorAll('.filter-menu').forEach(other=>{if(other!==menu)other.open=false;});}});
@@ -127,6 +134,7 @@
     menu.addEventListener('keydown',e=>{if(e.key==='Escape'){menu.open=false;summary.focus();}});
   });
   document.addEventListener('pointerdown',e=>{document.querySelectorAll('.filter-menu[open]').forEach(menu=>{if(!menu.contains(e.target))menu.open=false;});});
+  $('connection-reset').addEventListener('click',resetSearch);
   $('filter-reset').addEventListener('click',resetSearch);
   $('connection-clear').addEventListener('click',resetSearch);
   $('network-all').addEventListener('click',resetSearch);

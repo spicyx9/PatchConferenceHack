@@ -578,7 +578,10 @@
               <button type="button" id="filter-reset" hidden>Reset filters</button></div>
           </div>
           <div class="connection-chat">
-          <label class="connection-query-label" for="connection-query">Ask about your connections</label>
+          <div class="connection-chat-heading">
+            <label class="connection-query-label" for="connection-query">Ask about your connections</label>
+            <button type="button" id="connection-reset" aria-label="Reset network and show all people">↺ Reset network</button>
+          </div>
           <form id="connection-search" class="connection-search">
             <span class="search-spark" aria-hidden="true">✳</span>
             <input id="connection-query" maxlength="1000" minlength="2" required autocomplete="off"
