@@ -27,10 +27,12 @@ async def test_usage_counts_only_successful_responses() -> None:
         {"a": 1}, {"a": 2}, {"error": "Crawler error: Unexpected Status 502 (no_peer)"}]))
     async with httpx.AsyncClient(transport=ok, base_url="https://api.brightdata.com") as http:
         out = await BrightDataClient("k", client=http).scrape_dataset("gd_x", [{"url": "u"}])
-    assert out.status == "ready" and brightdata.usage()["datasets"] == 2
+    assert out.status == "ready" and brightdata.usage()["returned"]["datasets"] == 2
+    assert brightdata.usage()["requests"]["datasets"] == 1  # one call, two data rows
     bad = httpx.MockTransport(lambda r: httpx.Response(401))
     async with httpx.AsyncClient(transport=bad, base_url="https://api.brightdata.com") as http:
         with pytest.raises(BrightDataError, match="HTTP 401"):
             await BrightDataClient("k", client=http, retries=0, unlocker_zone="z").unlock("https://x.test/")
-    assert brightdata.usage() == {"datasets": 2, "web_unlocker": 0, "serp": 0, "total": 2}
+    assert brightdata.usage()["returned"] == {"datasets": 2, "web_unlocker": 0, "serp": 0, "total": 2}
+    assert brightdata.usage()["requests"]["web_unlocker"] == 0  # a 401 is not an answered request
     brightdata.reset_usage()

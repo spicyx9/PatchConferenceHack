@@ -14,8 +14,8 @@ def test_live_discovery_without_serp_zone_is_a_visible_failure(monkeypatch: pyte
 
     monkeypatch.setattr(brightdata.BrightDataClient, "from_env", classmethod(
         lambda cls: cls("key", serp_zone=None, unlocker_zone=None)))
-    reset = brightdata.usage()["serp"]
+    reset = brightdata.usage()["returned"]["serp"]
     slice_ = asyncio.run(sources._live_discovery())
     assert slice_.status == "failed" and slice_.events == []
     assert slice_.errors == ["BRIGHTDATA_SERP_ZONE not configured"]
-    assert brightdata.usage()["serp"] == reset  # nothing counted: nothing was collected
+    assert brightdata.usage()["returned"]["serp"] == reset  # nothing counted: nothing was collected

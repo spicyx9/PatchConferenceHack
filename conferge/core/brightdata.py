@@ -92,9 +92,14 @@ def block_reason(html: str) -> str | None:
 SYNC_TIMEOUT = 75.0
 
 BrightDataApi = Literal["datasets", "web_unlocker", "serp"]
-# Process-wide count of what Bright Data actually returned (successful responses only):
-# dataset rows, Web Unlocker pages, SERP result pages. Shown on the demo home screen.
-_USAGE: dict[str, int] = {"datasets": 0, "web_unlocker": 0, "serp": 0}
+# Process-wide counts of what Bright Data actually returned (successful responses only).
+# ``_RETURNED``: dataset data rows, Web Unlocker pages, SERP result pages. ``_REQUESTS``: calls
+# that got an answer, per API. Shown apart on the demo home screen: one Web Unlocker page can
+# yield 34 itineraries from one request, and billing follows requests, not rows.
+# No USD figure anywhere: no Bright Data response captured so far carried a cost.
+_RETURNED: dict[str, int] = {"datasets": 0, "web_unlocker": 0, "serp": 0}
+_REQUESTS: dict[str, int] = {"datasets": 0, "web_unlocker": 0, "serp": 0}
+RETURNED_UNIT = {"datasets": "rows", "web_unlocker": "pages", "serp": "pages"}
 # Every Bright Data call that got an answer: api, dataset_id, snapshot_id, rows, status, at.
 _CALLS: list[dict[str, Any]] = []
 
@@ -115,11 +120,14 @@ def parse_body(response: httpx.Response) -> Any:
 
 
 def record_usage(api: BrightDataApi, count: int = 1) -> None:
-    _USAGE[api] = _USAGE.get(api, 0) + max(count, 0)
+    """Count what came back: ``count`` dataset rows, or one Web Unlocker / SERP page."""
+    _RETURNED[api] = _RETURNED.get(api, 0) + max(count, 0)
 
 
 def record_call(api: BrightDataApi, *, rows: int, status: str, dataset_id: str | None = None,
                 snapshot_id: str | None = None) -> None:
+    """One answered request to Bright Data (also counted in ``usage()["requests"]``)."""
+    _REQUESTS[api] = _REQUESTS.get(api, 0) + 1
     _CALLS.append({"api": api, "dataset_id": dataset_id, "snapshot_id": snapshot_id,
                    "rows": rows, "status": status,
                    "at": datetime.now(timezone.utc).isoformat()})
@@ -135,13 +143,18 @@ def calls() -> list[dict[str, Any]]:
     return [dict(c) for c in _CALLS]
 
 
-def usage() -> dict[str, int]:
-    return {**_USAGE, "total": sum(_USAGE.values())}
+def usage() -> dict[str, Any]:
+    """``returned`` (dataset rows, Unlocker pages, SERP pages) and ``requests`` per API."""
+    return {"returned": {**_RETURNED, "total": sum(_RETURNED.values())},
+            "requests": {**_REQUESTS, "total": sum(_REQUESTS.values())},
+            "unit": dict(RETURNED_UNIT)}
 
 
 def reset_usage() -> None:
-    for key in _USAGE:
-        _USAGE[key] = 0
+    for key in _RETURNED:
+        _RETURNED[key] = 0
+    for key in _REQUESTS:
+        _REQUESTS[key] = 0
     _CALLS.clear()
 
 
