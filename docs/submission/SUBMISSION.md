@@ -34,13 +34,15 @@ Demo case: GitHub Universe 2026, Fort Mason Center, San Francisco, October 28 an
 | Demo dataset (snapshot of that collection, deduplicated) | 207 events, 183 people |
 | FalkorDB graph | 697 nodes, 2,195 edges (49 HOSTS edges from event organizers), loaded in about 1 s |
 | API response times on the demo graph | goal 61 ms, events 8 ms, people 2 ms, graph path 11 ms, plan 8 ms, simulate-change 26 ms, meeting 17 ms, anti-FOMO agent about 1.1 s |
-| Tests | 926 passing (`make check`) |
+| Tests | 984 passed, 22 skipped (`make check`, main, 2026-10-24) |
 
 ## Links
 
 - Repository: https://github.com/spicyx9/PatchConferenceHack
 - Backup video: `docs/submission/demo-backup.mp4` (and `.webm`)
-- Slides: `docs/submission/slides.html` (arrow keys to navigate)
+- Slides: `docs/submission/slides.html` (7 slides, arrow keys to navigate)
+- Pitch script: `docs/submission/PITCH.md` (3 minutes, timed, with the wifi-down variant)
+- Stage checklist: `docs/submission/CHECKLIST.md`
 
 ## Team
 
