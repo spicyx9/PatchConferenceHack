@@ -211,7 +211,9 @@ class GoogleFlightsUnlockerProvider:
         try:
             rows, collected_at, url = await asyncio.shield(self._pages[key])
         except Exception as exc:  # noqa: BLE001 - refusal, timeout, transport: visible failure
-            return [], self._report(started, "failed", errors=[f"{type(exc).__name__}: {exc}"[:200]])
+            # A bot wall (unlocker_blocked:<pattern>) is degraded with its reason, no offer.
+            status = "degraded" if "unlocker_blocked:" in str(exc) else "failed"
+            return [], self._report(started, status, errors=[f"{type(exc).__name__}: {exc}"[:200]])
         offers, warnings = offers_from_rows(rows, url, collected_at, self.client.unlocker_zone,
                                             origin=origin, destination=destination)
         status = "ok" if offers else "failed"

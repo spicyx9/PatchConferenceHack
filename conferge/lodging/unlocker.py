@@ -129,7 +129,10 @@ class UnlockerHotelsSource:
                 warnings.append(f"{site}: {len(records) - priced} without a price in the HTML "
                                 "for these dates; price left null")
             items.extend(records)
-        status = "ok" if items and not errors else ("degraded" if items else "failed")
+        blocked = [e for e in errors if "unlocker_blocked:" in e]
+        # A bot wall is a degraded source (visible reason), never a stay with an empty price.
+        status = ("ok" if items and not errors else
+                  "degraded" if items or (errors and len(blocked) == len(errors)) else "failed")
         rep = report(PROVIDER, started, status=status,
                      termination="exhausted" if items else "error", source_mode="live",
                      fetched=len(items), unique=len({i.source_id for i in items}),
