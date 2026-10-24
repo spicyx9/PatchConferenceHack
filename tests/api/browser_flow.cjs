@@ -243,7 +243,7 @@ function pass(name) {
       "Travel provider searches retain chosen dates and validate return order without changing collected offers",
     );
     await page.locator("#research-origin").fill("New York");
-    await page.locator("#travel-search-button").click();
+    await page.locator("#travel-show-collected").click();
     await page.waitForFunction(
       () =>
         document

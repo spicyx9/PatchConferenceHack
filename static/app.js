@@ -1350,17 +1350,18 @@
       ? "Destination set from your conference."
       : "Search near the conference. Quoted stays use the guest count above.";
     updateResearchLinks();
-    searchTravel();
+    searchTravel("cached");
   }
   function searchTravel(mode) {
     if (!$("travel-research-form").reportValidity()) return Promise.resolve();
     updateResearchLinks();
     var q = travelQuery();
-    q.mode = mode || "cached";
+    q.mode = mode || "live";
     var sequence = ++travelSearchSequence,
       kind = q.kind;
     $("travel-search-button").disabled = true;
     $("travel-refresh-prices").disabled = true;
+    $("travel-show-collected").disabled = true;
     $("travel-search-button").querySelector("span").textContent = "Searching…";
     $("travel-results-workspace").setAttribute("aria-busy", "true");
     $("travel-search-feedback").textContent = "";
@@ -1392,7 +1393,11 @@
               ? "Freshly collected"
               : "No matching collection";
         $("travel-offer-context").textContent =
-          (bd ? "Bright Data · " : res.items && res.items.length ? "Google Flights · " : "") +
+          (bd
+            ? "Bright Data · "
+            : res.items && res.items.length
+              ? "Google Flights · "
+              : "") +
           provenance +
           (stamp ? " · " + stamp : "") +
           " · " +
@@ -1429,6 +1434,7 @@
         if (sequence !== travelSearchSequence) return;
         $("travel-search-button").disabled = false;
         $("travel-refresh-prices").disabled = false;
+        $("travel-show-collected").disabled = false;
         $("travel-search-button").querySelector("span").textContent = "Search";
         $("travel-results-workspace").setAttribute("aria-busy", "false");
       });
@@ -1451,7 +1457,8 @@
       return new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: currency || "USD",
-        maximumFractionDigits: 0,
+        maximumFractionDigits: 2,
+        minimumFractionDigits: 0,
       }).format(Number(value));
     } catch (e) {
       return value + " " + (currency || "");
@@ -2075,7 +2082,9 @@
       esc(orUnknown(e.confidence)) +
       " | observed at " +
       esc(orUnknown(e.observed_at)) +
-      (e.rationale ? '<br><span class="muted">' + esc(e.rationale) + "</span>" : "")
+      (e.rationale
+        ? '<br><span class="muted">' + esc(e.rationale) + "</span>"
+        : "")
     );
   }
 
@@ -3020,8 +3029,10 @@
                 return entry.id === opportunity.event_id;
               },
             );
-            var evidence = (opportunity.evidence && opportunity.evidence.length
-              ? opportunity.evidence : person.evidence) || [];
+            var evidence =
+              (opportunity.evidence && opportunity.evidence.length
+                ? opportunity.evidence
+                : person.evidence) || [];
             var whyEdges = (card.why && card.why.edges) || [];
             var sources = evidence
               .map(function (entry) {
@@ -3039,10 +3050,17 @@
                   sourceModeBadge(entry.source_mode) +
                   whyEdges
                     .filter(function (w) {
-                      return entry.source_url && (w.evidence_ids || []).indexOf(entry.source_url) >= 0;
+                      return (
+                        entry.source_url &&
+                        (w.evidence_ids || []).indexOf(entry.source_url) >= 0
+                      );
                     })
                     .map(function (w) {
-                      return '<br><span class="muted">' + esc(w.rationale) + "</span>";
+                      return (
+                        '<br><span class="muted">' +
+                        esc(w.rationale) +
+                        "</span>"
+                      );
                     })
                     .join("") +
                   "</li>"
@@ -3098,7 +3116,9 @@
               (card.met
                 ? '<div class="followup" id="followup-' + esc(id) + '"></div>'
                 : "") +
-              '<div class="small-text" id="why-' + esc(id) + '"></div>' +
+              '<div class="small-text" id="why-' +
+              esc(id) +
+              '"></div>' +
               '<div class="people-actions">' +
               '<button class="secondary" data-action="why" data-id="' +
               esc(id) +
@@ -3284,7 +3304,10 @@
       input.onchange = filterTravelResults;
     });
   $("travel-stay-radius").onchange = function () {
-    searchTravel();
+    searchTravel("cached");
+  };
+  $("travel-show-collected").onclick = function () {
+    searchTravel("cached");
   };
   $("travel-refresh-prices").onclick = function () {
     searchTravel("live");
@@ -3387,7 +3410,7 @@
         if (envelopes.travel) renderTravel(envelopes.travel);
         if (!travelAutoSearch && envelopes.conference) {
           travelAutoSearch = true;
-          searchTravel();
+          searchTravel("cached");
         }
         if (envelopes.people) renderPeople(envelopes.people);
         if (lastMapData) renderMap(lastMapData);
@@ -3982,15 +4005,24 @@
     var box = $("pipeline-cost");
     if (!box) return;
     if (!c) {
-      box.innerHTML = '<span class="muted">Bright Data cost counter unavailable.</span>';
+      box.innerHTML =
+        '<span class="muted">Bright Data cost counter unavailable.</span>';
       return;
     }
     var by = c.by_api || {};
     box.innerHTML =
-      "<b>Bright Data, live in this process:</b> " + esc(c.calls) + " calls, $" + esc(c.usd) +
-      ' <span class="muted">(estimate: $' + esc(c.usd_per_call) +
-      " per call, real price not verified)</span> · datasets " + esc(by.datasets || 0) +
-      " · unlocker " + esc(by.unlocker || 0) + " · serp " + esc(by.serp || 0);
+      "<b>Bright Data, live in this process:</b> " +
+      esc(c.calls) +
+      " calls, $" +
+      esc(c.usd) +
+      ' <span class="muted">(estimate: $' +
+      esc(c.usd_per_call) +
+      " per call, real price not verified)</span> · datasets " +
+      esc(by.datasets || 0) +
+      " · unlocker " +
+      esc(by.unlocker || 0) +
+      " · serp " +
+      esc(by.serp || 0);
   }
 
   function renderTimings(t, overall) {
@@ -4008,15 +4040,26 @@
     box.innerHTML =
       "<h3>Durations</h3>" +
       (overall && overall.display
-        ? '<p>Sources overall: <b class="overall-' + esc(overall.display.label) + '">' +
-          esc(overall.display.label) + "</b>: " + esc(overall.display.reason) + "</p>"
+        ? '<p>Sources overall: <b class="overall-' +
+          esc(overall.display.label) +
+          '">' +
+          esc(overall.display.label) +
+          "</b>: " +
+          esc(overall.display.reason) +
+          "</p>"
         : "") +
       '<table class="pipeline-table"><thead><tr><th>Step</th><th>Time</th></tr></thead><tbody>' +
       steps
         .map(function (s) {
           return (
-            "<tr><td>" + esc(s.step) + (s.note ? ' <span class="muted">(' + esc(s.note) + ")</span>" : "") +
-            "</td><td>" + esc(secs(s.seconds)) + "</td></tr>"
+            "<tr><td>" +
+            esc(s.step) +
+            (s.note
+              ? ' <span class="muted">(' + esc(s.note) + ")</span>"
+              : "") +
+            "</td><td>" +
+            esc(secs(s.seconds)) +
+            "</td></tr>"
           );
         })
         .join("") +
@@ -4025,9 +4068,17 @@
       sources
         .map(function (s) {
           return (
-            "<tr><td>" + esc(s.source) + "</td><td>" +
-            esc(s.status === "degraded" ? "partial (not exhausted)" : s.status) + "</td><td>" +
-            esc(s.records) + "</td><td>" + esc(secs(s.seconds)) + "</td></tr>"
+            "<tr><td>" +
+            esc(s.source) +
+            "</td><td>" +
+            esc(
+              s.status === "degraded" ? "partial (not exhausted)" : s.status,
+            ) +
+            "</td><td>" +
+            esc(s.records) +
+            "</td><td>" +
+            esc(secs(s.seconds)) +
+            "</td></tr>"
           );
         })
         .join("") +
@@ -4281,15 +4332,22 @@
               return (
                 "<li>" +
                 (link
-                  ? '<a href="' + esc(link) + '" target="_blank" rel="noopener noreferrer">' +
-                    esc(ev.evidence_id) + "</a>"
+                  ? '<a href="' +
+                    esc(link) +
+                    '" target="_blank" rel="noopener noreferrer">' +
+                    esc(ev.evidence_id) +
+                    "</a>"
                   : esc(ev.evidence_id)) +
                 "</li>"
               );
             })
             .join("");
           whyBox.innerHTML = why.answer
-            ? "<p>" + esc(why.answer) + '</p><ul class="plain-list">' + links + "</ul>"
+            ? "<p>" +
+              esc(why.answer) +
+              '</p><ul class="plain-list">' +
+              links +
+              "</ul>"
             : '<p class="muted">No connection path in the graph for this person.</p>';
         })
         .catch(function (e) {

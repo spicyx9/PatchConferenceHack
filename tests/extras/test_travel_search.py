@@ -125,17 +125,26 @@ async def test_live_flights_use_requested_route_and_preserve_live_provenance(mon
     assert mismatch["count"] == 0 and mismatch["data_source"] == "unknown"
 
 
-async def test_live_stays_missing_credentials_never_substitutes_cache(monkeypatch):
+async def test_live_stays_without_brightdata_attempts_direct_sources_without_cache(monkeypatch):
+    from datetime import datetime, timezone
+    from conferge.core.schemas import DataEnvelope, Lodging
     from conferge.extras import travel_search
     monkeypatch.setattr(travel_search, "env_value", lambda name: None)
+    calls = []
 
-    async def forbidden(q):
-        raise AssertionError("An unconfigured provider must not be contacted")
+    async def direct(q):
+        calls.append(q)
+        return DataEnvelope[Lodging](items=[], source_mode="live", status="failed",
+                                     collected_at=datetime.now(timezone.utc),
+                                     errors=["Direct source returned no matching hotel"])
 
-    monkeypatch.setattr(travel_search, "_run_live_stays", forbidden)
-    result = await travel_search.search_live(query(kind="stays", adults=2, mode="live"))
+    monkeypatch.setattr(travel_search, "_run_live_stays", direct)
+    result = await travel_search.search_live(query(kind="stays", adults=3, rooms=2, mode="live"))
+    assert len(calls) == 1 and calls[0].adults == 3 and calls[0].rooms == 2
     assert not result["items"] and result["status"] == "failed"
-    assert any("not configured" in text for text in result["warnings"])
+    assert result["data_source"] == "unknown"
+    assert any("direct and fallback" in text for text in result["warnings"])
+    assert any("No cached offers" in text for text in result["warnings"])
 
 
 async def test_live_hotel_collection_is_query_bound_and_keeps_actual_price(monkeypatch):

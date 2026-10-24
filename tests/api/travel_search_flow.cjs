@@ -22,19 +22,34 @@ const pass = (name) => {
     assert(r.ok());
     return r.json();
   };
+  const unexpectedLive = [];
+  await page.route("**/api/v1/travel/search", async (route) => {
+    const body = route.request().postDataJSON();
+    if (body.mode === "live") {
+      unexpectedLive.push(body);
+      return route.fulfill({
+        status: 503,
+        contentType: "application/json",
+        body: JSON.stringify({
+          detail: "Unmocked live calls are forbidden in fixture browser tests",
+        }),
+      });
+    }
+    return route.continue();
+  });
   const initialTravel = await getTravel();
   await page.goto(base + "/#travel");
   await page.waitForFunction(
     () =>
       document.querySelector("#main")?.getAttribute("aria-busy") === "false",
   );
-  const search = async () => {
+  const search = async (selector = "#travel-show-collected") => {
     const response = page.waitForResponse(
       (r) =>
         r.url().endsWith("/api/v1/travel/search") &&
         r.request().method() === "POST",
     );
-    await page.locator("#travel-search-button").click();
+    await page.locator(selector).click();
     const r = await response;
     assert(r.ok(), "Travel search HTTP " + r.status());
     const data = await r.json();
@@ -58,6 +73,48 @@ const pass = (name) => {
     flights.items.length,
   );
   pass("Search criteria return 34 collected flight alternatives");
+  assert.match(
+    await page.locator("#travel-offer-context").innerText(),
+    /Collected prices/i,
+  );
+  assert.match(
+    await page.locator("#travel-offer-context").innerText(),
+    /Bright Data|Google Flights/i,
+  );
+  let liveRequest;
+  const mockLive = async (route) => {
+    const body = route.request().postDataJSON();
+    assert.equal(body.mode, "live");
+    liveRequest = body;
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        kind: body.kind,
+        query: body,
+        items: [],
+        data_source: "unknown",
+        status: "failed",
+        warnings: ["Test provider unavailable"],
+        fallback_url: "https://www.google.com/travel/flights",
+      }),
+    });
+  };
+  await page.route("**/api/v1/travel/search", mockLive);
+  await search("#travel-search-button");
+  assert.equal(liveRequest.mode, "live");
+  assert.equal(await page.locator("#flights .travel-offer").count(), 0);
+  assert.match(
+    await page.locator("#travel-search-feedback").innerText(),
+    /Test provider unavailable/,
+  );
+  await page.unroute("**/api/v1/travel/search", mockLive);
+  const restored = await search("#travel-use-collected");
+  assert.equal(restored.items.length, 34);
+  assert.equal(await page.locator("#flights .travel-offer").count(), 34);
+  pass(
+    "Search requests live prices; explicit provider failure clears cards; collected action restores actual cache",
+  );
   await page.locator("#flight-sort").selectOption("price");
   const prices = await page
     .locator("#flights .flight-fare > strong")
@@ -88,6 +145,14 @@ const pass = (name) => {
     0,
     "Editing query clears stale cards",
   );
+  await page.locator("#travel-max-price").fill("1000");
+  await page.locator('input[name="travel-stops"][value="0"]').check();
+  assert.equal(
+    await page.locator("#flights .travel-offer").count(),
+    0,
+    "Filters cannot resurrect stale origin results",
+  );
+  await page.locator("#travel-clear-filters").click();
   const paris = await search();
   assert.equal(paris.items.length, 0);
   assert.equal(await page.locator("#flights .travel-offer").count(), 0);
@@ -100,6 +165,17 @@ const pass = (name) => {
     "Explicit external search fallback",
   );
   pass("Changed origin removes old offers and provides a truthful fallback");
+  await page.locator("#research-origin").fill("New York");
+  await page.locator("#flight-type").selectOption("one_way");
+  const oneWay = await search();
+  assert.equal(
+    oneWay.items.length,
+    0,
+    "Collected round trip cannot satisfy a one-way request",
+  );
+  assert.equal(await page.locator("#flights .travel-offer").count(), 0);
+  await page.locator("#flight-type").selectOption("round_trip");
+  pass("One-way criteria do not reuse round-trip quotes");
   await page.locator("#travel-stays-tab").click();
   await page.waitForFunction(
     () => !document.querySelector("#travel-search-button").disabled,
@@ -115,7 +191,25 @@ const pass = (name) => {
     stays.items.every((x) => x.total_price != null),
     "Real stay totals",
   );
-  pass("Stays return actual priced offers for matching two-adult occupancy");
+  const mappedStays = stays.items.filter(
+    (x) =>
+      typeof x.venue?.latitude === "number" &&
+      typeof x.venue?.longitude === "number",
+  );
+  assert(mappedStays.length > 0, "Collected hotels have source coordinates");
+  for (const stay of mappedStays) {
+    const marker = page
+      .locator("[data-travel-place]")
+      .filter({ hasText: stay.name });
+    assert.equal(
+      await marker.count(),
+      1,
+      "Actual hotel appears in synchronized map list: " + stay.name,
+    );
+  }
+  pass(
+    "Stays return actual priced offers for matching two-adult occupancy and map the hotels",
+  );
   await page.locator("#research-adults").selectOption("1");
   const solo = await search();
   assert.equal(
@@ -124,7 +218,16 @@ const pass = (name) => {
     "No reuse of two-adult price for one adult",
   );
   assert.equal(await page.locator("#stays .trip-stay").count(), 0);
-  pass("Occupancy mismatch clears stay quotes");
+  for (const stay of mappedStays)
+    assert.equal(
+      await page
+        .locator("[data-travel-place]")
+        .filter({ hasText: stay.name })
+        .count(),
+      0,
+      "Stale hotel removed from map",
+    );
+  pass("Occupancy mismatch clears stay quotes and their map options");
   await page.locator("#research-return").fill("2026-10-26");
   assert.equal(
     await page
@@ -204,6 +307,11 @@ const pass = (name) => {
     finalTravel.budget,
     initialTravel.budget,
     "Search must not mutate budget",
+  );
+  assert.deepEqual(
+    unexpectedLive,
+    [],
+    "Only the explicitly mocked Search may request live mode",
   );
   assert.deepEqual(errors, []);
   pass(

@@ -800,6 +800,32 @@
   color: #65594e;
   letter-spacing: 0;
 }
-#tab-travel .travel-category button,#tab-travel #travel-search-hint,#tab-travel .travel-filter-note,#tab-travel #flight-result-count,#tab-travel #stay-result-count,#tab-travel .travel-search-empty p,#tab-travel .flight-time span,#tab-travel .flight-duration small,#tab-travel .flight-caption,#tab-travel .flight-fare>span{color:#6d6259}
-#tab-travel .travel-category button[aria-selected=true]{color:#22201f}
-#tab-travel .travel-place-row strong{color:#34302d}
+#tab-travel .travel-category button,
+#tab-travel #travel-search-hint,
+#tab-travel .travel-filter-note,
+#tab-travel #flight-result-count,
+#tab-travel #stay-result-count,
+#tab-travel .travel-search-empty p,
+#tab-travel .flight-time span,
+#tab-travel .flight-duration small,
+#tab-travel .flight-caption,
+#tab-travel .flight-fare > span {
+  color: #6d6259;
+}
+#tab-travel .travel-category button[aria-selected="true"] {
+  color: #22201f;
+}
+#tab-travel .travel-place-row strong {
+  color: #34302d;
+}
+@media (max-width: 650px) {
+  .travel-prices-bar {
+    flex-wrap: wrap;
+  }
+  .travel-prices-bar #travel-offer-context {
+    flex-basis: 100%;
+  }
+  #travel-refresh-prices {
+    margin-left: auto;
+  }
+}

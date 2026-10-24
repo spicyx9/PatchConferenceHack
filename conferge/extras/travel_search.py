@@ -239,8 +239,7 @@ async def search_live(query: TravelSearch) -> dict:
             warnings.append("Hotel search currently covers San Francisco near Fort Mason. Search the provider for another destination.")
             return result
         if not env_value("BRIGHTDATA_API_KEY"):
-            warnings.append("Live hotel collection is not configured. Search the provider or use previously collected offers.")
-            return result
+            warnings.append("Bright Data is not configured; direct and fallback hotel sources will be attempted.")
     elif not (_airports(query.origin) and _airports(query.destination)):
         result["supported"] = False
         warnings.append("Choose a supported departure and destination airport or search with the provider.")
