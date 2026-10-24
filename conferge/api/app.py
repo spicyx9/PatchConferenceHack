@@ -290,6 +290,7 @@ def create_app(
                        "collected_at": s.collected_at.isoformat(), "warnings": s.warnings}
                 for name, s in state.data.domains.items()
             },
+            "badge": logic.source_badge(state.data.domains),
             "providers": [vars(s) for s in state.providers.statuses],
         })
 

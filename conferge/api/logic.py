@@ -544,6 +544,34 @@ def _sum_known(values: list[Any]) -> str | None:
     return str(sum(Decimal(str(v)) for v in values))
 
 
+CORE_DOMAINS = ("conference", "events", "people", "companies")
+TRAVEL_DOMAINS = ("stays", "flights")
+_MODE_LABEL = {"fixture": "Sample data", "live": "Live data", "cached": "Cached data",
+               "mixed": "Mixed sources", "unknown": "Sources need verification"}
+_TRAVEL_LABEL = {"fixture": "sample travel", "live": "live travel", "cached": "cached travel",
+                 "mixed": "mixed travel"}
+
+
+def _single_mode(modes: set[str]) -> str:
+    return modes.pop() if len(modes) == 1 else ("mixed" if modes else "unknown")
+
+
+def source_badge(domains: dict[str, Any]) -> dict[str, Any]:
+    """The provenance badge: the conference data's mode, with travel named apart when it differs.
+
+    Events, people and the conference are what the demo is judged on; stays and flights can be
+    live through Bright Data while the rest is the October 24 snapshot. "Mixed sources" would
+    hide that, so the badge reads "Sample data, live travel" instead and keeps the core mode's
+    colour. "Mixed sources" is kept for core domains that really disagree with each other.
+    """
+    core = _single_mode({domains[d].source_mode for d in CORE_DOMAINS if d in domains})
+    travel = _single_mode({domains[d].source_mode for d in TRAVEL_DOMAINS if d in domains})
+    label = _MODE_LABEL[core]
+    if travel != "unknown" and travel != core and core != "unknown":
+        label += f", {_TRAVEL_LABEL[travel]}"
+    return {"mode": core, "core_mode": core, "travel_mode": travel, "label": label}
+
+
 def travel_map(data: DemoData, plan: dict[str, Any]) -> dict[str, Any]:
     conf = data.conference
     markers = []

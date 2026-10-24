@@ -507,11 +507,19 @@
       mixed: "Mixed sources",
       unknown: "Sources need verification",
     };
+    // The API decides the badge: conference data's mode, travel named apart when it differs
+    // ("Sample data, live travel"), so live flights never turn the snapshot into "Mixed sources".
+    var apiBadge = envelopes.sources && envelopes.sources.badge;
+    var label = labels[mode] || labels.unknown;
+    if (apiBadge && apiBadge.label) {
+      mode = apiBadge.core_mode || mode;
+      label = apiBadge.label;
+    }
     var badge = $("badge-source");
     badge.className =
       "badge " +
       (mode === "fixture" ? "fixture" : mode === "live" ? "live" : "neutral");
-    badge.textContent = labels[mode] || labels.unknown;
+    badge.textContent = label;
     badge.title = "Record sources, separate from the ranking engine";
     var st = $("badge-status");
     st.className = "badge " + (worst || "neutral");
