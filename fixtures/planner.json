@@ -1,0 +1,614 @@
+{
+  "fixture_version": 1,
+  "source_mode": "fixture",
+  "generated_by": "w09-planner (hand-written)",
+  "disclaimer": "Fictional, deterministic planner test context. Every person, venue and event is invented and labelled fixture; URLs use the reserved .invalid TLD. Not collected from any provider; never present as live.",
+  "collected_at": "2026-10-24T09:00:00Z",
+  "goal_text": "Founder of an AI dev tool going to GitHub Universe to meet seed investors, AI agent founders and Copilot PMs.",
+  "context": {
+    "conference": {
+      "id": "fx-conf",
+      "name": "Fixture conference modelled on GitHub Universe 2026",
+      "start_date": "2026-10-28",
+      "end_date": "2026-10-29",
+      "city": "San Francisco",
+      "venue_name": "Fort Mason Center (fixture)",
+      "timezone": "America/Los_Angeles",
+      "latitude": 37.806,
+      "longitude": -122.432,
+      "topics": [
+        "AI agents",
+        "developer tools",
+        "Copilot",
+        "MCP"
+      ],
+      "evidence": [
+        {
+          "provider": "planner-fixture",
+          "source_mode": "fixture",
+          "source_url": "https://fixture.conferge.invalid/conference/fx-conf",
+          "collected_at": "2026-10-24T09:00:00Z",
+          "raw_ref": "fixtures/planner.json#conference/fx-conf",
+          "source_record_id": "conference/fx-conf",
+          "confidence": 1.0
+        }
+      ]
+    },
+    "goals": [],
+    "data_mode": "fixture",
+    "user_id": "fx-user",
+    "events": [
+      {
+        "id": "fx-s-agent-infra",
+        "title": "Fixture talk: agent infrastructure",
+        "event_type": "session",
+        "start_at": "2026-10-28T10:00:00-07:00",
+        "end_at": "2026-10-28T10:45:00-07:00",
+        "timezone": "America/Los_Angeles",
+        "venue": {
+          "name": "Fort Mason Center (fixture)",
+          "city": "San Francisco",
+          "latitude": 37.806,
+          "longitude": -122.432,
+          "coordinate_precision": "exact"
+        },
+        "room": "Room A (fixture)",
+        "speaker_ids": [
+          "fx-p-founder-ana"
+        ],
+        "topics": [
+          "AI agents",
+          "MCP"
+        ],
+        "status": "scheduled",
+        "conference_relation": "official",
+        "relation_score": 1.0,
+        "relation_evidence": [
+          "fixture: listed in fictional program"
+        ],
+        "conference_id": "fx-conf",
+        "evidence": [
+          {
+            "provider": "planner-fixture",
+            "source_mode": "fixture",
+            "source_url": "https://fixture.conferge.invalid/events/fx-s-agent-infra",
+            "collected_at": "2026-10-24T09:00:00Z",
+            "raw_ref": "fixtures/planner.json#events/fx-s-agent-infra",
+            "source_record_id": "events/fx-s-agent-infra",
+            "confidence": 1.0
+          }
+        ]
+      },
+      {
+        "id": "fx-s-seed-panel",
+        "title": "Fixture panel: seed rounds for devtools",
+        "event_type": "session",
+        "start_at": "2026-10-28T11:00:00-07:00",
+        "end_at": "2026-10-28T11:45:00-07:00",
+        "timezone": "America/Los_Angeles",
+        "venue": {
+          "name": "Fort Mason Center (fixture)",
+          "city": "San Francisco",
+          "latitude": 37.806,
+          "longitude": -122.432,
+          "coordinate_precision": "exact"
+        },
+        "room": "Room B (fixture)",
+        "speaker_ids": [
+          "fx-p-inv-bo"
+        ],
+        "topics": [
+          "developer tools"
+        ],
+        "status": "scheduled",
+        "conference_relation": "official",
+        "relation_score": 1.0,
+        "relation_evidence": [
+          "fixture: listed in fictional program"
+        ],
+        "conference_id": "fx-conf",
+        "evidence": [
+          {
+            "provider": "planner-fixture",
+            "source_mode": "fixture",
+            "source_url": "https://fixture.conferge.invalid/events/fx-s-seed-panel",
+            "collected_at": "2026-10-24T09:00:00Z",
+            "raw_ref": "fixtures/planner.json#events/fx-s-seed-panel",
+            "source_record_id": "events/fx-s-seed-panel",
+            "confidence": 1.0
+          }
+        ]
+      },
+      {
+        "id": "fx-side-agents-night",
+        "title": "Fixture side event: agents night",
+        "event_type": "party",
+        "start_at": "2026-10-28T18:30:00-07:00",
+        "end_at": "2026-10-28T21:00:00-07:00",
+        "timezone": "America/Los_Angeles",
+        "venue": {
+          "name": "Pier Loft (fixture)",
+          "city": "San Francisco",
+          "latitude": 37.7955,
+          "longitude": -122.3937,
+          "coordinate_precision": "approximate"
+        },
+        "organizer_ids": [
+          "fx-p-founder-cy"
+        ],
+        "topics": [
+          "AI agents"
+        ],
+        "status": "scheduled",
+        "conference_relation": "candidate",
+        "relation_score": 0.7,
+        "relation_evidence": [
+          "fixture: same dates and city"
+        ],
+        "conference_id": "fx-conf",
+        "is_free": true,
+        "evidence": [
+          {
+            "provider": "planner-fixture",
+            "source_mode": "fixture",
+            "source_url": "https://fixture.conferge.invalid/events/fx-side-agents-night",
+            "collected_at": "2026-10-24T09:00:00Z",
+            "raw_ref": "fixtures/planner.json#events/fx-side-agents-night",
+            "source_record_id": "events/fx-side-agents-night",
+            "confidence": 0.7
+          }
+        ]
+      },
+      {
+        "id": "fx-side-vc-dinner",
+        "title": "Fixture side event: devtools VC dinner",
+        "event_type": "meetup",
+        "start_at": "2026-10-28T19:00:00-07:00",
+        "end_at": "2026-10-28T21:30:00-07:00",
+        "timezone": "America/Los_Angeles",
+        "venue": {
+          "name": "Mission Table (fixture)",
+          "city": "San Francisco",
+          "latitude": 37.7599,
+          "longitude": -122.4148,
+          "coordinate_precision": "approximate"
+        },
+        "organizer_ids": [
+          "fx-p-inv-di"
+        ],
+        "topics": [
+          "developer tools"
+        ],
+        "status": "scheduled",
+        "conference_relation": "confirmed_side_event",
+        "relation_score": 0.9,
+        "relation_evidence": [
+          "fixture: organizer page names the conference"
+        ],
+        "conference_id": "fx-conf",
+        "price_min": "40",
+        "price_max": "40",
+        "currency": "USD",
+        "is_free": false,
+        "evidence": [
+          {
+            "provider": "planner-fixture",
+            "source_mode": "fixture",
+            "source_url": "https://fixture.conferge.invalid/events/fx-side-vc-dinner",
+            "collected_at": "2026-10-24T09:00:00Z",
+            "raw_ref": "fixtures/planner.json#events/fx-side-vc-dinner",
+            "source_record_id": "events/fx-side-vc-dinner",
+            "confidence": 0.9
+          }
+        ]
+      },
+      {
+        "id": "fx-side-untimed",
+        "title": "Fixture side event: time not published",
+        "event_type": "meetup",
+        "topics": [
+          "AI agents"
+        ],
+        "status": "scheduled",
+        "conference_relation": "candidate",
+        "relation_score": 0.8,
+        "relation_evidence": [
+          "fixture: same city"
+        ],
+        "conference_id": "fx-conf",
+        "evidence": [
+          {
+            "provider": "planner-fixture",
+            "source_mode": "fixture",
+            "source_url": "https://fixture.conferge.invalid/events/fx-side-untimed",
+            "collected_at": "2026-10-24T09:00:00Z",
+            "raw_ref": "fixtures/planner.json#events/fx-side-untimed",
+            "source_record_id": "events/fx-side-untimed",
+            "confidence": 0.6
+          }
+        ]
+      },
+      {
+        "id": "fx-side-cancelled",
+        "title": "Fixture side event: cancelled mixer",
+        "event_type": "party",
+        "start_at": "2026-10-29T18:00:00-07:00",
+        "end_at": "2026-10-29T20:00:00-07:00",
+        "topics": [
+          "AI agents"
+        ],
+        "status": "cancelled",
+        "conference_relation": "candidate",
+        "relation_score": 0.8,
+        "relation_evidence": [
+          "fixture"
+        ],
+        "conference_id": "fx-conf",
+        "evidence": [
+          {
+            "provider": "planner-fixture",
+            "source_mode": "fixture",
+            "source_url": "https://fixture.conferge.invalid/events/fx-side-cancelled",
+            "collected_at": "2026-10-24T09:00:00Z",
+            "raw_ref": "fixtures/planner.json#events/fx-side-cancelled",
+            "source_record_id": "events/fx-side-cancelled",
+            "confidence": 0.8
+          }
+        ]
+      },
+      {
+        "id": "fx-side-weak",
+        "title": "Fixture side event: weakly related crypto meetup",
+        "event_type": "meetup",
+        "start_at": "2026-10-29T12:00:00-07:00",
+        "end_at": "2026-10-29T13:00:00-07:00",
+        "topics": [
+          "crypto"
+        ],
+        "status": "scheduled",
+        "conference_relation": "candidate",
+        "relation_score": 0.2,
+        "relation_evidence": [
+          "fixture"
+        ],
+        "conference_id": "fx-conf",
+        "evidence": [
+          {
+            "provider": "planner-fixture",
+            "source_mode": "fixture",
+            "source_url": "https://fixture.conferge.invalid/events/fx-side-weak",
+            "collected_at": "2026-10-24T09:00:00Z",
+            "raw_ref": "fixtures/planner.json#events/fx-side-weak",
+            "source_record_id": "events/fx-side-weak",
+            "confidence": 0.4
+          }
+        ]
+      },
+      {
+        "id": "fx-s-copilot",
+        "title": "Fixture talk: Copilot extensions roadmap",
+        "event_type": "session",
+        "start_at": "2026-10-29T14:00:00-07:00",
+        "end_at": "2026-10-29T14:45:00-07:00",
+        "timezone": "America/Los_Angeles",
+        "venue": {
+          "name": "Fort Mason Center (fixture)",
+          "city": "San Francisco",
+          "latitude": 37.806,
+          "longitude": -122.432,
+          "coordinate_precision": "exact"
+        },
+        "room": "Room C (fixture)",
+        "speaker_ids": [
+          "fx-p-pm-eve"
+        ],
+        "topics": [
+          "Copilot",
+          "MCP"
+        ],
+        "status": "scheduled",
+        "conference_relation": "official",
+        "relation_score": 1.0,
+        "relation_evidence": [
+          "fixture: listed in fictional program"
+        ],
+        "conference_id": "fx-conf",
+        "evidence": [
+          {
+            "provider": "planner-fixture",
+            "source_mode": "fixture",
+            "source_url": "https://fixture.conferge.invalid/events/fx-s-copilot",
+            "collected_at": "2026-10-24T09:00:00Z",
+            "raw_ref": "fixtures/planner.json#events/fx-s-copilot",
+            "source_record_id": "events/fx-s-copilot",
+            "confidence": 1.0
+          }
+        ]
+      }
+    ],
+    "people": [
+      {
+        "id": "fx-p-inv-bo",
+        "name": "Bo Fixturely (fictional)",
+        "roles": [
+          "investor"
+        ],
+        "title": "Partner",
+        "company_id": "fx-co-acorn",
+        "topics": [
+          "developer tools",
+          "AI agents"
+        ],
+        "participation": "confirmed_speaker",
+        "event_ids": [
+          "fx-s-seed-panel",
+          "fx-side-agents-night"
+        ],
+        "bio": "Fictional fixture persona, not a real person.",
+        "evidence": [
+          {
+            "provider": "planner-fixture",
+            "source_mode": "fixture",
+            "source_url": "https://fixture.conferge.invalid/people/fx-p-inv-bo",
+            "collected_at": "2026-10-24T09:00:00Z",
+            "raw_ref": "fixtures/planner.json#people/fx-p-inv-bo",
+            "source_record_id": "people/fx-p-inv-bo",
+            "confidence": 1.0
+          }
+        ]
+      },
+      {
+        "id": "fx-p-inv-di",
+        "name": "Di Sampleton (fictional)",
+        "roles": [
+          "investor"
+        ],
+        "title": "Principal",
+        "company_id": "fx-co-birch",
+        "topics": [
+          "developer tools"
+        ],
+        "participation": "confirmed_organizer",
+        "event_ids": [
+          "fx-side-vc-dinner"
+        ],
+        "bio": "Fictional fixture persona, not a real person.",
+        "evidence": [
+          {
+            "provider": "planner-fixture",
+            "source_mode": "fixture",
+            "source_url": "https://fixture.conferge.invalid/people/fx-p-inv-di",
+            "collected_at": "2026-10-24T09:00:00Z",
+            "raw_ref": "fixtures/planner.json#people/fx-p-inv-di",
+            "source_record_id": "people/fx-p-inv-di",
+            "confidence": 1.0
+          }
+        ]
+      },
+      {
+        "id": "fx-p-inv-gil",
+        "name": "Gil Placeholder (fictional)",
+        "roles": [
+          "investor"
+        ],
+        "title": "Associate",
+        "company_id": "fx-co-acorn",
+        "topics": [
+          "developer tools"
+        ],
+        "participation": "public_attendee_listing",
+        "event_ids": [
+          "fx-side-agents-night"
+        ],
+        "bio": "Fictional fixture persona, not a real person.",
+        "evidence": [
+          {
+            "provider": "planner-fixture",
+            "source_mode": "fixture",
+            "source_url": "https://fixture.conferge.invalid/people/fx-p-inv-gil",
+            "collected_at": "2026-10-24T09:00:00Z",
+            "raw_ref": "fixtures/planner.json#people/fx-p-inv-gil",
+            "source_record_id": "people/fx-p-inv-gil",
+            "confidence": 0.6
+          }
+        ]
+      },
+      {
+        "id": "fx-p-founder-ana",
+        "name": "Ana Mockwell (fictional)",
+        "roles": [
+          "founder"
+        ],
+        "title": "Founder",
+        "company_id": "fx-co-cedar",
+        "topics": [
+          "AI agents",
+          "MCP"
+        ],
+        "participation": "confirmed_speaker",
+        "event_ids": [
+          "fx-s-agent-infra"
+        ],
+        "bio": "Fictional fixture persona, not a real person.",
+        "evidence": [
+          {
+            "provider": "planner-fixture",
+            "source_mode": "fixture",
+            "source_url": "https://fixture.conferge.invalid/people/fx-p-founder-ana",
+            "collected_at": "2026-10-24T09:00:00Z",
+            "raw_ref": "fixtures/planner.json#people/fx-p-founder-ana",
+            "source_record_id": "people/fx-p-founder-ana",
+            "confidence": 1.0
+          }
+        ]
+      },
+      {
+        "id": "fx-p-founder-cy",
+        "name": "Cy Stubbs (fictional)",
+        "roles": [
+          "founder"
+        ],
+        "title": "Co-founder",
+        "company_id": "fx-co-dune",
+        "topics": [
+          "AI agents"
+        ],
+        "participation": "confirmed_organizer",
+        "event_ids": [
+          "fx-side-agents-night"
+        ],
+        "bio": "Fictional fixture persona, not a real person.",
+        "evidence": [
+          {
+            "provider": "planner-fixture",
+            "source_mode": "fixture",
+            "source_url": "https://fixture.conferge.invalid/people/fx-p-founder-cy",
+            "collected_at": "2026-10-24T09:00:00Z",
+            "raw_ref": "fixtures/planner.json#people/fx-p-founder-cy",
+            "source_record_id": "people/fx-p-founder-cy",
+            "confidence": 1.0
+          }
+        ]
+      },
+      {
+        "id": "fx-p-pm-eve",
+        "name": "Eve Dummond (fictional)",
+        "roles": [
+          "pm"
+        ],
+        "title": "Product Manager, Copilot",
+        "company_id": "fx-co-elm",
+        "topics": [
+          "Copilot",
+          "MCP"
+        ],
+        "participation": "confirmed_speaker",
+        "event_ids": [
+          "fx-s-copilot"
+        ],
+        "bio": "Fictional fixture persona, not a real person.",
+        "evidence": [
+          {
+            "provider": "planner-fixture",
+            "source_mode": "fixture",
+            "source_url": "https://fixture.conferge.invalid/people/fx-p-pm-eve",
+            "collected_at": "2026-10-24T09:00:00Z",
+            "raw_ref": "fixtures/planner.json#people/fx-p-pm-eve",
+            "source_record_id": "people/fx-p-pm-eve",
+            "confidence": 1.0
+          }
+        ]
+      },
+      {
+        "id": "fx-p-eng-hal",
+        "name": "Hal Testa (fictional)",
+        "roles": [
+          "engineer"
+        ],
+        "title": "Staff Engineer",
+        "company_id": "fx-co-fir",
+        "topics": [
+          "kubernetes"
+        ],
+        "participation": "relevant_candidate",
+        "event_ids": [],
+        "bio": "Fictional fixture persona, not a real person.",
+        "evidence": [
+          {
+            "provider": "planner-fixture",
+            "source_mode": "fixture",
+            "source_url": "https://fixture.conferge.invalid/people/fx-p-eng-hal",
+            "collected_at": "2026-10-24T09:00:00Z",
+            "raw_ref": "fixtures/planner.json#people/fx-p-eng-hal",
+            "source_record_id": "people/fx-p-eng-hal",
+            "confidence": 0.5
+          }
+        ]
+      },
+      {
+        "id": "fx-p-title-only",
+        "name": "Ira Titled (fictional)",
+        "roles": [],
+        "title": "General Partner",
+        "company_id": "fx-co-grove",
+        "topics": [
+          "developer tools"
+        ],
+        "participation": "unknown",
+        "event_ids": [],
+        "bio": "Fictional fixture persona, not a real person.",
+        "evidence": [
+          {
+            "provider": "planner-fixture",
+            "source_mode": "fixture",
+            "source_url": "https://fixture.conferge.invalid/people/fx-p-title-only",
+            "collected_at": "2026-10-24T09:00:00Z",
+            "raw_ref": "fixtures/planner.json#people/fx-p-title-only",
+            "source_record_id": "people/fx-p-title-only",
+            "confidence": 0.5
+          }
+        ]
+      }
+    ],
+    "budget_usd": "2500",
+    "constraints": {}
+  },
+  "expected": {
+    "note": "Output of PlannerAgent(people_limit=None) with constraints.goal_text; regression target for tests/planner and fallback plan for the API.",
+    "goal_ids": [
+      "goal-seed-investors",
+      "goal-founder",
+      "goal-pm"
+    ],
+    "goal_weights": [
+      0.45,
+      0.35,
+      0.2
+    ],
+    "people_ranking": [
+      "fx-p-inv-bo",
+      "fx-p-inv-di",
+      "fx-p-founder-ana",
+      "fx-p-founder-cy",
+      "fx-p-pm-eve",
+      "fx-p-inv-gil",
+      "fx-p-title-only"
+    ],
+    "presence": {
+      "fx-p-inv-bo": "confirmed",
+      "fx-p-inv-di": "confirmed",
+      "fx-p-founder-ana": "confirmed",
+      "fx-p-founder-cy": "confirmed",
+      "fx-p-pm-eve": "confirmed",
+      "fx-p-inv-gil": "probable",
+      "fx-p-title-only": "unknown"
+    },
+    "excluded_non_targets": [
+      "fx-p-eng-hal"
+    ],
+    "plan": {
+      "days": [
+        {
+          "date": "2026-10-28",
+          "event_ids": [
+            "fx-s-agent-infra",
+            "fx-s-seed-panel",
+            "fx-side-agents-night"
+          ]
+        },
+        {
+          "date": "2026-10-29",
+          "event_ids": [
+            "fx-s-copilot"
+          ]
+        }
+      ],
+      "rejected": {
+        "fx-side-cancelled": "status cancelled",
+        "fx-side-untimed": "start or end time unknown; not scheduled",
+        "fx-side-vc-dinner": "overlaps 'Fixture side event: agents night' (score 64.2)",
+        "fx-side-weak": "candidate side event with relation_score 0.2 < 0.5"
+      }
+    }
+  }
+}

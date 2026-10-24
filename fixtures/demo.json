@@ -1,0 +1,2378 @@
+{
+  "collected_at": "2026-10-23T12:00:00+00:00",
+  "companies": {
+    "collected_at": "2026-10-23T12:00:00Z",
+    "errors": [],
+    "items": [
+      {
+        "categories": [
+          "fictional-demo",
+          "seed"
+        ],
+        "domain": null,
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#companies/co-lanternseed",
+            "source_mode": "fixture",
+            "source_record_id": "co-lanternseed",
+            "source_url": "https://demo.conferge.invalid/companies/co-lanternseed"
+          }
+        ],
+        "id": "co-lanternseed",
+        "industry": "venture capital",
+        "is_investor": true,
+        "linkedin_url": null,
+        "name": "Lanternseed Ventures"
+      },
+      {
+        "categories": [
+          "fictional-demo",
+          "seed"
+        ],
+        "domain": null,
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#companies/co-quarry-capital",
+            "source_mode": "fixture",
+            "source_record_id": "co-quarry-capital",
+            "source_url": "https://demo.conferge.invalid/companies/co-quarry-capital"
+          }
+        ],
+        "id": "co-quarry-capital",
+        "industry": "venture capital",
+        "is_investor": true,
+        "linkedin_url": null,
+        "name": "Quarry Lane Capital"
+      },
+      {
+        "categories": [
+          "fictional-demo",
+          "pre-seed"
+        ],
+        "domain": null,
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#companies/co-tidepool",
+            "source_mode": "fixture",
+            "source_record_id": "co-tidepool",
+            "source_url": "https://demo.conferge.invalid/companies/co-tidepool"
+          }
+        ],
+        "id": "co-tidepool",
+        "industry": "venture capital",
+        "is_investor": true,
+        "linkedin_url": null,
+        "name": "Tidepool Partners"
+      },
+      {
+        "categories": [
+          "fictional-demo",
+          "ai agents"
+        ],
+        "domain": null,
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#companies/co-orbitloop",
+            "source_mode": "fixture",
+            "source_record_id": "co-orbitloop",
+            "source_url": "https://demo.conferge.invalid/companies/co-orbitloop"
+          }
+        ],
+        "id": "co-orbitloop",
+        "industry": "software",
+        "is_investor": false,
+        "linkedin_url": null,
+        "name": "Orbitloop Agents"
+      },
+      {
+        "categories": [
+          "fictional-demo",
+          "developer tools"
+        ],
+        "domain": null,
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#companies/co-patchwork",
+            "source_mode": "fixture",
+            "source_record_id": "co-patchwork",
+            "source_url": "https://demo.conferge.invalid/companies/co-patchwork"
+          }
+        ],
+        "id": "co-patchwork",
+        "industry": "software",
+        "is_investor": false,
+        "linkedin_url": null,
+        "name": "Patchwork Labs"
+      },
+      {
+        "categories": [
+          "fictional-demo",
+          "mcp"
+        ],
+        "domain": null,
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#companies/co-kiteframe",
+            "source_mode": "fixture",
+            "source_record_id": "co-kiteframe",
+            "source_url": "https://demo.conferge.invalid/companies/co-kiteframe"
+          }
+        ],
+        "id": "co-kiteframe",
+        "industry": "software",
+        "is_investor": false,
+        "linkedin_url": null,
+        "name": "Kiteframe"
+      },
+      {
+        "categories": [
+          "fictional-demo",
+          "copilot"
+        ],
+        "domain": null,
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#companies/co-wingmate",
+            "source_mode": "fixture",
+            "source_record_id": "co-wingmate",
+            "source_url": "https://demo.conferge.invalid/companies/co-wingmate"
+          }
+        ],
+        "id": "co-wingmate",
+        "industry": "software",
+        "is_investor": false,
+        "linkedin_url": null,
+        "name": "Wingmate Labs"
+      },
+      {
+        "categories": [
+          "fictional-demo",
+          "infrastructure"
+        ],
+        "domain": null,
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#companies/co-hollowbyte",
+            "source_mode": "fixture",
+            "source_record_id": "co-hollowbyte",
+            "source_url": "https://demo.conferge.invalid/companies/co-hollowbyte"
+          }
+        ],
+        "id": "co-hollowbyte",
+        "industry": "software",
+        "is_investor": false,
+        "linkedin_url": null,
+        "name": "Hollowbyte"
+      }
+    ],
+    "reports": [
+      {
+        "errors": [],
+        "expected_count": null,
+        "fetched_count": 8,
+        "finished_at": "2026-10-23T12:00:00Z",
+        "pages": 0,
+        "provider": "conferge-demo-seed",
+        "source_mode": "fixture",
+        "started_at": "2026-10-23T12:00:00Z",
+        "status": "ok",
+        "termination": "not_applicable",
+        "unique_count": 8,
+        "warnings": [
+          "fixture: generated by scripts/gen_fixtures.py, no provider was called"
+        ]
+      }
+    ],
+    "source_mode": "fixture",
+    "status": "ok"
+  },
+  "conference": {
+    "city": "San Francisco",
+    "end_date": "2026-10-29",
+    "evidence": [
+      {
+        "collected_at": "2026-10-23T12:00:00Z",
+        "confidence": null,
+        "provider": "conferge-demo-seed",
+        "raw_ref": "docs/knowledge/03-demo-scenario.md",
+        "source_mode": "fixture",
+        "source_record_id": "github-universe-2026",
+        "source_url": null
+      }
+    ],
+    "id": "github-universe-2026",
+    "latitude": 37.806,
+    "longitude": -122.432,
+    "name": "GitHub Universe 2026",
+    "official_url": "https://githubuniverse.com/",
+    "sponsor_ids": [],
+    "start_date": "2026-10-28",
+    "timezone": "America/Los_Angeles",
+    "topics": [
+      "ai agents",
+      "developer tools",
+      "copilot",
+      "mcp"
+    ],
+    "venue_name": "Fort Mason Center"
+  },
+  "disclaimer": "Synthetic offline demo data. All people, companies, side events, sessions, venues, prices and attendance are fictional or simulated (source_mode=fixture). Only the anchor conference name, dates and venue come from docs/knowledge/03-demo-scenario.md and are not live-verified. Never present this file as live data.",
+  "events": {
+    "collected_at": "2026-10-23T12:00:00Z",
+    "errors": [],
+    "items": [
+      {
+        "capacity": null,
+        "conference_id": "github-universe-2026",
+        "conference_relation": "candidate",
+        "currency": null,
+        "description": "Synthetic side event for the offline demo.",
+        "end_at": "2026-10-27T21:00:00-07:00",
+        "event_type": "meetup",
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 0.6,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#events/evt-side-builders-meetup",
+            "source_mode": "fixture",
+            "source_record_id": "evt-side-builders-meetup",
+            "source_url": "https://demo.conferge.invalid/events/evt-side-builders-meetup"
+          }
+        ],
+        "first_listed_at": null,
+        "id": "evt-side-builders-meetup",
+        "is_free": null,
+        "organizer_ids": [
+          "p-fnd-faro"
+        ],
+        "organizer_names": [
+          "Patchwork Labs"
+        ],
+        "price_max": null,
+        "price_min": null,
+        "registered_count": null,
+        "registration_url": "https://demo.conferge.invalid/register/evt-side-builders-meetup",
+        "relation_evidence": [
+          "fixture-demo: same city and dates as the anchor conference"
+        ],
+        "relation_score": 0.6,
+        "room": null,
+        "source_url": "https://demo.conferge.invalid/events/evt-side-builders-meetup",
+        "speaker_ids": [],
+        "start_at": "2026-10-27T18:30:00-07:00",
+        "status": "scheduled",
+        "timezone": "America/Los_Angeles",
+        "title": "Pre-Universe Builders Meetup",
+        "topics": [
+          "developer tools",
+          "ai agents"
+        ],
+        "venue": {
+          "address": null,
+          "city": "San Francisco",
+          "coordinate_precision": "approximate",
+          "latitude": 37.7609,
+          "longitude": -122.4194,
+          "name": "Builders Loft (synthetic venue)"
+        }
+      },
+      {
+        "capacity": null,
+        "conference_id": "github-universe-2026",
+        "conference_relation": "official",
+        "currency": null,
+        "description": "Synthetic session for the offline demo; not from the official program.",
+        "end_at": "2026-10-28T10:45:00-07:00",
+        "event_type": "session",
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#events/evt-s-agents-production",
+            "source_mode": "fixture",
+            "source_record_id": "evt-s-agents-production",
+            "source_url": "https://demo.conferge.invalid/events/evt-s-agents-production"
+          }
+        ],
+        "first_listed_at": null,
+        "id": "evt-s-agents-production",
+        "is_free": null,
+        "organizer_ids": [],
+        "organizer_names": [],
+        "price_max": null,
+        "price_min": null,
+        "registered_count": null,
+        "registration_url": null,
+        "relation_evidence": [
+          "fixture-demo: synthetic record, not collected from any provider; official within the demo world only"
+        ],
+        "relation_score": 1.0,
+        "room": "Pavilion A (synthetic room)",
+        "source_url": "https://demo.conferge.invalid/events/evt-s-agents-production",
+        "speaker_ids": [
+          "p-fnd-elin",
+          "p-eng-lio"
+        ],
+        "start_at": "2026-10-28T10:00:00-07:00",
+        "status": "scheduled",
+        "timezone": "America/Los_Angeles",
+        "title": "Agents in Production",
+        "topics": [
+          "ai agents"
+        ],
+        "venue": {
+          "address": null,
+          "city": "San Francisco",
+          "coordinate_precision": "approximate",
+          "latitude": 37.806,
+          "longitude": -122.432,
+          "name": "Fort Mason Center"
+        }
+      },
+      {
+        "capacity": null,
+        "conference_id": "github-universe-2026",
+        "conference_relation": "official",
+        "currency": null,
+        "description": "Synthetic session for the offline demo; not from the official program.",
+        "end_at": "2026-10-28T14:45:00-07:00",
+        "event_type": "session",
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#events/evt-s-copilot-extensions",
+            "source_mode": "fixture",
+            "source_record_id": "evt-s-copilot-extensions",
+            "source_url": "https://demo.conferge.invalid/events/evt-s-copilot-extensions"
+          }
+        ],
+        "first_listed_at": null,
+        "id": "evt-s-copilot-extensions",
+        "is_free": null,
+        "organizer_ids": [],
+        "organizer_names": [],
+        "price_max": null,
+        "price_min": null,
+        "registered_count": null,
+        "registration_url": null,
+        "relation_evidence": [
+          "fixture-demo: synthetic record, not collected from any provider; official within the demo world only"
+        ],
+        "relation_score": 1.0,
+        "room": "Pavilion B (synthetic room)",
+        "source_url": "https://demo.conferge.invalid/events/evt-s-copilot-extensions",
+        "speaker_ids": [
+          "p-pm-ines"
+        ],
+        "start_at": "2026-10-28T14:00:00-07:00",
+        "status": "scheduled",
+        "timezone": "America/Los_Angeles",
+        "title": "Building Copilot Extensions with MCP",
+        "topics": [
+          "copilot",
+          "mcp"
+        ],
+        "venue": {
+          "address": null,
+          "city": "San Francisco",
+          "coordinate_precision": "approximate",
+          "latitude": 37.806,
+          "longitude": -122.432,
+          "name": "Fort Mason Center"
+        }
+      },
+      {
+        "capacity": null,
+        "conference_id": "github-universe-2026",
+        "conference_relation": "candidate",
+        "currency": null,
+        "description": "Synthetic side event for the offline demo.",
+        "end_at": "2026-10-28T21:30:00-07:00",
+        "event_type": "party",
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 0.6,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#events/evt-side-agents-after-hours",
+            "source_mode": "fixture",
+            "source_record_id": "evt-side-agents-after-hours",
+            "source_url": "https://demo.conferge.invalid/events/evt-side-agents-after-hours"
+          }
+        ],
+        "first_listed_at": null,
+        "id": "evt-side-agents-after-hours",
+        "is_free": null,
+        "organizer_ids": [
+          "p-inv-bram",
+          "p-fnd-hale"
+        ],
+        "organizer_names": [
+          "Quarry Lane Capital",
+          "Orbitloop Agents"
+        ],
+        "price_max": null,
+        "price_min": null,
+        "registered_count": null,
+        "registration_url": "https://demo.conferge.invalid/register/evt-side-agents-after-hours",
+        "relation_evidence": [
+          "fixture-demo: same city and dates as the anchor conference"
+        ],
+        "relation_score": 0.6,
+        "room": null,
+        "source_url": "https://demo.conferge.invalid/events/evt-side-agents-after-hours",
+        "speaker_ids": [],
+        "start_at": "2026-10-28T18:30:00-07:00",
+        "status": "scheduled",
+        "timezone": "America/Los_Angeles",
+        "title": "Agents After Hours",
+        "topics": [
+          "ai agents"
+        ],
+        "venue": {
+          "address": null,
+          "city": "San Francisco",
+          "coordinate_precision": "approximate",
+          "latitude": 37.7989,
+          "longitude": -122.4006,
+          "name": "Harbor Hall (synthetic venue)"
+        }
+      },
+      {
+        "capacity": null,
+        "conference_id": "github-universe-2026",
+        "conference_relation": "candidate",
+        "currency": null,
+        "description": "Synthetic side event for the offline demo.",
+        "end_at": "2026-10-28T21:30:00-07:00",
+        "event_type": "side_event",
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 0.5,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#events/evt-side-devtools-dinner",
+            "source_mode": "fixture",
+            "source_record_id": "evt-side-devtools-dinner",
+            "source_url": "https://demo.conferge.invalid/events/evt-side-devtools-dinner"
+          }
+        ],
+        "first_listed_at": null,
+        "id": "evt-side-devtools-dinner",
+        "is_free": null,
+        "organizer_ids": [
+          "p-inv-cleo",
+          "p-pm-kael"
+        ],
+        "organizer_names": [
+          "Tidepool Partners"
+        ],
+        "price_max": null,
+        "price_min": null,
+        "registered_count": null,
+        "registration_url": "https://demo.conferge.invalid/register/evt-side-devtools-dinner",
+        "relation_evidence": [
+          "fixture-demo: same city and dates as the anchor conference"
+        ],
+        "relation_score": 0.5,
+        "room": null,
+        "source_url": "https://demo.conferge.invalid/events/evt-side-devtools-dinner",
+        "speaker_ids": [],
+        "start_at": "2026-10-28T19:00:00-07:00",
+        "status": "scheduled",
+        "timezone": "America/Los_Angeles",
+        "title": "Devtools Founders Dinner",
+        "topics": [
+          "developer tools",
+          "copilot"
+        ],
+        "venue": {
+          "address": null,
+          "city": "San Francisco",
+          "coordinate_precision": "approximate",
+          "latitude": 37.788,
+          "longitude": -122.4075,
+          "name": "Union Table (synthetic venue)"
+        }
+      },
+      {
+        "capacity": null,
+        "conference_id": "github-universe-2026",
+        "conference_relation": "candidate",
+        "currency": null,
+        "description": "Synthetic side event for the offline demo.",
+        "end_at": "2026-10-29T09:30:00-07:00",
+        "event_type": "meetup",
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 0.5,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#events/evt-side-copilot-breakfast",
+            "source_mode": "fixture",
+            "source_record_id": "evt-side-copilot-breakfast",
+            "source_url": "https://demo.conferge.invalid/events/evt-side-copilot-breakfast"
+          }
+        ],
+        "first_listed_at": null,
+        "id": "evt-side-copilot-breakfast",
+        "is_free": null,
+        "organizer_ids": [
+          "p-pm-jory"
+        ],
+        "organizer_names": [
+          "Wingmate Labs"
+        ],
+        "price_max": null,
+        "price_min": null,
+        "registered_count": null,
+        "registration_url": "https://demo.conferge.invalid/register/evt-side-copilot-breakfast",
+        "relation_evidence": [
+          "fixture-demo: same city and dates as the anchor conference"
+        ],
+        "relation_score": 0.5,
+        "room": null,
+        "source_url": "https://demo.conferge.invalid/events/evt-side-copilot-breakfast",
+        "speaker_ids": [],
+        "start_at": "2026-10-29T08:00:00-07:00",
+        "status": "scheduled",
+        "timezone": "America/Los_Angeles",
+        "title": "Copilot Extensions Breakfast",
+        "topics": [
+          "copilot"
+        ],
+        "venue": {
+          "address": null,
+          "city": "San Francisco",
+          "coordinate_precision": "approximate",
+          "latitude": 37.803,
+          "longitude": -122.437,
+          "name": "Marina Cafe (synthetic venue)"
+        }
+      },
+      {
+        "capacity": null,
+        "conference_id": "github-universe-2026",
+        "conference_relation": "official",
+        "currency": null,
+        "description": "Synthetic session for the offline demo; not from the official program.",
+        "end_at": "2026-10-29T11:45:00-07:00",
+        "event_type": "session",
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#events/evt-s-mcp-tooling",
+            "source_mode": "fixture",
+            "source_record_id": "evt-s-mcp-tooling",
+            "source_url": "https://demo.conferge.invalid/events/evt-s-mcp-tooling"
+          }
+        ],
+        "first_listed_at": null,
+        "id": "evt-s-mcp-tooling",
+        "is_free": null,
+        "organizer_ids": [],
+        "organizer_names": [],
+        "price_max": null,
+        "price_min": null,
+        "registered_count": null,
+        "registration_url": null,
+        "relation_evidence": [
+          "fixture-demo: synthetic record, not collected from any provider; official within the demo world only"
+        ],
+        "relation_score": 1.0,
+        "room": "Pavilion A (synthetic room)",
+        "source_url": "https://demo.conferge.invalid/events/evt-s-mcp-tooling",
+        "speaker_ids": [
+          "p-fnd-gwen"
+        ],
+        "start_at": "2026-10-29T11:00:00-07:00",
+        "status": "scheduled",
+        "timezone": "America/Los_Angeles",
+        "title": "MCP Tooling for Agent Builders",
+        "topics": [
+          "mcp",
+          "ai agents"
+        ],
+        "venue": {
+          "address": null,
+          "city": "San Francisco",
+          "coordinate_precision": "approximate",
+          "latitude": 37.806,
+          "longitude": -122.432,
+          "name": "Fort Mason Center"
+        }
+      },
+      {
+        "capacity": null,
+        "conference_id": "github-universe-2026",
+        "conference_relation": "official",
+        "currency": null,
+        "description": "Synthetic session for the offline demo; not from the official program.",
+        "end_at": "2026-10-29T15:45:00-07:00",
+        "event_type": "session",
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#events/evt-s-funding-devtools",
+            "source_mode": "fixture",
+            "source_record_id": "evt-s-funding-devtools",
+            "source_url": "https://demo.conferge.invalid/events/evt-s-funding-devtools"
+          }
+        ],
+        "first_listed_at": null,
+        "id": "evt-s-funding-devtools",
+        "is_free": null,
+        "organizer_ids": [],
+        "organizer_names": [],
+        "price_max": null,
+        "price_min": null,
+        "registered_count": null,
+        "registration_url": null,
+        "relation_evidence": [
+          "fixture-demo: synthetic record, not collected from any provider; official within the demo world only"
+        ],
+        "relation_score": 1.0,
+        "room": "Pavilion C (synthetic room)",
+        "source_url": "https://demo.conferge.invalid/events/evt-s-funding-devtools",
+        "speaker_ids": [
+          "p-inv-ada"
+        ],
+        "start_at": "2026-10-29T15:00:00-07:00",
+        "status": "scheduled",
+        "timezone": "America/Los_Angeles",
+        "title": "Funding Developer Tools in 2027",
+        "topics": [
+          "developer tools"
+        ],
+        "venue": {
+          "address": null,
+          "city": "San Francisco",
+          "coordinate_precision": "approximate",
+          "latitude": 37.806,
+          "longitude": -122.432,
+          "name": "Fort Mason Center"
+        }
+      },
+      {
+        "capacity": null,
+        "conference_id": "github-universe-2026",
+        "conference_relation": "candidate",
+        "currency": null,
+        "description": "Synthetic side event for the offline demo.",
+        "end_at": "2026-10-29T20:00:00-07:00",
+        "event_type": "meetup",
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 0.5,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#events/evt-side-seed-office-hours",
+            "source_mode": "fixture",
+            "source_record_id": "evt-side-seed-office-hours",
+            "source_url": "https://demo.conferge.invalid/events/evt-side-seed-office-hours"
+          }
+        ],
+        "first_listed_at": null,
+        "id": "evt-side-seed-office-hours",
+        "is_free": null,
+        "organizer_ids": [
+          "p-inv-dov"
+        ],
+        "organizer_names": [
+          "Lanternseed Ventures"
+        ],
+        "price_max": null,
+        "price_min": null,
+        "registered_count": null,
+        "registration_url": "https://demo.conferge.invalid/register/evt-side-seed-office-hours",
+        "relation_evidence": [
+          "fixture-demo: same city and dates as the anchor conference"
+        ],
+        "relation_score": 0.5,
+        "room": null,
+        "source_url": "https://demo.conferge.invalid/events/evt-side-seed-office-hours",
+        "speaker_ids": [],
+        "start_at": "2026-10-29T18:00:00-07:00",
+        "status": "scheduled",
+        "timezone": "America/Los_Angeles",
+        "title": "Seed Office Hours",
+        "topics": [
+          "developer tools",
+          "copilot"
+        ],
+        "venue": {
+          "address": null,
+          "city": "San Francisco",
+          "coordinate_precision": "approximate",
+          "latitude": 37.7765,
+          "longitude": -122.395,
+          "name": "Lanternseed Studio (synthetic venue)"
+        }
+      },
+      {
+        "capacity": null,
+        "conference_id": "github-universe-2026",
+        "conference_relation": "candidate",
+        "currency": null,
+        "description": "Synthetic side event for the offline demo.",
+        "end_at": "2026-10-29T20:30:00-07:00",
+        "event_type": "party",
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 0.3,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#events/evt-side-infra-mixer",
+            "source_mode": "fixture",
+            "source_record_id": "evt-side-infra-mixer",
+            "source_url": "https://demo.conferge.invalid/events/evt-side-infra-mixer"
+          }
+        ],
+        "first_listed_at": null,
+        "id": "evt-side-infra-mixer",
+        "is_free": null,
+        "organizer_ids": [],
+        "organizer_names": [
+          "Hollowbyte"
+        ],
+        "price_max": null,
+        "price_min": null,
+        "registered_count": null,
+        "registration_url": "https://demo.conferge.invalid/register/evt-side-infra-mixer",
+        "relation_evidence": [
+          "fixture-demo: same city and dates as the anchor conference"
+        ],
+        "relation_score": 0.3,
+        "room": null,
+        "source_url": "https://demo.conferge.invalid/events/evt-side-infra-mixer",
+        "speaker_ids": [],
+        "start_at": "2026-10-29T18:30:00-07:00",
+        "status": "scheduled",
+        "timezone": "America/Los_Angeles",
+        "title": "Infra Engineers Mixer",
+        "topics": [
+          "infrastructure"
+        ],
+        "venue": {
+          "address": null,
+          "city": "San Francisco",
+          "coordinate_precision": "approximate",
+          "latitude": 37.785,
+          "longitude": -122.4,
+          "name": "Rack Room (synthetic venue)"
+        }
+      }
+    ],
+    "reports": [
+      {
+        "errors": [],
+        "expected_count": null,
+        "fetched_count": 10,
+        "finished_at": "2026-10-23T12:00:00Z",
+        "pages": 0,
+        "provider": "conferge-demo-seed",
+        "source_mode": "fixture",
+        "started_at": "2026-10-23T12:00:00Z",
+        "status": "ok",
+        "termination": "not_applicable",
+        "unique_count": 10,
+        "warnings": [
+          "fixture: generated by scripts/gen_fixtures.py, no provider was called"
+        ]
+      }
+    ],
+    "source_mode": "fixture",
+    "status": "ok"
+  },
+  "expected_replay": {
+    "change": {
+      "event_id": "evt-side-agents-after-hours",
+      "id": "scenario-cancel-clash-winner",
+      "label": "fixture: simulated cancellation for the live-replanning demo",
+      "type": "cancelled"
+    },
+    "conference_id": "github-universe-2026",
+    "diff": {
+      "added": [
+        "evt-side-devtools-dinner"
+      ],
+      "kept": [
+        "evt-side-builders-meetup",
+        "evt-s-agents-production",
+        "evt-s-copilot-extensions",
+        "evt-side-copilot-breakfast",
+        "evt-s-mcp-tooling",
+        "evt-s-funding-devtools",
+        "evt-side-seed-office-hours"
+      ],
+      "removed": [
+        "evt-side-agents-after-hours"
+      ],
+      "value_after": 332.0,
+      "value_before": 339.0
+    },
+    "discovery": {
+      "companies": 8,
+      "events": 10,
+      "flights": 3,
+      "lodging": 3,
+      "people": 14,
+      "source_mode": "fixture"
+    },
+    "goals": [
+      {
+        "id": "goal-seed-investors",
+        "priority": 0.45
+      },
+      {
+        "id": "goal-agent-founders",
+        "priority": 0.35
+      },
+      {
+        "id": "goal-copilot-pms",
+        "priority": 0.2
+      }
+    ],
+    "plan": {
+      "clashes": [
+        {
+          "distance_km": 1.36,
+          "event_ids": [
+            "evt-side-agents-after-hours",
+            "evt-side-devtools-dinner"
+          ],
+          "explanation": "Agents After Hours scores 69.0 against 62.0 for Devtools Founders Dinner; you miss 2 goal-matched people.",
+          "missed_people": [
+            "p-inv-cleo",
+            "p-pm-kael"
+          ],
+          "skipped": "evt-side-devtools-dinner",
+          "skipped_value": 62.0,
+          "winner": "evt-side-agents-after-hours",
+          "winner_value": 69.0
+        }
+      ],
+      "events": [
+        {
+          "end_at": "2026-10-27T21:00:00-07:00",
+          "id": "evt-side-builders-meetup",
+          "people": [
+            "p-fnd-faro"
+          ],
+          "start_at": "2026-10-27T18:30:00-07:00",
+          "title": "Pre-Universe Builders Meetup",
+          "value": 38.0
+        },
+        {
+          "end_at": "2026-10-28T10:45:00-07:00",
+          "id": "evt-s-agents-production",
+          "people": [
+            "p-fnd-elin"
+          ],
+          "start_at": "2026-10-28T10:00:00-07:00",
+          "title": "Agents in Production",
+          "value": 40.0
+        },
+        {
+          "end_at": "2026-10-28T14:45:00-07:00",
+          "id": "evt-s-copilot-extensions",
+          "people": [
+            "p-pm-ines"
+          ],
+          "start_at": "2026-10-28T14:00:00-07:00",
+          "title": "Building Copilot Extensions with MCP",
+          "value": 30.0
+        },
+        {
+          "end_at": "2026-10-28T21:30:00-07:00",
+          "id": "evt-side-agents-after-hours",
+          "people": [
+            "p-fnd-hale",
+            "p-inv-bram"
+          ],
+          "start_at": "2026-10-28T18:30:00-07:00",
+          "title": "Agents After Hours",
+          "value": 69.0
+        },
+        {
+          "end_at": "2026-10-29T09:30:00-07:00",
+          "id": "evt-side-copilot-breakfast",
+          "people": [
+            "p-pm-jory"
+          ],
+          "start_at": "2026-10-29T08:00:00-07:00",
+          "title": "Copilot Extensions Breakfast",
+          "value": 21.0
+        },
+        {
+          "end_at": "2026-10-29T11:45:00-07:00",
+          "id": "evt-s-mcp-tooling",
+          "people": [
+            "p-fnd-gwen"
+          ],
+          "start_at": "2026-10-29T11:00:00-07:00",
+          "title": "MCP Tooling for Agent Builders",
+          "value": 45.0
+        },
+        {
+          "end_at": "2026-10-29T15:45:00-07:00",
+          "id": "evt-s-funding-devtools",
+          "people": [
+            "p-inv-ada"
+          ],
+          "start_at": "2026-10-29T15:00:00-07:00",
+          "title": "Funding Developer Tools in 2027",
+          "value": 50.0
+        },
+        {
+          "end_at": "2026-10-29T20:00:00-07:00",
+          "id": "evt-side-seed-office-hours",
+          "people": [
+            "p-inv-dov"
+          ],
+          "start_at": "2026-10-29T18:00:00-07:00",
+          "title": "Seed Office Hours",
+          "value": 46.0
+        }
+      ],
+      "excluded": [],
+      "total_value": 339.0
+    },
+    "replan": {
+      "clashes": [],
+      "events": [
+        {
+          "end_at": "2026-10-27T21:00:00-07:00",
+          "id": "evt-side-builders-meetup",
+          "people": [
+            "p-fnd-faro"
+          ],
+          "start_at": "2026-10-27T18:30:00-07:00",
+          "title": "Pre-Universe Builders Meetup",
+          "value": 38.0
+        },
+        {
+          "end_at": "2026-10-28T10:45:00-07:00",
+          "id": "evt-s-agents-production",
+          "people": [
+            "p-fnd-elin"
+          ],
+          "start_at": "2026-10-28T10:00:00-07:00",
+          "title": "Agents in Production",
+          "value": 40.0
+        },
+        {
+          "end_at": "2026-10-28T14:45:00-07:00",
+          "id": "evt-s-copilot-extensions",
+          "people": [
+            "p-pm-ines"
+          ],
+          "start_at": "2026-10-28T14:00:00-07:00",
+          "title": "Building Copilot Extensions with MCP",
+          "value": 30.0
+        },
+        {
+          "end_at": "2026-10-28T21:30:00-07:00",
+          "id": "evt-side-devtools-dinner",
+          "people": [
+            "p-inv-cleo",
+            "p-pm-kael"
+          ],
+          "start_at": "2026-10-28T19:00:00-07:00",
+          "title": "Devtools Founders Dinner",
+          "value": 62.0
+        },
+        {
+          "end_at": "2026-10-29T09:30:00-07:00",
+          "id": "evt-side-copilot-breakfast",
+          "people": [
+            "p-pm-jory"
+          ],
+          "start_at": "2026-10-29T08:00:00-07:00",
+          "title": "Copilot Extensions Breakfast",
+          "value": 21.0
+        },
+        {
+          "end_at": "2026-10-29T11:45:00-07:00",
+          "id": "evt-s-mcp-tooling",
+          "people": [
+            "p-fnd-gwen"
+          ],
+          "start_at": "2026-10-29T11:00:00-07:00",
+          "title": "MCP Tooling for Agent Builders",
+          "value": 45.0
+        },
+        {
+          "end_at": "2026-10-29T15:45:00-07:00",
+          "id": "evt-s-funding-devtools",
+          "people": [
+            "p-inv-ada"
+          ],
+          "start_at": "2026-10-29T15:00:00-07:00",
+          "title": "Funding Developer Tools in 2027",
+          "value": 50.0
+        },
+        {
+          "end_at": "2026-10-29T20:00:00-07:00",
+          "id": "evt-side-seed-office-hours",
+          "people": [
+            "p-inv-dov"
+          ],
+          "start_at": "2026-10-29T18:00:00-07:00",
+          "title": "Seed Office Hours",
+          "value": 46.0
+        }
+      ],
+      "excluded": [
+        "evt-side-agents-after-hours"
+      ],
+      "total_value": 332.0
+    },
+    "source_mode": "fixture",
+    "top_people": [
+      {
+        "event_id": "evt-s-funding-devtools",
+        "id": "p-inv-ada",
+        "path": [
+          {
+            "id": "goal-seed-investors",
+            "kind": "Goal"
+          },
+          {
+            "id": "ai agents",
+            "kind": "Topic",
+            "relation": "ABOUT"
+          },
+          {
+            "id": "p-inv-ada",
+            "kind": "Person",
+            "relation": "SERVES_GOAL"
+          },
+          {
+            "id": "evt-s-funding-devtools",
+            "kind": "Event",
+            "relation": "SPEAKS_AT"
+          }
+        ],
+        "presence": "confirmed",
+        "score": 45.0
+      },
+      {
+        "event_id": "evt-side-agents-after-hours",
+        "id": "p-inv-bram",
+        "path": [
+          {
+            "id": "goal-seed-investors",
+            "kind": "Goal"
+          },
+          {
+            "id": "ai agents",
+            "kind": "Topic",
+            "relation": "ABOUT"
+          },
+          {
+            "id": "p-inv-bram",
+            "kind": "Person",
+            "relation": "SERVES_GOAL"
+          },
+          {
+            "id": "evt-side-agents-after-hours",
+            "kind": "Event",
+            "relation": "HOSTS"
+          }
+        ],
+        "presence": "confirmed",
+        "score": 36.0
+      },
+      {
+        "event_id": "evt-side-devtools-dinner",
+        "id": "p-inv-cleo",
+        "path": [
+          {
+            "id": "goal-seed-investors",
+            "kind": "Goal"
+          },
+          {
+            "id": "developer tools",
+            "kind": "Topic",
+            "relation": "ABOUT"
+          },
+          {
+            "id": "p-inv-cleo",
+            "kind": "Person",
+            "relation": "SERVES_GOAL"
+          },
+          {
+            "id": "evt-side-devtools-dinner",
+            "kind": "Event",
+            "relation": "HOSTS"
+          }
+        ],
+        "presence": "confirmed",
+        "score": 36.0
+      },
+      {
+        "event_id": "evt-side-seed-office-hours",
+        "id": "p-inv-dov",
+        "path": [
+          {
+            "id": "goal-seed-investors",
+            "kind": "Goal"
+          },
+          {
+            "id": "developer tools",
+            "kind": "Topic",
+            "relation": "ABOUT"
+          },
+          {
+            "id": "p-inv-dov",
+            "kind": "Person",
+            "relation": "SERVES_GOAL"
+          },
+          {
+            "id": "evt-side-seed-office-hours",
+            "kind": "Event",
+            "relation": "HOSTS"
+          }
+        ],
+        "presence": "confirmed",
+        "score": 36.0
+      },
+      {
+        "event_id": "evt-s-agents-production",
+        "id": "p-fnd-elin",
+        "path": [
+          {
+            "id": "goal-agent-founders",
+            "kind": "Goal"
+          },
+          {
+            "id": "ai agents",
+            "kind": "Topic",
+            "relation": "ABOUT"
+          },
+          {
+            "id": "p-fnd-elin",
+            "kind": "Person",
+            "relation": "SERVES_GOAL"
+          },
+          {
+            "id": "evt-s-agents-production",
+            "kind": "Event",
+            "relation": "SPEAKS_AT"
+          }
+        ],
+        "presence": "confirmed",
+        "score": 35.0
+      },
+      {
+        "event_id": "evt-s-mcp-tooling",
+        "id": "p-fnd-gwen",
+        "path": [
+          {
+            "id": "goal-agent-founders",
+            "kind": "Goal"
+          },
+          {
+            "id": "ai agents",
+            "kind": "Topic",
+            "relation": "ABOUT"
+          },
+          {
+            "id": "p-fnd-gwen",
+            "kind": "Person",
+            "relation": "SERVES_GOAL"
+          },
+          {
+            "id": "evt-s-mcp-tooling",
+            "kind": "Event",
+            "relation": "SPEAKS_AT"
+          }
+        ],
+        "presence": "confirmed",
+        "score": 35.0
+      },
+      {
+        "event_id": "evt-side-builders-meetup",
+        "id": "p-fnd-faro",
+        "path": [
+          {
+            "id": "goal-agent-founders",
+            "kind": "Goal"
+          },
+          {
+            "id": "ai agents",
+            "kind": "Topic",
+            "relation": "ABOUT"
+          },
+          {
+            "id": "p-fnd-faro",
+            "kind": "Person",
+            "relation": "SERVES_GOAL"
+          },
+          {
+            "id": "evt-side-builders-meetup",
+            "kind": "Event",
+            "relation": "HOSTS"
+          }
+        ],
+        "presence": "confirmed",
+        "score": 28.0
+      },
+      {
+        "event_id": "evt-side-agents-after-hours",
+        "id": "p-fnd-hale",
+        "path": [
+          {
+            "id": "goal-agent-founders",
+            "kind": "Goal"
+          },
+          {
+            "id": "ai agents",
+            "kind": "Topic",
+            "relation": "ABOUT"
+          },
+          {
+            "id": "p-fnd-hale",
+            "kind": "Person",
+            "relation": "SERVES_GOAL"
+          },
+          {
+            "id": "evt-side-agents-after-hours",
+            "kind": "Event",
+            "relation": "HOSTS"
+          }
+        ],
+        "presence": "confirmed",
+        "score": 28.0
+      },
+      {
+        "event_id": "evt-s-copilot-extensions",
+        "id": "p-pm-ines",
+        "path": [
+          {
+            "id": "goal-copilot-pms",
+            "kind": "Goal"
+          },
+          {
+            "id": "copilot",
+            "kind": "Topic",
+            "relation": "ABOUT"
+          },
+          {
+            "id": "p-pm-ines",
+            "kind": "Person",
+            "relation": "SERVES_GOAL"
+          },
+          {
+            "id": "evt-s-copilot-extensions",
+            "kind": "Event",
+            "relation": "SPEAKS_AT"
+          }
+        ],
+        "presence": "confirmed",
+        "score": 20.0
+      },
+      {
+        "event_id": "evt-side-copilot-breakfast",
+        "id": "p-pm-jory",
+        "path": [
+          {
+            "id": "goal-copilot-pms",
+            "kind": "Goal"
+          },
+          {
+            "id": "copilot",
+            "kind": "Topic",
+            "relation": "ABOUT"
+          },
+          {
+            "id": "p-pm-jory",
+            "kind": "Person",
+            "relation": "SERVES_GOAL"
+          },
+          {
+            "id": "evt-side-copilot-breakfast",
+            "kind": "Event",
+            "relation": "HOSTS"
+          }
+        ],
+        "presence": "confirmed",
+        "score": 16.0
+      }
+    ],
+    "top_people_after": [
+      "p-inv-ada",
+      "p-inv-cleo",
+      "p-inv-dov",
+      "p-fnd-elin",
+      "p-fnd-gwen",
+      "p-fnd-faro",
+      "p-pm-ines",
+      "p-inv-bram",
+      "p-pm-jory",
+      "p-pm-kael"
+    ],
+    "travel": {
+      "budget_usd": "2500",
+      "flight_id": "flt-ewr-sfo-noon",
+      "flight_price_status": "sandbox",
+      "label": "fixture: simulated fares and room totals, not live prices",
+      "lodging_id": "stay-marina-inn",
+      "lodging_price_status": "quoted_total",
+      "proactive_suggestion": "Arrive 2026-10-27 to make Pre-Universe Builders Meetup at 2026-10-27T18:30:00-07:00.",
+      "rejected_flights": [
+        "flt-lga-oak-evening"
+      ],
+      "simulated_total_usd": "1365.90"
+    }
+  },
+  "fixture_version": 1,
+  "flights": {
+    "collected_at": "2026-10-23T12:00:00Z",
+    "errors": [],
+    "items": [
+      {
+        "baggage_verified": null,
+        "booking_url": "https://demo.conferge.invalid/flights/flt-jfk-sfo-morning",
+        "booking_url_type": "unknown",
+        "carry_on_included": null,
+        "checked_bags_included": null,
+        "collected_at": "2026-10-23T12:00:00Z",
+        "currency": "USD",
+        "dedup_key": "FX101|FX202",
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#flights/flt-jfk-sfo-morning",
+            "source_mode": "fixture",
+            "source_record_id": "flt-jfk-sfo-morning",
+            "source_url": "https://demo.conferge.invalid/flights/flt-jfk-sfo-morning"
+          }
+        ],
+        "id": "flt-jfk-sfo-morning",
+        "price_scope": "total_all_passengers",
+        "price_status": "sandbox",
+        "raw_price_text": "$512.40 (simulated)",
+        "slices": [
+          {
+            "duration_minutes": 385,
+            "segments": [
+              {
+                "aircraft": null,
+                "arrival_at": "2026-10-27T11:25:00-07:00",
+                "connection_type": "unknown",
+                "departure_at": "2026-10-27T08:00:00-04:00",
+                "destination_iata": "SFO",
+                "duration_minutes": 385,
+                "flight_number": "FX101",
+                "marketing_carrier": "Fixture Air (fictional)",
+                "operating_carrier": null,
+                "origin_iata": "JFK"
+              }
+            ],
+            "self_transfer": null
+          },
+          {
+            "duration_minutes": 335,
+            "segments": [
+              {
+                "aircraft": null,
+                "arrival_at": "2026-10-30T21:35:00-04:00",
+                "connection_type": "unknown",
+                "departure_at": "2026-10-30T13:00:00-07:00",
+                "destination_iata": "JFK",
+                "duration_minutes": 335,
+                "flight_number": "FX202",
+                "marketing_carrier": "Fixture Air (fictional)",
+                "operating_carrier": null,
+                "origin_iata": "SFO"
+              }
+            ],
+            "self_transfer": null
+          }
+        ],
+        "total_price": "512.40",
+        "trip_type": "round_trip",
+        "warnings": [
+          "Simulated fixture fare; not an observed or bookable offer."
+        ]
+      },
+      {
+        "baggage_verified": null,
+        "booking_url": "https://demo.conferge.invalid/flights/flt-ewr-sfo-noon",
+        "booking_url_type": "unknown",
+        "carry_on_included": null,
+        "checked_bags_included": null,
+        "collected_at": "2026-10-23T12:00:00Z",
+        "currency": "USD",
+        "dedup_key": "FX105|FX208",
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#flights/flt-ewr-sfo-noon",
+            "source_mode": "fixture",
+            "source_record_id": "flt-ewr-sfo-noon",
+            "source_url": "https://demo.conferge.invalid/flights/flt-ewr-sfo-noon"
+          }
+        ],
+        "id": "flt-ewr-sfo-noon",
+        "price_scope": "total_all_passengers",
+        "price_status": "sandbox",
+        "raw_price_text": "$468.90 (simulated)",
+        "slices": [
+          {
+            "duration_minutes": 380,
+            "segments": [
+              {
+                "aircraft": null,
+                "arrival_at": "2026-10-27T15:20:00-07:00",
+                "connection_type": "unknown",
+                "departure_at": "2026-10-27T12:00:00-04:00",
+                "destination_iata": "SFO",
+                "duration_minutes": 380,
+                "flight_number": "FX105",
+                "marketing_carrier": "Fixture Air (fictional)",
+                "operating_carrier": null,
+                "origin_iata": "EWR"
+              }
+            ],
+            "self_transfer": null
+          },
+          {
+            "duration_minutes": 335,
+            "segments": [
+              {
+                "aircraft": null,
+                "arrival_at": "2026-10-31T00:05:00-04:00",
+                "connection_type": "unknown",
+                "departure_at": "2026-10-30T15:30:00-07:00",
+                "destination_iata": "EWR",
+                "duration_minutes": 335,
+                "flight_number": "FX208",
+                "marketing_carrier": "Fixture Air (fictional)",
+                "operating_carrier": null,
+                "origin_iata": "SFO"
+              }
+            ],
+            "self_transfer": null
+          }
+        ],
+        "total_price": "468.90",
+        "trip_type": "round_trip",
+        "warnings": [
+          "Simulated fixture fare; not an observed or bookable offer."
+        ]
+      },
+      {
+        "baggage_verified": null,
+        "booking_url": "https://demo.conferge.invalid/flights/flt-lga-oak-evening",
+        "booking_url_type": "unknown",
+        "carry_on_included": null,
+        "checked_bags_included": null,
+        "collected_at": "2026-10-23T12:00:00Z",
+        "currency": "USD",
+        "dedup_key": "FX111|FX208",
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#flights/flt-lga-oak-evening",
+            "source_mode": "fixture",
+            "source_record_id": "flt-lga-oak-evening",
+            "source_url": "https://demo.conferge.invalid/flights/flt-lga-oak-evening"
+          }
+        ],
+        "id": "flt-lga-oak-evening",
+        "price_scope": "total_all_passengers",
+        "price_status": "sandbox",
+        "raw_price_text": "$401.15 (simulated)",
+        "slices": [
+          {
+            "duration_minutes": 390,
+            "segments": [
+              {
+                "aircraft": null,
+                "arrival_at": "2026-10-27T20:30:00-07:00",
+                "connection_type": "unknown",
+                "departure_at": "2026-10-27T17:00:00-04:00",
+                "destination_iata": "OAK",
+                "duration_minutes": 390,
+                "flight_number": "FX111",
+                "marketing_carrier": "Fixture Air (fictional)",
+                "operating_carrier": null,
+                "origin_iata": "LGA"
+              }
+            ],
+            "self_transfer": null
+          },
+          {
+            "duration_minutes": 335,
+            "segments": [
+              {
+                "aircraft": null,
+                "arrival_at": "2026-10-31T00:05:00-04:00",
+                "connection_type": "unknown",
+                "departure_at": "2026-10-30T15:30:00-07:00",
+                "destination_iata": "EWR",
+                "duration_minutes": 335,
+                "flight_number": "FX208",
+                "marketing_carrier": "Fixture Air (fictional)",
+                "operating_carrier": null,
+                "origin_iata": "SFO"
+              }
+            ],
+            "self_transfer": null
+          }
+        ],
+        "total_price": "401.15",
+        "trip_type": "round_trip",
+        "warnings": [
+          "Simulated fixture fare; not an observed or bookable offer."
+        ]
+      }
+    ],
+    "reports": [
+      {
+        "errors": [],
+        "expected_count": null,
+        "fetched_count": 3,
+        "finished_at": "2026-10-23T12:00:00Z",
+        "pages": 0,
+        "provider": "conferge-demo-seed",
+        "source_mode": "fixture",
+        "started_at": "2026-10-23T12:00:00Z",
+        "status": "ok",
+        "termination": "not_applicable",
+        "unique_count": 3,
+        "warnings": [
+          "fixture: generated by scripts/gen_fixtures.py, no provider was called"
+        ]
+      }
+    ],
+    "source_mode": "fixture",
+    "status": "ok"
+  },
+  "generated_by": "scripts/gen_fixtures.py",
+  "goals": [
+    {
+      "description": "Meet seed investors active in developer tools",
+      "id": "goal-seed-investors",
+      "priority": 0.45,
+      "tags": [
+        "fundraising"
+      ],
+      "target_count": 5,
+      "target_roles": [
+        "investor"
+      ],
+      "topics": [
+        "developer tools",
+        "ai agents"
+      ]
+    },
+    {
+      "description": "Meet founders building AI agents",
+      "id": "goal-agent-founders",
+      "priority": 0.35,
+      "tags": [
+        "peers"
+      ],
+      "target_count": 4,
+      "target_roles": [
+        "founder"
+      ],
+      "topics": [
+        "ai agents",
+        "mcp"
+      ]
+    },
+    {
+      "description": "Meet Copilot product managers",
+      "id": "goal-copilot-pms",
+      "priority": 0.2,
+      "tags": [
+        "distribution"
+      ],
+      "target_count": 2,
+      "target_roles": [
+        "pm"
+      ],
+      "topics": [
+        "copilot",
+        "mcp"
+      ]
+    }
+  ],
+  "lodging": {
+    "collected_at": "2026-10-23T12:00:00Z",
+    "errors": [],
+    "items": [
+      {
+        "adults": 1,
+        "availability": "unknown",
+        "base_total": null,
+        "booking_url": "https://demo.conferge.invalid/stays/stay-marina-inn",
+        "check_in": "2026-10-27",
+        "check_out": "2026-10-30",
+        "currency": "USD",
+        "dedup_group": null,
+        "distance_to_venue_m": 900,
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#lodging/stay-marina-inn",
+            "source_mode": "fixture",
+            "source_record_id": "stay-marina-inn",
+            "source_url": "https://demo.conferge.invalid/lodging/stay-marina-inn"
+          }
+        ],
+        "fees_total": null,
+        "free_cancellation": null,
+        "id": "stay-marina-inn",
+        "includes_all_fees": null,
+        "lodging_type": "hotel",
+        "name": "Marina Courtyard Inn (synthetic)",
+        "nightly_avg": "299.00",
+        "payable_at_property": null,
+        "price_status": "quoted_total",
+        "provider": "conferge-demo-seed",
+        "rating": 8.4,
+        "rating_count": null,
+        "rating_scale": 10,
+        "rooms": 1,
+        "taxes": null,
+        "total_price": "897.00",
+        "venue": {
+          "address": null,
+          "city": "San Francisco",
+          "coordinate_precision": "approximate",
+          "latitude": 37.8005,
+          "longitude": -122.437,
+          "name": "Marina Courtyard Inn (synthetic)"
+        },
+        "verified_at": null
+      },
+      {
+        "adults": 1,
+        "availability": "unknown",
+        "base_total": null,
+        "booking_url": "https://demo.conferge.invalid/stays/stay-northpoint",
+        "check_in": "2026-10-27",
+        "check_out": "2026-10-30",
+        "currency": "USD",
+        "dedup_group": null,
+        "distance_to_venue_m": 1500,
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#lodging/stay-northpoint",
+            "source_mode": "fixture",
+            "source_record_id": "stay-northpoint",
+            "source_url": "https://demo.conferge.invalid/lodging/stay-northpoint"
+          }
+        ],
+        "fees_total": null,
+        "free_cancellation": null,
+        "id": "stay-northpoint",
+        "includes_all_fees": null,
+        "lodging_type": "hotel",
+        "name": "Northpoint Rooms (synthetic)",
+        "nightly_avg": "257.00",
+        "payable_at_property": null,
+        "price_status": "indicative",
+        "provider": "conferge-demo-seed",
+        "rating": 7.9,
+        "rating_count": null,
+        "rating_scale": 10,
+        "rooms": 1,
+        "taxes": null,
+        "total_price": "771.00",
+        "venue": {
+          "address": null,
+          "city": "San Francisco",
+          "coordinate_precision": "approximate",
+          "latitude": 37.805,
+          "longitude": -122.415,
+          "name": "Northpoint Rooms (synthetic)"
+        },
+        "verified_at": null
+      },
+      {
+        "adults": 1,
+        "availability": "unknown",
+        "base_total": null,
+        "booking_url": "https://demo.conferge.invalid/stays/stay-soma-pods",
+        "check_in": "2026-10-27",
+        "check_out": "2026-10-30",
+        "currency": "USD",
+        "dedup_group": null,
+        "distance_to_venue_m": 4300,
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#lodging/stay-soma-pods",
+            "source_mode": "fixture",
+            "source_record_id": "stay-soma-pods",
+            "source_url": "https://demo.conferge.invalid/lodging/stay-soma-pods"
+          }
+        ],
+        "fees_total": null,
+        "free_cancellation": null,
+        "id": "stay-soma-pods",
+        "includes_all_fees": null,
+        "lodging_type": "hotel",
+        "name": "SoMa Pods (synthetic)",
+        "nightly_avg": "166.00",
+        "payable_at_property": null,
+        "price_status": "indicative",
+        "provider": "conferge-demo-seed",
+        "rating": null,
+        "rating_count": null,
+        "rating_scale": null,
+        "rooms": 1,
+        "taxes": null,
+        "total_price": "498.00",
+        "venue": {
+          "address": null,
+          "city": "San Francisco",
+          "coordinate_precision": "approximate",
+          "latitude": 37.779,
+          "longitude": -122.4,
+          "name": "SoMa Pods (synthetic)"
+        },
+        "verified_at": null
+      }
+    ],
+    "reports": [
+      {
+        "errors": [],
+        "expected_count": null,
+        "fetched_count": 3,
+        "finished_at": "2026-10-23T12:00:00Z",
+        "pages": 0,
+        "provider": "conferge-demo-seed",
+        "source_mode": "fixture",
+        "started_at": "2026-10-23T12:00:00Z",
+        "status": "ok",
+        "termination": "not_applicable",
+        "unique_count": 3,
+        "warnings": [
+          "fixture: generated by scripts/gen_fixtures.py, no provider was called"
+        ]
+      }
+    ],
+    "source_mode": "fixture",
+    "status": "ok"
+  },
+  "people": {
+    "collected_at": "2026-10-23T12:00:00Z",
+    "errors": [],
+    "items": [
+      {
+        "bio": "Fictional demo persona. Not a real person; attendance is simulated.",
+        "company_id": "co-lanternseed",
+        "event_ids": [
+          "evt-s-funding-devtools"
+        ],
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#people/p-inv-ada",
+            "source_mode": "fixture",
+            "source_record_id": "p-inv-ada",
+            "source_url": "https://demo.conferge.invalid/people/p-inv-ada"
+          }
+        ],
+        "github_url": null,
+        "id": "p-inv-ada",
+        "identity_confidence": null,
+        "linkedin_url": null,
+        "match_confidence": null,
+        "name": "Ada Lanternwood",
+        "participation": "confirmed_speaker",
+        "presence_confidence": null,
+        "public_profile_url": "https://demo.conferge.invalid/people/p-inv-ada",
+        "role": "investor",
+        "roles": [
+          "investor"
+        ],
+        "title": "Partner",
+        "topics": [
+          "developer tools",
+          "ai agents"
+        ],
+        "x_handle": null
+      },
+      {
+        "bio": "Fictional demo persona. Not a real person; attendance is simulated.",
+        "company_id": "co-quarry-capital",
+        "event_ids": [
+          "evt-side-agents-after-hours"
+        ],
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#people/p-inv-bram",
+            "source_mode": "fixture",
+            "source_record_id": "p-inv-bram",
+            "source_url": "https://demo.conferge.invalid/people/p-inv-bram"
+          }
+        ],
+        "github_url": null,
+        "id": "p-inv-bram",
+        "identity_confidence": null,
+        "linkedin_url": null,
+        "match_confidence": null,
+        "name": "Bram Quillfeather",
+        "participation": "confirmed_organizer",
+        "presence_confidence": null,
+        "public_profile_url": "https://demo.conferge.invalid/people/p-inv-bram",
+        "role": "investor",
+        "roles": [
+          "investor"
+        ],
+        "title": "General Partner",
+        "topics": [
+          "ai agents",
+          "mcp"
+        ],
+        "x_handle": null
+      },
+      {
+        "bio": "Fictional demo persona. Not a real person; attendance is simulated.",
+        "company_id": "co-tidepool",
+        "event_ids": [
+          "evt-side-devtools-dinner"
+        ],
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#people/p-inv-cleo",
+            "source_mode": "fixture",
+            "source_record_id": "p-inv-cleo",
+            "source_url": "https://demo.conferge.invalid/people/p-inv-cleo"
+          }
+        ],
+        "github_url": null,
+        "id": "p-inv-cleo",
+        "identity_confidence": null,
+        "linkedin_url": null,
+        "match_confidence": null,
+        "name": "Cleo Marrowind",
+        "participation": "confirmed_organizer",
+        "presence_confidence": null,
+        "public_profile_url": "https://demo.conferge.invalid/people/p-inv-cleo",
+        "role": "investor",
+        "roles": [
+          "investor"
+        ],
+        "title": "Principal",
+        "topics": [
+          "developer tools"
+        ],
+        "x_handle": null
+      },
+      {
+        "bio": "Fictional demo persona. Not a real person; attendance is simulated.",
+        "company_id": "co-lanternseed",
+        "event_ids": [
+          "evt-side-seed-office-hours"
+        ],
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#people/p-inv-dov",
+            "source_mode": "fixture",
+            "source_record_id": "p-inv-dov",
+            "source_url": "https://demo.conferge.invalid/people/p-inv-dov"
+          }
+        ],
+        "github_url": null,
+        "id": "p-inv-dov",
+        "identity_confidence": null,
+        "linkedin_url": null,
+        "match_confidence": null,
+        "name": "Dov Embersley",
+        "participation": "confirmed_organizer",
+        "presence_confidence": null,
+        "public_profile_url": "https://demo.conferge.invalid/people/p-inv-dov",
+        "role": "investor",
+        "roles": [
+          "investor"
+        ],
+        "title": "Associate",
+        "topics": [
+          "developer tools",
+          "copilot"
+        ],
+        "x_handle": null
+      },
+      {
+        "bio": "Fictional demo persona. Not a real person; attendance is simulated.",
+        "company_id": "co-orbitloop",
+        "event_ids": [
+          "evt-s-agents-production"
+        ],
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#people/p-fnd-elin",
+            "source_mode": "fixture",
+            "source_record_id": "p-fnd-elin",
+            "source_url": "https://demo.conferge.invalid/people/p-fnd-elin"
+          }
+        ],
+        "github_url": null,
+        "id": "p-fnd-elin",
+        "identity_confidence": null,
+        "linkedin_url": null,
+        "match_confidence": null,
+        "name": "Elin Orbitson",
+        "participation": "confirmed_speaker",
+        "presence_confidence": null,
+        "public_profile_url": "https://demo.conferge.invalid/people/p-fnd-elin",
+        "role": "founder",
+        "roles": [
+          "founder"
+        ],
+        "title": "Founder and CEO",
+        "topics": [
+          "ai agents",
+          "mcp"
+        ],
+        "x_handle": null
+      },
+      {
+        "bio": "Fictional demo persona. Not a real person; attendance is simulated.",
+        "company_id": "co-patchwork",
+        "event_ids": [
+          "evt-side-builders-meetup"
+        ],
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#people/p-fnd-faro",
+            "source_mode": "fixture",
+            "source_record_id": "p-fnd-faro",
+            "source_url": "https://demo.conferge.invalid/people/p-fnd-faro"
+          }
+        ],
+        "github_url": null,
+        "id": "p-fnd-faro",
+        "identity_confidence": null,
+        "linkedin_url": null,
+        "match_confidence": null,
+        "name": "Faro Patchley",
+        "participation": "confirmed_organizer",
+        "presence_confidence": null,
+        "public_profile_url": "https://demo.conferge.invalid/people/p-fnd-faro",
+        "role": "founder",
+        "roles": [
+          "founder",
+          "engineer"
+        ],
+        "title": "Co-founder",
+        "topics": [
+          "developer tools",
+          "ai agents"
+        ],
+        "x_handle": null
+      },
+      {
+        "bio": "Fictional demo persona. Not a real person; attendance is simulated.",
+        "company_id": "co-kiteframe",
+        "event_ids": [
+          "evt-s-mcp-tooling"
+        ],
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#people/p-fnd-gwen",
+            "source_mode": "fixture",
+            "source_record_id": "p-fnd-gwen",
+            "source_url": "https://demo.conferge.invalid/people/p-fnd-gwen"
+          }
+        ],
+        "github_url": null,
+        "id": "p-fnd-gwen",
+        "identity_confidence": null,
+        "linkedin_url": null,
+        "match_confidence": null,
+        "name": "Gwen Kitesong",
+        "participation": "confirmed_speaker",
+        "presence_confidence": null,
+        "public_profile_url": "https://demo.conferge.invalid/people/p-fnd-gwen",
+        "role": "founder",
+        "roles": [
+          "founder"
+        ],
+        "title": "Founder",
+        "topics": [
+          "mcp",
+          "ai agents"
+        ],
+        "x_handle": null
+      },
+      {
+        "bio": "Fictional demo persona. Not a real person; attendance is simulated.",
+        "company_id": "co-orbitloop",
+        "event_ids": [
+          "evt-side-agents-after-hours"
+        ],
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#people/p-fnd-hale",
+            "source_mode": "fixture",
+            "source_record_id": "p-fnd-hale",
+            "source_url": "https://demo.conferge.invalid/people/p-fnd-hale"
+          }
+        ],
+        "github_url": null,
+        "id": "p-fnd-hale",
+        "identity_confidence": null,
+        "linkedin_url": null,
+        "match_confidence": null,
+        "name": "Hale Driftmoor",
+        "participation": "confirmed_organizer",
+        "presence_confidence": null,
+        "public_profile_url": "https://demo.conferge.invalid/people/p-fnd-hale",
+        "role": "founder",
+        "roles": [
+          "founder"
+        ],
+        "title": "Co-founder and CTO",
+        "topics": [
+          "ai agents"
+        ],
+        "x_handle": null
+      },
+      {
+        "bio": "Fictional demo persona. Not a real person; attendance is simulated.",
+        "company_id": "co-wingmate",
+        "event_ids": [
+          "evt-s-copilot-extensions"
+        ],
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#people/p-pm-ines",
+            "source_mode": "fixture",
+            "source_record_id": "p-pm-ines",
+            "source_url": "https://demo.conferge.invalid/people/p-pm-ines"
+          }
+        ],
+        "github_url": null,
+        "id": "p-pm-ines",
+        "identity_confidence": null,
+        "linkedin_url": null,
+        "match_confidence": null,
+        "name": "Ines Copperfield",
+        "participation": "confirmed_speaker",
+        "presence_confidence": null,
+        "public_profile_url": "https://demo.conferge.invalid/people/p-pm-ines",
+        "role": "pm",
+        "roles": [
+          "pm"
+        ],
+        "title": "Product Manager, Copilot integrations",
+        "topics": [
+          "copilot",
+          "mcp"
+        ],
+        "x_handle": null
+      },
+      {
+        "bio": "Fictional demo persona. Not a real person; attendance is simulated.",
+        "company_id": "co-wingmate",
+        "event_ids": [
+          "evt-side-copilot-breakfast"
+        ],
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#people/p-pm-jory",
+            "source_mode": "fixture",
+            "source_record_id": "p-pm-jory",
+            "source_url": "https://demo.conferge.invalid/people/p-pm-jory"
+          }
+        ],
+        "github_url": null,
+        "id": "p-pm-jory",
+        "identity_confidence": null,
+        "linkedin_url": null,
+        "match_confidence": null,
+        "name": "Jory Lumenhall",
+        "participation": "confirmed_organizer",
+        "presence_confidence": null,
+        "public_profile_url": "https://demo.conferge.invalid/people/p-pm-jory",
+        "role": "pm",
+        "roles": [
+          "pm"
+        ],
+        "title": "Senior PM, Copilot integrations",
+        "topics": [
+          "copilot"
+        ],
+        "x_handle": null
+      },
+      {
+        "bio": "Fictional demo persona. Not a real person; attendance is simulated.",
+        "company_id": "co-wingmate",
+        "event_ids": [
+          "evt-side-devtools-dinner"
+        ],
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#people/p-pm-kael",
+            "source_mode": "fixture",
+            "source_record_id": "p-pm-kael",
+            "source_url": "https://demo.conferge.invalid/people/p-pm-kael"
+          }
+        ],
+        "github_url": null,
+        "id": "p-pm-kael",
+        "identity_confidence": null,
+        "linkedin_url": null,
+        "match_confidence": null,
+        "name": "Kael Windmere",
+        "participation": "confirmed_organizer",
+        "presence_confidence": null,
+        "public_profile_url": "https://demo.conferge.invalid/people/p-pm-kael",
+        "role": "pm",
+        "roles": [
+          "pm"
+        ],
+        "title": "Product Manager, Copilot integrations",
+        "topics": [
+          "copilot",
+          "developer tools"
+        ],
+        "x_handle": null
+      },
+      {
+        "bio": "Fictional demo persona. Not a real person; attendance is simulated.",
+        "company_id": "co-hollowbyte",
+        "event_ids": [
+          "evt-s-agents-production"
+        ],
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#people/p-eng-lio",
+            "source_mode": "fixture",
+            "source_record_id": "p-eng-lio",
+            "source_url": "https://demo.conferge.invalid/people/p-eng-lio"
+          }
+        ],
+        "github_url": null,
+        "id": "p-eng-lio",
+        "identity_confidence": null,
+        "linkedin_url": null,
+        "match_confidence": null,
+        "name": "Lio Hollowell",
+        "participation": "confirmed_speaker",
+        "presence_confidence": null,
+        "public_profile_url": "https://demo.conferge.invalid/people/p-eng-lio",
+        "role": "engineer",
+        "roles": [
+          "engineer"
+        ],
+        "title": "Staff Engineer",
+        "topics": [
+          "infrastructure"
+        ],
+        "x_handle": null
+      },
+      {
+        "bio": "Fictional demo persona. Not a real person; attendance is simulated.",
+        "company_id": "co-patchwork",
+        "event_ids": [],
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#people/p-dr-mara",
+            "source_mode": "fixture",
+            "source_record_id": "p-dr-mara",
+            "source_url": "https://demo.conferge.invalid/people/p-dr-mara"
+          }
+        ],
+        "github_url": null,
+        "id": "p-dr-mara",
+        "identity_confidence": null,
+        "linkedin_url": null,
+        "match_confidence": null,
+        "name": "Mara Fenwick",
+        "participation": "relevant_candidate",
+        "presence_confidence": null,
+        "public_profile_url": "https://demo.conferge.invalid/people/p-dr-mara",
+        "role": "devrel",
+        "roles": [
+          "devrel"
+        ],
+        "title": "Developer Advocate",
+        "topics": [
+          "developer tools"
+        ],
+        "x_handle": null
+      },
+      {
+        "bio": "Fictional demo persona. Not a real person; attendance is simulated.",
+        "company_id": "co-hollowbyte",
+        "event_ids": [],
+        "evidence": [
+          {
+            "collected_at": "2026-10-23T12:00:00Z",
+            "confidence": 1.0,
+            "provider": "conferge-demo-seed",
+            "raw_ref": "fixtures/demo.json#people/p-exe-nils",
+            "source_mode": "fixture",
+            "source_record_id": "p-exe-nils",
+            "source_url": "https://demo.conferge.invalid/people/p-exe-nils"
+          }
+        ],
+        "github_url": null,
+        "id": "p-exe-nils",
+        "identity_confidence": null,
+        "linkedin_url": null,
+        "match_confidence": null,
+        "name": "Nils Ashgrove",
+        "participation": "unknown",
+        "presence_confidence": null,
+        "public_profile_url": "https://demo.conferge.invalid/people/p-exe-nils",
+        "role": "executive",
+        "roles": [
+          "executive"
+        ],
+        "title": "VP Engineering",
+        "topics": [
+          "infrastructure"
+        ],
+        "x_handle": null
+      }
+    ],
+    "reports": [
+      {
+        "errors": [],
+        "expected_count": null,
+        "fetched_count": 14,
+        "finished_at": "2026-10-23T12:00:00Z",
+        "pages": 0,
+        "provider": "conferge-demo-seed",
+        "source_mode": "fixture",
+        "started_at": "2026-10-23T12:00:00Z",
+        "status": "ok",
+        "termination": "not_applicable",
+        "unique_count": 14,
+        "warnings": [
+          "fixture: generated by scripts/gen_fixtures.py, no provider was called"
+        ]
+      }
+    ],
+    "source_mode": "fixture",
+    "status": "ok"
+  },
+  "scenarios": [
+    {
+      "event_id": "evt-side-agents-after-hours",
+      "id": "scenario-cancel-clash-winner",
+      "label": "fixture: simulated cancellation for the live-replanning demo",
+      "type": "cancelled"
+    }
+  ],
+  "seed": 42,
+  "source_mode": "fixture",
+  "user": {
+    "adults": 1,
+    "budget_usd": "2500",
+    "cabin": "economy",
+    "depart_on": "2026-10-27",
+    "destination_airports": [
+      "SFO",
+      "OAK",
+      "SJC"
+    ],
+    "goal_text": "Founder of an AI dev tool going to GitHub Universe to meet seed investors, AI agent founders and Copilot PMs.",
+    "home_city": "New York",
+    "id": "demo-user",
+    "label": "Fictional founder of an AI developer tool",
+    "origin_airports": [
+      "JFK",
+      "LGA",
+      "EWR"
+    ],
+    "return_on": "2026-10-30",
+    "source_mode": "fixture"
+  }
+}
