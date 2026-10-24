@@ -141,7 +141,10 @@ function pass(name) {
       "Sample data",
     );
     const brightdata = await api("/brightdata");
-    assert.equal(brightdata.data_source, Object.values(brightdata.ready || {}).some(Boolean) ? "live" : "unknown");
+    assert.equal(
+      brightdata.data_source,
+      Object.values(brightdata.ready || {}).some(Boolean) ? "live" : "unknown",
+    );
     assert.equal(
       await page.locator("#stat-events").textContent(),
       String((await api("/events")).items.length),
@@ -200,6 +203,35 @@ function pass(name) {
     );
     await page.getByRole("button", { name: "Clear search" }).click();
     pass("Event type/day filters, search, empty states and filter reset");
+    await nav("story");
+    assert.equal(await page.locator("#degraded-banner").isVisible(), false);
+    assert.equal(await page.locator("#step-roi").isVisible(), false);
+    await nav("people");
+    assert.equal(
+      await page.locator(".people-card .illustrated-avatar").count(),
+      10,
+    );
+    await nav("travel");
+    const places = page.locator("#map-places button");
+    assert((await places.count()) > 1);
+    await places.first().click();
+    assert.match(
+      await page.locator("#travel-place-detail").textContent(),
+      /conference/i,
+    );
+    await page.locator("#travel-map-scope").selectOption("nearby");
+    assert((await places.count()) > 1);
+    await nav("graph");
+    const choices = page.locator("#connection-choices button");
+    await choices.nth(1).click();
+    assert.equal(await choices.nth(1).getAttribute("aria-pressed"), "true");
+    assert(
+      (await page.locator("#connection-selected h2").textContent()).trim()
+        .length > 0,
+    );
+    pass(
+      "Quiet discovery, illustrated people, synchronized map selection, and actionable connections",
+    );
 
     for (const width of [1440, 390]) {
       await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
@@ -223,8 +255,16 @@ function pass(name) {
     await page.locator('#tab-story [data-open="goal-dialog"]').first().click();
     await page.locator("#goal-text").fill("");
     await page.locator("#btn-goal").click();
-    assert.equal(await page.locator("#goal-dialog").evaluate((element) => element.open), true);
-    assert.equal(await page.locator("#goal-text").evaluate((element) => element.validity.valueMissing), true);
+    assert.equal(
+      await page.locator("#goal-dialog").evaluate((element) => element.open),
+      true,
+    );
+    assert.equal(
+      await page
+        .locator("#goal-text")
+        .evaluate((element) => element.validity.valueMissing),
+      true,
+    );
     await page.locator("#goal-text").fill("Meet seed investors and engineers");
     await submit("#btn-goal", "/goal");
     await page.waitForFunction(
@@ -465,6 +505,14 @@ function pass(name) {
       await page.locator("#graph").textContent(),
       /visualization could not load|visualization is unavailable/i,
     );
+    if (await page.locator("#connection-map-details").count()) {
+      if (
+        !(await page
+          .locator("#connection-map-details")
+          .evaluate((element) => element.open))
+      )
+        await page.locator("#connection-map-details > summary").click();
+    }
     await page.locator(".graph-text > summary").click();
     assert(
       (await page

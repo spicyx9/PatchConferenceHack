@@ -37,8 +37,7 @@ The application uses its existing vanilla HTML/CSS/JavaScript architecture.
 - Main content max width 1088 px including horizontal padding. Discovery uses a
   flexible feed plus 272 px context column with a 50 px gap on large screens.
 - 12 px cards and 18 px cover radius. Avoid decorative shadows and dashboard tile grids.
-- Event artwork belongs to the corresponding exact source record. Missing artwork
-  uses an explicitly decorative typographic composition, never an unrelated event poster.
+- Event artwork belongs to the corresponding exact source record. Missing artwork uses generated atmospheric city illustrations, never a poster or a photograph claimed to document that event or venue.
 - The city cover is an AI-generated atmospheric illustration. Its generated nature
   is documented in `images/ASSETS.md`; it is not evidence about a venue or an event.
 
@@ -82,3 +81,16 @@ and dialogs. Actions use concise text without decorative arrows. Source provenan
 is available in Sources rather than repeated on every card. Event detail opens in
 a native accessible dialog, using the matching event artwork and source link.
 The header and trip context share the main content alignment.
+
+## Refinement after the first visual review
+
+Discover keeps the destination and discovery feed. Skipped alternatives are one
+compact disclosure; replanning and ROI tools live in the progress view. Connection
+availability and engine details are in Sources, not the discovery sidebar.
+
+Agenda uses a day rail and source-poster cards, with a conference-day default.
+People uses illustrated profiles with one matching priority, a linked session,
+and clear conversation actions. Generated avatars are decorative fictional art.
+Travel centers on a selectable map and place list; unknown offers remain empty.
+Connections starts with a person, their matching priority, and a real linked event.
+The full network and raw evidence remain available through secondary disclosures.

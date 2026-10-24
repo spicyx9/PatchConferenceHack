@@ -35,3 +35,32 @@ Public source-hosted Luma posters are associated by exact event ID from the expl
 fixture dataset. They are not generated, downloaded into the repository, or presented
 as artwork for another event. The event source link remains accessible. Covers absent
 from source data use a decorative typographic composition with no claim of official branding.
+
+## Illustrated profile avatars (v2)
+
+`people-illustrations-v2.jpg` is a generated 4×2 sprite atlas of eight fictional
+cartoon portraits. Built-in ImageGen produced the original on 2026-10-24; JPEG
+conversion preserves the full composition. The portraits are decorative, not
+likenesses or photographs of the named people. CSS chooses a stable tile per person.
+
+Prompt: one 2:1 canvas, exactly four equal columns and two equal rows, eight
+fictional head-and-shoulder adults at identical scale, no gutters or labels.
+Contemporary editorial illustration with irregular ink outlines, matte gouache
+texture, warm coral, butter yellow, slate blue, muted lilac, clay and cream.
+Distinct hairstyles, skin tones and glasses; calm expressions. No resemblance to
+real people, typography, logos, gradients, glossy 3D or emoji. Readable at 56px.
+
+## Session atmosphere illustrations (v2)
+
+`session-atmospheres-v2.jpg` is a generated 3×2 atlas for records without a source
+poster. The six images are decorative San Francisco-inspired photographic-style
+illustrations, not photographs of the named session, venue or attendees. Actual
+source posters always take precedence. Built-in ImageGen, generated 2026-10-24.
+
+Prompt: exactly three equal columns and two equal rows of square images, no
+gutters, text, logos, borders or people. Independent travel-magazine photographic
+illustrations: bridge structure and blue bay; warm empty café and espresso;
+waterfront pier and pale warehouse; modern glass/concrete architecture; dusk city
+street and cable car silhouette; sunlight through palms and cream architecture.
+Subtle analog grain, natural physical texture, warm coral/blue/cream palette.
+No claim to documentary event or venue coverage.
