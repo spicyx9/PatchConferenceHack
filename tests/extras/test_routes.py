@@ -72,5 +72,5 @@ def test_agenda_has_the_export_button() -> None:
     from pathlib import Path
 
     html = (Path(__file__).resolve().parents[2] / "static" / "index.html").read_text()
-    agenda = html[html.index('id="tab-events"'):html.index("Explore events")]
+    agenda = html[html.index('id="tab-events"'):html.index('id="tab-people"')]
     assert 'href="/api/v1/calendar.ics"' in agenda

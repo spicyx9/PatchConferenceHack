@@ -141,7 +141,10 @@ function pass(name) {
       "Sample data",
     );
     const brightdata = await api("/brightdata");
-    assert.equal(brightdata.data_source, Object.values(brightdata.ready || {}).some(Boolean) ? "live" : "unknown");
+    assert.equal(
+      brightdata.data_source,
+      Object.values(brightdata.ready || {}).some(Boolean) ? "live" : "unknown",
+    );
     assert.equal(
       await page.locator("#stat-events").textContent(),
       String((await api("/events")).items.length),
@@ -200,6 +203,106 @@ function pass(name) {
     );
     await page.getByRole("button", { name: "Clear search" }).click();
     pass("Event type/day filters, search, empty states and filter reset");
+    await nav("story");
+    assert.equal(await page.locator("#degraded-banner").isVisible(), false);
+    assert.equal(await page.locator("#step-roi").isVisible(), false);
+    await nav("people");
+    assert.equal(
+      await page.locator(".people-card .illustrated-avatar").count(),
+      10,
+    );
+    await nav("travel");
+    await page.locator("#research-origin").fill("Paris");
+    await page.locator("#research-depart").fill("2026-11-01");
+    await page.locator("#research-return").fill("2026-11-05");
+    assert.match(
+      decodeURIComponent(
+        await page.locator("#research-flights-link").getAttribute("href"),
+      ),
+      /Paris.*2026-11-01.*2026-11-05/,
+    );
+    assert.match(
+      await page.locator("#research-stays-link").getAttribute("href"),
+      /checkin=2026-11-01&checkout=2026-11-05/,
+    );
+    assert.match(
+      await page.locator("#travel-offer-context").textContent(),
+      /original dates/,
+    );
+    await page.locator("#research-return").fill("2026-10-25");
+    assert.equal(
+      await page
+        .locator("#travel-research-form")
+        .evaluate((f) => f.checkValidity()),
+      false,
+    );
+    await page.locator("#research-depart").fill("2026-10-27");
+    await page.locator("#research-return").fill("2026-10-30");
+    await page.locator("#research-origin").fill("JFK");
+    pass(
+      "Travel provider searches retain chosen dates and validate return order without changing collected offers",
+    );
+    const observedFlights = await api("/flights");
+    const testFlights = [410, 250].map((price, index) => ({
+      ...observedFlights.items[0],
+      id: "test-flight-" + index,
+      total_price: String(price),
+      currency: "USD",
+      source: { provider: "fixture", api: "fixture", tier: 3 },
+      booking_url: "https://example.com/test-flight-" + index,
+    }));
+    await page.route("**/api/v1/flights?alternatives=true", (route) =>
+      route.fulfill({ json: { ...observedFlights, items: testFlights } }),
+    );
+    await page.reload();
+    await settle();
+    await nav("travel");
+    assert.equal(await page.locator(".travel-offer").count(), 2);
+    await page.locator("#flight-sort").selectOption("price");
+    assert.match(
+      await page.locator(".travel-offer").first().textContent(),
+      /250 USD/,
+    );
+    assert.equal(
+      await page
+        .locator(".travel-offer")
+        .first()
+        .getByRole("link")
+        .getAttribute("href"),
+      "https://example.com/test-flight-1",
+    );
+    await page.locator(".travel-offer").first().locator("summary").click();
+    assert.match(
+      await page.locator(".travel-offer").first().textContent(),
+      /Sample data/,
+    );
+    await page.unroute("**/api/v1/flights?alternatives=true");
+    await page.reload();
+    await settle();
+    await nav("travel");
+    pass(
+      "Explicit mocked flight offers sort by observed price and retain provider links and source provenance",
+    );
+    const places = page.locator("#map-places button");
+    assert((await places.count()) > 1);
+    await places.first().click();
+    assert.match(
+      await page.locator("#travel-place-detail").textContent(),
+      /conference/i,
+    );
+    await page.locator("#travel-map-scope").selectOption("nearby");
+    assert((await places.count()) > 1);
+    await nav("graph");
+    const choices = page.locator("#connection-choices button");
+    await choices.nth(1).click();
+    assert.equal(await choices.nth(1).getAttribute("aria-pressed"), "true");
+    assert(
+      (await page.locator("#connection-selected h2").textContent()).trim()
+        .length > 0,
+    );
+    pass(
+      "Quiet discovery, illustrated people, synchronized map selection, and actionable connections",
+    );
 
     for (const width of [1440, 390]) {
       await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
@@ -223,8 +326,16 @@ function pass(name) {
     await page.locator('#tab-story [data-open="goal-dialog"]').first().click();
     await page.locator("#goal-text").fill("");
     await page.locator("#btn-goal").click();
-    assert.equal(await page.locator("#goal-dialog").evaluate((element) => element.open), true);
-    assert.equal(await page.locator("#goal-text").evaluate((element) => element.validity.valueMissing), true);
+    assert.equal(
+      await page.locator("#goal-dialog").evaluate((element) => element.open),
+      true,
+    );
+    assert.equal(
+      await page
+        .locator("#goal-text")
+        .evaluate((element) => element.validity.valueMissing),
+      true,
+    );
     await page.locator("#goal-text").fill("Meet seed investors and engineers");
     await submit("#btn-goal", "/goal");
     await page.waitForFunction(
@@ -281,6 +392,7 @@ function pass(name) {
     );
 
     await nav("events");
+    await page.locator("#agenda-day-tabs button").first().click();
     const beforePlan = await api("/plan");
     const skipped = beforePlan.plan.days.flatMap((d) => d.items)[0];
     await submit(
@@ -465,6 +577,14 @@ function pass(name) {
       await page.locator("#graph").textContent(),
       /visualization could not load|visualization is unavailable/i,
     );
+    if (await page.locator("#connection-map-details").count()) {
+      if (
+        !(await page
+          .locator("#connection-map-details")
+          .evaluate((element) => element.open))
+      )
+        await page.locator("#connection-map-details > summary").click();
+    }
     await page.locator(".graph-text > summary").click();
     assert(
       (await page

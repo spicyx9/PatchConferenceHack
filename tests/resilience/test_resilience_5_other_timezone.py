@@ -50,4 +50,4 @@ def test_other_timezone_event_is_labelled_and_out_of_the_plan() -> None:
     js = client.get("/static/app.js").text
     assert re.search(r"timeZone: tz \|\| EVENT_TZ", js)
     assert re.search(r'tz !== EVENT_TZ \? " \(" \+ tz \+ "\)"', js)
-    assert "fmtTime(e.start_at, e.timezone)" in js
+    assert re.search(r"fmt(?:Time|Hour)\(\s*(?:event|e)\.start_at,\s*(?:event|e)\.timezone\s*\)", js)

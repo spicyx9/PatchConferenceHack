@@ -60,3 +60,22 @@ def test_no_cache_keeps_the_labelled_fixture(tmp_path: Path, no_network: None) -
     body = TestClient(create_app(data=demo, found=Providers(), graph_probe=False)) \
         .get("/api/v1/stays").json()
     assert body["data_source"] == "fixture"
+
+
+def test_comparison_exposes_cached_alternatives_without_changing_trip(no_network: None) -> None:
+    demo = assemble(fixture_slices(), travel_cache.load()).demo
+    client = TestClient(create_app(data=demo, found=Providers(), graph_probe=False))
+    trip_before = client.get("/api/v1/travel").json()["itinerary"]
+    chosen = client.get("/api/v1/flights").json()
+    alternatives = client.get("/api/v1/flights?alternatives=true").json()
+    assert len(alternatives["items"]) > len(chosen["items"])
+    assert alternatives["data_source"] == "cached"
+    assert all(i["source"]["provider"] == "brightdata" for i in alternatives["items"])
+    assert all(i["collected_at"] for i in alternatives["items"])
+    assert client.get("/api/v1/travel").json()["itinerary"] == trip_before
+
+
+def test_alternatives_do_not_inject_cache_into_fixture_session(no_network: None) -> None:
+    demo = assemble(fixture_slices(), None).demo
+    client = TestClient(create_app(data=demo, found=Providers(), graph_probe=False))
+    assert client.get("/api/v1/flights?alternatives=true").json()["items"] == client.get("/api/v1/flights").json()["items"]

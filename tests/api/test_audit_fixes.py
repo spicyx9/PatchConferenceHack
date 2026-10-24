@@ -71,13 +71,12 @@ def _js_function(name: str) -> str:
 
 
 def test_fix5_every_amount_in_the_ui_shows_its_price_status() -> None:
-    travel = _js_function("renderTravel")
-    flight_branch = travel[travel.index('leg.kind === "flight"'):travel.index("var selected")]
-    assert "leg.price_status" in flight_branch
-    assert "priceStatusText(b.flights_price_status)" in travel
-    assert "priceStatusText(b.lodging_price_status)" in travel
-    assert "fmtUsd(b.remaining_usd) + priceStatusText(" in travel
+    assert "leg.price_status" in _js_function("renderFlights")
+    assert "st.price_status" in _js_function("renderStays")
+    # Research does not subtract unselected offers from a remaining budget.
+    assert "b.remaining_usd" not in _js_function("renderTravel")
     assert "spend_price_status" in _js_function("renderRoi")
+
 
 
 def test_fix6_budget_is_labelled_as_a_demo_assumption() -> None:

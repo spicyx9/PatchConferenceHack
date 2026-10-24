@@ -19,7 +19,7 @@ from typing import Any
 from conferge.api.provenance import source_of
 from conferge.core.schemas import FlightOffer, Lodging, RunReport
 from conferge.flights.round_trip_total import display as rt_display
-from conferge.integration.stays_flights import LiveDomain, pick_flights, pick_stays
+from conferge.integration.stays_flights import LiveDomain, dedupe_flights, pick_flights, pick_stays
 
 CACHE_DIR = Path(__file__).resolve().parents[2] / "data" / "cache"
 FILES = {"stays": "stays.json", "flights": "flights.json"}
@@ -87,7 +87,7 @@ def _reports(domain: str, records: list[dict[str, Any]], items: list[Any]) -> li
     return out
 
 
-def load(directory: Path = CACHE_DIR) -> dict[str, LiveDomain] | None:
+def load(directory: Path = CACHE_DIR, *, flight_alternatives: bool = False) -> dict[str, LiveDomain] | None:
     """LiveDomain per domain from the cache files, or None when no cache file exists."""
     found: dict[str, LiveDomain] = {}
     for domain, name in FILES.items():
@@ -96,7 +96,8 @@ def load(directory: Path = CACHE_DIR) -> dict[str, LiveDomain] | None:
             continue
         doc = json.loads(path.read_text(encoding="utf-8"))
         items = [_cached(_MODELS[domain].model_validate(r["record"])) for r in doc["records"]]
-        picked = pick_stays(items) if domain == "stays" else pick_flights(items)
+        picked = (pick_stays(items) if domain == "stays" else
+                  dedupe_flights(items) if flight_alternatives else pick_flights(items))
         labels = Counter(r["provenance"]["label"] for r in doc["records"])
         collected = datetime.fromisoformat(doc["collected_at"]) if doc.get("collected_at") else None
         found[domain] = LiveDomain(

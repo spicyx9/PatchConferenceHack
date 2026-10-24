@@ -529,9 +529,17 @@ def create_app(
         return _envelope(state, ["stays"], {"items": items, "count": len(items)})
 
     @api.get("/flights")
-    def flights() -> dict[str, Any]:
+    def flights(alternatives: bool = False) -> dict[str, Any]:
+        offers = state.data.flights
+        domain = state.data.domains.get("flights")
+        if alternatives and domain and domain.source_mode == "cached":
+            from conferge.integration import travel_cache
+
+            cached = travel_cache.load(flight_alternatives=True)
+            if cached and "flights" in cached:
+                offers = cached["flights"].items
         items = [{**f.model_dump(mode="json"), **rt_display(f), "source": source_of(f.evidence)}
-                 for f in state.data.flights]
+                 for f in offers]
         return _envelope(state, ["flights"], {"items": items, "count": len(items)})
 
     @api.get("/travel")

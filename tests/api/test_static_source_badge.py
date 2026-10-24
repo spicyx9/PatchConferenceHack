@@ -29,8 +29,8 @@ def test_source_api_badge_helper_is_used_on_stays_and_itinerary() -> None:
     assert 'if (!src || typeof src !== "object") return "";' in helper  # degrades when source is absent
     assert "title=" in helper and "snapshot_id" in helper and "esc(" in helper
     assert "sourceApiBadge(st.source)" in _body(js, "renderStays")
-    travel = _body(js, "renderTravel")
-    assert travel.count("sourceApiBadge(leg.source)") == 2  # flight and stay legs
+    travel = _body(js, "renderFlights")
+    assert travel.count("sourceApiBadge(leg.source)") == 1  # every flight offer retains its source
     assert "sourceBadge(leg.source_mode)" in travel  # existing badge kept
     assert "flightPriceText(leg)" in travel
 
@@ -61,7 +61,7 @@ def test_data_pipeline_panel_with_reachability_reads_the_api() -> None:
 
 def test_people_cards_show_linkedin_headline_and_company() -> None:
     js = _app_js()
-    assert "linkedinField(c.linkedin)" in _body(js, "renderPeople")
+    assert "linkedinField(card.linkedin)" in _body(js, "renderPeople")
     field = _body(js, "linkedinField")
     assert "li.headline" in field and "li.company" in field and "identity_confidence" in field
     assert "presence" not in field.replace("never presence", "")  # LinkedIn never claims presence
