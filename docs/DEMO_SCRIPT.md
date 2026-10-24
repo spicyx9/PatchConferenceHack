@@ -1,8 +1,8 @@
 # Demo script (2 minutes)
 
-Every figure below was read on screen, in headless Chrome at 1440 px width, on 2026-10-24 (PT).
-Setup for that run: `main` at 7a4dbef, LinkedIn cache files present in `data/probes/`, the demo
-started on a freshly reset graph, then **Reset session** clicked in the UI. If any figure on the
+Every figure below was read on screen, in headless Chrome at 1440 px width; counts measured 2026-10-24 14:13 PDT on `main` `b12c425`.
+Setup for that run: `FALKORDB_PORT=6380 make predemo` (fresh demo on a reset graph, all checks OK),
+then **Reset session** clicked in the UI. If any figure on the
 day differs, say the figure on screen, not the one written here.
 
 ## Before the demo: make predemo
@@ -55,8 +55,8 @@ non-zero exit. Then continue with step 3 below (browser, Reset session).
 | 0:00 | "Every conference, you miss the three people who mattered. Conferge finds them before you land." | Stay on **Discover**. | Hero "Your week in **San Francisco**", "GitHub Universe 2026 · Oct 28 — Oct 29". |
 | 0:10 | "I tell it why I'm going: I build AI developer tools and I want seed investors, agent founders and Copilot PMs." | Click the **V** avatar (top right). The goal is prefilled. Click **Update your agenda**. | Toast "Goal updated. Your agenda and suggested people have been recalculated." Chips **Meet seed investors (developer tools) · 45 %**, **Meet founders (ai agents) · 35 %**, **Meet product managers (copilot) · 20 %**. |
 | 0:20 | "That goal became an agenda." | Point at the right column. | **194** events to explore, **32** on your agenda, **50** suggested connections. |
-| 0:25 | "Where does the data come from? The official catalog, Luma, Partiful, and Bright Data for what is hard to reach." | Click **How are suggestions made?** (right column), then scroll to **Data pipeline**. | official **210**, luma **12**, partiful **6**, eventbrite **8**, aggregators **7** records. |
-| 0:35 | "Bright Data collected the stays, the flights and the LinkedIn profiles. Here is what it took: no call at query time." | Stay in the dialog; point at the counter and the pipeline rows. | "Records collected through Bright Data: **64**", "Stays via Bright Data: **6/6** · Flights via Bright Data: **1/1**", linkedin row **9** records, "Bright Data calls: none". Reachability: **10 of 21** sites without Bright Data, **14 of 21** with. Close the dialog. |
+| 0:25 | "Where does the data come from? The official catalog, Luma, Partiful, and Bright Data for what is hard to reach." | Click **How are suggestions made?** (right column), then scroll to **Data pipeline**. | official **210**, luma **12**, partiful **6**, eventbrite **8**, aggregators **7** records; Sources overall **partial: Partiful not exhausted, 6 events kept**. |
+| 0:35 | "Bright Data collected the stays, the flights and the LinkedIn profiles. Here is what it took: no call at query time." | Stay in the dialog; point at the counter and the pipeline rows. | "Bright Data: **38** requests, **79** records", product table (Booking 1 / 15, Airbnb 1 / 6, Google Hotels 1 / 0, LinkedIn 6 / 15, Crunchbase 1 / 2, Google Flights Web Unlocker 1 / 34, SERP 17 / 5 and 10 / 2), "Estimated cost $**0.0570**, list price estimate, not billed", "Stays via Bright Data: **6/6** · Flights via Bright Data: **1/1**". Reachability: **10 of 21** sites without Bright Data, **14 of 21** with. Close the dialog. |
 | 0:45 | "My first match is Ryan Hecht. His LinkedIn profile, collected by Bright Data, confirms he works at GitHub." | Tab **People**. Hover the green **brightdata:linkedin** badge on Ryan Hecht's card. | Card **Ryan Hecht**, Product Manager · GitHub, relevance **56**, "LINKEDIN · Not provided · GitHub profile **brightdata:linkedin**". Tooltip: dataset gd_l1viktl72bvl7bjuj0, snapshot sd_mvms2ssrh1bjodbs9, identity_confidence 1. |
 | 0:55 | "And this is why he's on my list: a path in the graph, from my goal to the session where he speaks." | Tab **Discover** → **See why** under Ryan Hecht. | Tab **Connections**, "**FalkorDB connected**". Path: Meet founders (ai agents) → ai agents → GitHub Copilot and Windows: Bringing local models into the workflow → Ryan Hecht. |
 | 1:05 | "Conferge also tells me what to skip. Anti-FOMO." | Tab **Discover**, scroll to "You don't need to be everywhere." | **4** skips: Outside planning hours, Schedule conflict, Travel time, Lower relevance. |
@@ -74,5 +74,4 @@ non-zero exit. Then continue with step 3 below (browser, Reset session).
   profiles. Do not invent one.
 - People tab says **10 suggestions** while Discover says **50** suggested connections: both
   are on screen; quote the one you are pointing at.
-- The live counter line "datasets 0 (not configured)" means no Bright Data call in this process;
-  the **64** records come from the Bright Data cache collected earlier the same day.
+- The counter reads the Bright Data cache collected earlier the same day: 0 requests are made by the running demo; times shown are each record's own `collected_at`.
