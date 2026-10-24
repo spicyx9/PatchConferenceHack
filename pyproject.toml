@@ -14,6 +14,8 @@ dependencies = [
   "fastapi>=0.115,<1",
   "uvicorn>=0.30,<1",
   "falkordb==1.8.0",
+  "pyairbnb==2.2.2",
+  "fast-flights==3.1.0",
 ]
 
 [dependency-groups]
