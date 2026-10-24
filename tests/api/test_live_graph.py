@@ -84,3 +84,25 @@ def test_met_persists_through_graphstore_when_person_exists(monkeypatch) -> None
     merges = [q for q in graph.queries if "MERGE" in q]
     assert any(q.startswith("MERGE (n:Meeting") for q in merges)
     assert any("MERGE (a)-[r:INVOLVES]->(b)" in q for q in merges)
+
+
+def test_graph_path_is_queried_in_falkordb_not_the_capped_sample(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    from conferge.graph import queries as graph_queries
+
+    client, _ = _client(monkeypatch, [])
+    path = {
+        "nodes": [
+            {"id": "g-1", "label": "Goal", "props": {"name": "Meet seed investors", "source_mode": "fixture"}},
+            {"id": "per-x", "label": "Person", "props": {"name": "Ada", "source_mode": "fixture"}},
+        ],
+        "edges": [{"source": "g-1", "target": "per-x", "type": "ABOUT",
+                   "props": {"source": "fixture:w08", "confidence": 0.9}}],
+    }
+    monkeypatch.setattr(graph_queries, "path_user_to_person",
+                        lambda store, user, person: {"rows": [], "paths": [path]})
+    body = client.get("/api/v1/graph/path", params={"person": "per-x"}).json()
+    assert body["backend"] == "falkordb"
+    assert body["node_ids"] == ["g-1", "per-x"]
+    assert body["hops"] == 1
+    assert body["explanation"]
+    assert body["data_source"] == "fixture"

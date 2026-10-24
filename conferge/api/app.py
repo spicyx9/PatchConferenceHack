@@ -334,8 +334,57 @@ def create_app(
                          {"nodes": nodes, "edges": edges, "backend": backend},
                          extra_warnings=notes, mode_override=mode)
 
+    def _falkordb_path(person: str, user: str) -> dict[str, Any] | None:
+        """Explainable goal -> person path queried in FalkorDB itself.
+
+        The /graph read is capped at 400 edges, too small a sample to search for a path.
+        """
+        store = state.store()
+        if store is None:
+            return None
+        try:
+            from conferge.graph import queries as graph_queries
+            from conferge.graph.explain import path_to_text
+
+            found = graph_queries.path_user_to_person(store, user, person)["paths"]
+        except Exception:  # noqa: BLE001 - fall back to the sampled graph, visibly
+            return None
+        if not found:
+            return None
+        path, steps = found[0], []
+        for i, node in enumerate(path["nodes"]):
+            props = node["props"]
+            steps.append({"node": {
+                "id": node["id"], "type": node["label"],
+                "label": str(props.get("name") or props.get("title") or node["id"]),
+                "source_mode": props.get("source_mode") or "unknown",
+            }})
+            if i < len(path["edges"]):
+                e = path["edges"][i]
+                steps.append({"edge": {
+                    "id": f"{e['source']}|{e['type']}|{e['target']}", "source": e["source"],
+                    "target": e["target"], "type": e["type"],
+                    "evidence_source": e["props"].get("source"),
+                    "confidence": e["props"].get("confidence"),
+                    "observed_at": e["props"].get("observed_at"),
+                }})
+        modes = {s["node"]["source_mode"] for s in steps if "node" in s}
+        return {"steps": steps, "explanation": path_to_text(path),
+                "mode": modes.pop() if len(modes) == 1 else "mixed"}
+
     @api.get("/graph/path")
     def graph_path(person: str, user: str = "demo-user") -> dict[str, Any]:
+        live = _falkordb_path(person, user)
+        if live is not None:
+            steps = live["steps"]
+            return _envelope(state, ["people", "events"], {
+                "path": steps,
+                "node_ids": [s["node"]["id"] for s in steps if "node" in s],
+                "edge_ids": [s["edge"]["id"] for s in steps if "edge" in s],
+                "hops": sum(1 for s in steps if "edge" in s),
+                "explanation": live["explanation"], "backend": "falkordb",
+            }, extra_warnings=["path queried in FalkorDB; node source_mode taken from node properties"],
+                mode_override=live["mode"])
         g, mode, notes = _graph()
         start = f"user:{user}"
         if not any(n["id"] == start for n in g["nodes"]):
