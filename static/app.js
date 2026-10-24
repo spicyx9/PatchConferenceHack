@@ -1970,7 +1970,7 @@
         errors,
       ),
       settle(
-        api("/brightdata", null, "brightdata"),
+        api("/brightdata", null, null),
         "collection",
         renderBrightData,
         errors,

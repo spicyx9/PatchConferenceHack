@@ -75,6 +75,7 @@ class DemoState:
         self.skipped: set[str] = set()
         self.accepted: set[str] = set()
         self.scenario_id: str | None = None
+        self.simulated_events: set[str] = set()  # event ids rewritten by /simulate-change
         self.agent_mode: str | None = None
         self.agent_opportunities: list[Opportunity] | None = None
         self.agent_warnings: list[str] = []
@@ -165,7 +166,14 @@ def _envelope(
     status = max((s.status for s in slices), key=lambda s: _STATUS_RANK[s], default="ok")
     if state.rank_mode == DEGRADED_NO_GRAPH and {"people", "events"} & set(domains) and not mode_override:
         data_source, status = DEGRADED_NO_GRAPH, "degraded"
-    warnings = sorted({w for s in slices for w in s.warnings} | set(extra_warnings or []))
+    warnings = {w for s in slices for w in s.warnings} | set(extra_warnings or [])
+    shared = payload.get("plan_graph")
+    if isinstance(shared, dict) and shared.get("error"):  # a 200 must not hide a failed graph write
+        warnings.add(f"plan not written to FalkorDB: {shared['error']}; served from the API process only")
+    if state.scenario_id:  # every response served while a simulation is in force says so
+        warnings.add(f"simulated change active: scenario {state.scenario_id!r} rewrote "
+                     f"{len(state.simulated_events)} event(s); not an update from the source (POST /reset clears it)")
+    warnings = sorted(warnings)
     collected = max((s.collected_at for s in slices), default=None)
     return {
         "data_source": data_source,
@@ -278,8 +286,8 @@ def create_app(
 
     def _plan_warnings() -> list[str]:
         if state.rank_mode == "graph":
-            return list(state.rank_warnings)
-        base = [*state.rank_warnings, *state.agent_warnings]
+            return [*state.rank_warnings, *logic.goal_warnings(state.goals)]
+        base = [*state.rank_warnings, *state.agent_warnings, *logic.goal_warnings(state.goals)]
         if state.agent_mode is None:
             base.append("planner agent not available: deterministic api-fallback ranking")
         return base
@@ -288,9 +296,7 @@ def create_app(
     async def goal(req: GoalRequest) -> dict[str, Any]:
         if req.conference_id and req.conference_id != state.data.conference.id:
             raise HTTPException(404, f"unknown conference_id {req.conference_id!r}")
-        goals = logic.parse_goals(req.text)
-        if not goals:
-            raise HTTPException(422, "no goal recognised; mention investors, founders, PMs or engineers")
+        goals = logic.parse_goals(req.text)  # never empty: unknown role -> tagged defaults + warning
         state.goal_text, state.goals = req.text, goals
         state.agent_mode, state.agent_opportunities, state.agent_warnings = None, None, []
         state.invalidate()
@@ -330,11 +336,15 @@ def create_app(
 
         client = bd.BrightDataClient.from_env()
         apis = ("datasets", "web_unlocker", "serp")
+        ready = {api: client.not_ready(api) is None for api in apis}
+        # "live" only when at least one Bright Data API can actually be called from this
+        # process; without a key nothing here is live, so the label says "unknown".
+        notes = [] if any(ready.values()) else ["Bright Data not configured: no API ready in this process"]
         return _envelope(state, [], {
             "usage": bd.usage(),
-            "ready": {api: client.not_ready(api) is None for api in apis},
+            "ready": ready,
             "not_ready_reason": {api: client.not_ready(api) for api in apis},
-        }, mode_override="live")
+        }, extra_warnings=notes, mode_override="live" if any(ready.values()) else "unknown")
 
     @api.get("/search")
     def search(q: str = Query(..., min_length=2, max_length=100),
@@ -393,7 +403,7 @@ def create_app(
         if store is not None:
             skips_written = publish_skips(store, USER_ID, skips)
         return _envelope(state, ["events", "people"], {
-            "skips": skips, "computed_by": result.agent, "status": result.status,
+            "skips": skips, "computed_by": result.agent, "agent_status": result.status,
             "plan_source": "falkordb" if store is not None else "process",
             "plan_version": plan_version, "skips_graph": skips_written,
         }, extra_warnings=notes)
@@ -435,6 +445,7 @@ def create_app(
             item["attended"] = event.id in state.attended
             item["skipped"] = event.id in state.skipped
             item.update(event_artwork(event, covers))
+            item["simulated"] = event.id in state.simulated_events
             out.append(item)
         out.sort(key=lambda e: (e["start_at"] is None, e["start_at"] or "", e["id"]))
         return out
@@ -596,7 +607,10 @@ def create_app(
         payload = _plan_payload()
         payload.update({"person_id": person.id, "persisted": persisted,
                         "memory_id": memory_id if persisted == "falkordb" else None})
-        return _envelope(state, ["people", "events"], payload, extra_warnings=_plan_warnings())
+        notes = _plan_warnings()
+        if persisted == "memory":
+            notes.append("meeting kept in process memory only: not written to FalkorDB")
+        return _envelope(state, ["people", "events"], payload, extra_warnings=notes)
 
     @api.get("/followup")
     def followup(person: str) -> dict[str, Any]:
@@ -616,7 +630,9 @@ def create_app(
             note=state.met.get(found.id) or None,
             path_text=opp.rationale if opp else None, met_at=state.met_at.get(found.id),
         )
-        return _envelope(state, ["people"], draft.model_dump(mode="json"))
+        payload = draft.model_dump(mode="json")
+        payload["draft_status"] = payload.pop("status")  # "status" belongs to the envelope
+        return _envelope(state, ["people"], payload)
 
     def _event_or_404(event_id: str) -> None:
         if state.data.event(event_id) is None:
@@ -646,7 +662,10 @@ def create_app(
                 persisted = "memory"
         payload = _plan_payload()
         payload.update({"event_id": req.event_id, "reason": req.reason, "persisted": persisted})
-        return _envelope(state, ["events", "people"], payload, extra_warnings=_plan_warnings())
+        notes = _plan_warnings()
+        if persisted == "memory":
+            notes.append("skip kept in process memory only: not written to FalkorDB")
+        return _envelope(state, ["events", "people"], payload, extra_warnings=notes)
 
     @api.get("/scenarios")
     def scenarios() -> dict[str, Any]:
@@ -681,6 +700,7 @@ def create_app(
         _publish_plan(before)  # the replanner reads the plan in force from the graph
         changed = logic.apply_scenario(state.data, scenario)
         state.scenario_id = scenario["id"]
+        state.simulated_events.update(changed)
         payload = _plan_payload(publish=False)
         store = state.store()
         if store is not None:
@@ -727,7 +747,18 @@ def create_app(
     @api.post("/reset")
     def reset() -> dict[str, Any]:
         state.reset()
-        return _envelope(state, ["events", "people"], _plan_payload(), extra_warnings=_plan_warnings())
+        cleared: dict[str, int] | None = None
+        notes: list[str] = []
+        store = state.store()
+        if store is not None:
+            try:  # the graph memory too: otherwise a reset would not reset the ranking
+                cleared = store.delete_user_state(USER_ID)
+            except Exception as exc:  # noqa: BLE001 - visible: the ranking will still exclude MET people
+                notes.append(f"graph memory kept: FalkorDB delete failed ({type(exc).__name__}); "
+                             "people met earlier stay excluded from the ranking")
+        payload = _plan_payload()
+        payload["graph_memory_cleared"] = cleared
+        return _envelope(state, ["events", "people"], payload, extra_warnings=[*_plan_warnings(), *notes])
 
     @api.post("/proposal/accept")
     def proposal_accept(req: ProposalRequest) -> dict[str, Any]:

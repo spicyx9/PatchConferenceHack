@@ -53,7 +53,7 @@ def test_health(client: TestClient) -> None:
 def test_parse_demo_goal_weights() -> None:
     goals = logic.parse_goals(DEMO_TEXT)
     assert [(g.id, g.priority) for g in goals] == [
-        ("goal-seed-investors", 0.45), ("goal-agent-founders", 0.35), ("goal-copilot-pm", 0.2),
+        ("goal-seed-investors", 0.45), ("goal-agent-founders", 0.35), ("goal-copilot-pms", 0.2),
     ]
 
 
@@ -74,9 +74,19 @@ def test_goal_demo_returns_people_and_two_day_plan(client: TestClient) -> None:
     assert any("planner agent not available" in w for w in body["warnings"])
 
 
-def test_goal_rejects_unknown_conference_and_empty_goal(client: TestClient) -> None:
+def test_goal_rejects_unknown_conference_and_flags_unknown_role(client: TestClient) -> None:
     assert client.post("/api/v1/goal", json={"text": "x", "conference_id": "nope"}).status_code == 404
-    assert client.post("/api/v1/goal", json={"text": "just sightseeing"}).status_code == 422
+    res = client.post("/api/v1/goal", json={"text": "just sightseeing"})
+    assert res.status_code == 200
+    body = res.json()
+    assert "role unknown: using default goals" in body["warnings"]
+    assert [g["id"] for g in body["goals"]] == ["goal-seed-investors", "goal-agent-founders", "goal-copilot-pms"]
+    assert all(any(t.startswith("default:") for t in g["tags"]) for g in body["goals"])
+    assert "role unknown: using default goals" in client.get("/api/v1/plan").json()["warnings"]
+    # A recognised sentence clears the warning.
+    body = client.post("/api/v1/goal", json={"text": "Rencontrer des recruteurs et des DevRel"}).json()
+    assert "role unknown: using default goals" not in body["warnings"]
+    assert [g["target_roles"] for g in body["goals"]] == [["recruiter"], ["devrel"]]
 
 
 @pytest.mark.parametrize("path", [

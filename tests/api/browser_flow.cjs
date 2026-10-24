@@ -140,7 +140,8 @@ function pass(name) {
       await page.locator("#badge-source").textContent(),
       "Sample data",
     );
-    assert.equal((await api("/brightdata")).data_source, "live");
+    const brightdata = await api("/brightdata");
+    assert.equal(brightdata.data_source, Object.values(brightdata.ready || {}).some(Boolean) ? "live" : "unknown");
     assert.equal(
       await page.locator("#stat-events").textContent(),
       String((await api("/events")).items.length),

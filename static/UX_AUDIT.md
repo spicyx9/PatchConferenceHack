@@ -55,7 +55,7 @@ Primary files: `conferge/core/schemas.py`, `conferge/integration/components.py`,
 - Saving a travel proposal does not book it, and budget is indicative.
 - Simulations modify the demo dataset; they are not source-observed updates.
 - The demo state is shared per application process, without multi-user isolation.
-- Resetting the API scenario does not erase persistent FalkorDB meeting memory.
+- Resetting the API scenario clears the user’s graph meeting and skipped-event state through the graph store; failures remain explicit.
 - No account, checkout, travel-date editing or external RSVP flow was added.
 
 ## Validation environment
@@ -73,7 +73,7 @@ not verified by the browser run. Before/after captures use the same fixture sour
 conference, goal, viewport and initial scenario.
 
 Baseline `make check`: 984 passed, 22 skipped, Ruff clean.
-Final `make check`: 1029 passed, 22 skipped, Ruff clean. Browser journey: 14 checks passed, including all five views at 320/390/768/1440 px, actual API mutations, accessible dialogs, partial-network retry, unavailable visualization CDNs, and no uncaught JavaScript errors. Automated WCAG checks found no violations on the five views and event detail.
+Local `make check` and the actual-API browser journey passed; the merged-base GitHub CI is checked before landing. Browser journey: 14 checks passed, including all five views at 320/390/768/1440 px, actual API mutations, accessible dialogs, partial-network retry, unavailable visualization CDNs, and no uncaught JavaScript errors. Automated WCAG checks found no violations on the five views and event detail.
 
 A repeatable browser probe is in `tests/api/browser_flow.cjs`. It requires Playwright,
 a local fixture server and `BASE_URL`; optional `EVIDENCE_DIR` saves captures and
