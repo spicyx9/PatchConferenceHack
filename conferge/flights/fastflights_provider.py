@@ -20,6 +20,7 @@ from collections.abc import Callable
 from datetime import date, datetime, timezone
 from typing import Any
 
+from conferge.core.brightdata import record_usage
 from conferge.core.schemas import FlightOffer, RunReport, SourceEvidence
 from conferge.core.settings import env_value
 from conferge.flights.normalize import (
@@ -117,6 +118,7 @@ class FastFlightsProvider:
             try:
                 result = await asyncio.to_thread(
                     get_flights, query, integration=BrightData(api_key=key, zone=zone))
+                record_usage("serp")  # one Google Flights page through the Bright Data SERP zone
                 return list(result or []), query.url()
             except Exception as exc:  # noqa: BLE001 - the SERP transport failed: go direct
                 failures.append(f"bright_data_serp_transport_failed: "
