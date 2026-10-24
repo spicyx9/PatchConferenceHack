@@ -6,7 +6,6 @@ are parameterized. Feature windows must use GraphStore, never direct MERGE.
 
 from __future__ import annotations
 
-import os
 import re
 from typing import Any, Protocol
 
@@ -82,11 +81,11 @@ def connect_graph():  # type: ignore[no-untyped-def]
     """Connect only when called; import remains testable without FalkorDB running."""
     from falkordb import FalkorDB
 
-    args: dict[str, Any] = {
-        "host": os.getenv("FALKORDB_HOST", "127.0.0.1"),
-        "port": int(os.getenv("FALKORDB_PORT", "6379")),
-    }
-    if os.getenv("FALKORDB_PASSWORD"):
-        args["password"] = os.environ["FALKORDB_PASSWORD"]
+    from conferge.core.settings import env_value, falkordb_address
+
+    host, port = falkordb_address()
+    args: dict[str, Any] = {"host": host, "port": port}
+    if env_value("FALKORDB_PASSWORD"):
+        args["password"] = env_value("FALKORDB_PASSWORD")
     db = FalkorDB(**args)
-    return GraphStore(db.select_graph(os.getenv("FALKORDB_GRAPH", "conferge")))
+    return GraphStore(db.select_graph(env_value("FALKORDB_GRAPH", "conferge") or "conferge"))

@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import importlib
 import inspect
-import os
 import socket
 from dataclasses import dataclass, field
 from typing import Any
@@ -92,7 +91,9 @@ async def run_agent(agent: Any, ctx: AgentContext) -> AgentResult:
 # FalkorDB
 
 def _falkordb_address() -> tuple[str, int]:
-    return os.getenv("FALKORDB_HOST", "127.0.0.1"), int(os.getenv("FALKORDB_PORT", "6379"))
+    from conferge.core.settings import falkordb_address
+
+    return falkordb_address()
 
 
 def falkordb_reachable(timeout: float = 0.3) -> bool:
