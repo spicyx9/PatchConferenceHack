@@ -96,3 +96,21 @@ def test_fix9_conference_name_and_dates_come_from_the_data() -> None:
     assert "GitHub Universe 2026" not in html and "October 28" not in html  # no hard-coded fact
     render = _js_function("renderConference")
     assert "conf.name" in render and "conf.start_date" in render and "conf.end_date" in render
+
+
+def test_fix1_draft_never_asserts_where_the_meeting_happened() -> None:
+    from fastapi.testclient import TestClient
+
+    from conferge.api.app import create_app
+
+    client = TestClient(create_app(found=providers.Providers(), graph_probe=False))
+    data = load_fixture()
+    person = next(p for p in data.people if any(data.event(e) for e in p.event_ids))
+    event = next(data.event(e) for e in person.event_ids if data.event(e))
+    client.post("/api/v1/met", json={"person_id": person.id, "note": "seed round"})
+    draft = client.get("/api/v1/followup", params={"person": person.id}).json()
+    assert f"at {data.conference.name}" in draft["message"] and event.title not in draft["message"]
+    assert draft["based_on"]["event"] is None and draft["based_on"]["person_event"] == event.title
+    client.post("/api/v1/attended", json={"event_id": event.id})  # the user says they were there
+    draft = client.get("/api/v1/followup", params={"person": person.id}).json()
+    assert f"Good to meet you at {event.title}" in draft["message"]

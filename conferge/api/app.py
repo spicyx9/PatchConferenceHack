@@ -674,10 +674,13 @@ def create_app(
         if found.id not in state.met:
             raise HTTPException(409, f"{person!r} not met yet: record the meeting first")
         opp = next((o for o in state.opportunities() if found.id in o.person_ids), None)
-        event = next((e for e in (state.data.event(i) for i in found.event_ids) if e is not None), None)
+        person_events = [e for e in (state.data.event(i) for i in found.event_ids) if e is not None]
+        # Where they met is known only if the user attended one of the person's events.
+        met_event = next((e for e in person_events if e.id in state.attended), None)
         draft = draft_followup(
             found, conference=state.data.conference, goal=best_goal(found, state.goals),
-            event=event, company=state.data.company(found.company_id),
+            event=met_event, person_event=person_events[0] if person_events else None,
+            company=state.data.company(found.company_id),
             note=state.met.get(found.id) or None,
             path_text=opp.rationale if opp else None, met_at=state.met_at.get(found.id),
         )
