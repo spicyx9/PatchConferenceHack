@@ -437,8 +437,12 @@ def _corroboration(existing: dict[str, Any], e: Enrichment) -> dict[str, Any]:
         "linkedin_observed_at": pr.collected_at, "linkedin_source_url": pr.linkedin_url,
         "linkedin_source_mode": pr.source_mode, "linkedin_title": pr.title,
     }
-    if first:
-        props["evidence_count"] = int(existing.get("evidence_count") or len(sources)) + 1
+    # The demo reload rewrites evidence_count from the person record (1): it never stays
+    # below the number of distinct sources, and LinkedIn counts once.
+    count = int(existing.get("evidence_count") or 0)
+    wanted = count + 1 if first else max(count, len(sources))
+    if wanted != count:
+        props["evidence_count"] = wanted
     known = existing.get("identity_confidence")
     if e.identity_confidence is not None and (known is None or e.identity_confidence > known):
         props["identity_confidence"] = e.identity_confidence
