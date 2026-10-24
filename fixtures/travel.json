@@ -1,0 +1,994 @@
+{
+  "captured_live_at": "2026-10-24T07:29:56.446433+00:00",
+  "note": "Replay of a live probe capture, relabelled fixture. Not live data.",
+  "plans": [
+    {
+      "collected_at": "2026-10-24T07:29:57.958225Z",
+      "destination": {
+        "bart_station": null,
+        "coordinate_precision": "approximate",
+        "iata": null,
+        "id": "venue-fort-mason",
+        "kind": "venue",
+        "latitude": 37.806,
+        "longitude": -122.432,
+        "name": "Fort Mason Center",
+        "source_url": "https://fortmason.org/"
+      },
+      "errors": [
+        "uber estimator: BRIGHTDATA_UNLOCKER_ZONE not configured",
+        "Muni/Caltrain/VTA legs not computed: 511.org transit key not configured"
+      ],
+      "options": [
+        {
+          "complete": true,
+          "id": "airport-sfo--venue-fort-mason-bart-walk",
+          "label": "BART to Embarcadero BART then walk",
+          "legs": [
+            {
+              "arrival_local": "2026-10-27T18:31:00-07:00",
+              "collected_at": "2026-10-24T07:29:56.861109Z",
+              "departure_local": "2026-10-27T18:00:00-07:00",
+              "distance_m": null,
+              "duration_minutes": 31,
+              "duration_status": "scheduled",
+              "evidence": [
+                {
+                  "collected_at": "2026-10-24T07:29:56.861109Z",
+                  "confidence": null,
+                  "provider": "bart",
+                  "raw_ref": null,
+                  "source_mode": "fixture",
+                  "source_record_id": null,
+                  "source_url": "https://api.bart.gov/api/sched.aspx?cmd=depart&orig=SFIA&dest=EMBR&date=10%2F27%2F2026&time=6%3A00pm&b=0&a=3&json=y"
+                }
+              ],
+              "from_place": {
+                "bart_station": "SFIA",
+                "coordinate_precision": "approximate",
+                "iata": "SFO",
+                "id": "airport-sfo",
+                "kind": "airport",
+                "latitude": 37.6213,
+                "longitude": -122.379,
+                "name": "San Francisco International Airport",
+                "source_url": null
+              },
+              "line": "ROUTE 2",
+              "mode": "bart",
+              "price": {
+                "amount": "11.80",
+                "currency": "USD",
+                "fare_class": "adult_clipper",
+                "note": "BART published fare for adult Clipper",
+                "status": "exact"
+              },
+              "provider": "bart",
+              "source_mode": "fixture",
+              "source_url": "https://api.bart.gov/api/sched.aspx?cmd=depart&orig=SFIA&dest=EMBR&date=10%2F27%2F2026&time=6%3A00pm&b=0&a=3&json=y",
+              "to_place": {
+                "bart_station": "EMBR",
+                "coordinate_precision": "approximate",
+                "iata": null,
+                "id": "station-bart-embr",
+                "kind": "station",
+                "latitude": 37.7929,
+                "longitude": -122.3975,
+                "name": "Embarcadero BART",
+                "source_url": null
+              },
+              "warnings": [
+                "FIXTURE: replay of a past live capture"
+              ]
+            },
+            {
+              "arrival_local": "2026-10-27T19:24:21.900000-07:00",
+              "collected_at": "2026-10-24T07:29:57.397372Z",
+              "departure_local": "2026-10-27T18:31:00-07:00",
+              "distance_m": 4003,
+              "duration_minutes": 54,
+              "duration_status": "estimate",
+              "evidence": [
+                {
+                  "collected_at": "2026-10-24T07:29:57.397372Z",
+                  "confidence": null,
+                  "provider": "osrm",
+                  "raw_ref": null,
+                  "source_mode": "fixture",
+                  "source_record_id": null,
+                  "source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/foot/-122.3975,37.7929;-122.432,37.806?overview=false"
+                }
+              ],
+              "from_place": {
+                "bart_station": "EMBR",
+                "coordinate_precision": "approximate",
+                "iata": null,
+                "id": "station-bart-embr",
+                "kind": "station",
+                "latitude": 37.7929,
+                "longitude": -122.3975,
+                "name": "Embarcadero BART",
+                "source_url": null
+              },
+              "line": null,
+              "mode": "walk",
+              "price": {
+                "amount": "0",
+                "currency": "USD",
+                "fare_class": null,
+                "note": "walking",
+                "status": "exact"
+              },
+              "provider": "osrm",
+              "source_mode": "fixture",
+              "source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/foot/-122.3975,37.7929;-122.432,37.806?overview=false",
+              "to_place": {
+                "bart_station": null,
+                "coordinate_precision": "approximate",
+                "iata": null,
+                "id": "venue-fort-mason",
+                "kind": "venue",
+                "latitude": 37.806,
+                "longitude": -122.432,
+                "name": "Fort Mason Center",
+                "source_url": "https://fortmason.org/"
+              },
+              "warnings": [
+                "OSRM foot profile estimate",
+                "FIXTURE: replay of a past live capture"
+              ]
+            }
+          ],
+          "total_duration_minutes": 85,
+          "total_price": {
+            "amount": "11.80",
+            "currency": "USD",
+            "fare_class": null,
+            "note": null,
+            "status": "exact"
+          },
+          "warnings": [
+            "OSRM foot profile estimate"
+          ]
+        },
+        {
+          "complete": false,
+          "id": "airport-sfo--venue-fort-mason-drive",
+          "label": "Taxi or rideshare (driving time)",
+          "legs": [
+            {
+              "arrival_local": "2026-10-27T18:28:42.900000-07:00",
+              "collected_at": "2026-10-24T07:29:57.958025Z",
+              "departure_local": "2026-10-27T18:00:00-07:00",
+              "distance_m": 26300,
+              "duration_minutes": 29,
+              "duration_status": "estimate",
+              "evidence": [
+                {
+                  "collected_at": "2026-10-24T07:29:57.958025Z",
+                  "confidence": null,
+                  "provider": "osrm",
+                  "raw_ref": null,
+                  "source_mode": "fixture",
+                  "source_record_id": null,
+                  "source_url": "https://router.project-osrm.org/route/v1/driving/-122.379,37.6213;-122.432,37.806?overview=false"
+                }
+              ],
+              "from_place": {
+                "bart_station": "SFIA",
+                "coordinate_precision": "approximate",
+                "iata": "SFO",
+                "id": "airport-sfo",
+                "kind": "airport",
+                "latitude": 37.6213,
+                "longitude": -122.379,
+                "name": "San Francisco International Airport",
+                "source_url": null
+              },
+              "line": null,
+              "mode": "drive",
+              "price": {
+                "amount": null,
+                "currency": null,
+                "fare_class": null,
+                "note": null,
+                "status": "unknown"
+              },
+              "provider": "osrm",
+              "source_mode": "fixture",
+              "source_url": "https://router.project-osrm.org/route/v1/driving/-122.379,37.6213;-122.432,37.806?overview=false",
+              "to_place": {
+                "bart_station": null,
+                "coordinate_precision": "approximate",
+                "iata": null,
+                "id": "venue-fort-mason",
+                "kind": "venue",
+                "latitude": 37.806,
+                "longitude": -122.432,
+                "name": "Fort Mason Center",
+                "source_url": "https://fortmason.org/"
+              },
+              "warnings": [
+                "OSRM free-flow driving time, no live traffic; taxi/rideshare fare unknown",
+                "FIXTURE: replay of a past live capture"
+              ]
+            }
+          ],
+          "total_duration_minutes": 29,
+          "total_price": {
+            "amount": null,
+            "currency": null,
+            "fare_class": null,
+            "note": null,
+            "status": "unknown"
+          },
+          "warnings": [
+            "rideshare fare unknown: no trusted estimate collected",
+            "OSRM free-flow driving time, no live traffic; taxi/rideshare fare unknown"
+          ]
+        }
+      ],
+      "origin": {
+        "bart_station": "SFIA",
+        "coordinate_precision": "approximate",
+        "iata": "SFO",
+        "id": "airport-sfo",
+        "kind": "airport",
+        "latitude": 37.6213,
+        "longitude": -122.379,
+        "name": "San Francisco International Airport",
+        "source_url": null
+      },
+      "reports": [
+        {
+          "errors": [],
+          "expected_count": null,
+          "fetched_count": 3,
+          "finished_at": "2026-10-24T07:29:56.864267Z",
+          "pages": 1,
+          "provider": "bart",
+          "source_mode": "fixture",
+          "started_at": "2026-10-24T07:29:56.480833Z",
+          "status": "ok",
+          "termination": "exhausted",
+          "unique_count": 3,
+          "warnings": []
+        },
+        {
+          "errors": [],
+          "expected_count": null,
+          "fetched_count": 1,
+          "finished_at": "2026-10-24T07:29:57.397523Z",
+          "pages": 1,
+          "provider": "osrm",
+          "source_mode": "fixture",
+          "started_at": "2026-10-24T07:29:56.864346Z",
+          "status": "ok",
+          "termination": "exhausted",
+          "unique_count": 1,
+          "warnings": [
+            "OSRM foot profile estimate"
+          ]
+        },
+        {
+          "errors": [],
+          "expected_count": null,
+          "fetched_count": 1,
+          "finished_at": "2026-10-24T07:29:57.958108Z",
+          "pages": 1,
+          "provider": "osrm",
+          "source_mode": "fixture",
+          "started_at": "2026-10-24T07:29:57.397865Z",
+          "status": "ok",
+          "termination": "exhausted",
+          "unique_count": 1,
+          "warnings": [
+            "OSRM free-flow driving time, no live traffic; taxi/rideshare fare unknown"
+          ]
+        },
+        {
+          "errors": [
+            "uber estimator: BRIGHTDATA_UNLOCKER_ZONE not configured"
+          ],
+          "expected_count": null,
+          "fetched_count": 0,
+          "finished_at": "2026-10-24T07:29:57.413639Z",
+          "pages": 0,
+          "provider": "uber_estimator",
+          "source_mode": "fixture",
+          "started_at": "2026-10-24T07:29:57.406763Z",
+          "status": "failed",
+          "termination": "error",
+          "unique_count": 0,
+          "warnings": []
+        }
+      ],
+      "source_mode": "fixture",
+      "status": "degraded"
+    },
+    {
+      "collected_at": "2026-10-24T07:29:59.479071Z",
+      "destination": {
+        "bart_station": null,
+        "coordinate_precision": "approximate",
+        "iata": null,
+        "id": "venue-fort-mason",
+        "kind": "venue",
+        "latitude": 37.806,
+        "longitude": -122.432,
+        "name": "Fort Mason Center",
+        "source_url": "https://fortmason.org/"
+      },
+      "errors": [
+        "uber estimator: BRIGHTDATA_UNLOCKER_ZONE not configured",
+        "Muni/Caltrain/VTA legs not computed: 511.org transit key not configured"
+      ],
+      "options": [
+        {
+          "complete": true,
+          "id": "airport-oak--venue-fort-mason-bart-walk",
+          "label": "BART to Embarcadero BART then walk",
+          "legs": [
+            {
+              "arrival_local": "2026-10-27T18:36:00-07:00",
+              "collected_at": "2026-10-24T07:29:58.328677Z",
+              "departure_local": "2026-10-27T18:00:00-07:00",
+              "distance_m": null,
+              "duration_minutes": 36,
+              "duration_status": "scheduled",
+              "evidence": [
+                {
+                  "collected_at": "2026-10-24T07:29:58.328677Z",
+                  "confidence": null,
+                  "provider": "bart",
+                  "raw_ref": null,
+                  "source_mode": "fixture",
+                  "source_record_id": null,
+                  "source_url": "https://api.bart.gov/api/sched.aspx?cmd=depart&orig=OAKL&dest=EMBR&date=10%2F27%2F2026&time=6%3A00pm&b=0&a=3&json=y"
+                }
+              ],
+              "from_place": {
+                "bart_station": "OAKL",
+                "coordinate_precision": "approximate",
+                "iata": "OAK",
+                "id": "airport-oak",
+                "kind": "airport",
+                "latitude": 37.7126,
+                "longitude": -122.2197,
+                "name": "Oakland International Airport",
+                "source_url": null
+              },
+              "line": "ROUTE 19 + ROUTE 11",
+              "mode": "bart",
+              "price": {
+                "amount": "13.45",
+                "currency": "USD",
+                "fare_class": "adult_clipper",
+                "note": "BART published fare for adult Clipper",
+                "status": "exact"
+              },
+              "provider": "bart",
+              "source_mode": "fixture",
+              "source_url": "https://api.bart.gov/api/sched.aspx?cmd=depart&orig=OAKL&dest=EMBR&date=10%2F27%2F2026&time=6%3A00pm&b=0&a=3&json=y",
+              "to_place": {
+                "bart_station": "EMBR",
+                "coordinate_precision": "approximate",
+                "iata": null,
+                "id": "station-bart-embr",
+                "kind": "station",
+                "latitude": 37.7929,
+                "longitude": -122.3975,
+                "name": "Embarcadero BART",
+                "source_url": null
+              },
+              "warnings": [
+                "transfer at COLS",
+                "FIXTURE: replay of a past live capture"
+              ]
+            },
+            {
+              "arrival_local": "2026-10-27T19:29:21.900000-07:00",
+              "collected_at": "2026-10-24T07:29:58.918947Z",
+              "departure_local": "2026-10-27T18:36:00-07:00",
+              "distance_m": 4003,
+              "duration_minutes": 54,
+              "duration_status": "estimate",
+              "evidence": [
+                {
+                  "collected_at": "2026-10-24T07:29:58.918947Z",
+                  "confidence": null,
+                  "provider": "osrm",
+                  "raw_ref": null,
+                  "source_mode": "fixture",
+                  "source_record_id": null,
+                  "source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/foot/-122.3975,37.7929;-122.432,37.806?overview=false"
+                }
+              ],
+              "from_place": {
+                "bart_station": "EMBR",
+                "coordinate_precision": "approximate",
+                "iata": null,
+                "id": "station-bart-embr",
+                "kind": "station",
+                "latitude": 37.7929,
+                "longitude": -122.3975,
+                "name": "Embarcadero BART",
+                "source_url": null
+              },
+              "line": null,
+              "mode": "walk",
+              "price": {
+                "amount": "0",
+                "currency": "USD",
+                "fare_class": null,
+                "note": "walking",
+                "status": "exact"
+              },
+              "provider": "osrm",
+              "source_mode": "fixture",
+              "source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/foot/-122.3975,37.7929;-122.432,37.806?overview=false",
+              "to_place": {
+                "bart_station": null,
+                "coordinate_precision": "approximate",
+                "iata": null,
+                "id": "venue-fort-mason",
+                "kind": "venue",
+                "latitude": 37.806,
+                "longitude": -122.432,
+                "name": "Fort Mason Center",
+                "source_url": "https://fortmason.org/"
+              },
+              "warnings": [
+                "OSRM foot profile estimate",
+                "FIXTURE: replay of a past live capture"
+              ]
+            }
+          ],
+          "total_duration_minutes": 90,
+          "total_price": {
+            "amount": "13.45",
+            "currency": "USD",
+            "fare_class": null,
+            "note": null,
+            "status": "exact"
+          },
+          "warnings": [
+            "transfer at COLS",
+            "OSRM foot profile estimate"
+          ]
+        },
+        {
+          "complete": false,
+          "id": "airport-oak--venue-fort-mason-drive",
+          "label": "Taxi or rideshare (driving time)",
+          "legs": [
+            {
+              "arrival_local": "2026-10-27T18:39:25.500000-07:00",
+              "collected_at": "2026-10-24T07:29:59.478728Z",
+              "departure_local": "2026-10-27T18:00:00-07:00",
+              "distance_m": 35306,
+              "duration_minutes": 40,
+              "duration_status": "estimate",
+              "evidence": [
+                {
+                  "collected_at": "2026-10-24T07:29:59.478728Z",
+                  "confidence": null,
+                  "provider": "osrm",
+                  "raw_ref": null,
+                  "source_mode": "fixture",
+                  "source_record_id": null,
+                  "source_url": "https://router.project-osrm.org/route/v1/driving/-122.2197,37.7126;-122.432,37.806?overview=false"
+                }
+              ],
+              "from_place": {
+                "bart_station": "OAKL",
+                "coordinate_precision": "approximate",
+                "iata": "OAK",
+                "id": "airport-oak",
+                "kind": "airport",
+                "latitude": 37.7126,
+                "longitude": -122.2197,
+                "name": "Oakland International Airport",
+                "source_url": null
+              },
+              "line": null,
+              "mode": "drive",
+              "price": {
+                "amount": null,
+                "currency": null,
+                "fare_class": null,
+                "note": null,
+                "status": "unknown"
+              },
+              "provider": "osrm",
+              "source_mode": "fixture",
+              "source_url": "https://router.project-osrm.org/route/v1/driving/-122.2197,37.7126;-122.432,37.806?overview=false",
+              "to_place": {
+                "bart_station": null,
+                "coordinate_precision": "approximate",
+                "iata": null,
+                "id": "venue-fort-mason",
+                "kind": "venue",
+                "latitude": 37.806,
+                "longitude": -122.432,
+                "name": "Fort Mason Center",
+                "source_url": "https://fortmason.org/"
+              },
+              "warnings": [
+                "OSRM free-flow driving time, no live traffic; taxi/rideshare fare unknown",
+                "FIXTURE: replay of a past live capture"
+              ]
+            }
+          ],
+          "total_duration_minutes": 40,
+          "total_price": {
+            "amount": null,
+            "currency": null,
+            "fare_class": null,
+            "note": null,
+            "status": "unknown"
+          },
+          "warnings": [
+            "rideshare fare unknown: no trusted estimate collected",
+            "OSRM free-flow driving time, no live traffic; taxi/rideshare fare unknown"
+          ]
+        }
+      ],
+      "origin": {
+        "bart_station": "OAKL",
+        "coordinate_precision": "approximate",
+        "iata": "OAK",
+        "id": "airport-oak",
+        "kind": "airport",
+        "latitude": 37.7126,
+        "longitude": -122.2197,
+        "name": "Oakland International Airport",
+        "source_url": null
+      },
+      "reports": [
+        {
+          "errors": [],
+          "expected_count": null,
+          "fetched_count": 3,
+          "finished_at": "2026-10-24T07:29:58.329065Z",
+          "pages": 1,
+          "provider": "bart",
+          "source_mode": "fixture",
+          "started_at": "2026-10-24T07:29:57.958253Z",
+          "status": "ok",
+          "termination": "exhausted",
+          "unique_count": 3,
+          "warnings": []
+        },
+        {
+          "errors": [],
+          "expected_count": null,
+          "fetched_count": 1,
+          "finished_at": "2026-10-24T07:29:58.919101Z",
+          "pages": 1,
+          "provider": "osrm",
+          "source_mode": "fixture",
+          "started_at": "2026-10-24T07:29:58.329129Z",
+          "status": "ok",
+          "termination": "exhausted",
+          "unique_count": 1,
+          "warnings": [
+            "OSRM foot profile estimate"
+          ]
+        },
+        {
+          "errors": [],
+          "expected_count": null,
+          "fetched_count": 1,
+          "finished_at": "2026-10-24T07:29:59.478853Z",
+          "pages": 1,
+          "provider": "osrm",
+          "source_mode": "fixture",
+          "started_at": "2026-10-24T07:29:58.919435Z",
+          "status": "ok",
+          "termination": "exhausted",
+          "unique_count": 1,
+          "warnings": [
+            "OSRM free-flow driving time, no live traffic; taxi/rideshare fare unknown"
+          ]
+        },
+        {
+          "errors": [
+            "uber estimator: BRIGHTDATA_UNLOCKER_ZONE not configured"
+          ],
+          "expected_count": null,
+          "fetched_count": 0,
+          "finished_at": "2026-10-24T07:29:58.934964Z",
+          "pages": 0,
+          "provider": "uber_estimator",
+          "source_mode": "fixture",
+          "started_at": "2026-10-24T07:29:58.928343Z",
+          "status": "failed",
+          "termination": "error",
+          "unique_count": 0,
+          "warnings": []
+        }
+      ],
+      "source_mode": "fixture",
+      "status": "degraded"
+    },
+    {
+      "collected_at": "2026-10-24T07:30:00.170371Z",
+      "destination": {
+        "bart_station": null,
+        "coordinate_precision": "approximate",
+        "iata": null,
+        "id": "venue-fort-mason",
+        "kind": "venue",
+        "latitude": 37.806,
+        "longitude": -122.432,
+        "name": "Fort Mason Center",
+        "source_url": "https://fortmason.org/"
+      },
+      "errors": [
+        "uber estimator: BRIGHTDATA_UNLOCKER_ZONE not configured",
+        "Muni/Caltrain/VTA legs not computed: 511.org transit key not configured",
+        "San Jose Mineta International Airport: no BART station; rail option not computed"
+      ],
+      "options": [
+        {
+          "complete": false,
+          "id": "airport-sjc--venue-fort-mason-drive",
+          "label": "Taxi or rideshare (driving time)",
+          "legs": [
+            {
+              "arrival_local": "2026-10-27T19:08:29-07:00",
+              "collected_at": "2026-10-24T07:30:00.169944Z",
+              "departure_local": "2026-10-27T18:00:00-07:00",
+              "distance_m": 79229,
+              "duration_minutes": 69,
+              "duration_status": "estimate",
+              "evidence": [
+                {
+                  "collected_at": "2026-10-24T07:30:00.169944Z",
+                  "confidence": null,
+                  "provider": "osrm",
+                  "raw_ref": null,
+                  "source_mode": "fixture",
+                  "source_record_id": null,
+                  "source_url": "https://router.project-osrm.org/route/v1/driving/-121.9289,37.3639;-122.432,37.806?overview=false"
+                }
+              ],
+              "from_place": {
+                "bart_station": null,
+                "coordinate_precision": "approximate",
+                "iata": "SJC",
+                "id": "airport-sjc",
+                "kind": "airport",
+                "latitude": 37.3639,
+                "longitude": -121.9289,
+                "name": "San Jose Mineta International Airport",
+                "source_url": null
+              },
+              "line": null,
+              "mode": "drive",
+              "price": {
+                "amount": null,
+                "currency": null,
+                "fare_class": null,
+                "note": null,
+                "status": "unknown"
+              },
+              "provider": "osrm",
+              "source_mode": "fixture",
+              "source_url": "https://router.project-osrm.org/route/v1/driving/-121.9289,37.3639;-122.432,37.806?overview=false",
+              "to_place": {
+                "bart_station": null,
+                "coordinate_precision": "approximate",
+                "iata": null,
+                "id": "venue-fort-mason",
+                "kind": "venue",
+                "latitude": 37.806,
+                "longitude": -122.432,
+                "name": "Fort Mason Center",
+                "source_url": "https://fortmason.org/"
+              },
+              "warnings": [
+                "OSRM free-flow driving time, no live traffic; taxi/rideshare fare unknown",
+                "FIXTURE: replay of a past live capture"
+              ]
+            }
+          ],
+          "total_duration_minutes": 69,
+          "total_price": {
+            "amount": null,
+            "currency": null,
+            "fare_class": null,
+            "note": null,
+            "status": "unknown"
+          },
+          "warnings": [
+            "rideshare fare unknown: no trusted estimate collected",
+            "OSRM free-flow driving time, no live traffic; taxi/rideshare fare unknown"
+          ]
+        }
+      ],
+      "origin": {
+        "bart_station": null,
+        "coordinate_precision": "approximate",
+        "iata": "SJC",
+        "id": "airport-sjc",
+        "kind": "airport",
+        "latitude": 37.3639,
+        "longitude": -121.9289,
+        "name": "San Jose Mineta International Airport",
+        "source_url": null
+      },
+      "reports": [
+        {
+          "errors": [],
+          "expected_count": null,
+          "fetched_count": 1,
+          "finished_at": "2026-10-24T07:30:00.170105Z",
+          "pages": 1,
+          "provider": "osrm",
+          "source_mode": "fixture",
+          "started_at": "2026-10-24T07:29:59.479203Z",
+          "status": "ok",
+          "termination": "exhausted",
+          "unique_count": 1,
+          "warnings": [
+            "OSRM free-flow driving time, no live traffic; taxi/rideshare fare unknown"
+          ]
+        },
+        {
+          "errors": [
+            "uber estimator: BRIGHTDATA_UNLOCKER_ZONE not configured"
+          ],
+          "expected_count": null,
+          "fetched_count": 0,
+          "finished_at": "2026-10-24T07:29:59.495246Z",
+          "pages": 0,
+          "provider": "uber_estimator",
+          "source_mode": "fixture",
+          "started_at": "2026-10-24T07:29:59.487945Z",
+          "status": "failed",
+          "termination": "error",
+          "unique_count": 0,
+          "warnings": []
+        }
+      ],
+      "source_mode": "fixture",
+      "status": "degraded"
+    },
+    {
+      "collected_at": "2026-10-24T07:30:01.219764Z",
+      "destination": {
+        "bart_station": "EMBR",
+        "coordinate_precision": "approximate",
+        "iata": null,
+        "id": "station-bart-embr",
+        "kind": "station",
+        "latitude": 37.7929,
+        "longitude": -122.3975,
+        "name": "Embarcadero BART",
+        "source_url": null
+      },
+      "errors": [
+        "uber estimator: BRIGHTDATA_UNLOCKER_ZONE not configured"
+      ],
+      "options": [
+        {
+          "complete": true,
+          "id": "venue-fort-mason--station-bart-embr-walk",
+          "label": "Walk",
+          "legs": [
+            {
+              "arrival_local": "2026-10-27T18:53:21.900000-07:00",
+              "collected_at": "2026-10-24T07:30:00.692228Z",
+              "departure_local": "2026-10-27T18:00:00-07:00",
+              "distance_m": 4003,
+              "duration_minutes": 54,
+              "duration_status": "estimate",
+              "evidence": [
+                {
+                  "collected_at": "2026-10-24T07:30:00.692228Z",
+                  "confidence": null,
+                  "provider": "osrm",
+                  "raw_ref": null,
+                  "source_mode": "fixture",
+                  "source_record_id": null,
+                  "source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/foot/-122.432,37.806;-122.3975,37.7929?overview=false"
+                }
+              ],
+              "from_place": {
+                "bart_station": null,
+                "coordinate_precision": "approximate",
+                "iata": null,
+                "id": "venue-fort-mason",
+                "kind": "venue",
+                "latitude": 37.806,
+                "longitude": -122.432,
+                "name": "Fort Mason Center",
+                "source_url": "https://fortmason.org/"
+              },
+              "line": null,
+              "mode": "walk",
+              "price": {
+                "amount": "0",
+                "currency": "USD",
+                "fare_class": null,
+                "note": "walking",
+                "status": "exact"
+              },
+              "provider": "osrm",
+              "source_mode": "fixture",
+              "source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/foot/-122.432,37.806;-122.3975,37.7929?overview=false",
+              "to_place": {
+                "bart_station": "EMBR",
+                "coordinate_precision": "approximate",
+                "iata": null,
+                "id": "station-bart-embr",
+                "kind": "station",
+                "latitude": 37.7929,
+                "longitude": -122.3975,
+                "name": "Embarcadero BART",
+                "source_url": null
+              },
+              "warnings": [
+                "OSRM foot profile estimate",
+                "FIXTURE: replay of a past live capture"
+              ]
+            }
+          ],
+          "total_duration_minutes": 54,
+          "total_price": {
+            "amount": "0",
+            "currency": "USD",
+            "fare_class": null,
+            "note": null,
+            "status": "exact"
+          },
+          "warnings": [
+            "OSRM foot profile estimate"
+          ]
+        },
+        {
+          "complete": false,
+          "id": "venue-fort-mason--station-bart-embr-drive",
+          "label": "Taxi or rideshare (driving time)",
+          "legs": [
+            {
+              "arrival_local": "2026-10-27T18:09:50.300000-07:00",
+              "collected_at": "2026-10-24T07:30:01.219480Z",
+              "departure_local": "2026-10-27T18:00:00-07:00",
+              "distance_m": 4875,
+              "duration_minutes": 10,
+              "duration_status": "estimate",
+              "evidence": [
+                {
+                  "collected_at": "2026-10-24T07:30:01.219480Z",
+                  "confidence": null,
+                  "provider": "osrm",
+                  "raw_ref": null,
+                  "source_mode": "fixture",
+                  "source_record_id": null,
+                  "source_url": "https://router.project-osrm.org/route/v1/driving/-122.432,37.806;-122.3975,37.7929?overview=false"
+                }
+              ],
+              "from_place": {
+                "bart_station": null,
+                "coordinate_precision": "approximate",
+                "iata": null,
+                "id": "venue-fort-mason",
+                "kind": "venue",
+                "latitude": 37.806,
+                "longitude": -122.432,
+                "name": "Fort Mason Center",
+                "source_url": "https://fortmason.org/"
+              },
+              "line": null,
+              "mode": "drive",
+              "price": {
+                "amount": null,
+                "currency": null,
+                "fare_class": null,
+                "note": null,
+                "status": "unknown"
+              },
+              "provider": "osrm",
+              "source_mode": "fixture",
+              "source_url": "https://router.project-osrm.org/route/v1/driving/-122.432,37.806;-122.3975,37.7929?overview=false",
+              "to_place": {
+                "bart_station": "EMBR",
+                "coordinate_precision": "approximate",
+                "iata": null,
+                "id": "station-bart-embr",
+                "kind": "station",
+                "latitude": 37.7929,
+                "longitude": -122.3975,
+                "name": "Embarcadero BART",
+                "source_url": null
+              },
+              "warnings": [
+                "OSRM free-flow driving time, no live traffic; taxi/rideshare fare unknown",
+                "FIXTURE: replay of a past live capture"
+              ]
+            }
+          ],
+          "total_duration_minutes": 10,
+          "total_price": {
+            "amount": null,
+            "currency": null,
+            "fare_class": null,
+            "note": null,
+            "status": "unknown"
+          },
+          "warnings": [
+            "rideshare fare unknown: no trusted estimate collected",
+            "OSRM free-flow driving time, no live traffic; taxi/rideshare fare unknown"
+          ]
+        }
+      ],
+      "origin": {
+        "bart_station": null,
+        "coordinate_precision": "approximate",
+        "iata": null,
+        "id": "venue-fort-mason",
+        "kind": "venue",
+        "latitude": 37.806,
+        "longitude": -122.432,
+        "name": "Fort Mason Center",
+        "source_url": "https://fortmason.org/"
+      },
+      "reports": [
+        {
+          "errors": [],
+          "expected_count": null,
+          "fetched_count": 1,
+          "finished_at": "2026-10-24T07:30:00.692362Z",
+          "pages": 1,
+          "provider": "osrm",
+          "source_mode": "fixture",
+          "started_at": "2026-10-24T07:30:00.170403Z",
+          "status": "ok",
+          "termination": "exhausted",
+          "unique_count": 1,
+          "warnings": [
+            "OSRM foot profile estimate"
+          ]
+        },
+        {
+          "errors": [],
+          "expected_count": null,
+          "fetched_count": 1,
+          "finished_at": "2026-10-24T07:30:01.219595Z",
+          "pages": 1,
+          "provider": "osrm",
+          "source_mode": "fixture",
+          "started_at": "2026-10-24T07:30:00.692688Z",
+          "status": "ok",
+          "termination": "exhausted",
+          "unique_count": 1,
+          "warnings": [
+            "OSRM free-flow driving time, no live traffic; taxi/rideshare fare unknown"
+          ]
+        },
+        {
+          "errors": [
+            "uber estimator: BRIGHTDATA_UNLOCKER_ZONE not configured"
+          ],
+          "expected_count": null,
+          "fetched_count": 0,
+          "finished_at": "2026-10-24T07:30:00.709323Z",
+          "pages": 0,
+          "provider": "uber_estimator",
+          "source_mode": "fixture",
+          "started_at": "2026-10-24T07:30:00.702050Z",
+          "status": "failed",
+          "termination": "error",
+          "unique_count": 0,
+          "warnings": []
+        }
+      ],
+      "source_mode": "fixture",
+      "status": "degraded"
+    }
+  ],
+  "source_mode": "fixture"
+}

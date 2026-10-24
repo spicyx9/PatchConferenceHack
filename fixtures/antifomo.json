@@ -1,0 +1,83 @@
+{
+  "_meta": {
+    "source_mode": "fixture",
+    "fictional": true,
+    "owner": "w10-antifomo",
+    "collected_at": "2026-10-24T12:00:00-07:00",
+    "note": "Synthetic planning fixture. Only the anchor conference name, dates, city and Fort Mason coordinates come from docs/knowledge/03-demo-scenario.md. Every event, time, venue other than Fort Mason, person, price and registration link below is fictional and labelled [Fixture]. Registration links point to example.com on purpose."
+  },
+  "conference": {
+    "id": "github-universe-2026",
+    "name": "GitHub Universe 2026",
+    "start_date": "2026-10-28",
+    "end_date": "2026-10-29",
+    "city": "San Francisco",
+    "venue_name": "Fort Mason Center",
+    "timezone": "America/Los_Angeles",
+    "official_url": "https://githubuniverse.com/",
+    "latitude": 37.806,
+    "longitude": -122.432,
+    "topics": ["AI agents", "developer tools", "Copilot", "MCP"],
+    "evidence": [
+      {"provider": "docs:03-demo-scenario", "source_mode": "fixture", "collected_at": "2026-10-23T12:00:00-07:00", "raw_ref": "docs/knowledge/03-demo-scenario.md"}
+    ]
+  },
+  "goals": [
+    {"id": "goal-seed-investors", "description": "Meet seed investors", "priority": 0.45, "topics": ["AI agents", "developer tools"], "target_roles": ["investor"]},
+    {"id": "goal-agent-founders", "description": "Meet AI agent founders", "priority": 0.35, "topics": ["AI agents", "MCP"], "target_roles": ["founder"]},
+    {"id": "goal-copilot-pms", "description": "Meet Copilot PMs", "priority": 0.2, "topics": ["Copilot", "developer tools"], "target_roles": ["pm"]}
+  ],
+  "venues": {
+    "fort_mason": {"name": "Fort Mason Center", "city": "San Francisco", "latitude": 37.806, "longitude": -122.432, "coordinate_precision": "exact"},
+    "marina": {"name": "[Fixture] Marina Rooftop (fictional venue)", "city": "San Francisco", "latitude": 37.803, "longitude": -122.437, "coordinate_precision": "approximate"},
+    "soma": {"name": "[Fixture] SoMa Loft (fictional venue)", "city": "San Francisco", "latitude": 37.781, "longitude": -122.396, "coordinate_precision": "approximate"},
+    "mission": {"name": "[Fixture] Mission Hall (fictional venue)", "city": "San Francisco", "latitude": 37.76, "longitude": -122.419, "coordinate_precision": "approximate"},
+    "hidden": {"name": "Location shared after approval", "city": "San Francisco", "coordinate_precision": "unknown"}
+  },
+  "people": [
+    {"id": "p-inv-ava", "name": "Ava Fixture (fictional)", "company_id": "co-fixture-fund-a", "roles": ["investor"], "participation": "confirmed_speaker", "event_ids": ["ev-28-devtools-panel"]},
+    {"id": "p-inv-ben", "name": "Ben Fixture (fictional)", "company_id": "co-fixture-fund-b", "roles": ["investor"], "participation": "confirmed_organizer", "event_ids": ["ev-28-investors-happy-hour"]},
+    {"id": "p-inv-cleo", "name": "Cleo Fixture (fictional)", "company_id": "co-fixture-fund-c", "roles": ["investor"], "participation": "confirmed_organizer", "event_ids": ["ev-29-office-hours"]},
+    {"id": "p-inv-hana", "name": "Hana Fixture (fictional)", "company_id": "co-fixture-fund-d", "roles": ["investor"], "participation": "public_attendee_listing", "event_ids": ["ev-28-investors-happy-hour"]},
+    {"id": "p-fdr-dev", "name": "Dev Fixture (fictional)", "company_id": "co-fixture-startup-a", "roles": ["founder"], "participation": "confirmed_speaker", "event_ids": ["ev-28-mcp-talk"]},
+    {"id": "p-fdr-eli", "name": "Eli Fixture (fictional)", "company_id": "co-fixture-startup-b", "roles": ["founder"], "participation": "confirmed_organizer", "event_ids": ["ev-28-founders-mixer"]},
+    {"id": "p-pm-fay", "name": "Fay Fixture (fictional)", "company_id": "co-fixture-devtools", "roles": ["pm"], "participation": "confirmed_speaker", "event_ids": ["ev-28-keynote", "ev-29-copilot-talk"]},
+    {"id": "p-pm-gus", "name": "Gus Fixture (fictional)", "company_id": "co-fixture-devtools", "roles": ["pm"], "participation": "confirmed_organizer", "event_ids": ["ev-28-pm-lunch", "ev-29-copilot-talk"]}
+  ],
+  "events": [
+    {"id": "ev-28-keynote", "title": "[Fixture] Opening keynote (simulated time)", "event_type": "session", "start_at": "2026-10-28T09:00:00-07:00", "end_at": "2026-10-28T10:30:00-07:00", "timezone": "America/Los_Angeles", "venue": "fort_mason", "speaker_ids": ["p-pm-fay"], "topics": ["Copilot", "AI agents"], "status": "scheduled", "conference_relation": "official", "relation_evidence": ["fixture: simulated official session, not read from the live catalog"], "registration_url": "https://example.com/fixture/universe-ticket"},
+    {"id": "ev-28-mcp-talk", "title": "[Fixture] Building agents with MCP", "event_type": "session", "start_at": "2026-10-28T11:00:00-07:00", "end_at": "2026-10-28T11:45:00-07:00", "timezone": "America/Los_Angeles", "venue": "fort_mason", "speaker_ids": ["p-fdr-dev"], "topics": ["AI agents", "MCP"], "status": "scheduled", "conference_relation": "official", "relation_evidence": ["fixture: simulated official session, not read from the live catalog"], "registration_url": "https://example.com/fixture/universe-ticket"},
+    {"id": "ev-28-devtools-panel", "title": "[Fixture] Devtools funding panel", "event_type": "session", "start_at": "2026-10-28T11:15:00-07:00", "end_at": "2026-10-28T12:00:00-07:00", "timezone": "America/Los_Angeles", "venue": "fort_mason", "speaker_ids": ["p-inv-ava"], "topics": ["developer tools"], "status": "scheduled", "conference_relation": "official", "relation_evidence": ["fixture: simulated official session, not read from the live catalog"], "registration_url": "https://example.com/fixture/universe-ticket"},
+    {"id": "ev-28-pm-lunch", "title": "[Fixture] Copilot PM lunch roundtable", "event_type": "side_event", "start_at": "2026-10-28T12:30:00-07:00", "end_at": "2026-10-28T13:30:00-07:00", "timezone": "America/Los_Angeles", "venue": "marina", "organizer_ids": ["p-pm-gus"], "topics": ["Copilot"], "status": "scheduled", "conference_relation": "candidate", "registration_url": "https://example.com/fixture/pm-lunch", "is_free": true},
+    {"id": "ev-28-eval-workshop", "title": "[Fixture] Agent evals workshop", "event_type": "workshop", "start_at": "2026-10-28T14:00:00-07:00", "end_at": "2026-10-28T16:00:00-07:00", "timezone": "America/Los_Angeles", "venue": "fort_mason", "topics": ["AI agents"], "status": "scheduled", "conference_relation": "official", "relation_evidence": ["fixture: simulated official session, not read from the live catalog"]},
+    {"id": "ev-28-investors-happy-hour", "title": "[Fixture] Seed Investors Happy Hour", "event_type": "side_event", "start_at": "2026-10-28T18:00:00-07:00", "end_at": "2026-10-28T20:00:00-07:00", "timezone": "America/Los_Angeles", "venue": "marina", "organizer_ids": ["p-inv-ben"], "topics": ["developer tools", "AI agents"], "status": "scheduled", "conference_relation": "candidate", "registration_url": "https://example.com/fixture/investors-hh", "is_free": true, "capacity": 120, "registered_count": 104},
+    {"id": "ev-28-founders-mixer", "title": "[Fixture] Agent Founders Mixer", "event_type": "side_event", "start_at": "2026-10-28T18:30:00-07:00", "end_at": "2026-10-28T21:00:00-07:00", "timezone": "America/Los_Angeles", "venue": "soma", "organizer_ids": ["p-fdr-eli"], "topics": ["AI agents", "MCP"], "status": "scheduled", "conference_relation": "candidate", "registration_url": "https://example.com/fixture/founders-mixer", "is_free": true, "capacity": 150, "registered_count": 131},
+    {"id": "ev-28-late-party", "title": "[Fixture] Late after party", "event_type": "party", "start_at": "2026-10-28T21:30:00-07:00", "end_at": "2026-10-28T23:30:00-07:00", "timezone": "America/Los_Angeles", "venue": "soma", "organizer_ids": ["p-fdr-eli"], "topics": [], "status": "scheduled", "conference_relation": "candidate"},
+    {"id": "ev-29-copilot-talk", "title": "[Fixture] Copilot extensibility deep dive", "event_type": "session", "start_at": "2026-10-29T10:00:00-07:00", "end_at": "2026-10-29T10:45:00-07:00", "timezone": "America/Los_Angeles", "venue": "fort_mason", "speaker_ids": ["p-pm-fay", "p-pm-gus"], "topics": ["Copilot", "developer tools"], "status": "scheduled", "conference_relation": "official", "relation_evidence": ["fixture: simulated official session, not read from the live catalog"], "registration_url": "https://example.com/fixture/universe-ticket"},
+    {"id": "ev-29-office-hours", "title": "[Fixture] Investor office hours", "event_type": "side_event", "start_at": "2026-10-29T13:00:00-07:00", "end_at": "2026-10-29T14:00:00-07:00", "timezone": "America/Los_Angeles", "venue": "mission", "organizer_ids": ["p-inv-cleo"], "topics": ["developer tools"], "status": "scheduled", "conference_relation": "candidate", "registration_url": "https://example.com/fixture/office-hours", "is_free": false, "price_min": "25", "price_max": "25", "currency": "USD"},
+    {"id": "ev-29-stealth-dinner", "title": "[Fixture] Stealth founders dinner", "event_type": "side_event", "start_at": "2026-10-29T19:00:00-07:00", "end_at": "2026-10-29T21:00:00-07:00", "timezone": "America/Los_Angeles", "venue": "hidden", "organizer_names": ["[Fixture] stealth host"], "topics": ["AI agents"], "status": "scheduled", "conference_relation": "candidate"},
+    {"id": "ev-29-rooftop-tba", "title": "[Fixture] Rooftop meetup (time TBA)", "event_type": "meetup", "timezone": "America/Los_Angeles", "venue": "marina", "topics": ["AI agents"], "status": "unknown", "conference_relation": "candidate"},
+    {"id": "ev-29-hack-night", "title": "[Fixture] Agent hack night (sold out)", "event_type": "side_event", "start_at": "2026-10-29T18:00:00-07:00", "end_at": "2026-10-29T22:00:00-07:00", "timezone": "America/Los_Angeles", "venue": "soma", "topics": ["AI agents", "MCP"], "status": "sold_out", "conference_relation": "candidate", "registration_url": "https://example.com/fixture/hack-night"}
+  ],
+  "scenarios": [
+    {
+      "id": "sold-out-evening",
+      "title": "An Oct 28 evening side event becomes sold out",
+      "change": {"type": "sold_out", "event_id": "ev-28-investors-happy-hour", "note": "[Fixture] simulated registration page now shows sold out"}
+    },
+    {
+      "id": "new-event-two-targets",
+      "title": "A new event appears with two target people",
+      "change": {
+        "type": "new_event",
+        "note": "[Fixture] simulated new listing",
+        "event": {"id": "ev-29-agents-investors-breakfast", "title": "[Fixture] Agents x Seed breakfast", "event_type": "side_event", "start_at": "2026-10-29T09:00:00-07:00", "end_at": "2026-10-29T10:15:00-07:00", "timezone": "America/Los_Angeles", "venue": "marina", "organizer_ids": ["p-inv-cleo"], "speaker_ids": ["p-fdr-dev"], "topics": ["AI agents", "developer tools"], "status": "scheduled", "conference_relation": "candidate", "registration_url": "https://example.com/fixture/agents-breakfast", "is_free": true}
+      }
+    },
+    {
+      "id": "talk-moved-conflict",
+      "title": "A talk is moved and creates a conflict",
+      "change": {"type": "time_change", "event_id": "ev-28-mcp-talk", "start_at": "2026-10-28T14:30:00-07:00", "end_at": "2026-10-28T15:15:00-07:00", "note": "[Fixture] simulated schedule update"}
+    }
+  ]
+}
