@@ -3438,37 +3438,38 @@ dialog .eyebrow {
 #tab-graph > details.panel { padding:15px; background:transparent; }
 @media(max-width:800px) { .connection-workspace { grid-template-columns:1fr; } .connection-sidebar { border-left:0; border-top:1px solid #e3e8df; max-height:none; } #tab-graph #graph { min-height:380px; } .connections-heading h1 { font-size:30px; } .connection-engine { font-size:10px; } #connection-ai-status { margin-left:0; width:100%; } .connection-search { gap:8px; padding-left:12px; } .connection-search button { padding:12px; } .connection-search button span { display:none; } .scope-tabs button { padding:8px 10px; } }
 
-/* Galaxy explorer: stars are decorative; every interactive point is graph data. */
-.connection-workspace { background:#080d1d; border-color:#202c49; box-shadow:0 20px 60px #10213d20; }
-.network-pane { background:#080d1d; }
-.network-toolbar { background:#0a1022; color:#d3e0f9; border-color:#202c435c; }
-#network-count { color:#8b9bb9; }
-.network-toolbar button { background:#141e36; color:#bacded; border-color:#283b5b; }
-.network-toolbar button:hover { background:#203254; color:#fff; }
-.network-toolbar #network-all { color:#bcdaff; margin-right:8px; border-color:#41638e; }
-#tab-graph #graph { min-height:570px; background-color:#080c1c; cursor:grab;
-  background-image:url('/static/galaxy-stars.svg'),radial-gradient(ellipse at 52% 48%,#4b2a7555 0%,transparent 50%),radial-gradient(ellipse at 35% 60%,#0e537744 0%,transparent 46%),radial-gradient(ellipse at 70% 30%,#282c6355 0%,transparent 50%);
-  background-size:cover,100% 100%,100% 100%,100% 100%; }
-#tab-graph #graph-legend { background:#0a1022; border-color:#202c435c; }
-#graph-legend span { color:#a2b3d1; }
-#graph-legend i { box-shadow:0 0 9px currentColor; }
-.connection-sidebar { background:#0e1528; border-color:#26314b; max-height:760px; scrollbar-color:#304464 #0e1528; }
-.connection-sidebar-head { background:#0e1528; color:#eef3ff; }
-.connection-sidebar-head button { color:#9dc9ff; font-size:11px; }
-#connection-summary { color:#a3b2cf; }
-#connection-results { max-height:520px; scrollbar-color:#304464 #0e1528; }
+/* Light 3D galaxy. The canvas projects real graph nodes in perspective. */
+.connection-workspace { background:#fafbff; border-color:#dce3f0; box-shadow:0 20px 60px #365a8f0d; }
+.network-pane { background:#f8faff; }
+.network-toolbar { background:#ffffffb8; color:#425575; border-color:#e1e7f2; }
+#network-count { color:#7d8da6; }
+.network-toolbar button { background:#fff; color:#61779a; border-color:#dce4f1; }
+.network-toolbar button:hover { background:#edf3ff; color:#365d9e; }
+.network-toolbar #network-all { color:#4b6ea9; margin-right:8px; border-color:#b8cbee; }
+#tab-graph #graph { position:relative; overflow:hidden; flex:none; height:570px !important; min-height:570px; background-color:#f9fbff; cursor:grab;
+  background-image:radial-gradient(ellipse at 52% 48%,#dcd6ff65 0%,transparent 55%),radial-gradient(ellipse at 35% 60%,#d1ebff75 0%,transparent 52%),radial-gradient(ellipse at 70% 30%,#ffe8dd60 0%,transparent 50%);
+  background-size:100% 100%; }
+.galaxy-hint { padding:8px 20px 12px; color:#8190a9; text-align:center; font-size:10px; letter-spacing:.03em; }
+#tab-graph #graph-legend { background:#ffffffa8; border-color:#e1e7f2; }
+#graph-legend span { color:#73829b; }
+#graph-legend i { box-shadow:0 0 8px #a6bce840; }
+.connection-sidebar { background:#fff; border-color:#e0e6f0; max-height:780px; scrollbar-color:#cad5e7 #fff; }
+.connection-sidebar-head { background:#fff; color:#344764; }
+.connection-sidebar-head button { color:#537bb7; font-size:11px; }
+#connection-summary { color:#77859a; }
+#connection-results { max-height:540px; scrollbar-color:#cad5e7 #fff; }
 .connection-sidebar:has(.connection-detail) #connection-results { max-height:185px; }
-.connection-person { color:#e5edff; }
-.connection-person:hover,.connection-person.selected { background:#1b2943; }
-.person-row-copy small,.match-reason { color:#9cacc9; }
-.person-monogram { background:#193454; color:#9dceff; box-shadow:0 0 15px #4288d114; }
-.connection-person:nth-child(3n+2) .person-monogram { background:#352849; color:#d7b9ff; }
-.connection-person:nth-child(3n+3) .person-monogram { background:#183c40; color:#8ce4db; }
-#tab-graph #graph-detail { border-color:#27334d; color:#edf3ff; }
-.connection-detail p,.connection-sessions,.connection-path li { color:#a7b9d6; }
-.detail-kicker { color:#8ca6cc; }
-.connection-source-link { color:#9dc9ff; }
-.topic-pills span { border-color:#314560; color:#a9c8ec; }
-.connection-path { border-color:#38557d; }
-.connection-empty,.network-empty { color:#a4b5d3; }
-@media(max-width:800px) { #tab-graph #graph { min-height:430px; } .network-toolbar { padding:14px 12px; } #network-count { display:block; margin:4px 0 0; } }
+.connection-person { color:#374965; }
+.connection-person:hover,.connection-person.selected { background:#f0f5ff; }
+.person-row-copy small,.match-reason { color:#7d8ba0; }
+.person-monogram { background:#e7effc; color:#5e83bc; }
+.connection-person:nth-child(3n+2) .person-monogram { background:#f0e9fa; color:#9b7aba; }
+.connection-person:nth-child(3n+3) .person-monogram { background:#e2f2ef; color:#60a195; }
+#tab-graph #graph-detail { border-color:#e0e6f0; color:#344764; }
+.connection-detail p,.connection-sessions,.connection-path li { color:#77859a; }
+.detail-kicker { color:#8295b2; }
+.connection-source-link { color:#537bb7; }
+.topic-pills span { border-color:#dce5f2; color:#728eb6; }
+.connection-path { border-color:#cbd9ed; }
+.connection-empty,.network-empty { color:#7e91b0; }
+@media(max-width:800px) { #tab-graph #graph { height:430px !important; min-height:430px; } .network-toolbar { padding:14px 12px; flex-wrap:wrap; gap:10px; } #network-count { display:block; margin:4px 0 0; } }

@@ -570,13 +570,15 @@
           </div>
           <div class="connection-workspace">
             <div class="network-pane">
-              <div class="network-toolbar"><span>Network <span id="network-count"></span></span>
-                <div><button type="button" id="network-all" hidden>↗ All connections</button>
+              <div class="network-toolbar"><span>3D network <span id="network-count"></span></span>
+                <div><button type="button" id="network-orbit" aria-pressed="true">Pause orbit</button>
+                <button type="button" id="network-all" hidden>↗ All connections</button>
                 <button type="button" id="network-fit" aria-label="Fit graph">Fit</button>
                   <button type="button" id="network-zoom-in" aria-label="Zoom in">+</button>
                   <button type="button" id="network-zoom-out" aria-label="Zoom out">−</button></div>
               </div>
               <div id="graph" class="graph" role="region" aria-label="Connections network"></div>
+              <div class="galaxy-hint">Drag to rotate · Scroll to zoom · Click a person</div>
               <div id="graph-legend" class="legend"></div>
               <p id="graph-focus-summary" class="sr-only"></p>
             </div>
@@ -787,6 +789,7 @@
       crossorigin=""
     ></script>
     <script src="https://unpkg.com/cytoscape@3.30.2/dist/cytoscape.min.js"></script>
+    <script src="/static/galaxy3d.js"></script>
     <script src="/static/connections.js"></script>
     <script src="/static/app.js"></script>
     <script src="/static/event-detail.js" defer></script>
