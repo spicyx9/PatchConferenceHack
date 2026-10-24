@@ -194,15 +194,22 @@ def test_identity_confidence(name: str, company: str | None, expected: float) ->
 class RecordingStore:
     """GraphStore stand-in: records the MERGE calls, answers the Company lookup."""
 
-    def __init__(self, companies: set[str]) -> None:
+    def __init__(self, companies: set[str],
+                 works_at: dict[tuple[str, str], dict[str, Any]] | None = None) -> None:
         self.companies = companies
+        self.works_at = works_at or {}
         self.nodes: list[tuple[str, str, dict[str, Any]]] = []
         self.edges: list[tuple[str, str, str, str, str, dict[str, Any]]] = []
         self.graph = self
 
     def query(self, q: str, params: dict[str, Any] | None = None) -> Any:
-        found = (params or {}).get("id") in self.companies
-        return type("R", (), {"result_set": [[params["id"]]] if found else []})()
+        params = params or {}
+        if "WORKS_AT" in q:
+            edge = self.works_at.get((params["p"], params["c"]))
+            rows = [[edge]] if edge is not None else []
+        else:
+            rows = [[params["id"]]] if params.get("id") in self.companies else []
+        return type("R", (), {"result_set": rows})()
 
     def merge_node(self, kind: str, node_id: str, props: dict[str, Any]) -> None:
         self.nodes.append((kind, node_id, props))
@@ -243,6 +250,49 @@ def test_writes_identity_headline_company_and_works_at_only() -> None:
     assert not any(e[2].startswith("ATTENDS") or e[3] == "Event" for e in store.edges)
     assert report.companies_created == ["company:new-labs"]  # existing AgentWorks untouched
     assert report.works_at == [("p1", "company:agentworks"), ("p2", "company:new-labs")]
+
+
+def test_linkedin_company_matching_the_known_one_reuses_its_id() -> None:
+    people = [Person(id="p1", name="Avery Sample", company_id="co-fx-agentworks",
+                     linkedin_url=URL.format("avery"))]
+    companies = [Company(id="co-fx-agentworks", name="AgentWorks (fictional)")]
+    (e,), _ = li.match(people, companies,
+                       _profiles([_record("avery", "Avery Sample", "AgentWorks")]))
+    assert e.company_id == "co-fx-agentworks" and e.identity_confidence == 1.0
+
+
+ORIGINAL = {"source": "rainfocus:github-universe-2026", "verification": "person_record",
+            "source_mode": "fixture", "observed_at": "2026-10-24T06:33:16+00:00",
+            "confidence": 1.0, "title": "Sr. Director", "evidence_count": 1}
+
+
+def test_existing_works_at_keeps_provenance_and_gets_linkedin_as_corroboration() -> None:
+    enrichments, _ = li.match(PEOPLE, COMPANIES,
+                              _profiles([_record("avery", "Avery Sample", "AgentWorks")]))
+    store = RecordingStore({"company:agentworks"},
+                           {("p1", "company:agentworks"): dict(ORIGINAL)})
+    report = li.write(store, enrichments)
+    (_, _, rel, _, _, props), = store.edges
+    assert rel == "WORKS_AT" and report.works_at_corroborated == [("p1", "company:agentworks")]
+    # Provenance is never written on an existing edge: only additions.
+    assert not set(props) & {"source", "verification", "source_mode", "observed_at",
+                             "confidence", "title", "provider"}
+    assert props["evidence_sources"] == ["rainfocus:github-universe-2026", "brightdata:linkedin"]
+    assert props["evidence_count"] == 2 and props["identity_confidence"] == 1.0
+    assert props["linkedin_verification"] == "linkedin_profile"
+    assert props["linkedin_snapshot_id"] == "sd_test"
+
+
+def test_corroboration_is_idempotent_and_never_lowers_identity() -> None:
+    enrichments, _ = li.match(PEOPLE, COMPANIES,
+                              _profiles([_record("avery", "Avery Sample", "Other Corp")]))
+    edge = {**ORIGINAL, "evidence_sources": [ORIGINAL["source"], "brightdata:linkedin"],
+            "evidence_count": 2, "identity_confidence": 1.0, "snapshot_id": "sd_old"}
+    e = enrichments[0]
+    props = li._corroboration(edge, li.Enrichment(e.person_id, e.profile, 0.7, e.company_id))
+    assert props["evidence_sources"] == edge["evidence_sources"] and "evidence_count" not in props
+    assert "identity_confidence" not in props  # 0.7 never lowers 1.0
+    assert props["snapshot_id"] is None  # the first version's edge key is removed
 
 
 def test_in_memory_people_only_change_identity_confidence() -> None:
@@ -323,7 +373,11 @@ def test_graph_top5_before_after_and_no_presence_written(monkeypatch: pytest.Mon
                    for p in speakers]
         enrichments, unmatched = li.match(people, data.companies, _profiles(records))
         assert len(enrichments) == len(speakers) and not unmatched
+        original = {(r[0], r[1]): r[2] for r in store.graph.query(
+            "MATCH (p:Person)-[r:WORKS_AT]->(c:Company) RETURN p.id, c.id, properties(r)"
+        ).result_set}
         report = li.write(store, enrichments)
+        li.write(store, enrichments)  # a second run adds nothing
         after = people_for_goal(store, "demo-user", goal, 5)["rows"]
 
         print("top5 before:", [(r["person_id"], r["score"]) for r in before])
@@ -340,6 +394,18 @@ def test_graph_top5_before_after_and_no_presence_written(monkeypatch: pytest.Mon
         assert {k: v for k, v in rels_after.items() if k != "WORKS_AT"} == \
             {k: v for k, v in rels_before.items() if k != "WORKS_AT"}
         assert rels_after.get("ATTENDS_CONFIRMED", 0) == rels_before.get("ATTENDS_CONFIRMED", 0)
+        assert report.works_at_corroborated, "fixture speakers carry a person_record WORKS_AT"
+        for pid, cid in report.works_at_corroborated:
+            now = store.graph.query(
+                "MATCH (:Person {id: $p})-[r:WORKS_AT]->(:Company {id: $c}) RETURN properties(r)",
+                params={"p": pid, "c": cid}).result_set[0][0]
+            before_edge = original[(pid, cid)]
+            for key in ("source", "verification", "source_mode", "observed_at", "confidence",
+                        "title"):
+                assert now.get(key) == before_edge.get(key), (pid, key)
+            assert now["verification"] == "person_record"
+            assert now["evidence_sources"] == [before_edge["source"], "brightdata:linkedin"]
+            assert now["evidence_count"] == before_edge["evidence_count"] + 1
         assert store.graph.query(
             "MATCH (p:Person) RETURN p.id, p.presence_confidence ORDER BY p.id").result_set \
             == presence_before

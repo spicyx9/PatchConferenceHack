@@ -14,7 +14,10 @@ What a profile may change, and nothing else:
   unchanged otherwise (a profile whose name does not match writes nothing at all);
 * ``headline`` and ``company`` on the Person node, with provenance (provider, dataset_id,
   snapshot_id, source_url, collected_at);
-* a ``WORKS_AT`` edge to the profile's company (Company node created when absent).
+* a ``WORKS_AT`` edge to the profile's company (Company node created when absent). An
+  existing edge keeps its provenance (source, verification, source_mode, observed_at,
+  confidence): LinkedIn is added as corroboration (``evidence_sources``, ``linkedin_*``) and
+  only raises its ``identity_confidence``.
 
 A LinkedIn profile proves nothing about presence at an event: no ATTENDS edge is written
 and ``presence_confidence`` is never touched.
@@ -91,6 +94,9 @@ class WriteReport:
     persons_written: list[str] = field(default_factory=list)
     companies_created: list[str] = field(default_factory=list)
     works_at: list[tuple[str, str]] = field(default_factory=list)
+    """Every WORKS_AT the run touched: created or corroborated."""
+    works_at_corroborated: list[tuple[str, str]] = field(default_factory=list)
+    """Existing edges that kept their provenance and got LinkedIn as extra evidence."""
 
 
 # -- targets ------------------------------------------------------------------------------
@@ -391,10 +397,13 @@ def match(people: Iterable[Person], companies: Iterable[Company],
             unmatched.append(profile.linkedin_url)
             continue
         known = names.get(person.company_id) if person.company_id else None
+        # The person's own company when LinkedIn names it: never a duplicate Company node.
+        same = company_matches(known, profile.company)
         done.append(Enrichment(
             person_id=person.id, profile=profile,
             identity_confidence=identity_confidence(person, known, profile),
-            company_id=company_id(profile.company) if profile.company else None))
+            company_id=person.company_id if same else (
+                company_id(profile.company) if profile.company else None)))
     return done, unmatched
 
 
@@ -404,8 +413,39 @@ def _company_exists(store: Any, company_id: str) -> bool:
     return bool(run_read(store, "MATCH (c:Company {id: $id}) RETURN c.id", {"id": company_id}))
 
 
+def _works_at(store: Any, person_id: str, company_id: str) -> dict[str, Any] | None:
+    from conferge.graph.queries import run_read
+
+    rows = run_read(store, "MATCH (:Person {id: $p})-[r:WORKS_AT]->(:Company {id: $c}) "
+                    "RETURN properties(r)", {"p": person_id, "c": company_id})
+    return dict(rows[0][0]) if rows else None
+
+
 def _clean(values: dict[str, Any]) -> dict[str, Any]:
     return {k: v for k, v in values.items() if v is not None}
+
+
+def _corroboration(existing: dict[str, Any], e: Enrichment) -> dict[str, Any]:
+    """LinkedIn added to an existing WORKS_AT: provenance (source, verification, source_mode,
+    observed_at, confidence, title) is never written; evidence grows, identity only rises."""
+    pr = e.profile
+    sources = [str(x) for x in existing.get("evidence_sources") or [existing.get("source")] if x]
+    first = PROVIDER not in sources
+    props: dict[str, Any] = {
+        "evidence_sources": [*sources, PROVIDER] if first else sources,
+        "linkedin_verification": "linkedin_profile", "linkedin_snapshot_id": pr.snapshot_id,
+        "linkedin_observed_at": pr.collected_at, "linkedin_source_url": pr.linkedin_url,
+        "linkedin_source_mode": pr.source_mode, "linkedin_title": pr.title,
+    }
+    if first:
+        props["evidence_count"] = int(existing.get("evidence_count") or len(sources)) + 1
+    known = existing.get("identity_confidence")
+    if e.identity_confidence is not None and (known is None or e.identity_confidence > known):
+        props["identity_confidence"] = e.identity_confidence
+    props = _clean(props)
+    if "snapshot_id" in existing:  # written on the edge by the first version, now linkedin_*
+        props["snapshot_id"] = None
+    return props
 
 
 def write(store: Any, enrichments: Iterable[Enrichment]) -> WriteReport:
@@ -426,10 +466,19 @@ def write(store: Any, enrichments: Iterable[Enrichment]) -> WriteReport:
                 "name": pr.company, "source": PROVIDER, "source_mode": pr.source_mode,
                 "observed_at": pr.collected_at}))
             report.companies_created.append(e.company_id)
-        store.merge_edge("Person", e.person_id, "WORKS_AT", "Company", e.company_id, _clean({
-            "verification": "linkedin_profile", "source": PROVIDER, "source_mode": pr.source_mode,
-            "title": pr.title, "confidence": e.identity_confidence,
-            "observed_at": pr.collected_at, "snapshot_id": pr.snapshot_id}))
+        existing = _works_at(store, e.person_id, e.company_id)
+        if existing is not None:
+            props = _corroboration(existing, e)
+            report.works_at_corroborated.append((e.person_id, e.company_id))
+        else:
+            props = _clean({
+                "verification": "linkedin_profile", "source": PROVIDER,
+                "source_mode": pr.source_mode, "title": pr.title,
+                "confidence": e.identity_confidence, "identity_confidence": e.identity_confidence,
+                "observed_at": pr.collected_at, "evidence_sources": [PROVIDER],
+                "evidence_count": 1, "linkedin_snapshot_id": pr.snapshot_id,
+                "linkedin_source_url": pr.linkedin_url})
+        store.merge_edge("Person", e.person_id, "WORKS_AT", "Company", e.company_id, props)
         report.works_at.append((e.person_id, e.company_id))
     return report
 

@@ -124,7 +124,9 @@ def main() -> int:
         "", "## FalkorDB writes (GraphStore MERGE)", "",
         f"- Person nodes written: {len(res.written.persons_written) if res.written else 0}; "
         f"nodes with provider brightdata:linkedin: {tagged}",
-        f"- WORKS_AT edges: {len(res.written.works_at) if res.written else 0}; Company nodes created: "
+        f"- WORKS_AT edges: {len(res.written.works_at) if res.written else 0} (existing, kept their "
+        f"provenance + LinkedIn corroboration: "
+        f"{len(res.written.works_at_corroborated) if res.written else 0}); Company nodes created: "
         f"{len(res.written.companies_created) if res.written else 0}",
         "- no ATTENDS edge, no presence_confidence change (identity only)",
         "", "## people_for_goal top 5", "", "Before:", *_top(before), "", "After:", *_top(after), "",

@@ -89,7 +89,8 @@ def linkedin_enrichment(args: argparse.Namespace, assembly: Any, goals: list[Any
           f"{len(res.enrichments)} matched, {len(res.unmatched)} name mismatch, "
           f"{len(res.absent_after)} missing; graph "
           f"{len(res.written.persons_written) if res.written else 0} persons, "
-          f"{len(res.written.works_at) if res.written else 0} WORKS_AT")
+          f"{len(res.written.works_at) if res.written else 0} WORKS_AT "
+          f"({len(res.written.works_at_corroborated) if res.written else 0} corroborated)")
 
 
 def main() -> int:
