@@ -491,7 +491,9 @@
   }
 
   function renderPeople(p) {
-    var items = (p && p.items) || [];
+    var all = (p && p.items) || [];
+    // Top 10 still to meet, then the people already met (they sink in the ranking but keep their follow-up).
+    var items = all.filter(function (c) { return !c.met; }).slice(0, 10).concat(all.filter(function (c) { return c.met; }));
     $("people-cards").innerHTML = items.length ? items.map(function (c) {
       var o = c.opportunity || {};
       var person = c.person || {};
@@ -568,7 +570,7 @@
       settle(api("/stays", null, "stays"), "stays", renderStays, errors),
       settle(api("/travel/map", null, "map"), "map", renderMap, errors),
       settle(api("/graph", null, "graph"), "graph", renderGraph, errors),
-      settle(api("/people", null, "people"), "people", renderPeople, errors),
+      settle(api("/people?limit=100", null, "people"), "people", renderPeople, errors),
       settle(api("/scenarios", null, "scenarios"), "scenarios", renderScenarios, errors)
     ]).then(loadAgentsState).then(function () {
       if (errors.length) showError("Erreur de chargement: " + errors.join(" | "));

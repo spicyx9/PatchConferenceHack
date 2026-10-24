@@ -19,6 +19,7 @@ Start with window **00** on `main`. Only after CI is green, fork **separate bran
 | 12 | `w12-api` | `conferge/api/`, `static/` | FastAPI and the one-page demo UI |
 | 13 | `w13-demo` | `conferge/demo/`, `scripts/gen_fixtures.py`, `demo/` | Deterministic demo and 3-minute script |
 | 15 | `w15-integration` | `conferge/integration/`, `tests/integration/` | E2E verification and final backup |
+| 16 | `w16-followup` | `conferge/agents/followup/` | Follow-up draft after a MET memory, proposed for validation, never sent |
 
 **Special ownership rule for window 13:** fixture files `fixtures/<slug>.json` belong to the corresponding source window, not to window 13. Window 13 builds its own fixture `fixtures/demo.json`, may *read* other windows' fixtures, and must not edit them.
 

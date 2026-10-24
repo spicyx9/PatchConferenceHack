@@ -30,7 +30,7 @@ def _data():  # type: ignore[no-untyped-def]
 
 def test_draft_uses_goal_event_company_and_quotes_the_note() -> None:
     data, goals = _data()
-    person = data.person("p-inv-ada")
+    person = data.person("per-fx-07")
     assert person is not None
     goal = best_goal(person, goals)
     assert goal is not None and goal.id == "goal-seed-investors"
@@ -45,20 +45,20 @@ def test_draft_uses_goal_event_company_and_quotes_the_note() -> None:
         met_at=MET_AT,
     )
     assert draft.sent is False and draft.status == "draft"
-    assert draft.message.startswith("Hi Ada,")
+    assert draft.message.startswith("Hi Gray,")
     assert event is not None and event.title in draft.message
     assert "[Your note from the meeting, edit before sending: talked about seed]" in draft.message
     assert "short deck" in draft.message  # investor ask
     assert draft.based_on["goal"] == goal.description
     assert draft.based_on["shared_topic"] in person.topics
-    assert draft.next_action.kind == "public_profile_message"
+    assert draft.next_action.kind == "manual"
     assert draft.next_action.due_at == datetime(2026, 10, 30, 18, 30, tzinfo=timezone.utc)
     assert "fixture person" in " ".join(draft.warnings)
 
 
 def test_draft_without_note_or_goal_is_flagged_not_invented() -> None:
     data, _ = _data()
-    person = data.person("p-fnd-elin")
+    person = data.person("per-fx-05")
     assert person is not None
     draft = draft_followup(person, conference=data.conference, goal=None, met_at=MET_AT)
     assert "[Your note" not in draft.message
@@ -71,7 +71,7 @@ def test_draft_without_note_or_goal_is_flagged_not_invented() -> None:
 
 def test_naive_met_at_is_refused() -> None:
     data, _ = _data()
-    person = data.person("p-inv-ada")
+    person = data.person("per-fx-07")
     assert person is not None
     with pytest.raises(ValueError):
         draft_followup(person, conference=data.conference, goal=None, met_at=datetime(2026, 10, 28))
@@ -85,14 +85,14 @@ async def test_agent_one_draft_per_met_person() -> None:
         events=data.events,
         people=data.people,
         constraints={
-            "met_person_ids": ["p-inv-ada", "p-fnd-elin", "ghost"],
-            "met_notes": {"p-inv-ada": "coffee"},
+            "met_person_ids": ["per-fx-07", "per-fx-05", "ghost"],
+            "met_notes": {"per-fx-07": "coffee"},
         },
     )
     res = await FollowUpAgent().run(ctx)
     assert res.status == "ok" and res.agent == "followup"
     drafts = [d for d in res.decisions if d["type"] == "followup_draft"]
-    assert [d["person_id"] for d in drafts] == ["p-inv-ada", "p-fnd-elin"]
+    assert [d["person_id"] for d in drafts] == ["per-fx-07", "per-fx-05"]
     assert all(d["sent"] is False for d in drafts)
     assert "coffee" in drafts[0]["message"] and "[Your note" not in drafts[1]["message"]
     empty = await FollowUpAgent().run(ctx.model_copy(update={"constraints": {}}))
@@ -109,4 +109,4 @@ def test_api_followup_requires_a_recorded_meeting(client: TestClient) -> None:
     assert "talked about seed" in body["message"]
     assert body["based_on"]["path"]  # rationale of the ranking that justified the meeting
     assert body["next_action"]["due_at"] > body["based_on"]["met_at"]
-    assert body["data_source"] == "fixture"
+    assert body["data_source"] in {"fixture", "degraded_no_graph"}  # no FalkorDB in this test
