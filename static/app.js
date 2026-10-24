@@ -1173,6 +1173,7 @@
           "Clear filters",
         );
     if (envelopes.plan) renderPlan(envelopes.plan);
+    if (envelopes.travel) renderTravel(envelopes.travel);
   }
 
   function isPlaceholderStay(name) {
@@ -1180,17 +1181,12 @@
   }
   function renderTravel(t) {
     if (!t) return;
-    var legs = t.itinerary || [];
-    var flights = legs.filter(function (leg) {
-      return leg.kind === "flight";
-    });
-    var outbound = flights[0],
-      inbound = flights[flights.length - 1];
+    var profile = (envelopes.conference && envelopes.conference.user) || {};
     var form = $("travel-research-form");
-    if (!form.dataset.initialized) {
-      $("research-origin").value = outbound ? outbound.from : "JFK";
-      $("research-depart").value = (outbound && outbound.date) || "2026-10-27";
-      $("research-return").value = (inbound && inbound.date) || "2026-10-30";
+    if (!form.dataset.initialized && envelopes.conference) {
+      $("research-origin").value = profile.origin_city || "";
+      $("research-depart").value = profile.depart_date || "";
+      $("research-return").value = profile.return_date || "";
       form.dataset.initialized = "true";
     }
     updateResearchLinks();
@@ -2982,6 +2978,7 @@
     ])
       .then(function () {
         if (envelopes.plan) renderPlan(envelopes.plan);
+        if (envelopes.travel) renderTravel(envelopes.travel);
         if (envelopes.people) renderPeople(envelopes.people);
         if (lastMapData) renderMap(lastMapData);
         if (selectedConnectionId)

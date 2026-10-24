@@ -24,6 +24,7 @@ from pydantic import BaseModel, Field
 from conferge.api import logic, providers
 from conferge.api.data import DemoData, load_fixture
 from conferge.api.provenance import source_of
+from conferge.extras.router import router as calendar_router
 from conferge.flights.round_trip_total import display as rt_display
 from conferge.core.schemas import AgentContext, Goal, Opportunity
 
@@ -846,6 +847,7 @@ def create_app(
         return _envelope(state, ["flights", "stays", "people"], view)
 
     app.include_router(api)
+    app.include_router(calendar_router)
 
     if STATIC_DIR.is_dir():
         app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
