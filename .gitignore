@@ -28,3 +28,6 @@ probes/*.ndjson
 
 # Worker logs, PIDs, and snapshots (never upload provider responses or secrets)
 /logs/
+
+# Bright Data dataset snapshots (scripts/probes/flights_collect.py): scraped bodies, never committed
+data/snapshots/
