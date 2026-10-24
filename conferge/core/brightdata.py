@@ -30,8 +30,23 @@ NETWORK_BACKOFF = (0.25, 0.22)
 STATUS_BACKOFF = (0.32, 0.26)
 RETRY_AFTER_MAX = 30.0
 MAX_RETRIES = 2
-COOLDOWN_DELAYS = (15.0, 30.0)
+# Bright Data out of peers / in cooldown (Unlocker and datasets alike): wait 15, 30, 60 s,
+# at most 3 retries, then the source is degraded with the warning NO_PEERS.
+COOLDOWN_DELAYS = (15.0, 30.0, 60.0)
 _COOLDOWN = re.compile(r"cooldown|no_peers", re.I)
+NO_PEERS = "brightdata_no_peers"
+
+
+def has_no_peers(payload: Any) -> bool:
+    """True when a body or a record says no_peers / cooldown (error, error_code, status, text)."""
+    if isinstance(payload, str):
+        return bool(_COOLDOWN.search(payload[:4000]))
+    if isinstance(payload, dict):
+        return any(isinstance(payload.get(k), str) and _COOLDOWN.search(payload[k])
+                   for k in ("error", "error_code", "status", "message"))
+    if isinstance(payload, list):
+        return any(has_no_peers(r) for r in payload if isinstance(r, dict))
+    return False
 # Web Unlocker answered 200 but the page is a bot wall: title + first 4000 chars.
 BLOCK_PATTERNS = ("captcha", "verify you are human", "access denied", "unusual traffic",
                   "cf-chl", "challenge-platform")
@@ -199,9 +214,7 @@ class BrightDataClient:
             await self._client.aclose()
 
     def _status_wait(self, response: httpx.Response, attempt: int) -> float:
-        """Delay before retry ``attempt`` (1-based) after a retryable HTTP status."""
-        if _COOLDOWN.search(response.text[:2000] if response.content else ""):
-            return COOLDOWN_DELAYS[min(attempt, len(COOLDOWN_DELAYS)) - 1]
+        """Delay before retry ``attempt`` (1-based) after a retryable, non-cooldown HTTP status."""
         after = retry_after_seconds(response.headers.get("retry-after"))
         return after if after is not None else status_delay(attempt, self._rand)
 
@@ -211,7 +224,9 @@ class BrightDataClient:
     ) -> httpx.Response:
         if not self._api_key:
             raise BrightDataError("Bright Data key missing; set BRIGHTDATA_API_KEY")
-        for attempt in range(self.retries + 1):
+        attempt = 0  # ordinary retries (network, 429/408/5xx): at most self.retries
+        cooldowns = 0  # no_peers / cooldown answers: their own 15, 30, 60 s budget
+        while True:
             try:
                 logger.info("brightdata.request", extra={"endpoint": path, "attempt": attempt + 1})
                 response = await self._client.request(
@@ -219,20 +234,31 @@ class BrightDataClient:
                     headers={"Authorization": f"Bearer {self._api_key}"},
                     **({"timeout": timeout} if timeout is not None else {}),
                 )
-                if response.status_code in _RETRY_STATUSES and attempt < self.retries:
-                    await self._sleep(self._status_wait(response, attempt + 1))
-                    continue
-                if response.status_code >= 400:
-                    raise BrightDataError(
-                        f"Bright Data {path}: HTTP {response.status_code}"
-                    )
-                return response
             except (httpx.RequestError, httpx.TimeoutException) as exc:
-                if attempt == self.retries or not retry_network:
+                # Ambiguous: the server may have started a billed collection. Never resend
+                # when the caller says so (retry_network=False on POST /scrape).
+                if attempt >= self.retries or not retry_network:
                     kind = "timeout" if isinstance(exc, httpx.TimeoutException) else "network error"
                     raise BrightDataError(f"Bright Data {path}: {kind}") from exc
-                await self._sleep(network_delay(attempt + 1, self._rand))
-        raise BrightDataError(f"Bright Data {path}: exhausted retries")
+                attempt += 1
+                await self._sleep(network_delay(attempt, self._rand))
+                continue
+            if response.status_code in _RETRY_STATUSES:
+                # An answered error is not ambiguous: resending it starts nothing twice.
+                if has_no_peers(response.text if response.content else ""):
+                    if cooldowns < len(COOLDOWN_DELAYS):
+                        await self._sleep(COOLDOWN_DELAYS[cooldowns])
+                        cooldowns += 1
+                        continue
+                    raise BrightDataError(
+                        f"Bright Data {path}: HTTP {response.status_code} {NO_PEERS}")
+                if attempt < self.retries:
+                    attempt += 1
+                    await self._sleep(self._status_wait(response, attempt))
+                    continue
+            if response.status_code >= 400:
+                raise BrightDataError(f"Bright Data {path}: HTTP {response.status_code}")
+            return response
 
     @staticmethod
     def _dataset_params(
@@ -256,12 +282,18 @@ class BrightDataClient:
         # The synchronous endpoint holds the connection up to about a minute, then answers 202
         # with a snapshot_id (client timeout SYNC_TIMEOUT); never resend on a network timeout
         # (each resend would start a new, billed collection).
-        response = await self._request(
-            "POST", "/datasets/v3/scrape",
-            params=self._dataset_params(dataset_id, method, limit_per_input),
-            payload={"input": inputs}, retry_network=False,
-        )
-        payload = parse_body(response)
+        for retry in range(len(COOLDOWN_DELAYS) + 1):
+            response = await self._request(
+                "POST", "/datasets/v3/scrape",
+                params=self._dataset_params(dataset_id, method, limit_per_input),
+                payload={"input": inputs}, retry_network=False,
+            )
+            payload = parse_body(response)
+            # A clear no_peers answer (not an ambiguous timeout) may be sent again.
+            if response.status_code == 202 or not has_no_peers(payload):
+                break
+            if retry < len(COOLDOWN_DELAYS):
+                await self._sleep(COOLDOWN_DELAYS[retry])
         if response.status_code == 202:
             snapshot_id = payload.get("snapshot_id") if isinstance(payload, dict) else None
             if not snapshot_id:
@@ -272,7 +304,8 @@ class BrightDataClient:
         rows = _data_rows(payload)
         record_usage("datasets", rows)
         record_call("datasets", rows=rows, status="ready", dataset_id=dataset_id)
-        return CollectionOutput(status="ready", source_mode="live", data=payload)
+        return CollectionOutput(status="ready", source_mode="live", data=payload,
+                                warnings=[NO_PEERS] if has_no_peers(payload) else [])
 
     async def trigger_dataset(
         self, dataset_id: str, inputs: list[dict[str, Any]], *,
@@ -280,13 +313,21 @@ class BrightDataClient:
     ) -> str:
         if not inputs:
             raise ValueError("dataset inputs cannot be empty")
-        response = await self._request(
-            "POST", "/datasets/v3/trigger",
-            params=self._dataset_params(dataset_id, method, limit_per_input),
-            payload=inputs,
-        )
-        payload = parse_body(response)
+        for retry in range(len(COOLDOWN_DELAYS) + 1):
+            response = await self._request(
+                "POST", "/datasets/v3/trigger",
+                params=self._dataset_params(dataset_id, method, limit_per_input),
+                payload=inputs, retry_network=False,
+            )
+            payload = parse_body(response)
+            snapshot = payload.get("snapshot_id") if isinstance(payload, dict) else None
+            if snapshot or not has_no_peers(payload):
+                break
+            if retry < len(COOLDOWN_DELAYS):
+                await self._sleep(COOLDOWN_DELAYS[retry])
         if not isinstance(payload, dict) or not payload.get("snapshot_id"):
+            if has_no_peers(payload):
+                raise BrightDataError(f"Bright Data trigger: {NO_PEERS}")
             raise BrightDataError("Bright Data trigger did not return snapshot_id")
         return str(payload["snapshot_id"])
 
@@ -298,10 +339,16 @@ class BrightDataClient:
         return data
 
     async def snapshot_results(self, snapshot_id: str) -> CollectionOutput:
-        response = await self._request(
-            "GET", f"/datasets/v3/snapshot/{snapshot_id}", params={"format": "json"}
-        )
-        data = parse_body(response)
+        for retry in range(len(COOLDOWN_DELAYS) + 1):
+            response = await self._request(
+                "GET", f"/datasets/v3/snapshot/{snapshot_id}", params={"format": "json"}
+            )
+            data = parse_body(response)
+            # Only ever a re-read of the same snapshot: never a new, billed collection.
+            if response.status_code == 202 or not has_no_peers(data):
+                break
+            if retry < len(COOLDOWN_DELAYS):
+                await self._sleep(COOLDOWN_DELAYS[retry])
         if response.status_code == 202 or (
             isinstance(data, dict) and data.get("status") in {"starting", "running", "building"}
         ):
@@ -312,7 +359,8 @@ class BrightDataClient:
         record_usage("datasets", rows)
         record_call("datasets", rows=rows, status="ready", snapshot_id=snapshot_id)
         return CollectionOutput(
-            status="ready", source_mode="live", snapshot_id=snapshot_id, data=data
+            status="ready", source_mode="live", snapshot_id=snapshot_id, data=data,
+            warnings=[NO_PEERS] if has_no_peers(data) else [],
         )
 
     async def serp(self, query: str, *, country: str = "us") -> str:
