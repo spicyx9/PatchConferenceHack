@@ -3364,3 +3364,9 @@ dialog .eyebrow {
 .event-dialog:not(.has-artwork) {
   width: min(720px, calc(100vw - 24px));
 }
+
+.roi-story { grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; margin-top: 20px; }
+.roi-story .roi-tile { padding: 12px; }
+.roi-tile .note { font-size: 12px; margin-top: 8px; }
+.followup-text { white-space: pre-wrap; font: inherit; font-size: 14px; line-height: 1.65; padding: 16px; background: #f7f7f7; border-radius: 8px; }
+@media (max-width: 760px) { .roi-story { grid-template-columns: repeat(2,minmax(0,1fr)); } }

@@ -639,6 +639,12 @@
       "Indicative budget: " +
       fmtUsd(roi.budget_usd) +
       (roi.spend_note ? " · " + roi.spend_note : "");
+    [ ["roi-spend", roi.spend_usd == null ? null : fmtUsd(roi.spend_usd)], ["roi-meetings", roi.meetings], ["roi-qualified", roi.qualified_contacts], ["roi-opportunities", roi.opportunities] ].forEach(function (pair) {
+      var element = $(pair[0]);
+      element.textContent = pair[1] == null ? "Not provided" : String(pair[1]);
+      element.classList.toggle("unknown", pair[1] == null);
+    });
+    $("roi-spend-note").textContent = roi.spend_usd == null ? "Prices are not available yet." : "";
     $("stat-met").textContent = roi.meetings == null ? "—" : roi.meetings;
   }
 
@@ -1719,7 +1725,8 @@
 
   function renderPeople(p) {
     lastPeople = p;
-    var all = (p && p.items) || [],
+    var candidates = (p && p.items) || [];
+    var all = candidates.filter(function (card) { return !card.met; }).slice(0,10).concat(candidates.filter(function (card) { return card.met; })),
       needle = fold($("people-search").value);
     var items = all.filter(function (c) {
       return (
@@ -1800,9 +1807,11 @@
               '<ul class="plain-list">' +
               (sources ||
                 '<li class="muted">No additional sources provided.</li>') +
-              '</ul><p class="presence-note">An announced appearance does not guarantee a chance to meet.</p></details><div class="card-actions">' +
+              '</ul><p class="presence-note">An announced appearance does not guarantee a chance to meet.</p></details>' +
+              (c.met ? '<div class="followup" id="followup-' + esc(pid) + '"></div>' : "") +
+              '<div class="card-actions">' +
               (c.met
-                ? ""
+                ? '<button class="primary" data-action="followup" data-id="' + esc(pid) + '">Draft a follow-up</button>'
                 : '<button data-action="met" data-id="' +
                   esc(pid) +
                   '" data-name="' +
@@ -1947,7 +1956,7 @@
       settle(api("/stays", null, "stays"), "stays", renderStays, errors),
       settle(api("/travel/map", null, "map"), "map", renderMap, errors),
       settle(api("/graph", null, "graph"), "connections", renderGraph, errors),
-      settle(api("/people", null, "people"), "people", renderPeople, errors),
+      settle(api("/people?limit=100", null, "people"), "people", renderPeople, errors),
       settle(
         api("/scenarios", null, "scenarios"),
         "simulations",
@@ -2570,6 +2579,17 @@
       $("meeting-person").textContent = pendingMeeting.name;
       $("meeting-note").value = "";
       openDialog("meeting-dialog");
+    } else if (action === "followup") {
+      withBusy(btn, function () {
+        return api("/followup?person=" + encodeURIComponent(id), null, "people").then(function (draft) {
+          var box = $("followup-" + id), next = draft.next_action || {}, link = safeUrl(next.url);
+          if (!box) return;
+          box.innerHTML = '<p class="small-text muted">Your draft · review before sending</p><pre class="followup-text">' + esc(draft.message) + '</pre><p class="small-text">' + esc(next.label || "") + (link ? ' <a href="' + esc(link) + '" target="_blank" rel="noopener noreferrer">Open profile</a>' : "") + (next.due_at ? ' · ' + esc(shortDate(String(next.due_at).slice(0,10))) : "") + '</p><button class="secondary" data-action="copy-followup" data-id="' + esc(id) + '">Copy draft</button>';
+        });
+      });
+    } else if (action === "copy-followup") {
+      var box = $("followup-" + id), text = box && box.querySelector(".followup-text");
+      if (text && navigator.clipboard) navigator.clipboard.writeText(text.textContent).then(function () { toast("Draft copied."); }).catch(function () { toast("Copying is not available in this browser."); });
     } else if (action === "showpath" || action === "path") {
       if (action === "showpath") switchTab("graph");
       setTimeout(function () {
