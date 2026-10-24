@@ -486,6 +486,10 @@ OPPORTUNITY_THRESHOLD = 30
 BUDGET_SOURCE = "demo persona assumption (fixtures/api.json), not entered by you"
 
 
+# Shown beside every trip total: the collections were made for different party sizes.
+OCCUPANCY_NOTE = "Stay quoted for 2 adults · flight for 1 adult (collection settings)"
+
+
 def travel_view(
     data: DemoData, plan: dict[str, Any], accepted: set[str]
 ) -> dict[str, Any]:
@@ -546,6 +550,7 @@ def travel_view(
         "budget": {
             "budget_usd": str(budget),
             "budget_source": BUDGET_SOURCE,
+            "occupancy_note": OCCUPANCY_NOTE,
             "source_mode": user.get("source_mode", "fixture"),
             "flights_usd": flight_total, "lodging_usd": stay_total,
             "flights_price_status": [f.price_status for f in trip],
@@ -659,6 +664,7 @@ def roi_view(
         "opportunity_threshold": OPPORTUNITY_THRESHOLD,
         "budget_usd": travel["budget"]["budget_usd"],
         "budget_source": travel["budget"]["budget_source"],
+        "occupancy_note": OCCUPANCY_NOTE,
     }
 
 

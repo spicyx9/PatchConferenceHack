@@ -935,7 +935,8 @@
       "Indicative budget: " +
       fmtUsd(roi.budget_usd) +
       (roi.budget_source ? " (" + roi.budget_source + ")" : "") +
-      (roi.spend_note ? " · " + roi.spend_note : "");
+      (roi.spend_note ? " · " + roi.spend_note : "") +
+      (roi.occupancy_note ? " · " + roi.occupancy_note : "");
     [
       ["roi-spend", roi.spend_usd == null ? null : fmtUsd(roi.spend_usd)],
       ["roi-meetings", roi.meetings],
@@ -952,6 +953,7 @@
     var spendStatus = roi.spend_price_status || {};
     $("roi-spend-note").textContent =
       (roi.spend_usd == null ? "Prices are not available yet." : "") +
+      (roi.occupancy_note ? roi.occupancy_note + ". " : "") +
       priceStatusText(
         [].concat(
           spendStatus.flights || [],
@@ -1334,7 +1336,8 @@
         ? ""
         : esc("Your budget · " + fmtUsd(b.budget_usd)) +
           " " +
-          sourceModeBadge(b.source_mode);
+          sourceModeBadge(b.source_mode) +
+          (b.occupancy_note ? ' <span class="muted small-text occupancy-note">' + esc(b.occupancy_note) + "</span>" : "");
   }
 
   var travelSearchKind = "flights",
