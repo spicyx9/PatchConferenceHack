@@ -42,7 +42,8 @@ SITE_NAMES = {
     "google_flights": "Google Flights", "hilton": "Hilton", "marriott": "Marriott",
     "kayak": "Kayak", "expedia": "Expedia", "hotels_com": "Hotels.com",
 }
-TIERS = {"dataset": 0, "unlocker": 1, "serp": 2, "fallback": 2, "fixture": 3, "unknown": 3}
+TIERS = {"dataset": 0, "unlocker": 1, "direct": 2, "serp": 2, "fallback": 2, "fixture": 3,
+         "unknown": 3}
 
 
 def _site_name(site: str | None) -> str:
@@ -91,6 +92,10 @@ def source_of(evidence: Sequence[SourceEvidence] | None) -> dict[str, Any]:
         return _unlocker(raw, default)
     if provider == "brightdata_google_flights":
         return _dataset("google_flights", raw)
+    if provider == "google_hotels_direct":
+        # Secondary source without a key (swoop-hotels method): after the Bright Data datasets.
+        return _out("google_hotels_direct", "direct", "Google Hotels direct (no key)",
+                    site="google_hotels")
     if provider == "fast_flights_google_flights":
         return _out("fast-flights", "fallback", "Fallback fast-flights", site="google_flights")
     if provider == "google_flights_fli":
