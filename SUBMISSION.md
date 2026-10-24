@@ -41,26 +41,26 @@ Bright Data (datasets, Web Unlocker, SERP)   public endpoints (RainFocus, Luma, 
 
 ## Real numbers
 
-| Measure | Value | Read from |
+| Measure | Value (measured 2026-10-24 14:13 PDT) | Read from |
 |---|---|---|
-| Events in the demo dataset | 194: 161 official sessions (RainFocus), 12 Luma, 6 Partiful, 8 Eventbrite, 7 conferenceparties (github26) | `GET /api/v1/events` (`data_source: fixture`, snapshot of the 2026-10-24 public collection) |
-| Collection runs | official 210 records, Luma 12, Partiful 6 (`page_cap`, shown as partial), Eventbrite 8, conferenceparties 7 | `GET /api/v1/pipeline` rows (RunReports) |
-| Live probe totals (not the demo snapshot) | Partiful 85 unique (11 in window, `page_cap`), Luma 1092 raw (194 in window), conferenceparties/github26 7 | `probes/partiful.md`, `probes/luma.md`, `probes/eventbrite-aggregators.md` |
-| People ranked for the goal | 50, computed from FalkorDB traversals | `GET /api/v1/people?limit=100` (`total`) |
-| FalkorDB graph | 704 nodes, 2,233 edges | `redis-cli GRAPH.QUERY conferge_demo "MATCH (n) RETURN count(n)"` and `"MATCH ()-[r]->() RETURN count(r)"` on a graph created fresh by `make demo` on `e6c08e4` (`/graph` returns a capped sample, not totals) |
-| Stays | 21 records through Bright Data datasets (15 Booking `gd_m4bf7a917zfezv9d5`, 6 Airbnb `gd_ld7ll037kqy322v05`), collected 18:41 UTC, 6 shown | `GET /api/v1/pipeline`, `GET /api/v1/stays` (`data_source: cached`) |
-| Flights | 34 Google Flights itineraries through Bright Data Web Unlocker (`web_unlocker1`), collected 18:18 UTC, 1 shown | `GET /api/v1/pipeline`, `GET /api/v1/flights` (`data_source: cached`) |
-| LinkedIn profiles | 15 Bright Data LinkedIn profiles in the graph: 9 through the dataset on catalog URLs, 6 found by SERP then the dataset (1 more target not written: name not confirmed); 10 visible in the top 50 people cards; the dataset returned no headline (`position` empty), the 6 headlines shown come from the SERP title | `GET /api/v1/people`, `redis-cli GRAPH.QUERY conferge_demo "MATCH (p:Person {provider:'brightdata:linkedin'}) RETURN count(p)"` |
-| Bright Data records | 64 (30 dataset, 34 Web Unlocker); cost about $0.096, an **estimate** (records x 1.5 / 1000) | `GET /api/v1/pipeline` `totals` |
-| Reachability (block matrix, 21 sites from the code) | 10 of 21 without Bright Data, 12 of 21 with Web Unlocker alone, 14 of 21 with Web Unlocker or dataset | `GET /api/v1/pipeline` `reachability` (`data/block_matrix.json`, run 19:01 UTC, datasets read 19:16 UTC) |
-| Tests | `make check`: 1,216 passed, 26 skipped (38 s); `make e2e`: 16 passed against the real API and FalkorDB | local run, `make check` on `e6c08e4` at 20:45 UTC, `make e2e` at 20:12 UTC |
+| FalkorDB graph | 684 nodes, 2,214 edges: Person 215, Event 194, Company 141, Venue 58, Topic 54, Opportunity 10, Lodging 6, Goal 3, Conference 1, FlightOffer 1, User 1 | `count()` queries on `conferge_demo` after `make predemo` (`GET /api/v1/graph` serves a capped sample: 332 nodes, 400 edges) |
+| Events in the demo | 194: RainFocus official catalog 161, Luma 12, Eventbrite 8, conferenceparties/github26 7, Partiful 6 (partial: Partiful not exhausted, `page_cap`) | `GET /api/v1/events`, `GET /api/v1/pipeline` |
+| Stays | 21 Bright Data dataset records (Booking 15, Airbnb 6), 6 shown; Google Hotels dataset 0 (`no_peers`) | `GET /api/v1/pipeline`, `GET /api/v1/stays` (`cached`) |
+| Flights | 34 Google Flights itineraries from 1 Bright Data Web Unlocker request, 1 shown | `GET /api/v1/pipeline`, `GET /api/v1/flights` (`cached`) |
+| Bright Data requests and records | 38 requests, 79 records. Datasets 10 / 38 (Booking 1 / 15, Airbnb 1 / 6, Google Hotels 1 / 0, LinkedIn 6 / 15, Crunchbase 1 / 2); Web Unlocker 1 / 34 (Google Flights); SERP 27 / 7 (LinkedIn URL search 17 / 5, Crunchbase URL search 10 / 2). Cost $0.0570 on dataset records only, list price estimate, not billed. 0 requests made by the running demo (all from cache); Google Maps not merged | `GET /api/v1/brightdata`, `GET /api/v1/cost` |
+| LinkedIn | 10 of the 50 people cards carry a Bright Data LinkedIn profile (9 in the first 10); 15 `Person` nodes with `provider brightdata:linkedin` in the graph, 6 of their URLs found by SERP | `GET /api/v1/people?limit=50`, FalkorDB |
+| Crunchbase | funding on 27 of the 50 people cards, from 2 companies (GitHub, Swamp Club); read from the cache by the API, not written to the graph | `GET /api/v1/people?limit=50` |
+| People and plan | 50 people ranked from FalkorDB traversals; top 3 Ryan Hecht 56, Camila Maia 47, Nick Liffen 40; 32 items on the agenda | `GET /api/v1/people`, `GET /api/v1/plan` |
+| Reachability (block matrix run 2026-10-24 19:01 UTC, 21 sites) | 10 without Bright Data, 12 with Web Unlocker alone, 14 with Bright Data; 18 projected once KYC is approved (Kayak, Hotels.com, Expedia, Marriott) | `GET /api/v1/pipeline` `reachability` |
+| Tests | `make check`: 1,355 passed, 27 skipped (main `b12c425`) | local run |
+| Live collection totals (probes, not the demo snapshot) | Luma 1,092 raw rows (194 in Oct 27-30); Partiful Explore 85 unique events (11 in the window, `page_cap`, not exhaustive); RainFocus 210 records (156 sessions, 54 exhibitors) | `probes/luma.md`, `probes/partiful.md`, `probes/official.md` |
 
 ## What is real, what is fixture, what is projected
 
-- **Real, collected through Bright Data**: the 21 stays, the 34 flight itineraries and the 15 LinkedIn profiles above, served from the cache of those runs (`data_source: cached`) with their collection time; nothing is fetched at query time.
+- **Real, collected through Bright Data**: the stays, flight itineraries, LinkedIn profiles and Crunchbase rows above, served from the cache of those runs (`data_source: cached`) with their collection time; nothing is fetched at query time.
 - **Fixture**: the events and people are a snapshot of the public collection of 2026-10-24 (RainFocus, Luma, Partiful, Eventbrite, conferenceparties), labelled `fixture` in every response and in the UI badge, so the demo runs offline on stage. The traveller (New York, October 27 to 30, budget $2,500) is the demo persona from `fixtures/api.json`, labelled as such in the UI.
 - **Simulated**: the sold-out change; every later response carries a warning until Reset.
-- **Projected, not measured**: **18 of 21** sites reachable with Bright Data once the account KYC is approved (Kayak, Hotels.com, Expedia, Marriott are refused by Web Unlocker until then).
+- **Projected, not measured**: the reachability once the account KYC is approved (see the table); Kayak, Hotels.com, Expedia and Marriott are refused by Web Unlocker until then.
 - **Never invented**: no price, attendance or guest list. A public speaker is never presented as a confirmed side-event attendee, a missing price stays `unknown` with its `price_status`, and a follow-up draft never claims where you met someone unless you marked that event attended.
 - **No LLM in the loop**: goal parsing is rule based, ranking is graph traversals, drafts are templates filled with graph facts.
 
