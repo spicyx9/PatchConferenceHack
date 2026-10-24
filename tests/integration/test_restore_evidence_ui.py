@@ -64,3 +64,18 @@ def test_graph_why_returns_edges_and_score_breakdown(monkeypatch: pytest.MonkeyP
         assert why["score_breakdown"] is not None
     finally:
         store.graph.delete()
+
+
+# -- 2. graph gaps block under the Connections search -----------------------------------
+
+APP = (ROOT / "static" / "app.js").read_text(encoding="utf-8")
+SUBTITLE = ("No recorded path found, and that's the answer: the graph has no evidence linking this "
+            "goal to anyone at the conference. It does not prove the person or event is absent.")
+
+
+def test_graph_gaps_block_is_back_under_the_search() -> None:
+    tab = HTML[HTML.index('id="connection-search"'):HTML.index('class="connection-workspace"')]
+    assert 'id="graph-gaps"' in tab and 'id="graph-gaps-body"' in tab
+    assert "<h2>No path in our graph</h2>" in tab and SUBTITLE in tab
+    assert 'api("/graph/gaps", null, null), "graph gaps", renderGraphGaps' in APP
+    assert "No gaps for these goals" in APP and '<pre class="cypher">' in APP
