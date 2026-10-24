@@ -11,7 +11,10 @@ A domain that fails or returns nothing falls back to the API fixture, labelled `
 re-runs itself once through ``uv run --with pyairbnb --with fast-flights`` (ephemeral).
 ``--travel fixture`` skips the live travel searches.
 
-Run: ``uv run python scripts/run_demo.py [--mode fixture|live] [--travel live|fixture] [--graph conferge_demo] [--port 8000]``
+``--keep-graph`` serves on the graph as it is (no reset, no reload): restarting the API
+process this way keeps what the session wrote to FalkorDB (meetings, skips).
+
+Run: ``uv run python scripts/run_demo.py [--mode fixture|live] [--travel live|fixture] [--graph conferge_demo] [--port 8000] [--keep-graph]``
 FalkorDB address: FALKORDB_HOST / FALKORDB_PORT from the env or .env (default 127.0.0.1:6379).
 """
 
@@ -53,6 +56,8 @@ def main() -> int:
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument("--no-graph", action="store_true", help="serve without loading FalkorDB")
+    parser.add_argument("--keep-graph", action="store_true",
+                        help="serve on the existing graph without resetting or reloading it")
     parser.add_argument("--travel", choices=["live", "fixture"], default="live",
                         help="stays/flights: live search with fixture fallback, or fixture only")
     args = parser.parse_args()
@@ -88,7 +93,9 @@ def main() -> int:
         for w in d.warnings:
             print(f"    - {w}")
 
-    if not args.no_graph:
+    if args.keep_graph:
+        print(f"graph {args.graph}: kept as is (--keep-graph), not reset or reloaded")
+    elif not args.no_graph:
         from conferge.core.store import connect_graph
 
         store = connect_graph()
