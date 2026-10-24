@@ -199,6 +199,18 @@ USER_ID = "demo-user"
 DEGRADED_NO_GRAPH = "degraded_no_graph"
 
 
+def _pipeline_mode(rows: list[dict[str, Any]]) -> str:
+    """live only for rows that returned records in this process; cached rows say cached.
+
+    Rows with no record (a failed source, a note row) do not decide the label.
+    """
+    collected = [r for r in rows if r["kind"] != "fallback" and r.get("records")]
+    live = [r for r in collected if not r.get("cached")]
+    if live:
+        return "live" if len(live) == len(collected) else "mixed"
+    return "cached" if collected else "fixture"
+
+
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -434,7 +446,7 @@ def create_app(
             "brightdata_calls": bd.calls(), "reachability": reachability(),
             "timings": timings, "sources_report": state.data.sources_report,
             "note": None if rows else "no collection run in this process (dataset served as loaded)",
-        }, mode_override="live" if any(r["kind"] != "fallback" for r in rows) else "fixture")
+        }, mode_override=_pipeline_mode(rows))
 
     @api.get("/cost")
     def cost() -> dict[str, Any]:
