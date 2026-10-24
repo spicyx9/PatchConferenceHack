@@ -1,8 +1,9 @@
 """Merge source slices into one dataset and into the ``DemoData`` the API accepts.
 
-Domains with no merged source window (lodging w05, flights w06) come from the
-window 12 fixture and keep ``source_mode=fixture`` with a warning naming the
-missing window. The anchor conference comes from the official source when it
+Stays (w05) and flights (w06) come from ``stays_flights.collect_stays_flights``
+when the caller passes live results; a domain that failed or returned nothing
+falls back to the window 12 fixture, kept ``source_mode=fixture`` with a warning
+naming the live failure. The anchor conference comes from the official source when it
 produced one; otherwise from the API fixture, labelled as such.
 """
 
@@ -16,6 +17,7 @@ from conferge.api.data import DemoData, DomainSlice
 from conferge.api.data import load_fixture as load_api_fixture
 from conferge.core.schemas import Company, Conference, Event, Person, RunStatus
 from conferge.integration.sources import SourceSlice
+from conferge.integration.stays_flights import LiveDomain, usable
 
 _RANK: dict[str, int] = {"ok": 0, "degraded": 1, "failed": 2}
 
@@ -105,7 +107,26 @@ def _scenarios(fixture_scenarios: list[dict[str, Any]], events: list[Event]) -> 
     }]
 
 
-def assemble(slices: list[SourceSlice]) -> Assembly:
+def _travel_domain(name: str, window: str, live: LiveDomain | None,
+                   fixture: DemoData) -> tuple[DomainSlice, list[Any]]:
+    base = fixture.domains[name]
+    if live is not None and usable(live):
+        warnings = [f"{window}: {live.source_mode} {live.status}", *live.warnings,
+                    *(f"{window}: {e}" for e in live.errors)]
+        return (DomainSlice(live.source_mode, live.status,
+                            live.collected_at or datetime.now(timezone.utc), warnings),
+                list(live.items))
+    if live is None:
+        reason = f"{window} live search not run: API fixture used"
+    else:
+        why = "; ".join(live.errors)[:200] or "zero results"
+        reason = f"{window} live search gave no usable records ({why}): API fixture fallback"
+    return (DomainSlice("fixture", "degraded", base.collected_at, [*base.warnings, reason]),
+            list(getattr(fixture, name)))
+
+
+def assemble(slices: list[SourceSlice],
+             live_travel: dict[str, LiveDomain] | None = None) -> Assembly:
     now = datetime.now(timezone.utc)
     api_fixture = load_api_fixture()
     warnings: list[str] = []
@@ -140,10 +161,10 @@ def assemble(slices: list[SourceSlice]) -> Assembly:
         "people": _domain(slices, "people", now),
         "companies": _domain(slices, "companies", now),
     }
+    travel = live_travel or {}
+    picked: dict[str, list[Any]] = {}
     for name, window in (("stays", "w05 lodging"), ("flights", "w06 flights")):
-        base = fixture_domains[name]
-        domains[name] = DomainSlice("fixture", "degraded", base.collected_at,
-                                    [*base.warnings, f"{window} not merged: API fixture used"])
+        domains[name], picked[name] = _travel_domain(name, window, travel.get(name), api_fixture)
     demo = DemoData(
         conference=conference,
         user=dict(api_fixture.user),
@@ -151,8 +172,8 @@ def assemble(slices: list[SourceSlice]) -> Assembly:
         events=events,
         people=people,
         companies=companies,
-        stays=list(api_fixture.stays),
-        flights=list(api_fixture.flights),
+        stays=picked["stays"],
+        flights=picked["flights"],
         scenarios=_scenarios(api_fixture.scenarios, events),
         domains=domains,
     )
