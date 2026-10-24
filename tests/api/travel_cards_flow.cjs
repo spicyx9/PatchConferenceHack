@@ -53,6 +53,19 @@ async function capture(page, selector, name) {
       ["mobile", 390, 844],
     ]) {
       await page.setViewportSize({ width, height });
+      if (version === "after") {
+        const croppedLogos = await page.locator(".fare-logo img").evaluateAll((images) =>
+          images.filter((image) => {
+            const frame = image.parentElement.getBoundingClientRect();
+            const bounds = image.getBoundingClientRect();
+            return bounds.left < frame.left || bounds.top < frame.top ||
+              bounds.right > frame.right || bounds.bottom > frame.bottom ||
+              Math.abs((bounds.left + bounds.right) - (frame.left + frame.right)) > 1 ||
+              Math.abs((bounds.top + bounds.bottom) - (frame.top + frame.bottom)) > 1;
+          }).map((image) => image.alt)
+        );
+        assert.deepEqual(croppedLogos, [], `${size}: every airline logo fits and is centered`);
+      }
       for (const [kind, selector] of [
         ["flight", "#flights article"],
         ["stay", "#stays article"],
