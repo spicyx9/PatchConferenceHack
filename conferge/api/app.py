@@ -70,7 +70,6 @@ class DemoState:
         self.goal_text = self.data.demo_goal_text
         self.goals: list[Goal] = logic.parse_goals(self.goal_text)
         self.met: dict[str, str] = {}
-        self.met_at: dict[str, datetime] = {}
         self.attended: set[str] = set()
         self.skipped: set[str] = set()
         self.accepted: set[str] = set()
@@ -416,6 +415,9 @@ def create_app(
                          extra_warnings=_plan_warnings())
 
     def _events_view(event_type: str | None, day: str | None, min_score: float | None) -> list[dict[str, Any]]:
+        from conferge.api.artwork import event_artwork, load_fixture_covers
+
+        covers = load_fixture_covers()
         scores = state.event_scores()
         out = []
         for event in state.data.events:
@@ -431,6 +433,7 @@ def create_app(
             item["source_mode"] = logic._mode_of(event.evidence)
             item["attended"] = event.id in state.attended
             item["skipped"] = event.id in state.skipped
+            item.update(event_artwork(event, covers))
             out.append(item)
         out.sort(key=lambda e: (e["start_at"] is None, e["start_at"] or "", e["id"]))
         return out
@@ -572,7 +575,6 @@ def create_app(
         if person is None:
             raise HTTPException(404, f"unknown person_id {req.person_id!r}")
         state.met[person.id] = req.note or ""
-        state.met_at[person.id] = datetime.now(timezone.utc)
         persisted, memory_id = "memory", None
         store = state.store()
         if store is not None:
@@ -593,26 +595,6 @@ def create_app(
         payload.update({"person_id": person.id, "persisted": persisted,
                         "memory_id": memory_id if persisted == "falkordb" else None})
         return _envelope(state, ["people", "events"], payload, extra_warnings=_plan_warnings())
-
-    @api.get("/followup")
-    def followup(person: str) -> dict[str, Any]:
-        """Follow-up draft for a person the user has MET; proposed, never sent."""
-        from conferge.agents.followup import best_goal, draft_followup
-
-        found = state.data.person(person)
-        if found is None:
-            raise HTTPException(404, f"unknown person_id {person!r}")
-        if found.id not in state.met:
-            raise HTTPException(409, f"{person!r} not met yet: record the meeting first")
-        opp = next((o for o in state.opportunities() if found.id in o.person_ids), None)
-        event = next((e for e in (state.data.event(i) for i in found.event_ids) if e is not None), None)
-        draft = draft_followup(
-            found, conference=state.data.conference, goal=best_goal(found, state.goals),
-            event=event, company=state.data.company(found.company_id),
-            note=state.met.get(found.id) or None,
-            path_text=opp.rationale if opp else None, met_at=state.met_at.get(found.id),
-        )
-        return _envelope(state, ["people"], draft.model_dump(mode="json"))
 
     def _event_or_404(event_id: str) -> None:
         if state.data.event(event_id) is None:
