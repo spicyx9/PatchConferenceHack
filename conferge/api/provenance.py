@@ -6,7 +6,7 @@ first; later entries are verification/detail fetches).
 
 Contract (consumed by the UI, key names are frozen)::
 
-    {"provider": "brightdata"|"pyairbnb"|"fast-flights"|"serpapi"|"fixture"|"unknown",
+    {"provider": "brightdata"|"pyairbnb"|"fast-flights"|"fli"|"serpapi"|"fixture"|"unknown",
      "api": "dataset"|"unlocker"|"serp"|"fallback"|"fixture"|"unknown",
      "id": dataset id or unlocker zone or None,
      "site": "booking"|"google_hotels"|"airbnb"|"hilton"|"google_flights"|... or None,
@@ -93,6 +93,8 @@ def source_of(evidence: Sequence[SourceEvidence] | None) -> dict[str, Any]:
         return _dataset("google_flights", raw)
     if provider == "fast_flights_google_flights":
         return _out("fast-flights", "fallback", "Fallback fast-flights", site="google_flights")
+    if provider == "google_flights_fli":
+        return _out("fli", "fallback", "Fallback fli (Google Flights)", site="google_flights")
     if provider.startswith("serpapi"):
         return _out("serpapi", "serp", "SerpApi Google Flights", site="google_flights")
     return _out("unknown", "unknown", "Unknown source")

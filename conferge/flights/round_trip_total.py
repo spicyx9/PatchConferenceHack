@@ -44,6 +44,9 @@ def display(offer: FlightOffer) -> dict[str, Any]:
     """View overrides for the API; empty when the offer is shown as stored."""
     rt = round_trip_total(offer)
     if rt is None:
-        return {}
+        from conferge.flights.fli_provider import display_status
+
+        status = display_status(offer)  # fli: quoted_total / indicative, never guessed
+        return {"price_status": status} if status else {}
     return {"trip_type": "round_trip", "price_status": "quoted_total", "total_price": rt[0],
             "currency": rt[1], "price_label": LABEL, "return_slice_collected": False}
