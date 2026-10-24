@@ -1,0 +1,600 @@
+/* One search task, grouped by route, dates and party. */
+#tab-travel .travel-heading {
+  padding: 24px 0 16px;
+}
+#tab-travel .travel-heading h1 {
+  font-size: 32px;
+  letter-spacing: -1.1px;
+  margin-top: 8px;
+}
+#tab-travel .travel-category {
+  margin-bottom: 12px;
+}
+#tab-travel .travel-search-v3 {
+  position: relative;
+  margin-bottom: 12px;
+}
+#tab-travel .travel-search-options {
+  margin-bottom: 8px;
+  min-height: 36px;
+}
+#tab-travel .travel-search-options select {
+  min-height: 36px;
+}
+#tab-travel .travel-search-fields,
+#tab-travel .travel-search-fields.is-stays,
+#tab-travel .travel-search-fields.is-oneway {
+  display: grid;
+  grid-template-columns:
+    minmax(240px, 2fr) minmax(218px, 1.5fr) minmax(135px, 1fr)
+    auto;
+  gap: 8px;
+}
+#tab-travel .travel-search-fields.is-stays {
+  grid-template-columns:
+    minmax(220px, 2fr) minmax(218px, 1.5fr) minmax(135px, 1fr)
+    auto;
+}
+.travel-route-fields,
+.travel-date-fields,
+.travel-party-field {
+  min-width: 0;
+  display: flex;
+  border: 1px solid #d6d1cc;
+  background: #fff;
+  border-radius: 10px;
+  position: relative;
+}
+.travel-route-fields:focus-within,
+.travel-date-fields:focus-within,
+.travel-party-field:focus-within {
+  border-color: #292321;
+  box-shadow: 0 0 0 1px #292321;
+}
+#tab-travel .travel-route-fields > label,
+#tab-travel .travel-date-fields > label {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  margin: 0;
+  padding: 10px 12px;
+}
+.travel-route-fields > label + label,
+.travel-date-fields > label + label {
+  border-left: 1px solid #e2dfdc;
+}
+#tab-travel .travel-search-fields input {
+  font-size: 14px;
+  min-height: 24px;
+  text-overflow: ellipsis;
+}
+#tab-travel .travel-date-fields input {
+  font-size: 13px;
+  cursor: pointer;
+}
+.travel-date-fields input::-webkit-calendar-picker-indicator {
+  display: none;
+}
+#tab-travel #travel-swap-route {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid #ddd7d0;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  min-height: 32px;
+  padding: 0;
+  background: #fff;
+  color: #4c423a;
+  z-index: 1;
+  font-size: 19px;
+  box-shadow: none;
+}
+#tab-travel
+  .travel-route-fields:has(#research-origin-label:not([hidden]))
+  .search-origin {
+  padding-right: 20px;
+}
+#tab-travel
+  .travel-route-fields:has(#research-origin-label:not([hidden]))
+  .search-destination {
+  border-left: 1px solid #e2dfdc;
+  padding-left: 22px;
+}
+#tab-travel .travel-search-fields.is-oneway .search-depart {
+  grid-column: auto;
+}
+#tab-travel .travel-party-field {
+  flex-direction: column;
+  justify-content: center;
+  padding: 8px 10px;
+  gap: 2px;
+}
+#tab-travel .travel-party-field label {
+  margin: 0;
+  min-width: 0;
+}
+#tab-travel .travel-party-field select {
+  display: block;
+  width: 100%;
+  border: 0;
+  box-shadow: none;
+  background-color: transparent;
+  font: inherit;
+  font-size: 13px;
+  padding: 2px 18px 2px 0;
+  min-height: 24px;
+  cursor: pointer;
+  text-overflow: ellipsis;
+}
+#tab-travel .travel-party-field > label:first-child select {
+  font-weight: 600;
+}
+#tab-travel .travel-search-button,
+#tab-travel .is-stays .travel-search-button {
+  grid-column: auto;
+  min-height: 64px;
+  padding: 0 18px;
+}
+#tab-travel .travel-search-foot {
+  padding: 8px 0;
+  align-items: center;
+  flex-direction: row;
+  gap: 8px;
+  font-size: 12px;
+}
+#tab-travel .travel-search-foot button {
+  font-size: 12px;
+}
+#tab-travel .travel-prices-bar {
+  padding-bottom: 8px;
+  gap: 8px;
+}
+#tab-travel .travel-prices-bar #travel-offer-context {
+  flex: 1;
+  font-size: 12px;
+  line-height: 1.5;
+}
+#tab-travel .travel-results-workspace {
+  padding-top: 16px;
+  gap: 24px;
+}
+#tab-travel .travel-results-header {
+  margin-bottom: 10px;
+}
+.travel-sort-shortcuts {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+#tab-travel .travel-sort-shortcuts button {
+  background: #fff;
+  color: #61564c;
+  border: 1px solid #ddd6cf;
+  border-radius: 8px;
+  padding: 9px 14px;
+  font-size: 12px;
+  min-height: 44px;
+  box-shadow: none;
+}
+#tab-travel .travel-sort-shortcuts button[aria-pressed="true"] {
+  background: #eee9e3;
+  color: #282320;
+  border-color: #84786c;
+}
+#tab-travel #travel-show-map {
+  margin-left: auto;
+}
+#tab-travel .travel-search-popover {
+  position: absolute;
+  z-index: 40;
+  width: min(360px, 100%);
+  background: #fff;
+  border: 1px solid #d8d2cb;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px #29232126;
+  padding: 16px;
+  max-height: min(560px, 75vh);
+  overflow: auto;
+  box-sizing: border-box;
+}
+#tab-travel .dates-popover {
+  width: min(688px, 100%);
+}
+#tab-travel .search-popover-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+#tab-travel .search-popover-heading > button {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  background: transparent;
+  color: #564c43;
+  border: 0;
+  font-size: 24px;
+  padding: 0;
+  box-shadow: none;
+}
+.search-popover-caption {
+  font-size: 12px;
+  color: #6d6259;
+  margin: 0 0 8px;
+}
+#tab-travel .places-popover {
+  padding: 12px;
+}
+#tab-travel .places-popover [data-place] {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  text-align: left;
+  min-height: 60px;
+  padding: 10px 12px;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  box-shadow: none;
+  color: #282320;
+}
+#tab-travel .places-popover [data-place]:hover,
+#tab-travel .places-popover [aria-selected="true"] {
+  background: #f2eee9;
+}
+.places-popover strong,
+.places-popover small {
+  display: block;
+}
+.places-popover strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+.places-popover small {
+  font-size: 12px;
+  color: #6d6259;
+  margin-top: 4px;
+}
+.places-popover b {
+  font-size: 12px;
+  color: #6d6259;
+}
+.search-popover-empty {
+  font-size: 14px;
+  line-height: 1.5;
+}
+.calendar-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.calendar-navigation span {
+  font-size: 12px;
+  color: #6d6259;
+}
+#tab-travel .calendar-navigation button {
+  width: 44px;
+  height: 44px;
+  background: #fff;
+  color: #282320;
+  border: 1px solid #e2dfdc;
+  border-radius: 8px;
+  padding: 0;
+  font-size: 24px;
+  box-shadow: none;
+}
+.travel-calendar-months {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+#tab-travel .travel-calendar-month h3 {
+  text-align: center;
+  font-size: 14px;
+  letter-spacing: 0;
+  margin: 12px 0 16px;
+}
+.calendar-weekdays,
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  text-align: center;
+  gap: 3px 0;
+}
+.calendar-weekdays {
+  font-size: 11px;
+  color: #6d6259;
+  margin-bottom: 6px;
+}
+#tab-travel .calendar-days button {
+  background: #fff;
+  color: #282320;
+  border: 0;
+  box-shadow: none;
+  border-radius: 4px;
+  padding: 0;
+  min-height: 40px;
+  min-width: 0;
+  font-size: 13px;
+}
+#tab-travel .calendar-days button:hover:not(:disabled) {
+  background: #e9e1d7;
+}
+#tab-travel .calendar-days button:disabled {
+  color: #b5afa8;
+  cursor: not-allowed;
+}
+#tab-travel .calendar-days .in-range {
+  background: #f1ece6;
+  border-radius: 0;
+}
+#tab-travel .calendar-days .selected-date {
+  background: #282320;
+  color: #fff;
+  border-radius: 6px;
+}
+#tab-travel .calendar-days .selected-date:hover {
+  background: #48403a;
+}
+.calendar-range-summary {
+  border-top: 1px solid #e2dfdc;
+  padding-top: 12px;
+  font-size: 13px;
+  margin: 16px 0 0;
+  color: #6d6259;
+}
+.party-counter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid #e2dfdc;
+}
+.party-counter strong,
+.party-counter small {
+  display: block;
+}
+.party-counter strong {
+  font-size: 15px;
+}
+.party-counter small {
+  font-size: 12px;
+  color: #6d6259;
+  margin-top: 5px;
+}
+.party-counter > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.party-counter output {
+  font-size: 16px;
+  min-width: 14px;
+  text-align: center;
+}
+#tab-travel .party-counter button {
+  width: 44px;
+  height: 44px;
+  background: #fff;
+  color: #282320;
+  border: 1px solid #c8bfb5;
+  border-radius: 8px;
+  padding: 0;
+  font-size: 22px;
+  box-shadow: none;
+}
+#tab-travel .party-counter button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+#tab-travel .party-cabins {
+  border: 0;
+  padding: 16px 0;
+  margin: 0;
+}
+.party-cabins legend {
+  font-weight: 600;
+  font-size: 14px;
+  padding-top: 16px;
+}
+#tab-travel .party-cabins label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  margin: 0;
+  font-size: 14px;
+}
+#tab-travel .party-cabins input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: #282320;
+}
+#tab-travel .party-done {
+  width: 100%;
+  margin-top: 16px;
+  min-height: 44px;
+  background: #282320;
+  color: #fff;
+  border: 0;
+  border-radius: 8px;
+}
+#tab-travel .travel-search-popover button:focus-visible,
+#tab-travel .travel-search-fields select:focus-visible,
+#tab-travel .travel-search-fields input:focus-visible {
+  outline: 2px solid #846a50;
+  outline-offset: 2px;
+}
+@media (max-width: 1100px) and (min-width: 701px) {
+  #tab-travel .travel-search-fields,
+  #tab-travel .travel-search-fields.is-stays,
+  #tab-travel .travel-search-fields.is-oneway {
+    grid-template-columns:
+      minmax(210px, 2fr) minmax(205px, 1.6fr) minmax(120px, 1fr)
+      auto;
+    gap: 6px;
+  }
+  #tab-travel .travel-search-button {
+    padding: 0 12px;
+  }
+  #tab-travel .travel-search-button .icon {
+    display: none;
+  }
+  #tab-travel .travel-route-fields > label,
+  #tab-travel .travel-date-fields > label {
+    padding-left: 9px;
+    padding-right: 9px;
+  }
+  #tab-travel .travel-search-fields input {
+    font-size: 13px;
+  }
+}
+@media (max-width: 700px) {
+  #tab-travel .travel-heading {
+    padding: 16px 0 10px;
+  }
+  #tab-travel .travel-heading h1 {
+    font-size: 28px;
+  }
+  #tab-travel .travel-category {
+    margin-bottom: 8px;
+  }
+  #tab-travel .travel-search-fields,
+  #tab-travel .travel-search-fields.is-stays,
+  #tab-travel .travel-search-fields.is-oneway {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+  #tab-travel .travel-route-fields,
+  #tab-travel .travel-date-fields {
+    grid-column: 1/-1;
+  }
+  #tab-travel .travel-party-field {
+    min-height: 60px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 8px 12px;
+  }
+  #tab-travel .travel-party-field > label {
+    max-width: 55%;
+  }
+  #tab-travel .travel-party-field select {
+    font-size: 13px;
+  }
+  #tab-travel .travel-search-button,
+  #tab-travel .is-stays .travel-search-button {
+    min-height: 60px;
+    padding: 0 18px;
+  }
+  #tab-travel .travel-search-fields input {
+    font-size: 16px;
+  }
+  #tab-travel .travel-date-fields input {
+    font-size: 15px;
+  }
+  #tab-travel .travel-search-foot {
+    align-items: flex-start;
+  }
+  #tab-travel #travel-search-hint {
+    display: none;
+  }
+  #tab-travel .travel-search-foot button {
+    font-size: 11px;
+    min-height: 32px;
+  }
+  #tab-travel .travel-prices-bar {
+    flex-wrap: wrap;
+  }
+  #tab-travel .travel-prices-bar #travel-offer-context {
+    flex-basis: 100%;
+    font-size: 11px;
+  }
+  #tab-travel .travel-prices-bar > button {
+    min-height: 32px;
+  }
+  #tab-travel .travel-results-workspace {
+    gap: 10px;
+    padding-top: 10px;
+  }
+  #tab-travel .travel-sort-shortcuts {
+    gap: 6px;
+  }
+  #tab-travel .travel-sort-shortcuts button {
+    font-size: 11px;
+    padding: 8px 10px;
+  }
+  #tab-travel .travel-search-popover {
+    left: 0 !important;
+    max-height: 65vh;
+  }
+}
+@media (max-width: 650px) {
+  .travel-calendar-months {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .travel-calendar-month:nth-child(2) {
+    display: none;
+  }
+  #tab-travel .calendar-days button {
+    min-height: 44px;
+  }
+  #tab-travel .search-popover-heading {
+    font-size: 15px;
+  }
+}
+@media (max-width: 360px) {
+  #tab-travel .travel-party-field {
+    padding: 8px;
+    gap: 4px;
+  }
+  #tab-travel .travel-party-field select {
+    font-size: 11px;
+  }
+  #tab-travel .travel-search-button {
+    padding: 0 12px;
+  }
+  #tab-travel .travel-search-button .icon {
+    display: none;
+  }
+}
+
+#tab-travel .travel-search-options:has(#flight-type-label[hidden]) {
+  display: none;
+}
+#tab-travel .travel-map-heading {
+  flex-wrap: wrap;
+}
+#tab-travel .travel-map-heading > div {
+  flex: 1;
+  min-width: 200px;
+}
+
+@media (max-width: 650px) {
+  #tab-travel .travel-filter-sidebar:not(.filters-open) {
+    display: none;
+  }
+  #tab-travel .travel-sort-shortcuts #travel-mobile-filters {
+    font-size: 11px;
+    min-height: 44px;
+  }
+  #tab-travel [data-stay-sort="distance"] {
+    display: none;
+  }
+}
