@@ -618,7 +618,9 @@ def create_app(
             cached = travel_cache.load(flight_alternatives=True)
             if cached and "flights" in cached:
                 offers = cached["flights"].items
-        items = [{**f.model_dump(mode="json"), **rt_display(f), "source": source_of(f.evidence)}
+        from conferge.api.travel_cards import view
+
+        items = [{**view(f), **rt_display(f), "source": source_of(f.evidence)}
                  for f in offers]
         return _envelope(state, ["flights"], {"items": items, "count": len(items)})
 

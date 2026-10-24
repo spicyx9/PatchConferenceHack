@@ -441,7 +441,9 @@ def stays_view(data: DemoData) -> list[dict[str, Any]]:
     conf = data.conference
     out = []
     for stay in data.stays:
-        item = stay.model_dump(mode="json")
+        from conferge.api.travel_cards import view
+
+        item = view(stay)
         distance = stay.distance_to_venue_m
         computed = False
         if distance is None and stay.venue and stay.venue.latitude is not None and conf.latitude is not None:

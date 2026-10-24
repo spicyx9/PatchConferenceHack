@@ -290,12 +290,20 @@ class GoogleHotelsSource:
                          termination=_error_termination(exc), errors=[str(exc)])  # type: ignore[arg-type]
             return DiscoveryResult(run_report=rep, errors=list(rep.errors))
 
-        warnings = list(got.warnings)
+        from conferge.lodging.detail_candidates import hydrate
+
+        hydrated, detail_warnings, detail_partial, detail_calls = await hydrate(
+            got.rows, client=self.client, dataset=DATASET_GOOGLE_HOTELS, site="google",
+            limit=q.limit, country=q.country, poll_interval=self.poll_interval,
+            max_wait=self.max_wait,
+        )
+        warnings = [*got.warnings, *detail_warnings]
         items: list[SourceRecord] = []
         seen: set[str] = set()
         skipped = duplicates = 0
-        for row in got.rows:
-            record = self._record(row, kind="search", snapshot_id=got.snapshot_id, query=q)
+        for row in hydrated:
+            record = self._record(row, kind="search",
+                                  snapshot_id=row.get("_detail_snapshot_id", got.snapshot_id), query=q)
             if record is None:
                 skipped += 1
                 continue
@@ -316,10 +324,10 @@ class GoogleHotelsSource:
             warnings.append(f"page_cap: {returned} rows == limit {q.limit}; more may exist")
             status, termination = "degraded", "page_cap"
         else:
-            status = "degraded" if (got.error_rows or skipped) else "ok"
+            status = "degraded" if (got.error_rows or skipped or detail_partial) else "ok"
             termination = "exhausted"
         rep = report(PROVIDER, started, status=status, termination=termination,  # type: ignore[arg-type]
-                     fetched=len(got.rows), unique=len(items), pages=1, warnings=warnings,
+                     fetched=max(len(got.rows), len(items)), unique=len(items), pages=1 + detail_calls, warnings=warnings,
                      finished_at=self.clock())
         return DiscoveryResult(items=items, run_report=rep)
 

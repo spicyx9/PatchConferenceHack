@@ -18,13 +18,15 @@ from typing import Any
 
 from conferge.api.provenance import source_of
 from conferge.core.brightdata import NO_PEERS
-from conferge.core.schemas import FlightOffer, Lodging, RunReport
+from conferge.core.schemas import RunReport
+from conferge.flights.card_details import FlightWithCard
+from conferge.lodging.card_details import LodgingWithCard
 from conferge.flights.round_trip_total import as_stored
 from conferge.integration.stays_flights import LiveDomain, dedupe_flights, pick_flights, pick_stays
 
 CACHE_DIR = Path(__file__).resolve().parents[2] / "data" / "cache"
 FILES = {"stays": "stays.json", "flights": "flights.json"}
-_MODELS: dict[str, type] = {"stays": Lodging, "flights": FlightOffer}
+_MODELS: dict[str, type] = {"stays": LodgingWithCard, "flights": FlightWithCard}
 # Report provider names the data pipeline panel already maps to a Bright Data API.
 _REPORT_PROVIDER = {("dataset", "booking"): "booking", ("dataset", "google_hotels"): "google_hotels",
                     ("dataset", "airbnb"): "brightdata",
@@ -50,7 +52,9 @@ def build(domain: str, items: list[Any], *, sources: list[str], generated_at: da
         "kind": "conferge.travel_cache", "domain": domain, "generated_at": generated_at.isoformat(),
         "collected_at": max(stamps).isoformat() if stamps else None,
         "sources": sources,
-        "records": [{"provenance": provenance(i), "record": json.loads(i.model_dump_json())}
+        "records": [{"provenance": provenance(i), "record": json.loads(i.model_dump_json()),
+                     "card_details": i.card_details.model_dump(mode="json")
+                     if getattr(i, "card_details", None) is not None else {}}
                     for i in items],
     }
 
@@ -118,7 +122,8 @@ def load(directory: Path = CACHE_DIR, *, flight_alternatives: bool = False) -> d
         if not path.exists():
             continue
         doc = json.loads(path.read_text(encoding="utf-8"))
-        items = [_cached(_MODELS[domain].model_validate(r["record"])) for r in doc["records"]]
+        items = [_cached(_MODELS[domain].model_validate({**r["record"],
+                  "card_details": r.get("card_details") or {}})) for r in doc["records"]]
         if domain == "flights":  # a record saved before quoted_total existed, read as stored now
             items = [as_stored(i) for i in items]
         picked = (pick_stays(items) if domain == "stays" else

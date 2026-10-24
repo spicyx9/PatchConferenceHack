@@ -1,0 +1,525 @@
+/* Itinerary and property facts alongside a distinct provider offer. */
+#tab-travel .fare-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 222px;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #dedbd7;
+  background: #fff;
+  border-radius: 12px;
+  margin: 14px 0;
+}
+.fare-itinerary {
+  padding: 22px 24px 16px;
+  min-width: 0;
+}
+.fare-slice {
+  display: grid;
+  grid-template-columns: minmax(120px, 1.15fr) 65px minmax(100px, 1fr) 65px;
+  gap: 12px;
+  align-items: center;
+}
+.fare-slice + .fare-slice {
+  margin-top: 18px;
+  border-top: 1px solid #eeece9;
+  padding-top: 18px;
+}
+.fare-airline {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+}
+.fare-airline strong {
+  font-size: 14px;
+}
+.fare-airline small,
+.fare-endpoint span,
+.fare-date small {
+  display: block;
+  font-size: 11px;
+  color: #68615b;
+  margin-top: 5px;
+}
+.fare-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  border: 1px solid #eeeae5;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 650;
+  overflow: hidden;
+  background: #fff;
+}
+.fare-logo img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+.fare-endpoint strong {
+  font-size: 22px;
+  font-weight: 650;
+  letter-spacing: -0.65px;
+  font-variant-numeric: tabular-nums;
+}
+.fare-endpoint sup {
+  font-size: 10px;
+  letter-spacing: 0;
+  margin-left: 2px;
+}
+.fare-arrival {
+  text-align: right;
+}
+.fare-route {
+  text-align: center;
+  min-width: 0;
+}
+.fare-route span {
+  display: block;
+  font-size: 12px;
+  color: #625c57;
+}
+.fare-route i {
+  display: block;
+  position: relative;
+  height: 1px;
+  background: #c6c0b9;
+  margin: 9px 3px;
+}
+.fare-route i:after {
+  content: "";
+  display: block;
+  position: absolute;
+  right: -1px;
+  top: -2px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #9d958c;
+}
+.fare-date {
+  grid-column: 2/-1;
+  font-size: 11px;
+  color: #625c57;
+}
+.fare-date small {
+  display: inline;
+  margin-left: 10px;
+  font-size: 10px;
+}
+#tab-travel .fare-inclusions {
+  font-size: 12px;
+  margin: 17px 0 0;
+  color: #625c57;
+}
+.fare-return-missing {
+  padding: 10px 12px;
+  border-radius: 7px;
+  background: #f6f4f0;
+  font-size: 12px !important;
+  line-height: 1.5;
+  margin-top: 16px !important;
+}
+.fare-price {
+  border-left: 1px solid #eeebe7;
+  background: #fcfbf9;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  text-align: right;
+  gap: 7px;
+  font-size: 12px;
+}
+.fare-price > strong {
+  font-size: 28px;
+  letter-spacing: -1px;
+  font-weight: 650;
+}
+.fare-price small,
+.stay-price small {
+  font-size: 11px;
+  color: #68615b;
+  line-height: 1.5;
+}
+.offer-provider {
+  font-size: 11px;
+  color: #68615b;
+}
+.fare-price > .offer-provider {
+  margin-bottom: 2px;
+}
+#tab-travel .offer-deal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 44px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #292521;
+  color: #fff;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.4;
+  margin: 7px 0 2px;
+}
+.offer-deal:hover {
+  background: #4c4239;
+}
+.offer-deal:focus-visible {
+  outline: 3px solid #8c75ab;
+  outline-offset: 3px;
+}
+#tab-travel .offer-evidence {
+  grid-column: 1/-1;
+  border-top: 1px solid #eeebe7;
+  padding: 11px 20px;
+  font-size: 12px;
+}
+.offer-evidence summary {
+  width: fit-content;
+  min-height: 24px;
+  display: list-item;
+  line-height: 24px;
+}
+.offer-evidence p {
+  margin-bottom: 0;
+}
+.offer-unconfirmed {
+  color: #726454;
+  font-size: 11px;
+  line-height: 1.5;
+}
+#tab-travel .stay-card {
+  display: grid;
+  grid-template-columns: 182px minmax(0, 1fr) 205px;
+  gap: 20px;
+  padding: 18px 18px 0;
+  margin: 14px 0;
+  background: #fff;
+  border: 1px solid #dedbd7;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.stay-photo {
+  display: flex;
+  min-height: 182px;
+  height: 100%;
+  max-height: 240px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f0ede8;
+  align-items: center;
+  justify-content: center;
+  color: #756d64;
+  font-size: 12px;
+  text-align: center;
+}
+.stay-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  min-height: 182px;
+}
+.stay-content {
+  min-width: 0;
+  padding-top: 2px;
+}
+#tab-travel .stay-card h3 {
+  font-size: 20px;
+  line-height: 1.35;
+  letter-spacing: -0.4px;
+  margin: 7px 0 5px;
+}
+.stay-stars {
+  color: #ab7a19;
+  font-size: 15px;
+  letter-spacing: 2px;
+}
+.stay-card p {
+  line-height: 1.55;
+}
+.stay-location {
+  font-size: 12px !important;
+}
+.stay-room {
+  color: #39332d !important;
+  font-size: 12px !important;
+  font-weight: 600;
+}
+.stay-amenities {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.stay-amenities li {
+  border: 1px solid #e9e4dd;
+  border-radius: 5px;
+  padding: 4px 7px;
+  font-size: 10px;
+  color: #62594f;
+}
+.stay-policies {
+  color: #356444 !important;
+  font-size: 12px !important;
+}
+.stay-dates {
+  font-size: 11px !important;
+  margin-top: 15px !important;
+}
+.stay-offer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+.stay-review {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  text-align: right;
+}
+.stay-review strong {
+  font-size: 11px;
+  font-weight: 500;
+}
+.stay-review > span > small {
+  display: block;
+  font-size: 10px;
+  color: #68615b;
+  margin-top: 4px;
+}
+.stay-review > b {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #4e4660;
+  color: #fff;
+  min-width: 42px;
+  min-height: 44px;
+  border-radius: 7px 7px 7px 0;
+  font-size: 17px;
+}
+.stay-review > b > small {
+  font-size: 9px;
+  font-weight: 400;
+  opacity: 0.8;
+}
+.stay-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  gap: 5px;
+  width: 100%;
+}
+.stay-price > strong {
+  font-size: 25px;
+  letter-spacing: -0.8px;
+}
+.stay-price > span {
+  font-size: 11px;
+}
+.stay-card > .stay-source {
+  grid-column: 1/-1;
+  margin: 0 -18px;
+  width: calc(100% + 36px);
+  box-sizing: border-box;
+  border-top: 1px solid #eeebe7;
+  padding: 12px 18px;
+  font-size: 11px;
+}
+.stay-source .offer-evidence {
+  border-top: 0 !important;
+  padding: 8px 0 0 !important;
+}
+@media (max-width: 1000px) {
+  #tab-travel .stay-card {
+    grid-template-columns: 145px minmax(0, 1fr) 180px;
+    gap: 16px;
+  }
+  .fare-slice {
+    grid-template-columns: minmax(90px, 1fr) 60px minmax(90px, 1fr) 60px;
+    gap: 8px;
+  }
+  .fare-itinerary {
+    padding: 20px 18px;
+  }
+  .fare-airline {
+    gap: 8px;
+  }
+  .fare-logo {
+    flex-basis: 32px;
+    width: 32px;
+    height: 32px;
+  }
+}
+@media (max-width: 700px) {
+  #tab-travel .fare-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .fare-itinerary {
+    padding: 18px 15px 14px;
+  }
+  .fare-slice {
+    grid-template-columns: 55px minmax(40px, 1fr) minmax(70px, 1.3fr) minmax(
+        40px,
+        1fr
+      );
+    gap: 8px;
+  }
+  .fare-airline {
+    flex-direction: column;
+    gap: 5px;
+    align-items: flex-start;
+  }
+  .fare-airline > span > strong {
+    display: none;
+  }
+  .fare-airline small {
+    font-size: 9px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+  .fare-logo {
+    flex-basis: 32px;
+  }
+  .fare-endpoint strong {
+    font-size: 20px;
+  }
+  .fare-route span {
+    font-size: 10px;
+  }
+  .fare-date {
+    grid-column: 1/-1;
+    margin-top: 3px;
+    font-size: 10px;
+  }
+  .fare-date small {
+    display: block;
+    margin: 5px 0 0;
+  }
+  .fare-price {
+    border-left: 0;
+    border-top: 1px solid #eeebe7;
+    padding: 15px;
+    align-items: flex-start;
+    text-align: left;
+    gap: 5px;
+  }
+  .fare-price > strong {
+    font-size: 26px;
+  }
+  .fare-price > .offer-deal {
+    margin: 9px 0 2px;
+  }
+  .fare-price > .offer-provider {
+    display: none;
+  }
+  #tab-travel .stay-card {
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 14px;
+    padding: 14px 14px 0;
+  }
+  .stay-photo {
+    min-height: 120px;
+    height: 135px;
+  }
+  .stay-photo img {
+    min-height: 135px;
+  }
+  .stay-content {
+    padding: 0;
+  }
+  #tab-travel .stay-card h3 {
+    font-size: 17px;
+    margin-top: 6px;
+  }
+  .stay-content .offer-provider {
+    font-size: 10px;
+  }
+  .stay-stars {
+    font-size: 12px;
+  }
+  .stay-location {
+    font-size: 11px !important;
+  }
+  .stay-amenities {
+    gap: 5px;
+  }
+  .stay-amenities li {
+    font-size: 9px;
+  }
+  .stay-dates {
+    font-size: 10px !important;
+  }
+  .stay-offer {
+    grid-column: 1/-1;
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 12px;
+    border-top: 1px solid #eeebe7;
+    padding-top: 14px;
+    align-items: start;
+  }
+  .stay-review {
+    text-align: left;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 7px;
+  }
+  .stay-review > span {
+    min-width: 0;
+  }
+  .stay-review strong {
+    font-size: 10px;
+  }
+  .stay-review > span > small {
+    font-size: 9px;
+  }
+  .stay-review > b {
+    min-width: 36px;
+    min-height: 40px;
+    font-size: 15px;
+  }
+  .stay-price > strong {
+    font-size: 23px;
+  }
+  .stay-price > .offer-deal {
+    font-size: 11px;
+  }
+  .stay-card > .stay-source {
+    margin: 0 -14px;
+    width: calc(100% + 28px);
+  }
+}
+
+/* A slow or failed provider image never leaves an empty tile. */
+.fare-logo,
+.stay-photo {
+  position: relative;
+}
+.fare-logo img {
+  position: absolute;
+  inset: 4px;
+}
+.stay-photo img {
+  position: absolute;
+  inset: 0;
+}

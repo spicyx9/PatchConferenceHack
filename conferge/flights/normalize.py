@@ -17,6 +17,7 @@ from typing import Any
 
 from conferge.core.schemas import FlightOffer, FlightSegment, FlightSlice, SourceEvidence
 from conferge.flights.airports import timezone_for
+from conferge.flights.card_details import FlightWithCard
 from conferge.flights.dedupe import itinerary_id, offer_id
 
 PRICE_WARNING = "price_indicative: metasearch price observed at collected_at, not a ticket"
@@ -61,6 +62,7 @@ class RawOffer:
     fare: str | None = None
     evidence: list[SourceEvidence] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
+    card_details: dict[str, Any] = field(default_factory=dict)
 
 
 class NormalizationError(ValueError):
@@ -186,7 +188,8 @@ def build_offer(raw: RawOffer, collected_at: datetime, *, price_status: str = "o
     if booking_url and not str(booking_url).startswith(("http://", "https://")):
         warnings.append("booking_link_not_a_url: token kept out of booking_url")
         booking_url, url_type = None, "unknown"
-    return FlightOffer(
+    return FlightWithCard(
+        card_details=raw.card_details,
         id=offer_id(itin, raw.provider, raw.fare, raw.carry_on_included, raw.checked_bags_included),
         dedup_key=itin,
         trip_type=raw.trip_type,

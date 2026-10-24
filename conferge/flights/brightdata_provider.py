@@ -378,12 +378,21 @@ def record_to_raw_offer(record: SourceRecord) -> RawOffer:
     if isinstance(providers, list) and providers:
         names = [str(_pick(p, "provider_name", "name")) for p in providers if isinstance(p, dict)]
         warnings.append(f"booking_options_seen: {', '.join(n for n in names if n != 'None')}")
+    from conferge.flights.card_details import from_row
+
+    carry_on = _pick(row, "carry_on_included", "baggage.carry_on_included", "pricing.carry_on_included")
+    checked = _pick(row, "checked_bags_included", "baggage.checked_bags_included", "pricing.checked_bags_included")
+    scope = pricing.get("price_scope")
     return RawOffer(
+        card_details=from_row(row),
+        carry_on_included=carry_on if isinstance(carry_on, bool) else None,
+        checked_bags_included=checked if isinstance(checked, int) and not isinstance(checked, bool)
+        and checked >= 0 else None,
         provider=PROVIDER, slices=slices, trip_type=trip,
         price=price, currency=_pick(pricing, "currency"),
-        # Decision: Google shows the price for the requested passengers; with
-        # adults=1 it is still recorded as unknown scope until verified live.
-        price_scope="unknown",
+        # Preserve scope only when the source explicitly states it; a passenger
+        # count in the search widget alone does not prove price scope.
+        price_scope=scope if scope in {"per_adult", "total_all_passengers"} else "unknown",
         booking_url=url, booking_url_type=classify_url(url),
         evidence=evidence, warnings=warnings,
     )
@@ -432,7 +441,6 @@ async def search_round_trip(
     for record in detailed:
         try:
             raw = record_to_raw_offer(record)
-            raw.price_scope = "unknown"
             offers.append(build_offer(raw, record.collected_at))
         except KeyError as exc:
             schema_misses += 1
