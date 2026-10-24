@@ -12,6 +12,7 @@ from __future__ import annotations
 from typing import Any
 
 from conferge.core.schemas import Goal, Opportunity
+from conferge.people.models import ScoreBreakdown, grade_for
 from conferge.graph.explain import path_to_text
 from conferge.graph.queries import events_for_goal, people_for_goal
 
@@ -35,12 +36,15 @@ def rank_people(target: Any, user_id: str, goals: list[Goal], limit: int = 50) -
     totals: dict[str, float] = {}
     rows: dict[str, dict[str, Any]] = {}
     goal_ids: dict[str, list[str]] = {}
+    parts: dict[str, dict[str, float]] = {}
     best: dict[str, dict[str, Any]] = {}
     for goal in goals:
         result = people_for_goal(target, user_id, goal.id, limit)
         for row in result["rows"]:
             pid = row["person_id"]
             totals[pid] = totals.get(pid, 0.0) + row["score"]
+            for name, value in row.get("parts", {}).items():
+                parts.setdefault(pid, {})[name] = parts.get(pid, {}).get(name, 0.0) + 100.0 * value
             goal_ids.setdefault(pid, []).append(goal.id)
             if pid not in rows or row["score"] > rows[pid]["score"]:
                 rows[pid] = row
@@ -53,11 +57,20 @@ def rank_people(target: Any, user_id: str, goals: list[Goal], limit: int = 50) -
         event = next((n for n in (path or {}).get("nodes", []) if n["label"] == "Event"), None)
         presence = next((_PRESENCE[r] for r in ("attendance", "speaker", "host")
                          if r in row["reasons"]), "unknown")
+        score = round(min(100.0, 100.0 * totals[pid]), 1)
+        # Graph ranking: presence / goal_fit from the strongest source, corroboration from
+        # the other independent sources (noisy-OR split); identity and graph memory are 0.
+        split = ScoreBreakdown.capped(parts.get(pid, {}), ndigits=1)
+        residue = round(score - split.total(), 1)
+        if residue:  # rounding of the per-goal scores; all of it when no split is known
+            values = split.model_dump()
+            top = max(values, key=lambda k: values[k]) if any(values.values()) else "graph"
+            split = split.model_copy(update={top: round(values[top] + residue, 1)})
         out.append(Opportunity(
             id=f"opp-graph-{pid}",
             title=f"Meet {row['name'] or pid}" + (f" ({row['title']})" if row.get("title") else ""),
             goal_ids=goal_ids[pid], event_id=event["id"] if event else None, person_ids=[pid],
-            score=round(min(100.0, 100.0 * totals[pid]), 1),
+            score=score, score_breakdown=split.model_dump(), grade=grade_for(score),
             rationale=path_to_text(path) if path else "graph match: " + ", ".join(row["reasons"]),
             path=edge_why(path),
             where=(event["props"].get("title") if event else None),

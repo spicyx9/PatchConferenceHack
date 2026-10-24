@@ -220,6 +220,34 @@ def combine_by_source(contributions: list[tuple[str, float]]) -> float:
     return 1.0 - remaining
 
 
+# Path kind -> score_breakdown part: kinds placing the person at an event are presence.
+PATH_PART = {"speaker": "presence", "attendance": "presence", "host": "presence",
+             "host_company": "presence", "company_topic": "goal_fit", "topic": "goal_fit",
+             "role": "goal_fit"}
+
+
+def attribute_by_source(contributions: list[tuple[str, str, float]]) -> dict[str, float]:
+    """Exact additive split of ``combine_by_source`` over (source, kind, score) triples.
+
+    Sources are taken strongest first (their best path, as in combine_by_source): the
+    first one counts in the part of its path kind, each further independent source adds
+    its marginal gain ``s * prod(1 - previous)`` to ``corroboration``. Parts sum to the
+    noisy-OR value.
+    """
+    best: dict[str, tuple[float, str]] = {}
+    for source, kind, score in contributions:
+        score = min(max(score, 0.0), 1.0)
+        if source not in best or score > best[source][0]:
+            best[source] = (score, kind)
+    parts: dict[str, float] = {}
+    remaining = 1.0
+    for index, (score, kind) in enumerate(sorted(best.values(), key=lambda sk: (-sk[0], sk[1]))):
+        part = PATH_PART.get(kind, "goal_fit") if index == 0 else "corroboration"
+        parts[part] = parts.get(part, 0.0) + score * remaining
+        remaining *= 1.0 - score
+    return parts
+
+
 def _excluded_people(target: GraphStore | GraphQuery, user_id: str) -> set[str]:
     rows = run_read(target, Q_PEOPLE_MET_BEFORE, {"user_id": user_id})
     return {row[0] for row in rows if row[2] in {"MET", "CONTACTED"}}
@@ -235,6 +263,7 @@ def people_for_goal(target: GraphStore | GraphQuery, user_id: str, goal_id: str,
     excluded = set() if include_met else _excluded_people(target, user_id)
 
     contributions: dict[str, list[tuple[str, float]]] = defaultdict(list)
+    kinds: dict[str, list[str]] = defaultdict(list)  # parallel to contributions
     reasons: dict[str, list[str]] = defaultdict(list)
     person_paths: dict[str, list[tuple[str, SerializedPath]]] = defaultdict(list)
     for kind, query in (("speaker", Q_PEOPLE_VIA_SPEAKER), ("attendance", Q_PEOPLE_VIA_ATTENDANCE),
@@ -250,11 +279,13 @@ def people_for_goal(target: GraphStore | GraphQuery, user_id: str, goal_id: str,
             person_paths[person_id].append((kind, path))
             contributions[person_id].append(
                 (root_source(path), PATH_WEIGHTS[kind] * _path_confidence(path)))
+            kinds[person_id].append(kind)
             reasons[person_id].append(kind)
     for person_id, matched_roles in run_read(target, Q_PEOPLE_BY_ROLE, params):
         if person_id in excluded:
             continue
         contributions[person_id].append(("person_record:roles", PATH_WEIGHTS["role"]))
+        kinds[person_id].append("role")
         reasons[person_id].append(f"role:{','.join(matched_roles)}")
     scores = {pid: combine_by_source(c) for pid, c in contributions.items()}
 
@@ -276,6 +307,10 @@ def people_for_goal(target: GraphStore | GraphQuery, user_id: str, goal_id: str,
             "unknown_confidence": any(UNKNOWN_CONFIDENCE_FLAG in p.get("flags", [])
                                       for _, p in person_paths[person_id]),
             "shortest_hops": min((len(p["edges"]) for p in best), default=None),
+            # Same split as score, already multiplied by the goal priority.
+            "parts": {k: round(v * priority, 6) for k, v in attribute_by_source(
+                [(src, kind, sc) for (src, sc), kind
+                 in zip(contributions[person_id], kinds[person_id], strict=True)]).items()},
         })
         paths.extend(best)
     return {"rows": rows, "paths": paths}

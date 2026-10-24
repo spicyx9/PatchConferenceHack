@@ -20,7 +20,14 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from conferge.core.schemas import DataMode, Event, Goal, RunStatus
 from conferge.people.collect import combine_modes
-from conferge.people.models import PersonMatch, PersonProfile, PresenceStatus, WhereSlot
+from conferge.people.models import (
+    PersonMatch,
+    PersonProfile,
+    PresenceStatus,
+    ScoreBreakdown,
+    WhereSlot,
+    grade_for,
+)
 from conferge.people.taxonomy import normalize_roles, normalize_topics
 
 ROLE_WEIGHT = 0.6
@@ -28,6 +35,8 @@ TOPIC_WEIGHT = 0.4
 GOAL_POINTS = 80.0
 PRESENCE_BONUS = {"confirmed": 12.0, "probable": 4.0, "unknown": 0.0}
 IDENTITY_BONUS = 8.0
+# Corroboration (ai-sdr contact_research): distinct providers among the person's evidence.
+CORROBORATION_BONUS = ((2, 4.0), (3, 2.0))  # +4 from 2 sources, +2 more from 3
 
 
 class LLMScore(BaseModel):
@@ -99,14 +108,30 @@ def _weights(goals: Sequence[Goal]) -> dict[str, float]:
     return {g.id: (g.priority or 1.0) / total for g in goals}
 
 
+def source_count(profile: PersonProfile) -> int:
+    """Distinct providers in the person's evidence and in the evidence of their presences."""
+    evidence = [*profile.person.evidence, *(p.evidence for p in profile.presences)]
+    return len({e.provider for e in evidence})
+
+
+def breakdown(goal_scores: Mapping[str, float], weights: Mapping[str, float],
+              profile: PersonProfile) -> ScoreBreakdown:
+    base = sum(weights.get(gid, 0.0) * min(max(v, 0.0), 1.0) for gid, v in goal_scores.items())
+    person = profile.person
+    identity = IDENTITY_BONUS if (person.identity_confidence or 0) >= 0.9 and (
+        person.linkedin_url or person.github_url) else 0.0
+    sources = source_count(profile)
+    return ScoreBreakdown.capped({
+        "goal_fit": GOAL_POINTS * base,
+        "presence": PRESENCE_BONUS[presence_status(profile)],
+        "identity": identity,
+        "corroboration": sum(bonus for floor, bonus in CORROBORATION_BONUS if sources >= floor),
+    })
+
+
 def _combine(goal_scores: Mapping[str, float], weights: Mapping[str, float],
              profile: PersonProfile) -> float:
-    base = sum(weights.get(gid, 0.0) * min(max(v, 0.0), 1.0) for gid, v in goal_scores.items())
-    score = GOAL_POINTS * base + PRESENCE_BONUS[presence_status(profile)]
-    person = profile.person
-    if (person.identity_confidence or 0) >= 0.9 and (person.linkedin_url or person.github_url):
-        score += IDENTITY_BONUS
-    return round(min(score, 100.0), 2)
+    return breakdown(goal_scores, weights, profile).total()
 
 
 def where_slots(profile: PersonProfile, events: Mapping[str, Event]) -> tuple[
@@ -195,12 +220,14 @@ async def rank(goals: Sequence[Goal], profiles: Iterable[PersonProfile], *,
         reasons = _reasons(profile, goals, fits, slots)
         goal_scores = {gid: round(v, 3) for gid, (v, _) in fits.items()}
         score, used, match_warnings = det_score, "deterministic", []
+        parts = breakdown({gid: v for gid, (v, _) in fits.items()}, weights, profile)
         if scorer is not None and index < llm_cap:
             try:
                 llm = await scorer.score(profile, goals)
                 clipped = {g.id: min(max(float(llm.goal_scores.get(g.id, 0.0)), 0.0), 1.0)
                            for g in goals}
                 score, goal_scores, used = _combine(clipped, weights, profile), clipped, "llm"
+                parts = breakdown(clipped, weights, profile)
                 if llm.reason:
                     reasons = [llm.reason, *reasons]
                 if llm.opener:
@@ -213,6 +240,7 @@ async def rank(goals: Sequence[Goal], profiles: Iterable[PersonProfile], *,
             person=person, score=score, reasons=reasons, goal_scores=goal_scores,
             where=slots, opener=opener, presence_status=presence_status(profile),
             confidence=person.identity_confidence, scorer=used, warnings=match_warnings,
+            score_breakdown=parts, grade=grade_for(score),
         ))
     matches.sort(key=lambda m: (-m.score, m.person.id))
     return (matches[:limit] if limit else matches), warnings
@@ -229,9 +257,14 @@ def apply_graph_adjustments(matches: Sequence[PersonMatch],
         if not items:
             out.append(match.model_copy())
             continue
-        score = min(max(match.score + sum(a.delta for a in items), 0.0), 100.0)
+        score = round(min(max(match.score + sum(a.delta for a in items), 0.0), 100.0), 2)
         reasons = [*match.reasons, *(f"graph {a.delta:+.1f}: {a.reason}" for a in items)]
-        out.append(match.model_copy(update={"score": round(score, 2), "reasons": reasons}))
+        update: dict[str, object] = {"score": score, "reasons": reasons, "grade": grade_for(score)}
+        if match.score_breakdown is not None:  # the clamped delta lands in "graph"
+            parts = match.score_breakdown
+            update["score_breakdown"] = parts.model_copy(update={"graph": round(
+                parts.graph + score - parts.total(), 2)})
+        out.append(match.model_copy(update=update))
     out.sort(key=lambda m: (-m.score, m.person.id))
     return out
 

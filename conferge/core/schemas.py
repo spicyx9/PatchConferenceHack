@@ -357,6 +357,9 @@ class Opportunity(CoreModel):
     presence: Literal["confirmed", "probable", "unknown"] = "unknown"
     evidence: list[SourceEvidence] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
+    # {goal_fit, presence, identity, corroboration, graph}, summing to score (people.models).
+    score_breakdown: dict[str, float] | None = None
+    grade: Literal["A", "B", "C", "D"] | None = None
 
 
 class AgentContext(CoreModel):

@@ -673,6 +673,22 @@ def create_app(
                 "cypher": cypher, "browser_url": providers.browser_url(cypher) if cypher else None,
                 "mode": modes.pop() if len(modes) == 1 else "mixed"}
 
+    @api.get("/graph/why/{person_id}")
+    def graph_why(person_id: str, user: str = USER_ID) -> dict[str, Any]:
+        """Deterministic why: edge rationales of the FalkorDB paths, each citing [ev:<id>]."""
+        if state.data.person(person_id) is None:
+            raise HTTPException(404, f"unknown person_id {person_id!r}")
+        store = state.store()
+        if store is None:
+            raise HTTPException(503, "FalkorDB not reachable: the why answer is read from the graph")
+        from conferge.graph.why import why_person
+
+        why = why_person(store, user, person_id)
+        notes = ["answer built from edge rationales in FalkorDB (rule-based, no LLM)"]
+        if why["answer"] is None:
+            notes.append("no goal-to-person path in the graph for this person")
+        return _envelope(state, ["people", "events"], why, extra_warnings=notes)
+
     @api.get("/graph/path")
     def graph_path(person: str, user: str = "demo-user") -> dict[str, Any]:
         live = _falkordb_path(person, user)
