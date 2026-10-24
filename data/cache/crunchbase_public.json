@@ -1,0 +1,52 @@
+{
+  "provider": "brightdata:crunchbase",
+  "companies": [
+    {
+      "company_id": "company:github",
+      "name": "GitHub",
+      "crunchbase_url": "https://www.crunchbase.com/organization/github",
+      "funding": {
+        "total_funding_usd": null,
+        "last_round_amount_usd": null,
+        "last_round_type": "series_b",
+        "last_round_date": null,
+        "investors": [
+          "Thrive Capital",
+          "Sequoia Capital",
+          "IVP",
+          "Andreessen Horowitz",
+          "EquityZen",
+          "Employee Stock Option Fund",
+          "SV Angel"
+        ],
+        "employee_range": "501-1000",
+        "founded": null
+      },
+      "snapshot_id": "sd_mvmv474n1abc3ijv2z",
+      "collected_at": "2026-10-24T20:42:53.717481+00:00",
+      "source_url": "https://www.crunchbase.com/organization/github",
+      "provider": "brightdata:crunchbase"
+    },
+    {
+      "company_id": "company:swamp-club",
+      "name": "Swamp Club",
+      "crunchbase_url": "https://www.crunchbase.com/organization/swamp-club",
+      "funding": {
+        "total_funding_usd": "7000000",
+        "last_round_amount_usd": "7000000",
+        "last_round_type": "seed",
+        "last_round_date": null,
+        "investors": [
+          "Encoded Ventures",
+          "Amplify Partners"
+        ],
+        "employee_range": "1-10",
+        "founded": null
+      },
+      "snapshot_id": "sd_mvmv474n1abc3ijv2z",
+      "collected_at": "2026-10-24T20:42:53.717481+00:00",
+      "source_url": "https://www.crunchbase.com/organization/swamp-club",
+      "provider": "brightdata:crunchbase"
+    }
+  ]
+}

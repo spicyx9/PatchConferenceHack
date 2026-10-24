@@ -109,13 +109,36 @@ def _row_for(url: str, rows: list[dict]) -> dict | None:
     return None
 
 
+def rebuild(raw_path: Path) -> int:
+    """Re-run normalize() on already collected rows (after a parser fix): no new call."""
+    import json
+
+    raw = json.loads(raw_path.read_text(encoding="utf-8"))
+    by_url = {str(r.get("url")).rstrip("/"): r for r in raw.get("records", []) if isinstance(r, dict)}
+    current = cb.load_public_cache()
+    entries = []
+    for entry in current.values():
+        row = by_url.get(str(entry.get("crunchbase_url")).rstrip("/"))
+        if row is None:
+            continue
+        entries.append({**entry, "funding": cb.normalize(row)})
+    cb.write_public_cache(entries)
+    print(f"rebuilt {cb.PUBLIC_CACHE.relative_to(ROOT)}: {len(entries)} companies from "
+          f"{raw_path.name} (snapshot {raw.get('snapshot_id')})")
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--force", action="store_true", help="run again on the same day")
     parser.add_argument("--graph", default="conferge_crunchbase_probe")
     parser.add_argument("--dry-run", action="store_true",
                         help="select companies and stop (no Bright Data call)")
+    parser.add_argument("--rebuild", type=Path, default=None, metavar="RAW",
+                        help="re-normalize a raw file into the public cache (no Bright Data call)")
     args = parser.parse_args()
+    if args.rebuild:
+        return rebuild(args.rebuild)
 
     today = datetime.now(timezone.utc).date().isoformat()
     raw_path = cb.PROBE_DIR / f"crunchbase_{today}.json"

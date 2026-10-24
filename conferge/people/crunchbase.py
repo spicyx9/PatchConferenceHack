@@ -410,14 +410,37 @@ def normalize(row: dict[str, Any]) -> dict[str, Any]:
 
     investors: list[str] = []
     for key in _INVESTOR_KEYS:
-        investors += _names(row.get(key))
+        for item in row.get(key) or []:
+            # Real rows (snapshot sd_mvmv474n1abc3ijv2z): investors[] are investments whose
+            # investor name is investor.value; the item's own value is the investment title.
+            if isinstance(item, dict) and isinstance(item.get("investor"), dict):
+                name = item["investor"].get("value") or item["investor"].get("name")
+                if isinstance(name, str) and name.strip():
+                    investors.append(name.strip())
+            else:
+                investors += _names([item])
     for rnd in _rounds(row):
-        investors += _names(rnd.get("lead_investors")) + _names(rnd.get("investors"))
+        investors += _names(rnd.get("lead_investors"))
+        investors += [n for n in _names(rnd.get("investors")) if " investment in " not in n]
     seen: set[str] = set()
     unique = [n for n in investors if not (n.casefold() in seen or seen.add(n.casefold()))]
 
+    listed = [r for r in (row.get("funding_rounds_list") or []) if isinstance(r, dict)]
+    amounts = [parse_money_usd((r.get("money_raised") or {}).get("value_usd"))
+               if isinstance(r.get("money_raised"), dict) else None for r in listed]
+    detailed = [r for r in (row.get("funding_rounds_detailed") or []) if isinstance(r, dict)]
+    last_amount = None
+    if round_type and len(detailed) == len(listed):
+        idx = next((i for i, r in enumerate(detailed) if r.get("type") == round_type), None)
+        last_amount = amounts[idx] if idx is not None else None
+    expected = summary.get("num_funding_rounds") if summary else None
+    if total is None and listed and all(a is not None for a in amounts) and expected == len(listed):
+        # Every round is listed with its USD amount: the total is their sum, nothing estimated.
+        total = str(sum(Decimal(a) for a in amounts))  # type: ignore[arg-type]
+
     return {
         "total_funding_usd": total,
+        "last_round_amount_usd": last_amount,
         "last_round_type": str(round_type).strip() if isinstance(round_type, str)
         and round_type.strip() else None,
         "last_round_date": round_date,

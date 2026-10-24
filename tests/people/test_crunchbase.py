@@ -221,7 +221,7 @@ def test_normalize_full_row() -> None:
         "founded_date": {"value": "2019-01-01", "precision": "year"},
     }
     assert cb.normalize(row) == {
-        "total_funding_usd": "42000000", "last_round_type": "series_b",
+        "total_funding_usd": "42000000", "last_round_amount_usd": None, "last_round_type": "series_b",
         "last_round_date": "2025-03-04", "investors": ["Seed Fund One", "Angel Two", "Lead VC"],
         "employee_range": "51-100", "founded": "2019",
     }
@@ -229,7 +229,7 @@ def test_normalize_full_row() -> None:
 
 def test_normalize_never_invents() -> None:
     assert cb.normalize({"name": "Empty Co"}) == {
-        "total_funding_usd": None, "last_round_type": None, "last_round_date": None,
+        "total_funding_usd": None, "last_round_amount_usd": None, "last_round_type": None, "last_round_date": None,
         "investors": [], "employee_range": None, "founded": None,
     }
     out = cb.normalize({"funds_total": "€3M", "last_funding_at": "Q3 2024",
@@ -373,3 +373,29 @@ def test_lone_candidate_must_agree_with_the_company_name() -> None:
     assert pick_candidate("Overmind", [base + "acme-robotics"]) is None
     assert pick_candidate("Acme", [base + "acme-labs", base + "acme-ai"]) is None
     assert pick_candidate("Acme", [base + "acme", base + "acme-ai"]) == base + "acme"
+
+
+def test_normalize_real_row_shape_from_snapshot_sd_mvmv474n1abc3ijv2z() -> None:
+    from conferge.people.crunchbase import normalize
+
+    row = {  # trimmed from the real Swamp Club row (field names and nesting as returned)
+        "name": "Swamp Club", "num_employees": "1-10",
+        "funding_rounds": {"last_funding_type": "seed", "num_funding_rounds": 1},
+        "funding_rounds_list": [{"money_raised": {"currency": "USD", "value": 7000000,
+                                                  "value_usd": 7000000},
+                                 "lead_investors": [{"name": "Amplify Partners"}],
+                                 "title": "Seed Round - Swamp Club"}],
+        "funding_rounds_detailed": [{"type": "seed", "stage": "seed"}],
+        "investors": [{"funding_round": {"value": "Seed Round - Swamp Club"},
+                       "investor": {"id": "encoded-ventures", "value": "Encoded Ventures"}}],
+    }
+    out = normalize(row)
+    assert out["total_funding_usd"] == "7000000" and out["last_round_amount_usd"] == "7000000"
+    assert out["last_round_type"] == "seed" and out["last_round_date"] is None
+    assert out["investors"] == ["Encoded Ventures", "Amplify Partners"]
+    assert out["employee_range"] == "1-10" and out["founded"] is None
+    # A round without a published amount leaves the total unknown (never a partial sum).
+    row["funding_rounds"]["num_funding_rounds"] = 2
+    row["funding_rounds_list"].append({"title": "Series A - Swamp Club"})
+    row["funding_rounds_detailed"].append({"type": "series_a"})
+    assert normalize(row)["total_funding_usd"] is None
