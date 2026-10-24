@@ -64,9 +64,27 @@
       ${p.bio?`<p class="detail-bio">${esc(p.bio.slice(0,420))}</p>`:''}
       <div class="topic-pills">${p.topics.slice(0,5).map(t=>`<span>${esc(t)}</span>`).join('')}</div>
       ${path && path.path && path.path.length?`<h4>Connection path</h4><ol class="connection-path">${path.path.filter(x=>x.node).map(x=>`<li>${esc(x.node.label)}</li>`).join('')}</ol>`:'<p class="muted">No goal path recorded.</p>'}
+      <div id="connection-why"></div>
       ${p.events.length?`<h4>Sessions</h4><ul class="connection-sessions">${p.events.slice(0,3).map(e=>`<li>${esc(e.title)}</li>`).join('')}</ul>`:''}
       ${p.photo?`<a class="connection-source-link" href="${esc(p.photo.source_url)}" target="_blank" rel="noopener noreferrer">Photo: ${p.photo.provider==='brightdata:web_unlocker'?'LinkedIn · via Bright Data':'Official team profile'} ↗</a>`:""}
       ${sources.length?`<h4>Sources</h4>${sources.slice(0,3).map(s=>`<a class="connection-source-link" href="${esc(s.source_url)}" target="_blank" rel="noopener noreferrer">${esc(s.provider)} ↗</a>`).join('')}`:''}</div>`;
+  }
+  // Evidence behind the path: each edge's rationale, source_mode and evidence ids (linked to
+  // their source_url), then the score_breakdown as /graph/why returns it. On failure, nothing.
+  function whyHtml(why) {
+    const rows=(why.edges||[]).filter(e=>e.rationale).map(e=>`<li><span class="why-rationale">${esc(e.rationale)}</span>
+      <small class="muted"> · ${esc(e.source_mode||'unknown')}</small>
+      <span class="why-evidence">${(e.evidence||[]).map(ev=>/^https?:\/\//.test(ev.source_url||'')?`<a href="${esc(ev.source_url)}" target="_blank" rel="noopener noreferrer">[ev:${esc(ev.evidence_id)}]</a>`:`<span>[ev:${esc(ev.evidence_id)}]</span>`).join(' ')}</span></li>`).join('');
+    const parts=why.score_breakdown?Object.entries(why.score_breakdown).map(([k,v])=>`<span>${esc(k)} ${esc(v)}</span>`).join(' · '):'';
+    return (rows?`<h4>Why this path</h4><ul class="connection-why">${rows}</ul>`:'')+
+      (parts?`<p class="small-text score-breakdown">Score breakdown: ${parts}</p>`:'');
+  }
+  async function showWhy(id, ticket) {
+    try {
+      const why=await api(`graph/why/${encodeURIComponent(id)}`);
+      const box=$('connection-why');
+      if(ticket===request && box) box.innerHTML=whyHtml(why);
+    } catch(e) { /* keep the current display */ }
   }
   async function focus(id) {
     const ticket=++request;readySearch();selected=id;$('connection-clear').hidden=false;$('network-all').hidden=false;
@@ -77,7 +95,7 @@
       if(ticket!==request)return;
       const p=data.items.find(x=>x.id===id);
       if(!p){$('graph-detail').textContent='This person is not in the selected list.';return;}
-      draw(data.graph);details(p,path);
+      draw(data.graph);details(p,path);showWhy(id,ticket);
       if(cy)cy.select(id);
     } catch(e){if(ticket===request)$('graph-detail').textContent=e.message;}
   }

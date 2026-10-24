@@ -784,6 +784,9 @@ def create_app(
         from conferge.graph.why import why_person
 
         why = why_person(store, user, person_id)
+        # The ranking's own split for this person, as /people returns it (read, not recomputed).
+        opp = next((o for o in state.opportunities() if person_id in o.person_ids), None)
+        why["score_breakdown"] = opp.score_breakdown if opp else None
         notes = ["answer built from edge rationales in FalkorDB (rule-based, no LLM)"]
         if why["answer"] is None:
             notes.append("no goal-to-person path in the graph for this person")
