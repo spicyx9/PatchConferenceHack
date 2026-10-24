@@ -3473,3 +3473,10 @@ dialog .eyebrow {
 .connection-path { border-color:#cbd9ed; }
 .connection-empty,.network-empty { color:#7e91b0; }
 @media(max-width:800px) { #tab-graph #graph { height:430px !important; min-height:430px; } .network-toolbar { padding:14px 12px; flex-wrap:wrap; gap:10px; } #network-count { display:block; margin:4px 0 0; } }
+
+.connection-filters { display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; margin:0 0 18px; }
+.connection-filters label { flex:1; min-width:150px; display:flex; flex-direction:column; gap:7px; color:#7b8799; font-size:11px; font-weight:500; }
+.connection-filters select { width:100%; padding:11px 30px 11px 12px; border:1px solid #dce3ef; border-radius:8px; background-color:#fff; color:#435675; font:inherit; font-size:12px; }
+.filter-feedback { display:flex; flex-direction:column; justify-content:center; align-items:flex-end; gap:5px; min-width:110px; min-height:42px; color:#7e8da3; font-size:11px; }
+#filter-reset { border:0; background:none; color:#537bb7; font-size:11px; padding:0; }
+@media(max-width:600px) { .connection-filters label { min-width:calc(50% - 12px); } .filter-feedback { flex:1; } }

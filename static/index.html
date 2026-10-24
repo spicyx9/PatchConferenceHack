@@ -555,6 +555,13 @@
               <button type="button" data-connection-scope="met" aria-pressed="false">People I’ve met</button>
             </div><span class="connection-source">Demo snapshot</span>
           </div>
+          <div class="connection-filters" role="group" aria-label="Filter connections">
+            <label>Company<select id="filter-company"><option value="">All companies</option></select></label>
+            <label>Role<select id="filter-role"><option value="">All roles</option></select></label>
+            <label>Profile / session topic<select id="filter-topic"><option value="">All topics</option></select></label>
+            <div class="filter-feedback"><span id="filter-count" role="status" aria-live="polite"></span>
+              <button type="button" id="filter-reset" hidden>Reset filters</button></div>
+          </div>
           <form id="connection-search" class="connection-search">
             <span class="search-spark" aria-hidden="true">✳</span>
             <label class="sr-only" for="connection-query">Ask about people in this list</label>

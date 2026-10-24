@@ -27,3 +27,8 @@ checked against local FalkorDB 6.0.3 using a separate disposable test graph. Liv
 were cached in FalkorDB, and the Responses API returned six scoped matches with
 profile-based reasons. The browser search flow also passed. This is a functional
 smoke test, not a retrieval-quality evaluation; the account balance remains unverified.
+
+Company, role and profile/session-topic filters combine with AND semantics. Options
+come from the current scope, and filtering happens before keyword or vector retrieval.
+All connections / Reset filters clear the query and all filters within the current scope.
+Changing a filter returns to the filtered overview without making a paid AI call.

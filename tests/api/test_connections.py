@@ -67,3 +67,32 @@ def test_overview_keeps_every_person_and_focus_is_scoped(monkeypatch):
     focused = c.graph_view(state, items, 'p9')
     assert [n['id'] for n in focused['nodes']] == ['p9']
     assert 'outsider' not in {n['id'] for n in c.graph_view(state, items, 'outsider')['nodes']}
+
+
+def test_filters_intersect_and_include_session_topics():
+    people = [
+        {'id': 'a', 'company': 'Acme', 'roles': ['engineer'], 'topics': [], 'session_topics': ['AI']},
+        {'id': 'b', 'company': 'Other', 'roles': ['engineer'], 'topics': ['AI']},
+        {'id': 'c', 'company': 'Acme', 'roles': ['founder'], 'topics': ['Design']},
+    ]
+    filters = c.ConnectionFilters(company='Acme', role='engineer', topic='AI')
+    assert [p['id'] for p in c.filter_people(people, filters)] == ['a']
+    assert c.filter_people(people, c.ConnectionFilters(company='Missing')) == []
+    assert c.filter_options(people) == {'company': ['Acme', 'Other'],
+                                       'role': ['engineer', 'founder'], 'topic': ['AI', 'Design']}
+
+
+def test_filtered_routes_and_search_cannot_escape_filters(monkeypatch):
+    monkeypatch.setattr(c, 'key', lambda: None)
+    client = TestClient(create_app(found=Providers(), graph_probe=False))
+    directory = client.get('/api/v1/connections').json()
+    company = directory['filters']['company'][0]
+    filtered = client.get('/api/v1/connections', params={'company': company}).json()
+    assert filtered['count'] > 0
+    assert all(p['company'] == company for p in filtered['items'])
+    assert filtered['total'] == directory['count']
+    assert filtered['filters'] == directory['filters']
+    missing = {'company': 'No such company'}
+    assert client.get('/api/v1/connections', params=missing).json()['count'] == 0
+    assert client.post('/api/v1/connections/search', json={'query': 'AI', **missing}).json()['items'] == []
+    assert client.get('/api/v1/connections', params={'company': 'x' * 201}).status_code == 422

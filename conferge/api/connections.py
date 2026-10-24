@@ -9,7 +9,7 @@ import re
 from typing import Any, Literal
 
 import httpx
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from conferge.api.providers import _entity
@@ -21,7 +21,13 @@ EMBED_MODEL = "text-embedding-3-small"
 VECTOR_PROPERTY = "connection_embedding"
 
 
-class SearchRequest(BaseModel):
+class ConnectionFilters(BaseModel):
+    company: str = Field(default="", max_length=200)
+    role: str = Field(default="", max_length=200)
+    topic: str = Field(default="", max_length=200)
+
+
+class SearchRequest(ConnectionFilters):
     query: str = Field(min_length=2, max_length=1000)
     scope: Literal["all", "met"] = "all"
 
@@ -55,6 +61,7 @@ def card(state: Any, person: Any) -> dict[str, Any]:
         "id": person.id, "name": person.name, "title": person.title or person.role or "",
         "company": company.name if company else "", "bio": person.bio or "",
         "topics": person.topics, "roles": person.roles,
+        "session_topics": sorted({t for e in events if e for t in e.topics}),
         "met": person.id in state.met,
         "events": [{"id": e.id, "title": e.title} for e in events if e],
         "sources": [e.model_dump(mode="json") for e in person.evidence],
@@ -86,6 +93,21 @@ def eligible(state: Any, scope: str) -> list[dict[str, Any]]:
     for item in items:
         item["met"] = item["id"] in met
     return items
+
+
+def filter_people(items: list[dict], filters: ConnectionFilters) -> list[dict]:
+    return [p for p in items
+            if (not filters.company or p["company"] == filters.company)
+            and (not filters.role or filters.role in p["roles"])
+            and (not filters.topic or filters.topic in p["topics"] + p.get("session_topics", []))]
+
+
+def filter_options(items: list[dict]) -> dict:
+    return {
+        "company": sorted({p["company"] for p in items if p["company"]}, key=str.casefold),
+        "role": sorted({r for p in items for r in p["roles"]}, key=str.casefold),
+        "topic": sorted({t for p in items for t in p["topics"] + p.get("session_topics", [])}, key=str.casefold),
+    }
 
 
 async def openai_post(endpoint: str, payload: dict[str, Any]) -> dict[str, Any]:
@@ -233,14 +255,19 @@ def router(state: Any) -> APIRouter:
     lock = asyncio.Lock()
 
     @api.get("")
-    def connections(scope: Literal["all", "met"] = "all", focus: str | None = None) -> dict:
-        items = eligible(state, scope)
-        return {"items": items, "count": len(items), "scope": scope, "ai_configured": bool(key()),
+    def connections(scope: Literal["all", "met"] = "all", focus: str | None = None,
+                    company: str = Query("", max_length=200),
+                    role: str = Query("", max_length=200),
+                    topic: str = Query("", max_length=200)) -> dict:
+        directory = eligible(state, scope)
+        items = filter_people(directory, ConnectionFilters(company=company, role=role, topic=topic))
+        return {"items": items, "count": len(items), "total": len(directory),
+                "filters": filter_options(directory), "scope": scope, "ai_configured": bool(key()),
                 "graph": graph_view(state, items, focus)}
 
     @api.post("/search")
     async def search(req: SearchRequest) -> dict:
-        items = eligible(state, req.scope)
+        items = filter_people(eligible(state, req.scope), req)
         if not items:
             return {"items": [], "summary": "No people in this list yet.", "mode": "empty", "scope": req.scope}
         if not key():
