@@ -665,6 +665,15 @@
       "</div>"
     );
   }
+  // "Meet: X" only for a confirmed speaker/host (SPEAKS_AT / HOSTS); else "Possibly: X (not confirmed)".
+  function meetLine(people) {
+    var sure = (people || []).filter(function (p) { return p.confirmed; }),
+      maybe = (people || []).filter(function (p) { return !p.confirmed; });
+    var names = function (list) { return list.map(function (p) { return p.name; }).join(", "); };
+    return (sure.length ? "Meet: " + names(sure) : "") +
+      (sure.length && maybe.length ? " · " : "") +
+      (maybe.length ? "Possibly: " + names(maybe) + " (not confirmed)" : "");
+  }
   // Events whose status comes from a /simulate-change scenario (API flag ``simulated``).
   var simulatedIds = {};
   function markSimulated(ids) {
@@ -972,11 +981,7 @@
     $("next-actions").innerHTML = items.length
       ? items
           .map(function (i) {
-            var who = (i.people || [])
-              .map(function (p) {
-                return p.name;
-              })
-              .join(", ");
+            var who = meetLine(i.people);
             return (
               "<li><b>" +
               esc(fmtTime(i.start_at, i.timezone)) +
@@ -986,7 +991,7 @@
               esc(orUnknown(i.venue)) +
               ")</span>" +
               (who
-                ? '<div class="muted small-text">Meet: ' + esc(who) + "</div>"
+                ? '<div class="muted small-text">' + esc(who) + "</div>"
                 : "") +
               "</li>"
             );
@@ -3187,13 +3192,15 @@
               esc(r.title) +
               " (" +
               esc(fmtTime(r.start_at)) +
-              ")"
+              ")" +
+              (meetLine(r.people) ? "<br>" + esc(meetLine(r.people)) : "")
             : "") +
           "<br><b>Reason:</b> " +
           esc(x.reason) +
           (p
             ? "<br><b>Path:</b> " +
               esc(p.nodes.join(" > ")) +
+              (p.confirmed === false ? " (not confirmed)" : "") +
               (p.explanation
                 ? '<br><span class="muted">' + esc(p.explanation) + "</span>"
                 : "")

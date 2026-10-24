@@ -935,19 +935,21 @@ def create_app(
         """Why the replacement matters: goal -> person path for the first person it brings."""
         if not replacement or not replacement["people"]:
             return None
-        person = replacement["people"][0]["person_id"]
+        # A confirmed speaker/host of the replacement first; otherwise the path says "not confirmed".
+        pick = next((p for p in replacement["people"] if p.get("confirmed")), replacement["people"][0])
+        person, confirmed = pick["person_id"], bool(pick.get("confirmed"))
         live = _falkordb_path(person, "demo-user")
         if live is not None:
             labels = [s["node"]["label"] for s in live["steps"] if "node" in s]
             return {"backend": "falkordb", "person_id": person, "nodes": labels,
-                    "explanation": live["explanation"]}
+                    "explanation": live["explanation"], "confirmed": confirmed}
         g = logic.build_graph(state.data, state.goals, state.met)
         steps = logic.shortest_path(g, "user:demo-user", person)
         if not steps:
             return None
         return {"backend": logic.FALLBACK, "person_id": person,
                 "nodes": [s["node"].get("label", s["node"]["id"]) for s in steps if "node" in s],
-                "explanation": None}
+                "explanation": None, "confirmed": confirmed}
 
     @api.post("/simulate-change")
     def simulate_change(req: ScenarioRequest) -> dict[str, Any]:

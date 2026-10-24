@@ -113,7 +113,7 @@ def test_gain_names_an_event_the_served_plan_keeps_not_the_agents_choice() -> No
     # for FAR must gain OVERLAP, the only neighbour the user actually sees in the plan.
     data = _data()
     plan_items = {"overlap": {"event_id": "overlap", "title": "OVERLAP", "score": 70.0,
-                              "people": [{"person_id": "p1", "name": "Ada Lovelace"}]},
+                              "people": [{"person_id": "p1", "name": "Ada Lovelace", "confirmed": True}]},
                   "planned": {"event_id": "planned", "title": "PLANNED", "score": 10.0, "people": []}}
     skips = logic.antifomo_skips(_decisions(), data, planned=set(plan_items), plan_items=plan_items)
     far = next(s for s in skips if s["event_id"] == "far")

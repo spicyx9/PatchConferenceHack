@@ -33,3 +33,33 @@ def test_simulated_sold_out_is_flagged_and_labelled_as_simulated() -> None:
     assert '"Sold out (simulated scenario)"' in APP_JS
     assert "markSimulated(res.changed_events)" in APP_JS and "e.simulated" in APP_JS
     assert "eventStatus(event.status)" not in APP_JS  # the agenda card uses statusLabel
+
+
+# -- 2. "Meet: X" only with SPEAKS_AT / HOSTS ---------------------------------------------
+
+def test_meet_only_for_confirmed_speakers_or_hosts() -> None:
+    from conferge.api import logic
+
+    data = load_fixture()
+    client = _client()
+    client.post("/api/v1/goal", json={"text": data.demo_goal_text, "user_id": "demo-user"})
+    plan = client.get("/api/v1/plan").json()["plan"]
+    people = [(i["event_id"], p) for d in plan["days"] for i in d["items"] for p in i["people"]]
+    people += [(c["loser"]["event_id"], p) for c in plan["conflicts"] for p in c["what_you_miss"]]
+    assert people and all("confirmed" in p for _, p in people)
+    for event_id, p in people:
+        event = data.event(event_id)
+        edge = p["person_id"] in event.speaker_ids + event.organizer_ids or (
+            event_id in data.person(p["person_id"]).event_ids
+            and data.person(p["person_id"]).participation in {"confirmed_speaker",
+                                                              "confirmed_organizer"})
+        assert p["confirmed"] is edge
+    # an attendee listing gives a possible, never confirmed, meeting
+    attendee = next((q for q in data.people if q.event_ids and q.participation not in
+                     {"confirmed_speaker", "confirmed_organizer"}), None)
+    if attendee:
+        ev = next(e for e in data.events if e.id in attendee.event_ids)
+        if attendee.id not in ev.speaker_ids + ev.organizer_ids:
+            assert logic.confirmed_at(data, ev, attendee.id) is False
+    assert 'Possibly: " + names(maybe) + " (not confirmed)"' in APP_JS
+    assert "var who = meetLine(i.people);" in APP_JS and "meetLine(r.people)" in APP_JS
