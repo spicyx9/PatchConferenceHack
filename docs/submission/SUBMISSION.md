@@ -16,7 +16,7 @@ Most attendees go home with a few business cards and the feeling they were in th
 4. **Reverse planning**: a day-by-day plan for the days you are in town, with a map of the venues.
 5. **Anti-FOMO**: which events to skip (time conflict, travel too long, low score) and what you gain by skipping them.
 6. **Live replanning**: when an event sells out, the plan is recomputed and the diff explains what was removed, what replaces it and why.
-7. **Memory**: "I met this person" is written to the graph and the ranking changes immediately.
+7. **Memory**: "I met this person" is written to the graph and the ranking changes immediately; a follow-up draft built from that graph path and your note is then proposed for validation, never sent.
 
 ## Tracks
 

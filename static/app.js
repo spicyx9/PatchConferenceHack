@@ -491,7 +491,9 @@
   }
 
   function renderPeople(p) {
-    var items = (p && p.items) || [];
+    var all = (p && p.items) || [];
+    // Top 10 still to meet, then the people already met (they sink in the ranking but keep their follow-up).
+    var items = all.filter(function (c) { return !c.met; }).slice(0, 10).concat(all.filter(function (c) { return c.met; }));
     $("people-cards").innerHTML = items.length ? items.map(function (c) {
       var o = c.opportunity || {};
       var person = c.person || {};
@@ -510,7 +512,9 @@
         '<div class="field"><b>Ou:</b> ' + esc(orUnknown(o.where)) + "</div>" +
         '<div class="field"><b>Accroche:</b> ' + esc(orUnknown(o.opener)) + "</div>" +
         (c.met_note ? '<div class="field"><b>Note:</b> ' + esc(c.met_note) + "</div>" : "") +
-        '<div class="row">' + (c.met ? "" : '<button class="small primary" data-action="met" data-id="' + esc(pid) + '">Rencontre</button>') +
+        (c.met ? '<div class="followup" id="followup-' + esc(pid) + '"></div>' : "") +
+        '<div class="row">' + (c.met ? '<button class="small primary" data-action="followup" data-id="' + esc(pid) + '">Suivi</button>'
+          : '<button class="small primary" data-action="met" data-id="' + esc(pid) + '">Rencontre</button>') +
         '<button class="small" data-action="showpath" data-id="' + esc(pid) + '">Voir le chemin</button></div>' +
         "</div>";
     }).join("") : '<p class="muted">Aucune personne.</p>';
@@ -566,7 +570,7 @@
       settle(api("/stays", null, "stays"), "stays", renderStays, errors),
       settle(api("/travel/map", null, "map"), "map", renderMap, errors),
       settle(api("/graph", null, "graph"), "graph", renderGraph, errors),
-      settle(api("/people", null, "people"), "people", renderPeople, errors),
+      settle(api("/people?limit=100", null, "people"), "people", renderPeople, errors),
       settle(api("/scenarios", null, "scenarios"), "scenarios", renderScenarios, errors)
     ]).then(loadAgentsState).then(function () {
       if (errors.length) showError("Erreur de chargement: " + errors.join(" | "));
@@ -860,6 +864,24 @@
       var note = window.prompt("Note sur la rencontre (optionnel):", "");
       if (note === null) return;
       withBusy(btn, function () { return mutate("/met", { person_id: id, note: note || null }); });
+    } else if (action === "followup") {
+      withBusy(btn, function () {
+        return api("/followup?person=" + encodeURIComponent(id), {}, "people").then(function (d) {
+          var box = $("followup-" + id);
+          if (!box) return;
+          var next = d.next_action || {};
+          box.innerHTML = '<div class="field"><b>Brouillon (non envoye):</b></div>' +
+            '<pre class="followup-text">' + esc(d.message) + "</pre>" +
+            '<div class="field"><b>Suite:</b> ' + esc(next.label || "") +
+            (next.url ? ' <a href="' + esc(next.url) + '" target="_blank" rel="noopener">' + esc(next.url) + "</a>" : "") +
+            (next.due_at ? " (" + esc(String(next.due_at).slice(0, 10)) + ")" : "") + "</div>" +
+            (d.warnings && d.warnings.length ? '<div class="field muted small-text">' + esc(d.warnings.join("; ")) + "</div>" : "") +
+            '<button class="small" data-action="copy-followup" data-id="' + esc(id) + '">Copier</button>';
+        });
+      });
+    } else if (action === "copy-followup") {
+      var pre = document.querySelector("#followup-" + id + " .followup-text");
+      if (pre && navigator.clipboard) navigator.clipboard.writeText(pre.textContent).then(function () { btn.textContent = "Copie"; });
     } else if (action === "copy-agents-cypher") {
       var q = $("agents-cypher") ? $("agents-cypher").textContent : "";
       if (navigator.clipboard) navigator.clipboard.writeText(q).then(function () { btn.textContent = "Copie"; });
