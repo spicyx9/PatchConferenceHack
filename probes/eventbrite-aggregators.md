@@ -13,24 +13,12 @@
 | eventbrite | SF 2026-10-27..2026-10-30, q=AI | live | ok | exhausted | 727 | 15 | 15 | 750 |
 | conferenceparties/github26 | GitHub Universe 2026 (anchor) | live | ok | exhausted | 7 | 7 | 1 | null |
 | conferenceparties/reinvent2026 | AWS re:Invent 2026 (parser breadth) | live | ok | exhausted | 95 | 95 | 1 | null |
-| raidandev/reinvent-2026 | AWS re:Invent 2026 | live | ok | exhausted | 66 | 66 | 1 | null |
-| raidandev/reinvent2026 | legacy slug from spec (expected schema_changed) | live | failed | schema_changed | 0 | 0 | 1 | null |
-| reinventradar/reinventradar | AWS re:Invent 2026 schedule | live | ok | exhausted | 87 | 87 | 1 | null |
 
 ## Incomplete-window reasons, warnings and errors
 
 - `eventbrite all` warning: declared_count_mismatch:2026-10-27..2026-10-30 declared 734, retrieved 676
 - `eventbrite q=AI` warning: declared_count_mismatch:2026-10-27..2026-10-30 declared 750, retrieved 715
 - `eventbrite q=AI` warning: keyword_filter_client_side:15 of 715 match ['AI'] (API ignores q)
-- `raidandev/reinvent-2026` warning: row_without_day:'Apps Associates Happy Hour'
-- `raidandev/reinvent-2026` warning: row_without_day:'Qumulo Happy Hour at F1 Arcade (+ customer lunch)'
-- `raidandev/reinvent-2026` warning: row_without_day:'Gaming Industry Networking Event'
-- `raidandev/reinvent-2026` warning: row_without_day:'FinOps Community Celebration'
-- `raidandev/reinvent-2026` warning: row_without_day:'Sonar Customer Happy Hour'
-- `raidandev/reinvent-2026` warning: row_without_day:'Lens Happy Hour @ re:Invent'
-- `raidandev/reinvent-2026` warning: row_without_day:"Heavybit Developer Lounge + 'Escape the Madness' party"
-- `raidandev/reinvent2026` error: no event cards found (page layout changed or slug unknown)
-- `reinventradar/reinventradar` warning: row_without_day:'Darktrace at AWS re:Invent 2026'
 
 ## Sample normalized events
 

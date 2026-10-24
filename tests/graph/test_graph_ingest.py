@@ -34,7 +34,11 @@ NODE_RE = re.compile(
 EDGE_RE = re.compile(
     r"^MATCH \(a:[A-Za-z]+ \{id: \$from_id\}\), \(b:[A-Za-z]+ \{id: \$to_id\}\) "
     r"MERGE \(a\)-\[r:[A-Z_]+\]->\(b\)"
-    r"(?: SET r\.\w+ = \$prop_\d+(?:, r\.\w+ = \$prop_\d+)*)? RETURN a\.id, b\.id$"
+    r" SET (?:r\.\w+ = \$prop_\d+, )*r\.evidence_ids = CASE WHEN r\.evidence_ids IS NULL "
+    r"THEN \$evidence_ids ELSE r\.evidence_ids \+ \[x IN \$evidence_ids WHERE NOT x IN "
+    r"r\.evidence_ids\] END, r\.rationale = replace\(replace\(\$rationale, '\{from\}', "
+    r"coalesce\(a\.name, a\.title, a\.description, a\.id\)\), '\{to\}', "
+    r"coalesce\(b\.name, b\.title, b\.description, b\.id\)\) RETURN a\.id, b\.id$"
 )
 ASSIGN_RE = re.compile(r"[nr]\.(\w+) = \$(prop_\d+)")
 NODE_HEAD_RE = re.compile(r"^MERGE \(n:(\w+) ")
@@ -51,6 +55,8 @@ def _decode(call: Any) -> dict[str, Any]:
         return {"type": "node", "label": NODE_HEAD_RE.match(cypher).group(1),
                 "id": params["id"], "props": props, "cypher": cypher, "params": params}
     from_kind, to_kind, rel = EDGE_HEAD_RE.match(cypher).groups()
+    props["evidence_ids"] = params["evidence_ids"]
+    props["rationale"] = params["rationale"]  # template; the names are filled in by Cypher
     return {"type": "edge", "from_kind": from_kind, "to_kind": to_kind, "rel": rel,
             "from": params["from_id"], "to": params["to_id"], "props": props,
             "cypher": cypher, "params": params}
@@ -84,7 +90,7 @@ def ingested(bundle: GraphBundle) -> tuple[Mock, Any, list[dict[str, Any]]]:
     return _ingest(bundle)
 
 
-def _fx_evidence(url: str | None = None) -> list[SourceEvidence]:
+def _fx_evidence(url: str | None = "https://example.org/fixture/test") -> list[SourceEvidence]:
     return [SourceEvidence(provider="test", source_mode="fixture", collected_at=AT,
                            source_url=url)]
 
@@ -149,6 +155,25 @@ def test_relevant_candidate_with_event_and_url_still_no_attendance(bundle):
     _, _, writes = _ingest(variant)
     rels = {e["rel"] for e in _edges(writes) if e["from"] == "p-cand"}
     assert not rels & {"ATTENDS_CONFIRMED", "SPEAKS_AT", "HOSTS"}
+
+
+def test_every_edge_has_rationale_and_evidence_ids(ingested):
+    _, _, writes = ingested
+    for edge in _edges(writes):
+        assert edge["props"]["evidence_ids"], edge
+        assert edge["props"]["rationale"].startswith("[fixture] "), edge
+    speaks = next(e for e in _edges(writes, "SPEAKS_AT") if e["from"] == "p-fx-alice")
+    assert speaks["props"]["evidence_ids"] == ["fixtures/graph.json#events/e-fx-talk-agents"]
+
+
+def test_edge_without_evidence_is_skipped_and_reported(bundle):
+    event = Event(id="e-bare", conference_id=bundle.conference.id, title="[FIXTURE] Bare",
+                  evidence=_fx_evidence(None))
+    variant = bundle.model_copy(update={"events": [*bundle.events, event]})
+    _, report, writes = _ingest(variant)
+    assert not [e for e in _edges(writes) if e["from"] == "e-bare"]
+    assert any(s.startswith("PART_OF e-bare->") and "no evidence id" in s
+               for s in report.skipped_edges)
 
 
 # -- None handling ----------------------------------------------------------------
@@ -278,6 +303,22 @@ def test_record_memory_rejects_naive_and_met_non_person():
     with pytest.raises(ValueError):
         record_memory(store, "demo-user", "MET", "Event", "e1", at=AT)
     graph.query.assert_not_called()
+
+
+def test_goal_edges_carry_stated_at_as_observed_at():
+    from conferge.core.schemas import Goal
+
+    graph = Mock()
+    ing = GraphIngestor(GraphStore(graph), default_mode="live")
+    ing.ingest_goals("demo-user", [
+        Goal(id="g-stated", description="Meet founders", topics=["AI agents"], stated_at=AT),
+        Goal(id="g-config", description="Meet PMs", topics=["Copilot"]),
+    ])
+    about = {e["from"]: e for e in _edges(_writes(graph), "ABOUT")}
+    assert about["g-stated"]["props"]["observed_at"] == AT.isoformat()
+    assert "observed_at" not in about["g-config"]["props"]  # never the ingest time
+    goal = next(n for n in _nodes(_writes(graph), "Goal") if n["id"] == "g-stated")
+    assert goal["props"]["observed_at"] == AT.isoformat()
 
 
 def test_record_memory_occurrences_are_distinct_and_timestamped():

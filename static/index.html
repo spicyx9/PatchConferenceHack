@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#1f2926" />
-    <title>Conferge</title>
+    <title>Conferge — make the right connections</title>
     <meta name="description" content="Find the right people, explore your connections, and plan your conference with Conferge." />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Conferge" />
@@ -33,6 +33,11 @@
       crossorigin=""
     />
     <link rel="stylesheet" href="/static/styles.css" />
+    <link rel="stylesheet" href="/static/agenda-v2.css" />
+    <link rel="stylesheet" href="/static/travel-v2.css" />
+    <link rel="stylesheet" href="/static/refinement-v2.css" />
+    <link rel="stylesheet" href="/static/travel-search-v3.css" />
+    <link rel="stylesheet" href="/static/travel-cards.css" />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -189,8 +194,13 @@
           class="tab-panel active"
           aria-labelledby="overview-title"
         >
-          <section class="city-hero" aria-labelledby="overview-title">
+          <section
+            class="city-hero"
+            title="Illustration generated with AI, not a photo of the event"
+            aria-labelledby="overview-title"
+          >
             <div class="city-hero-shade"></div>
+
             <div class="city-hero-content">
               <div class="city-context">
                 <svg class="icon"><use href="#i-pin" /></svg> AROUND GITHUB
@@ -202,11 +212,11 @@
                   >San Francisco</span
                 >
               </h1>
-
+              <p>Find the right events.<br />Meet the right people.</p>
               <div class="hero-meta">
-                <span id="conference-title">GitHub Universe 2026</span
+                <span id="conference-title">Loading conference…</span
                 ><span aria-hidden="true">·</span
-                ><span id="conference-dates">October 28–29</span>
+                ><span id="conference-dates"></span>
               </div>
               <button class="hero-cta" data-nav="events">
                 Explore your agenda
@@ -218,13 +228,16 @@
               <section class="event-discovery-section">
                 <div class="section-heading">
                   <div>
-
-                    <h2>Events</h2>
+                    <span class="eyebrow">AROUND THE CONFERENCE</span>
+                    <h2>Worth making time for</h2>
                   </div>
                   <a href="#events" data-nav="events" class="text-button"
                     >View all</a
                   >
                 </div>
+                <p class="discovery-note">
+                  Discover what’s happening during your trip.
+                </p>
                 <div id="discover-events" class="discover-events">
                   <div class="skeleton-card"></div>
                   <div class="skeleton-card"></div>
@@ -233,8 +246,8 @@
               <section id="step-opps" class="overview-section">
                 <div class="section-heading">
                   <div>
-
-                    <h2>People</h2>
+                    <span class="eyebrow">BEYOND THE BADGE</span>
+                    <h2>People to connect with</h2>
                   </div>
                   <a href="#people" data-nav="people" class="text-button"
                     >View all people</a
@@ -250,7 +263,7 @@
                 <section id="step-plan" class="panel agenda-preview">
                   <div class="section-heading">
                     <div>
-
+                      <span class="eyebrow">TIME WELL SPENT</span>
                       <h2>Your agenda</h2>
                     </div>
                     <a
@@ -271,8 +284,8 @@
                 <section class="panel map-preview">
                   <div class="section-heading">
                     <div>
-
-                      <h2>Locations</h2>
+                      <span class="eyebrow">ON THE GROUND</span>
+                      <h2>Your meeting places</h2>
                     </div>
                     <svg class="icon"><use href="#i-pin" /></svg>
                   </div>
@@ -281,55 +294,24 @@
                     class="map story-map"
                     aria-label="Map of agenda locations"
                   ></div>
+                  <p class="map-note">Your agenda, mapped out.</p>
                 </section>
               </div>
-              <section id="step-antifomo" class="antifomo-panel">
-                <div class="section-heading">
-                  <div>
-
-                    <h2>Suggested skips</h2>
-
-                  </div>
-                  <span class="antifomo-stamp"
-                    >ANTI-FOMO <svg class="icon"><use href="#i-check" /></svg
-                  ></span>
-                </div>
+              <details id="step-antifomo" class="discover-alternatives">
+                <summary>
+                  <span>Outside your agenda</span
+                  ><span id="alternatives-count">0</span>
+                </summary>
                 <div id="story-antifomo"></div>
-              </section>
-              <div class="overview-lower">
-                <section class="panel" id="step-change">
-
-                  <h2>Replan</h2>
-
-                  <button id="story-simulate" class="secondary">
-                    Explore a sold-out scenario
-                  </button>
-                  <div id="story-diff" aria-live="polite"></div>
-                </section>
-                <section class="panel" id="step-met">
-
-                  <h2>Meetings</h2>
-
-                  <div id="story-met" aria-live="polite"></div>
-                </section>
-              </div>
-              <section class="panel" id="step-roi" aria-labelledby="trip-results-title">
-                <h2 id="trip-results-title">Trip summary</h2>
-                <div class="roi-grid roi-story">
-                  <div class="roi-tile"><div id="roi-spend" class="value unknown">unknown</div><div class="name">Known travel costs</div><div id="roi-spend-note" class="note muted"></div></div>
-                  <div class="roi-tile"><div id="roi-meetings" class="value unknown">unknown</div><div class="name">Meetings recorded</div></div>
-                  <div class="roi-tile"><div id="roi-qualified" class="value unknown">unknown</div><div class="name">Qualified contacts</div></div>
-                  <div class="roi-tile"><div id="roi-opportunities" class="value unknown">unknown</div><div class="name">Opportunities scoring 30+</div></div>
-                </div>
-              </section>
+              </details>
             </div>
             <aside class="context-column" aria-label="Your trip and priorities">
               <div class="conference-context">
                 <div class="context-avatar">
                   <svg class="icon"><use href="#i-calendar" /></svg>
                 </div>
-
-                <h2 id="sidebar-conference">GitHub Universe 2026</h2>
+                <span class="eyebrow">YOUR TRIP</span>
+                <h2 id="sidebar-conference">Loading conference…</h2>
                 <p>
                   <span id="conference-place">Fort Mason Center</span
                   ><br /><span id="conference-city">San Francisco</span>
@@ -379,75 +361,82 @@
                   ><span class="stat-label">conversations saved</span>
                 </div>
               </div>
-              <div
-                id="degraded-banner"
-                data-ranking-mode="degraded_no_graph"
-                class="degraded-banner hidden"
-                role="status"
-              >
-                <svg class="icon"><use href="#i-info" /></svg
-                ><span>Graph unavailable · fallback ranking active.</span>
-              </div>
+
             </aside>
           </div>
         </section>
 
         <section
           id="tab-events"
-          class="tab-panel"
+          class="tab-panel agenda-page"
           aria-labelledby="agenda-title"
           hidden
         >
-          <div class="page-heading">
+          <header class="agenda-heading">
             <div>
-
+              <p class="agenda-overline">Your time, well spent</p>
               <h1 id="agenda-title">My agenda</h1>
-
+              <p>A few great events. Room for the unexpected.</p>
             </div>
-            <button class="secondary" data-open="goal-dialog">
-              <svg class="icon"><use href="#i-edit" /></svg>Edit priorities
+            <button class="agenda-edit-priorities" data-open="goal-dialog">
+              <svg class="icon" aria-hidden="true"><use href="#i-edit" /></svg
+              >Edit priorities
             </button>
-          </div>
-          <div class="panel">
-            <div class="section-heading">
-              <h2>My agenda</h2>
-              <span class="timezone-label"
-                >Pacific Time unless otherwise noted</span
-              >
-            </div>
+            <a
+              class="text-button"
+              id="calendar-export"
+              href="/api/v1/calendar.ics"
+              download="conferge-plan.ics"
+              >Export agenda</a
+            >
+          </header>
+          <div class="agenda-date-bar">
             <div
               id="agenda-day-tabs"
               class="day-tabs"
               aria-label="Filter agenda by day"
             ></div>
-            <div id="plan-days"></div>
+            <span class="agenda-timezone">Pacific Time</span>
           </div>
-          <details class="panel">
+          <div id="plan-days" class="agenda-timeline"></div>
+          <details class="agenda-alternatives">
             <summary>
-              Your agenda’s trade-offs
-              <span class="muted">Conflicts and skipped events</span>
+              <span>Why these events?</span
+              ><span class="agenda-disclosure-meta"
+                >Alternatives &amp; skipped events
+                <span id="agenda-alternatives-count"></span
+                ><svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
+                  <path d="m6 9 6 6 6-6" /></svg
+              ></span>
             </summary>
-            <div id="conflicts"></div>
-            <h3>Skipped events</h3>
-            <ul id="excluded" class="plain-list"></ul>
+            <div class="agenda-alternatives-body">
+              <div id="conflicts"></div>
+              <h3>Not in your plan</h3>
+              <ul id="excluded" class="plain-list"></ul>
+            </div>
           </details>
-          <div class="panel">
-            <div class="section-heading">
+          <section
+            class="agenda-explore"
+            aria-labelledby="agenda-explore-title"
+          >
+            <div class="agenda-explore-heading">
               <div>
-
-                <h2>Explore events</h2>
+                <h2 id="agenda-explore-title">Keep exploring</h2>
+                <p>Find something else that catches your eye.</p>
               </div>
               <span id="events-result-count" class="muted"></span>
             </div>
-            <div class="filter-row">
+            <div class="filter-row agenda-filters">
               <label class="search-input"
-                ><svg class="icon"><use href="#i-search" /></svg
+                ><svg class="icon" aria-hidden="true">
+                  <use href="#i-search" /></svg
                 ><span class="sr-only">Search events or venues</span
                 ><input
                   id="events-search"
                   type="search"
-                  placeholder="Search events or venues…" /></label
-              ><label class="filter-select"
+                  placeholder="Search events or venues…"
+              /></label>
+              <label class="filter-select"
                 ><span class="sr-only">Event type</span
                 ><select id="events-type">
                   <option value="all">All formats</option>
@@ -461,8 +450,8 @@
                 </select></label
               >
             </div>
-            <div id="events-list"></div>
-          </div>
+            <div id="events-list" class="agenda-browser-feed"></div>
+          </section>
         </section>
 
         <section
@@ -473,11 +462,13 @@
         >
           <div class="page-heading">
             <div>
-
-              <h1 id="people-title">People</h1>
-
+              <span class="eyebrow">YOUR NETWORK AT UNIVERSE</span>
+              <h1 id="people-title">People worth meeting.</h1>
+              <p>A short list, shaped around your priorities.</p>
             </div>
-
+            <button class="secondary" data-open="goal-dialog">
+              Edit priorities
+            </button>
           </div>
           <div class="people-toolbar">
             <label class="search-input"
@@ -494,7 +485,9 @@
             ></span>
           </div>
           <div id="people-cards" class="cards"></div>
-
+          <p class="section-note">
+            Find the context behind each connection on their profile.
+          </p>
         </section>
 
         <section
@@ -503,50 +496,357 @@
           aria-labelledby="travel-title"
           hidden
         >
-          <div class="page-heading">
-            <div>
-
-              <h1 id="travel-title">Travel</h1>
-
+          <div class="travel-heading">
+            <p id="travel-context" class="travel-conference">
+              GitHub Universe · San Francisco · Oct 28–29
+            </p>
+            <h1 id="travel-title">Find your flight.</h1>
+          </div>
+          <div
+            class="travel-category"
+            role="tablist"
+            aria-label="Travel search"
+          >
+            <button
+              id="travel-flights-tab"
+              type="button"
+              role="tab"
+              aria-selected="true"
+              aria-controls="flight-results-panel"
+            >
+              <svg class="icon" aria-hidden="true"><use href="#i-plane" /></svg
+              >Flights
+            </button>
+            <button
+              id="travel-stays-tab"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="stay-results-panel"
+            >
+              <svg class="icon" aria-hidden="true"><use href="#i-pin" /></svg
+              >Stays
+            </button>
+          </div>
+          <form
+            id="travel-research-form"
+            class="travel-search-v3"
+            aria-label="Trip research"
+          >
+            <div class="travel-search-options">
+              <label id="flight-type-label"
+                ><span class="sr-only">Trip type</span
+                ><select id="flight-type">
+                  <option value="round_trip">Round trip</option>
+                  <option value="one_way">One way</option>
+                </select></label
+              >
+              <label
+                ><span class="sr-only" id="research-adults-label"
+                  >Travelers</span
+                ><select
+                  id="research-adults"
+                  aria-labelledby="research-adults-label"
+                >
+                  <option value="1">1 adult</option>
+                  <option value="2">2 adults</option>
+                  <option value="3">3 adults</option>
+                  <option value="4">4 adults</option>
+                </select></label
+              >
+              <label id="research-cabin-label"
+                ><span class="sr-only">Cabin</span
+                ><select id="research-cabin">
+                  <option value="economy">Economy</option>
+                  <option value="premium_economy">Premium economy</option>
+                  <option value="business">Business</option>
+                  <option value="first">First</option>
+                </select></label
+              >
+              <label id="research-rooms-label" hidden
+                ><span class="sr-only">Rooms</span
+                ><select id="research-rooms">
+                  <option value="1">1 room</option>
+                  <option value="2">2 rooms</option>
+                  <option value="3">3 rooms</option>
+                </select></label
+              >
+            </div>
+            <div class="travel-search-fields">
+              <label class="search-origin" id="research-origin-label"
+                ><span>From</span
+                ><input
+                  id="research-origin"
+                  type="text"
+                  placeholder="City or airport"
+                  maxlength="80"
+                  required
+                  list="travel-airports"
+              /></label>
+              <datalist id="travel-airports">
+                <option value="New York"></option>
+                <option value="JFK"></option>
+                <option value="EWR"></option>
+                <option value="LGA"></option>
+                <option value="Paris"></option>
+                <option value="London"></option>
+                <option value="Los Angeles"></option>
+              </datalist>
+              <label class="search-destination"
+                ><span id="research-destination-label">To</span
+                ><input
+                  id="research-destination"
+                  type="text"
+                  value="San Francisco"
+                  required
+                  maxlength="80"
+              /></label>
+              <label class="search-depart"
+                ><span id="research-depart-label">Departure</span
+                ><input id="research-depart" type="date" required
+              /></label>
+              <label class="search-return"
+                ><span id="research-return-label">Return</span
+                ><input id="research-return" type="date" required
+              /></label>
+              <button
+                id="travel-search-button"
+                type="submit"
+                class="travel-search-button"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-search" /></svg
+                ><span>Search</span>
+              </button>
+            </div>
+            <div class="travel-search-foot">
+              <span id="travel-search-hint"
+                >Destination set from your conference.</span
+              ><button
+                type="button"
+                id="travel-local-toggle"
+                class="text-button"
+              >
+                I’m local or already booked
+              </button>
+            </div>
+          </form>
+          <div id="travel-local-note" hidden>
+            <h2>You’re ready to explore.</h2>
+            <p>
+              Your conference venues and agenda are on the map below. You can
+              search for travel whenever you need it.
+            </p>
+            <button type="button" id="travel-resume" class="secondary">
+              Search travel
+            </button>
+          </div>
+          <div class="travel-prices-bar">
+            <p
+              id="travel-offer-context"
+              class="travel-result-status"
+              aria-live="polite"
+            ></p>
+            <button
+              type="button"
+              id="travel-show-collected"
+              class="text-button"
+            >
+              Collected offers</button
+            ><button
+              type="button"
+              id="travel-refresh-prices"
+              class="text-button"
+            >
+              Refresh prices
+            </button>
+          </div>
+          <div id="travel-search-feedback" role="status"></div>
+          <div class="travel-results-workspace" id="travel-results-workspace">
+            <aside
+              class="travel-filter-sidebar"
+              aria-label="Filter travel results"
+            >
+              <button
+                type="button"
+                id="travel-mobile-filters"
+                aria-expanded="false"
+              >
+                Filters
+              </button>
+              <div class="travel-filter-title">
+                <h2>Filters</h2>
+                <button
+                  type="button"
+                  id="travel-clear-filters"
+                  class="text-button"
+                >
+                  Reset
+                </button>
+              </div>
+              <fieldset id="travel-stop-filters">
+                <legend>Stops</legend>
+                <label
+                  ><input
+                    type="radio"
+                    name="travel-stops"
+                    value="all"
+                    checked
+                  />Any number of stops</label
+                ><label
+                  ><input type="radio" name="travel-stops" value="0" />Nonstop
+                  only</label
+                ><label
+                  ><input type="radio" name="travel-stops" value="1" />Up to 1
+                  stop</label
+                >
+              </fieldset>
+              <fieldset>
+                <legend>Price</legend>
+                <label class="travel-price-filter"
+                  >Maximum total (USD)<input
+                    id="travel-max-price"
+                    type="number"
+                    min="1"
+                    step="1"
+                    placeholder="No limit"
+                /></label>
+              </fieldset>
+              <fieldset id="stay-radius-filter" hidden>
+                <legend>Location</legend>
+                <label class="travel-price-filter"
+                  >Within distance of venue<select id="travel-stay-radius">
+                    <option value="3">3 km</option>
+                    <option value="5" selected>5 km</option>
+                    <option value="10">10 km</option>
+                  </select></label
+                >
+              </fieldset>
+              <p class="travel-filter-note">
+                Your destination is close to the conference. Prices are for the
+                full quoted trip or stay.
+              </p>
+            </aside>
+            <div class="travel-result-column">
+              <section
+                id="flight-results-panel"
+                class="travel-comparison"
+                role="tabpanel"
+                aria-labelledby="travel-flights-tab"
+              >
+                <div class="travel-results-header">
+                  <div>
+                    <h2 id="flight-compare-title">Flights to San Francisco</h2>
+                    <span id="flight-result-count"></span>
+                  </div>
+                  <label
+                    >Sort by<select id="flight-sort">
+                      <option value="price">Lowest price</option>
+                      <option value="duration">Shortest duration</option>
+                      <option value="departure">Earliest departure</option>
+                      <option value="route">Airport</option>
+                    </select></label
+                  >
+                </div>
+                <div id="flights"></div>
+              </section>
+              <section
+                id="stay-results-panel"
+                class="trip-stays-section"
+                role="tabpanel"
+                aria-labelledby="travel-stays-tab"
+                hidden
+              >
+                <div class="travel-results-header">
+                  <div>
+                    <h2 id="trip-stays-title">Stay close to your plans</h2>
+                    <span id="stay-result-count"></span>
+                  </div>
+                  <label
+                    >Sort by<select id="stay-sort">
+                      <option value="distance">Closest to conference</option>
+                      <option value="price">Lowest total price</option>
+                      <option value="recommended">Recommended</option>
+                    </select></label
+                  >
+                </div>
+                <div id="stays"></div>
+              </section>
             </div>
           </div>
-          <div class="grid two">
-            <div class="panel">
-
-              <h2>Your itinerary</h2>
-              <ol id="itinerary" class="itinerary"></ol>
-            </div>
-            <div class="panel">
-
-              <h2>Trip budget</h2>
-              <div id="budget"></div>
-            </div>
-          </div>
-          <div class="panel">
-            <h2>Suggestions for your trip</h2>
-            <div id="proposals"></div>
-          </div>
-          <section>
-            <div class="section-heading">
+          <a
+            id="research-flights-link"
+            hidden
+            target="_blank"
+            rel="noopener noreferrer"
+            >Search flights with provider</a
+          ><a
+            id="research-stays-link"
+            hidden
+            target="_blank"
+            rel="noopener noreferrer"
+            >Search stays with provider</a
+          >
+          <aside id="budget" aria-label="Trip budget"></aside>
+          <section
+            class="travel-map-panel panel"
+            aria-labelledby="travel-map-title"
+          >
+            <div class="travel-map-heading">
               <div>
-
-                <h2>Places to stay</h2>
+                <span class="eyebrow">GET TO KNOW THE NEIGHBORHOOD</span>
+                <h2 id="travel-map-title">Your places in the city.</h2>
+                <p id="travel-map-count" class="muted">Loading places…</p>
+              </div>
+              <button id="travel-map-fit" type="button" class="secondary">
+                Fit places
+              </button>
+            </div>
+            <div class="travel-map-filters">
+              <label
+                >Show<select id="travel-map-scope">
+                  <option value="planned">Your agenda</option>
+                  <option value="nearby">Nearby events</option>
+                </select></label
+              ><label
+                >Day<select id="travel-map-day">
+                  <option value="all">All days</option>
+                </select></label
+              ><span class="travel-map-key"
+                ><i></i> Conference <i></i> Events &amp; stays</span
+              >
+            </div>
+            <div class="travel-map-workspace">
+              <div
+                class="travel-place-list"
+                id="map-places"
+                aria-label="Places shown on the map"
+              ></div>
+              <div class="travel-map-canvas">
+                <div
+                  id="map"
+                  class="map"
+                  aria-label="Interactive map of conference and events"
+                ></div>
+                <div
+                  id="travel-place-detail"
+                  class="travel-place-detail"
+                  aria-live="polite"
+                ></div>
               </div>
             </div>
-            <div id="stays" class="cards"></div>
+            <p id="map-kind" class="small-text muted"></p>
+            <p class="map-note" id="travel-map-note">
+              Choose a day to see your visits in order.
+            </p>
           </section>
-          <div class="panel travel-map-panel">
-            <h2>Map</h2>
-            <div
-              id="map"
-              class="map"
-              aria-label="Map of events and places to stay"
-            ></div>
-            <details>
-              <summary>View locations as a list</summary>
-              <div id="map-places"></div>
-            </details>
-          </div>
+          <section
+            class="trip-suggestions-section"
+            aria-labelledby="trip-suggestions-title"
+          >
+            <h2 id="trip-suggestions-title">A little planning ahead.</h2>
+            <div id="proposals"></div>
+          </section>
         </section>
 
         <section
@@ -642,8 +942,8 @@
         >
           <div class="page-heading">
             <div>
-
-              <h1>Summary</h1>
+              <span class="eyebrow">THE BIGGER PICTURE</span>
+              <h1>Your trip at a glance.</h1>
             </div>
           </div>
           <div class="grid two">
@@ -662,6 +962,48 @@
             <h2>What’s next</h2>
             <ol id="next-actions" class="next-actions"></ol>
           </div>
+          <div class="progress-tools">
+            <section id="step-change">
+              <h2>Adjust your agenda</h2>
+              <button id="story-simulate" class="secondary">
+                Explore a sold-out scenario
+              </button>
+              <div id="story-diff" aria-live="polite"></div>
+            </section>
+            <section id="step-met">
+              <h2>Your latest meeting</h2>
+              <div id="story-met" aria-live="polite"></div>
+            </section>
+          </div>
+          <section
+            class="panel"
+            id="step-roi"
+            aria-labelledby="trip-results-title"
+          >
+            <span class="eyebrow">BEYOND THIS CONFERENCE</span>
+            <h2 id="trip-results-title">Your trip, in perspective.</h2>
+            <div class="roi-grid roi-story">
+              <div class="roi-tile">
+                <div id="roi-spend" class="value unknown">unknown</div>
+                <div class="name">Known travel costs</div>
+                <div id="roi-spend-note" class="note muted"></div>
+              </div>
+              <div class="roi-tile">
+                <div id="roi-meetings" class="value unknown">unknown</div>
+                <div class="name">Meetings recorded</div>
+              </div>
+              <div class="roi-tile">
+                <div id="roi-qualified" class="value unknown">unknown</div>
+                <div class="name">Qualified contacts</div>
+              </div>
+              <div class="roi-tile">
+                <div id="roi-opportunities" class="value unknown">unknown</div>
+                <div class="name" id="roi-opportunities-label">
+                  Opportunities above the score threshold
+                </div>
+              </div>
+            </div>
+          </section>
         </section>
         <footer class="footer"><span>Conferge</span></footer>
       </main>
@@ -669,7 +1011,8 @@
 
     <dialog id="goal-dialog" aria-labelledby="goal-dialog-title">
       <div class="dialog-head">
-        <button
+        <span class="eyebrow">YOUR PRIORITIES</span
+        ><button
           class="icon-button"
           data-close="goal-dialog"
           aria-label="Close"
@@ -677,7 +1020,11 @@
           <svg class="icon"><use href="#i-close" /></svg>
         </button>
       </div>
-      <h2 id="goal-dialog-title">Edit priorities</h2>
+      <h2 id="goal-dialog-title">What would make this trip worthwhile?</h2>
+      <p class="muted">
+        Tell us who you want to meet: seed investors, AI agent founders, Copilot
+        product managers, or engineers.
+      </p>
       <form id="goal-form">
         <label for="goal-text">Your priorities for this conference</label
         ><textarea
@@ -687,7 +1034,10 @@
           aria-describedby="goal-help goal-error"
           required
         ></textarea>
-        <p id="goal-help" class="small-text muted">People and topics you want to focus on.</p>
+        <p id="goal-help" class="small-text muted">
+          Describe the people and topics you care about. Specific priorities
+          help shape your agenda.
+        </p>
         <p id="goal-error" class="form-error" role="alert"></p>
         <div class="dialog-actions">
           <button type="button" class="secondary" data-close="goal-dialog">
@@ -700,7 +1050,8 @@
     </dialog>
     <dialog id="meeting-dialog" aria-labelledby="meeting-title">
       <div class="dialog-head">
-        <button
+        <span class="eyebrow">KEEP IN TOUCH</span
+        ><button
           class="icon-button"
           data-close="meeting-dialog"
           aria-label="Close"
@@ -708,7 +1059,7 @@
           <svg class="icon"><use href="#i-close" /></svg>
         </button>
       </div>
-      <h2 id="meeting-title">Record meeting</h2>
+      <h2 id="meeting-title">A conversation worth remembering.</h2>
       <p id="meeting-person" class="muted"></p>
       <form id="meeting-form">
         <label for="meeting-note"
@@ -730,7 +1081,8 @@
     </dialog>
     <dialog id="simulation-dialog" aria-labelledby="simulation-title">
       <div class="dialog-head">
-        <button
+        <span class="eyebrow">WHEN PLANS CHANGE</span
+        ><button
           class="icon-button"
           data-close="simulation-dialog"
           aria-label="Close"
@@ -738,7 +1090,10 @@
           <svg class="icon"><use href="#i-close" /></svg>
         </button>
       </div>
-      <h2 id="simulation-title">Simulate a change</h2>
+      <h2 id="simulation-title">What if your plans changed?</h2>
+      <p class="muted">
+        Choose a scenario to explore how your agenda would adapt.
+      </p>
       <label for="scenario-select">Choose a scenario</label
       ><select id="scenario-select"></select
       ><button id="btn-simulate" class="primary full-width">
@@ -756,20 +1111,94 @@
     <dialog id="reset-dialog" aria-labelledby="reset-title">
       <h2 id="reset-title">Reset this session?</h2>
       <p>
-        Your agenda, choices, and recorded meeting history will return to their starting point.
+        Your agenda, choices, and recorded meeting history will return to their
+        starting point.
       </p>
       <div class="dialog-actions">
         <button class="secondary" data-close="reset-dialog">Cancel</button
         ><button id="btn-reset" class="danger-solid">Reset session</button>
       </div>
     </dialog>
-    <div hidden aria-hidden="true"><div id="conf-name"></div><div id="badge-source"></div><div id="badge-status"></div><div id="collected-at"></div><div id="source-domains"></div><div id="bd-counter"></div><div id="warnings-box"></div><div id="warnings-count"></div><div id="warnings-list"></div></div>
+    <dialog id="sources-dialog" aria-labelledby="sources-title">
+      <div class="dialog-head">
+        <span class="eyebrow">BEHIND YOUR AGENDA</span
+        ><button
+          class="icon-button"
+          data-close="sources-dialog"
+          aria-label="Close"
+        >
+          <svg class="icon"><use href="#i-close" /></svg>
+        </button>
+      </div>
+      <h2 id="sources-title">Sources and how it works</h2>
+      <p id="conf-name" class="muted"></p>
+      <div class="source-summary">
+        <span>Data provenance</span>
+        <span id="badge-source" class="badge fixture">Loading data</span>
+      </div>
+      <div class="source-summary">
+        <span>Source status</span
+        ><span id="badge-status" class="badge neutral">Loading</span>
+      </div>
+      <div class="source-summary">
+        <span>Last collected</span
+        ><span id="collected-at" class="small-text">—</span>
+      </div>
+      <p class="small-text muted">
+        Fixture data is replayed or fictional; live data comes from a real
+        collection. Availability and prices may have changed since collection.
+        Speaker listings do not guarantee a meeting. Conference affiliation and
+        attendance evidence are shown on individual records.
+      </p>
+      <p class="small-text muted">
+        The ranking uses your selected profiles and priorities, with a fallback
+        when the graph is unavailable. Map lines show the order of visits, not
+        calculated routes, and some location coordinates are approximate.
+      </p>
+      <p class="small-text muted">
+        Saving a travel suggestion does not make a booking. Change scenarios
+        affect this session and are not source updates. Resetting a session
+        clears the conversation memory saved in FalkorDB.
+      </p>
+      <div
+        id="degraded-banner"
+        data-ranking-mode="degraded_no_graph"
+        class="degraded-banner hidden"
+        role="status"
+      >
+        <svg class="icon"><use href="#i-info" /></svg
+        ><span>Graph unavailable · fallback ranking active.</span>
+      </div>
+      <div id="source-domains"></div>
+      <div id="bd-counter" class="bd-counter"></div>
+      <details id="pipeline-panel" class="pipeline-panel">
+        <summary>Data pipeline</summary>
+        <p id="pipeline-headline" class="pipeline-headline"></p>
+        <div class="pipeline-refresh">
+          <button id="btn-bd-refresh" class="small">Refresh via Bright Data</button>
+          <span class="small-text muted">2 live calls: Web Unlocker (Google Flights, 45 s) + SERP (LinkedIn, 20 s), never at startup</span>
+          <div id="pipeline-refresh-result" aria-live="polite"></div>
+        </div>
+        <div id="pipeline-table"></div>
+        <div id="pipeline-calls" class="small-text muted"></div>
+        <div id="pipeline-cost" class="small-text"></div>
+        <div id="pipeline-timings" class="pipeline-reach"></div>
+        <div id="pipeline-reach" class="pipeline-reach"></div>
+      </details>
+      <details id="warnings-box">
+        <summary>
+          Details and warnings <span id="warnings-count">0</span>
+        </summary>
+        <ul id="warnings-list"></ul>
+      </details>
+    </dialog>
     <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
     <script
       src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
       crossorigin=""
     ></script>
     <script src="https://unpkg.com/cytoscape@3.30.2/dist/cytoscape.min.js"></script>
+    <script src="/static/travel-cards.js"></script>
     <script src="/static/galaxy3d.js"></script>
     <script src="/static/connections.js"></script>
     <script src="/static/app.js"></script>

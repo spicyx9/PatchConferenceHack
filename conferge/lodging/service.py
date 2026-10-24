@@ -1,5 +1,8 @@
 """Parallel lodging search: discover, verify, normalize, distance, dedup, rank.
 
+Bright Data first: the dataset and Web Unlocker sources run in parallel; the fallback
+sources (pyairbnb) run only when none of them normalized a single stay.
+
 Providers run concurrently (asyncio.gather); one failing provider never hides the others
 and never crashes the run: it shows up as a failed RunReport. Caches (in memory):
 - discovery results 6 h, keyed (provider, query dates/occupancy/currency/area);
@@ -26,6 +29,7 @@ from conferge.lodging.normalize import normalize, refresh_status, sort_key
 logger = logging.getLogger(__name__)
 
 DISCOVERY_TTL = timedelta(hours=6)
+PROVIDER_TIMEOUT = 120.0  # one slow source becomes a failed report, never a dead search
 VERIFY_TTL = timedelta(minutes=30)
 
 
@@ -57,25 +61,44 @@ def _as_cached(result: DiscoveryResult, age: timedelta) -> DiscoveryResult:
 
 
 def default_sources() -> dict[str, Any]:
-    from conferge.lodging.airbnb import AirbnbSource
+    """Bright Data first: the three datasets and the Web Unlocker search pages, in parallel."""
+    from conferge.lodging.airbnb import AirbnbSource, BrightDataAirbnbBackend
     from conferge.lodging.booking import BookingSource
     from conferge.lodging.google_hotels import GoogleHotelsSource
+    from conferge.lodging.google_hotels_direct import GoogleHotelsDirectSource
+    from conferge.lodging.unlocker import UnlockerHotelsSource
 
     return {"booking": BookingSource(), "google_hotels": GoogleHotelsSource(),
-            "airbnb": AirbnbSource()}
+            "airbnb": AirbnbSource(primary=BrightDataAirbnbBackend(), fallback=None),
+            "unlocker": UnlockerHotelsSource(),
+            # Secondary, labelled google_hotels_direct; shown after the datasets (tier 2).
+            "google_hotels_direct": GoogleHotelsDirectSource()}
+
+
+def default_fallback_sources() -> dict[str, Any]:
+    """pyairbnb, used only when every Bright Data source normalized zero stays."""
+    from conferge.lodging.airbnb import AirbnbSource, PyAirbnbBackend
+
+    return {"airbnb_pyairbnb": AirbnbSource(primary=PyAirbnbBackend(), fallback=None)}
 
 
 class LodgingService:
     def __init__(
         self, sources: dict[str, Any] | None = None, *, clock: Callable[[], datetime] = now_utc,
+        fallback_sources: dict[str, Any] | None = None,
+        provider_timeout: float = PROVIDER_TIMEOUT,
     ) -> None:
+        self.provider_timeout = provider_timeout
         self._sources = sources if sources is not None else default_sources()
+        if fallback_sources is None:
+            fallback_sources = default_fallback_sources() if sources is None else {}
+        self._fallbacks = fallback_sources
         self._clock = clock
         self._discovery: dict[tuple[Any, ...], _Entry] = {}
         self._verified: dict[tuple[Any, ...], _Entry] = {}
 
     async def aclose(self) -> None:
-        for src in self._sources.values():
+        for src in [*self._sources.values(), *self._fallbacks.values()]:
             close = getattr(src, "aclose", None)
             if close is not None:
                 await close()
@@ -92,18 +115,29 @@ class LodgingService:
             if disc and now - disc.at <= DISCOVERY_TTL:
                 result = disc.result
             else:
-                result = await src.search(q)
+                result = await asyncio.wait_for(src.search(q), self.provider_timeout)
                 if result.items:
                     self._discovery[key] = _Entry(self._clock(), result)
             verify_report = None
             verify = getattr(src, "verify", None)
             if verify is not None and result.items and q.verify_top > 0:
-                items, verify_report = await verify(list(result.items), q)
+                try:
+                    items, verify_report = await asyncio.wait_for(
+                        verify(list(result.items), q), self.provider_timeout)
+                except (asyncio.TimeoutError, TimeoutError):
+                    # Discovery results stand; the re-check is reported as failed.
+                    return result, report(f"{name}_verify", started, status="failed",
+                                          termination="error",
+                                          errors=[f"verify timeout after {self.provider_timeout:.0f}s"])
                 result = DiscoveryResult(items=items, run_report=result.run_report,
                                          errors=list(result.errors))
                 if verify_report.status != "failed":
                     self._verified[key] = _Entry(self._clock(), result, verify_report)
             return result, verify_report
+        except (asyncio.TimeoutError, TimeoutError):
+            rep = report(name, started, status="failed", termination="error",
+                         errors=[f"timeout: no answer within {self.provider_timeout:.0f}s"])
+            return DiscoveryResult(run_report=rep, errors=list(rep.errors)), None
         except Exception as exc:  # noqa: BLE001 - a broken provider is reported, not raised
             logger.warning("lodging.provider_failed", extra={"provider": name,
                                                              "error": type(exc).__name__})
@@ -111,9 +145,9 @@ class LodgingService:
                          errors=[f"{type(exc).__name__}: {str(exc)[:200]}"])
             return DiscoveryResult(run_report=rep, errors=list(rep.errors)), None
 
-    async def search(self, q: LodgingQuery) -> LodgingSearch:
-        names = list(self._sources)
-        outcomes = await asyncio.gather(*(self._provider(n, self._sources[n], q) for n in names))
+    async def _tier(self, sources: dict[str, Any], q: LodgingQuery,
+                    ) -> tuple[list[SourceRecord], list[RunReport], list[RunReport]]:
+        outcomes = await asyncio.gather(*(self._provider(n, src, q) for n, src in sources.items()))
         reports: list[RunReport] = []
         verify_reports: list[RunReport] = []
         records: list[SourceRecord] = []
@@ -122,7 +156,20 @@ class LodgingService:
             if verify_report is not None:
                 verify_reports.append(verify_report)
             records.extend(result.items)
-        return self.assemble(records, q, reports, verify_reports)
+        return records, reports, verify_reports
+
+    async def search(self, q: LodgingQuery) -> LodgingSearch:
+        records, reports, verify_reports = await self._tier(self._sources, q)
+        found = self.assemble(records, q, reports, verify_reports)
+        if found.envelope.items or not self._fallbacks:
+            return found
+        # Every primary (Bright Data) source came back empty: only now try the fallbacks.
+        more, more_reports, more_verify = await self._tier(self._fallbacks, q)
+        found = self.assemble([*records, *more], q, [*reports, *more_reports],
+                              [*verify_reports, *more_verify])
+        found.warnings.insert(0, "fallback used: no stay from Bright Data, "
+                                 f"tried {', '.join(self._fallbacks)}")
+        return found
 
     def assemble(
         self, records: list[SourceRecord], q: LodgingQuery, reports: list[RunReport],

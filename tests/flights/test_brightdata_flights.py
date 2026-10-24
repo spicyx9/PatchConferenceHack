@@ -161,3 +161,17 @@ async def test_zero_results_is_failure(rows):
     offers, report = await provider.search_round_trip(
         "JFK", "SFO", date(2026, 10, 27), date(2026, 10, 30))
     assert offers == [] and report.status == "failed"
+
+
+def test_explicit_baggage_and_price_scope_are_preserved_not_assumed():
+    row = _detail()
+    row["baggage"] = {"carry_on_included": False, "checked_bags_included": 0}
+    row["pricing"]["price_scope"] = "per_adult"
+    offer = build_offer(record_to_raw_offer(_record(row)), NOW)
+    assert offer.carry_on_included is False and offer.checked_bags_included == 0
+    assert offer.price_scope == "per_adult" and offer.baggage_verified is None
+    row["baggage"] = {"carry_on_included": "yes", "checked_bags_included": True}
+    row["pricing"]["price_scope"] = "unrecognized"
+    unknown = record_to_raw_offer(_record(row))
+    assert unknown.carry_on_included is None and unknown.checked_bags_included is None
+    assert unknown.price_scope == "unknown"

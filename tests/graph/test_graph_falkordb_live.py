@@ -28,7 +28,7 @@ def store():
     db = FalkorDB(host=os.getenv("FALKORDB_HOST", "127.0.0.1"),
                   port=int(os.getenv("FALKORDB_PORT", "6379")),
                   password=os.getenv("FALKORDB_PASSWORD") or None)
-    graph = db.select_graph("conferge_w08_pytest")
+    graph = db.select_graph(os.getenv("CONFERGE_TEST_GRAPH", "conferge_w08_pytest"))
     try:
         graph.delete()
     except Exception:  # noqa: BLE001 - absent graph

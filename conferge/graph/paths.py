@@ -24,6 +24,8 @@ class PathEdge(TypedDict):
     evidence_source: str | None
     confidence: float | None
     observed_at: str | None
+    rationale: str | None  # rule-based sentence written by GraphStore.merge_edge
+    evidence_ids: list[str]
 
 
 class SerializedPath(TypedDict):
@@ -60,7 +62,9 @@ def serialize_path(path: Any) -> SerializedPath:
         edges.append({"source": src, "target": dst, "type": edge.relation, "props": props,
                       "evidence_source": props.get("source"),
                       "confidence": float(confidence) if isinstance(confidence, (int, float)) else None,
-                      "observed_at": props.get("observed_at")})
+                      "observed_at": props.get("observed_at"),
+                      "rationale": props.get("rationale"),
+                      "evidence_ids": [str(x) for x in props.get("evidence_ids") or []]})
     return {"nodes": nodes, "edges": edges}
 
 

@@ -37,8 +37,7 @@ The application uses its existing vanilla HTML/CSS/JavaScript architecture.
 - Main content max width 1088 px including horizontal padding. Discovery uses a
   flexible feed plus 272 px context column with a 50 px gap on large screens.
 - 12 px cards and 18 px cover radius. Avoid decorative shadows and dashboard tile grids.
-- Event artwork belongs to the corresponding exact source record. Missing artwork
-  uses an explicitly decorative typographic composition, never an unrelated event poster.
+- Event artwork belongs to the corresponding exact source record. Missing artwork uses generated atmospheric city illustrations, never a poster or a photograph claimed to document that event or venue.
 - The city cover is an AI-generated atmospheric illustration. Its generated nature
   is documented in `images/ASSETS.md`; it is not evidence about a venue or an event.
 
@@ -82,3 +81,24 @@ and dialogs. Actions use concise text without decorative arrows. Source provenan
 is available in Sources rather than repeated on every card. Event detail opens in
 a native accessible dialog, using the matching event artwork and source link.
 The header and trip context share the main content alignment.
+
+## Refinement after the first visual review
+
+Discover keeps the destination and discovery feed. Skipped alternatives are one
+compact disclosure; replanning and ROI tools live in the progress view. Connection
+availability and engine details are in Sources, not the discovery sidebar.
+
+Agenda uses a day rail and source-poster cards, with a conference-day default.
+People uses illustrated profiles with one matching priority, a linked session,
+and clear conversation actions. Generated avatars are decorative fictional art.
+Travel centers on a selectable map and place list; unknown offers remain empty.
+Connections starts with a person, their matching priority, and a real linked event.
+The full network and raw evidence remain available through secondary disclosures.
+
+### Travel research and identity corrections
+
+Travel begins with editable origin/dates and provider search links. These links research current offers externally; editing dates does not relabel the collected API offers. Flight and lodging cards compare collected offers, preserve observed prices and collection provenance, and never imply a booking or a selected itinerary. Map includes real geolocated stays alongside conference/events. Neutral illustrated placeholders avoid inventing a person's appearance when no verified portrait is provided.
+
+### Travel search implementation
+
+Flights and Stays are separate tasks with visible destination, dates and occupancy. Search submits one structured request; changing criteria clears stale offers. Flights use a time–duration–arrival row with a separate total-fare column, filters for stops and price, and actual sorting. Stay searches use check-in/out, guests, rooms and venue radius; the map reflects searched stay coordinates. Local/already-arranged travelers can skip the search. Search is against attributed collected offers, with an exact-criteria provider fallback when no collection covers the query. Reference: https://www.kayak.com/flights and https://www.airbnb.com/help/article/479.

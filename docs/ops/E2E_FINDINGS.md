@@ -17,30 +17,47 @@ Owners: **graph** = FalkorDB session (`conferge/graph`, ranking in `conferge/api
 |---|---|---|---|
 | 1 | 8a7d7d4 | 9 passed, 1 failed (step 10) | F1, F2, F3 |
 | 2 | 84dbe8b | 10 passed | F2 |
+| 3 | 4494e77 | 15 passed (journey + shared agent state) | F2 |
+| 4 | a5e6479 | 16 passed (after the (a) fix below) | F4 |
+| 5 | ff8f06a | 16 passed | none (F4 resolved by decision) |
 
 ## Open
 
-_F1 and F3 moved to Resolved in run 2._
-
-### F2 (c, graph/core): user goals have no timestamp, so goal edges cannot carry `observed_at`
-
-- **Step**: `test_05_top5_paths_in_falkordb_with_provenance` (passes after aligning the test with the contract).
-- **Symptom**: the 5 `(Goal)-[:ABOUT]->(Topic)` edges have `source=user`, `verification=user_goal` but
-  `observed_at=null`; every other edge on the top-5 paths has a timestamp.
-- **Where**: `conferge/graph/ingest.py:307-316` (`ingest_goals` passes `evidence=[]`), contract in
-  `conferge/graph/schema.py:34` ("observed_at None when the source has no timestamp; never the ingest time"),
-  `conferge/core/schemas.py:333` (`Goal` has no `created_at`).
-- **Proposed fix**: window 0 adds an optional `stated_at: AwareDatetime | None` to `Goal`, `POST /goal` sets it,
-  `ingest_goals` writes it as `observed_at`. Until then the e2e test accepts `observed_at=null` only when
-  `evidence_source == "user"`.
+_No open finding after the F4 decision._
 
 ## Resolved
+
+### F4 (c, graph/core vs shared agent state): `/reset` deletes the plan history
+
+- **Resolved by decision (user, 2026-10-24)**: `POST /reset` is a hard demo reset and does delete the
+  demo user's `PLANS`, `SKIPS` and `Change`. The "invalidated, never deleted" rule applies only to
+  replanning in normal use (`agent_state.write_plan` / `write_skips` / `write_change`). No code change.
+- **Found in**: run 4, reading #26 (a5e6479) against the shared agent state contract (#25).
+- **Symptom**: `POST /reset` now calls `GraphStore.delete_user_state`, which runs
+  `MATCH (c:Change {user_id: $user_id}) DETACH DELETE c` and
+  `MATCH (:User {id: $user_id})-[r:PLANS|SKIPS]->() DELETE r`. The shared agent state contract
+  (`conferge/graph/agent_state.py`, from the shared-agent-state brief) says an old plan becomes
+  `state: invalidated` with its previous `plan_version` and is never deleted; Change nodes are the audit
+  trail of replanning. After a reset the history and the agents' write counts are gone.
+- **Where**: `conferge/core/store.py:92-94` (`delete_user_state`), called from `conferge/api/app.py:710`.
+- **Proposed fix**: keep deleting `Meeting` nodes (that was the F1 follow-up), but for `PLANS`/`SKIPS`
+  set `state = 'invalidated'`, `invalidated_by = 'reset'`, `invalidated_at_ms` through
+  `GraphStore.merge_edge` (or `agent_state.write_plan(store, user, [], written_by="reset")` and
+  `write_skips(..., [])`, which already do exactly this), and keep `Change` nodes. If a hard wipe is
+  wanted for the demo, make it a separate explicit endpoint and say so in the contract.
+
+### F2 (c): goal edges without `observed_at`
+
+- **Resolved on main by a5e6479 (#26)**: `Goal.stated_at`, set by `POST /goal` and written as `observed_at`.
+  Configured demo goals keep `observed_at = null` (never the ingest time), which the test still accepts
+  for `source == "user"` only.
+
 
 ### F1 (b, graph): ranking is lost when the API process restarts
 
 - **Resolved on main by aa488c3 (#19, rankings computed from FalkorDB)**: `/goal` ranks from the graph
   (`computed_by: falkordb`), which reads the `Meeting` nodes, so the met person stays down after a restart.
-  Run 2 passes step 10. The `/reset` question below is still open.
+  Run 2 passes step 10. The `/reset` question below was answered by #26 (a5e6479), see F4.
 
 - **Step**: `test_10_restart_keeps_ranking`.
 - **Symptom**: after `POST /met` the met person drops from rank 0 to rank 9; after restarting the API on the
@@ -69,6 +86,11 @@ _F1 and F3 moved to Resolved in run 2._
   ingest path (MERGE only), and `/graph/path` reports `backend` so the fallback stays visible.
 
 ## Fixed in the e2e branch (a)
+
+- Run 4: `PLANS`, `SKIPS` and `AFFECTS` edges written by `conferge/graph/agent_state.py` lacked the
+  `confidence`, `observed_at` and `verification` fields every edge carries per `conferge/graph/schema.py:34`.
+  They now carry `confidence 1.0`, `verification agent_decision` and `observed_at` = the decision time;
+  covered by `test_agent_edges_carry_the_graph_provenance_contract`.
 
 - `scripts/run_demo.py --keep-graph`: serve on the existing graph without the reset/reload, so an API
   restart can be tested at all (before, every start deleted the graph).

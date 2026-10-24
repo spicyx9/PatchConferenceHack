@@ -21,7 +21,7 @@ def _plan() -> RoutePlan:
     now = utcnow()
     known = RouteLeg(from_place=SFO, to_place=EMBARCADERO, mode="bart", duration_minutes=31,
                      duration_status="scheduled", provider="bart", source_mode="live",
-                     collected_at=now,
+                     collected_at=now, source_url="https://www.bart.gov/schedules",
                      price=Price(amount="11.80", currency="USD", status="exact"))
     unknown = RouteLeg(from_place=EMBARCADERO, to_place=FORT_MASON, mode="muni",
                        provider="none", source_mode="live", collected_at=now)
@@ -50,6 +50,15 @@ def test_graph_writes_only_known_durations_via_store():
     edge = [q for q in graph.queries if "NEAR" in q[0]]
     assert len(edge) == 1 and 31 in edge[0][1].values()
     assert not any("muni_minutes" in str(q) for q in graph.queries)
+    assert edge[0][1]["evidence_ids"] == ["https://www.bart.gov/schedules"]
+
+
+def test_graph_skips_legs_without_source_url():
+    plan = _plan()
+    leg = plan.options[0].legs[0].model_copy(update={"source_url": None})
+    graph = RecordingGraph()
+    assert write_plans(GraphStore(graph), [plan.model_copy(update={"options": [
+        make_option("o1", "BART", [leg])]})]) == 0
 
 
 def test_fixture_requires_opt_in_and_relabels(tmp_path):

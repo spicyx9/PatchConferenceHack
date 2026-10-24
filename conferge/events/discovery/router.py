@@ -35,7 +35,7 @@ _LUMA_RESERVED = frozenset({
     "san-francisco", "nyc", "ai",
 })
 _OFFICIAL_HOSTS = ("githubuniverse.com", "reg.githubuniverse.com")
-_AGGREGATOR_HOSTS = ("conferenceparties.com", "raidandev.org", "reinventradar.com")
+_AGGREGATOR_HOSTS = ("conferenceparties.com",)
 _SOCIAL_HOSTS = ("x.com", "twitter.com", "instagram.com", "threads.net", "bsky.app")
 _SEARCH_HOSTS = ("google.com", "bing.com", "duckduckgo.com")
 

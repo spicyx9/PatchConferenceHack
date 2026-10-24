@@ -3557,3 +3557,37 @@ dialog .eyebrow {
 #connection-reset { flex-shrink:0; border:1px solid #dcdbe4; border-radius:999px; padding:8px 14px; background:#f5f3f8; color:#636471; font:inherit; font-size:12px; cursor:pointer; }
 #connection-reset:hover { background:#ebe7f1; color:#343440; }
 #connection-reset:focus-visible { outline:2px solid #8196bc; outline-offset:3px; }
+/* Data pipeline, Reachability, provenance and LinkedIn badges */
+.pipeline-panel { margin-top: 1rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--panel); padding: 0.75rem 1rem; }
+.pipeline-panel > summary { font-weight: 700; cursor: pointer; }
+.pipeline-headline { font-weight: 600; margin: 0.5rem 0; }
+.pipeline-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 0.5rem 0; }
+.pipeline-table th, .pipeline-table td { border-bottom: 1px solid var(--border); padding: 0.3rem 0.45rem; text-align: left; vertical-align: top; }
+.pipeline-table tr.kind-brightdata td:nth-child(3) { color: var(--green); font-weight: 700; }
+.pipeline-table tr.kind-fallback td:nth-child(3), .pipeline-table tr.kind-skipped td:nth-child(3) { color: var(--amber); font-weight: 700; }
+.pipeline-reach h3 { font-size: 0.95rem; margin: 0.75rem 0 0.25rem; }
+.reach-ok { color: var(--green); font-weight: 700; }
+.reach-blocked, .reach-error { color: var(--red); font-weight: 700; }
+.reach-pending, .reach-shell_js { color: var(--amber); font-weight: 700; }
+.overall-failed { color: var(--red); font-weight: 700; }
+.overall-partial { color: var(--amber); font-weight: 700; }
+.overall-ok { color: var(--green); font-weight: 700; }
+.badge.src-bd { background: rgba(40, 115, 67, 0.12); color: var(--green); }
+.badge.src-fallback { background: rgba(139, 92, 24, 0.12); color: var(--amber); }
+.badge.src-fixture { background: var(--panel-2); color: var(--muted); }
+.bd-travel { margin-top: 0.25rem; font-size: 0.85rem; color: var(--muted); }
+.field-linkedin { font-size: 0.9rem; }
+.field-linkedin .badge { margin-left: 0.25rem; }
+.artwork-credit { position: absolute; right: 6px; bottom: 6px; font-size: 0.65rem; padding: 1px 6px; border-radius: 6px; background: #000a; color: #fff; }
+.event-artwork { position: relative; }
+.hero-image-credit { position: absolute; right: 12px; bottom: 10px; z-index: 2; font-size: 0.7rem; padding: 2px 8px; border-radius: 6px; background: #0009; color: #fff; }
+
+/* "Why?" answer on a person card: long evidence URLs wrap inside the card. */
+.people-why {
+  overflow-wrap: anywhere;
+}
+
+.pipeline-refresh { margin: 0.6rem 0; }
+.pipeline-refresh .refresh-head { font-weight: 600; margin-top: 0.4rem; }
+.pipeline-refresh .refresh-error { color: #fff; background: var(--red); padding: 0.3rem 0.5rem; margin-top: 0.3rem; border-radius: 4px; }
+.pipeline-refresh .refresh-slow { color: #3b2a00; background: #f0b429; padding: 0.3rem 0.5rem; margin-top: 0.3rem; border-radius: 4px; }

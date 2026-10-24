@@ -122,7 +122,7 @@ def test_people_for_goal_aggregates_excludes_and_ranks():
     assert first["nodes"][-1]["label"] == "Person"
     assert first["edges"][-1] == {"source": "p-alice", "target": "e-talk", "type": "SPEAKS_AT",
                                   "props": {}, "evidence_source": None, "confidence": None,
-                                  "observed_at": None}
+                                  "observed_at": None, "rationale": None, "evidence_ids": []}
     assert first["edges"][0]["source"] == "g1" and first["edges"][0]["target"] == "topic:ai-agents"
 
 

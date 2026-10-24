@@ -2,6 +2,12 @@ services:
   falkordb:
     image: falkordb/falkordb:6.0.3
     restart: unless-stopped
+    environment:
+      # The Browser bundled in 6.0.3 (2.7.2, falkordb-ts 6.9.1) sends `version N` with every
+      # query and expects the reply "version mismatch"; 6.0.3 answers "ERR invalid graph version",
+      # so every query fails in that Browser. It is switched off and the `browser` service below
+      # serves a Browser whose client does not send `version`. Same ports, same login defaults.
+      BROWSER: "0"
     ports:
       - "127.0.0.1:${FALKORDB_PORT:-6379}:6379"
       - "127.0.0.1:${FALKORDB_BROWSER_PORT:-3000}:3000"
@@ -12,6 +18,19 @@ services:
       interval: 10s
       timeout: 5s
       retries: 6
+
+  browser:
+    # Last Browser release whose client (falkordb-ts 6.8.0) works with FalkorDB 6.0.3.
+    image: falkordb/falkordb-browser:v2.6.2
+    restart: unless-stopped
+    # Shares the falkordb container's network: the login form's defaults (localhost, 6379)
+    # reach the server, and the Browser is published through the falkordb ports above.
+    network_mode: "service:falkordb"
+    environment:
+      HOSTNAME: "0.0.0.0"
+    depends_on:
+      falkordb:
+        condition: service_healthy
 
 volumes:
   falkordb_data:

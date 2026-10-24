@@ -68,27 +68,6 @@ def _venue_from_lines(lines: list[str], hidden: bool, city: str | None) -> Venue
     return Venue(name=name, address=address, city=city)
 
 
-def _venue_from_text(text: str | None, address: str | None, hidden: bool, city: str | None):
-    if hidden or not text or text.lower() in {"venue tba", "tba"}:
-        return Venue(city=city, address=address) if (city or address) else None
-    parts = [part.strip() for part in text.split(",") if part.strip()]
-    return Venue(
-        name=parts[0] if parts else None,
-        address=address or (", ".join(parts[1:]) or None),
-        city=city,
-    )
-
-
-def _parse_iso(value: str | None) -> datetime | None:
-    if not value:
-        return None
-    try:
-        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except ValueError:
-        return None
-    return parsed if parsed.tzinfo is not None else None
-
-
 def normalize_record(
     record: SourceRecord, *, conference_id: str | None = None,
     timezone_name: str | None = None, city: str | None = None,
@@ -104,32 +83,13 @@ def normalize_record(
         except ValueError:
             day = None
 
-    start_at = end_at = None
-    if record.provider == "reinventradar":
-        start_at = _parse_iso(payload.get("start_at_raw"))
-        end_at = _parse_iso(payload.get("end_at_raw"))
-        if zone is not None:
-            start_at = start_at.astimezone(zone) if start_at else None
-            end_at = end_at.astimezone(zone) if end_at else None
-        if start_at and end_at and end_at < start_at:
-            end_at = None
-    else:
-        start, end = parse_time_range(payload.get("time_text"))
-        start_at, end_at = combine(day, start, end, zone)
-
-    if record.provider == "conferenceparties":
-        venue = _venue_from_lines(
-            payload.get("location_lines") or [], bool(payload.get("address_hidden")), city
-        )
-        hosts = split_hosts(payload.get("sponsor"))
-        kinds: list[str] = []
-    else:
-        venue = _venue_from_text(
-            payload.get("location_text"), payload.get("address"),
-            bool(payload.get("address_hidden")), city,
-        )
-        hosts = split_hosts(payload.get("host"))
-        kinds = [payload.get("event_kind") or ""] + list(payload.get("categories") or [])
+    start, end = parse_time_range(payload.get("time_text"))
+    start_at, end_at = combine(day, start, end, zone)
+    venue = _venue_from_lines(
+        payload.get("location_lines") or [], bool(payload.get("address_hidden")), city
+    )
+    hosts = split_hosts(payload.get("sponsor"))
+    kinds: list[str] = []
 
     first_listed_at = None
     listed = parse_month_day(payload.get("added_text"), day)

@@ -1,6 +1,6 @@
 # Conferge
 
-**Don't just attend conferences. Be in the right place, with the right people, at the right time.**
+**Plan a conference trip in minutes and maximize the professional opportunities you get out of it.**
 
 ![Conferge demo overview](docs/demo/screens/0-overview.png)
 
@@ -12,21 +12,23 @@ Most attendees go home with a few business cards and the feeling they were in th
 
 ## What it does
 
-1. **Goal first**: turns one sentence ("meet seed investors, AI agent founders, Copilot PMs") into weighted goals.
-2. **Event discovery**: collects official sessions and side events (Luma, Partiful, Eventbrite, party aggregators) and links them to the conference.
-3. **Who to meet, and why**: ranks people and shows the explainable FalkorDB path from your goal to each person, with sources.
-4. **Reverse planning**: builds a day-by-day plan for the days you are in town, with a map of the venues.
-5. **Anti-FOMO**: tells you which events to skip (time conflict, travel too long, low score) and what you gain by skipping them.
-6. **Live replanning**: when an event sells out, the plan is recomputed and the diff says what was removed, what replaces it and why.
-7. **Memory**: "I met this person" is written to the graph and the ranking changes immediately; a follow-up draft built from that graph path and your note is then proposed for validation, never sent.
+1. **Goal first**: one sentence ("meet seed investors, AI agent founders, Copilot PMs") becomes weighted goals. Rule based, 25 of 25 sentences of the coverage test recognised in French and English.
+2. **Event discovery**: official sessions plus side events from Luma, Partiful, Eventbrite and party aggregators, linked to the conference.
+3. **Who to meet, and why**: people ranked against your goals, each with the FalkorDB path from goal to person and its sources.
+4. **Reverse planning**: a day-by-day plan for the days you are in town, with a map of the venues (straight lines in visit order, labelled as such).
+5. **Anti-FOMO and live replanning**: which events to skip (time conflict, travel too long, low score) and what you gain by skipping them; when an event sells out, the plan is recomputed and the diff explains what was removed, what replaces it and why.
+6. **Memory and follow-up draft**: "I met this person" is written to the graph and the ranking changes immediately; a follow-up draft built from that graph path and your note is then proposed for validation, never sent.
+7. **ROI panel**: four figures for the trip (meetings recorded, qualified contacts, opportunities scored 30 or more, budget against collected flight and lodging prices; spend stays unknown until prices are collected).
 
 ## Architecture
 
 ```
   Public sources                      Bright Data (when a key is set)
-  RainFocus catalog, Luma,            SERP discovery, Web Unlocker,
-  Partiful, Eventbrite,               datasets: Google Flights, Booking,
-  conference-party aggregators        LinkedIn, Facebook Events
+  RainFocus catalog, Luma,            Web Unlocker (Google Flights page), SERP
+  Partiful, Eventbrite,               (LinkedIn, Crunchbase URLs), datasets:
+  conference-party aggregators        Booking, Airbnb, LinkedIn, Crunchbase,
+                                      Google Maps (Google Flights, Google Hotels,
+                                      Facebook Events: implemented, no record yet)
             |                                   |
             +-----------------+-----------------+
                               v
@@ -50,6 +52,7 @@ Most attendees go home with a few business cards and the feeling they were in th
 ```
 
 - **Bright Data** is the acquisition layer for everything a plain HTTP request cannot reach: long-tail event discovery through SERP, flights and hotels through Web Scraper datasets, LinkedIn profiles for people matching, and unblocking dynamic pages.
+  Agents never fetch the web at query time: all reasoning runs on the stored, deduplicated, provenance-tagged graph.
 - **FalkorDB** is the opportunity graph: every relation carries its evidence, the "why this person" explanation is a real graph path query, and the user's memory (who they met) lives in the same graph.
 
 ## Graph model and Cypher queries
@@ -128,13 +131,7 @@ CREATE FULLTEXT INDEX FOR (e:Event) ON (e.title)
 
 Fort Mason Center, San Francisco, October 28 and 29. Fictional traveller from New York, in town October 27 to 30.
 
-| Measure | Value |
-|---|---|
-| Live collection, 2026-10-24, public endpoints, no API key | 161 official sessions, 183 speakers, 122 companies, 194 Luma events, 19 Eventbrite events, 11 Partiful events, 7 aggregator parties |
-| Demo dataset (snapshot of that collection, deduplicated) | 207 events, 183 people |
-| FalkorDB graph | 697 nodes, 2,195 edges (49 HOSTS edges from event organizers), loaded in about 1 s |
-| API response times on the demo graph | goal 61 ms, events 8 ms, people 2 ms, graph path 11 ms, plan 8 ms, simulate-change 26 ms, meeting 17 ms, anti-FOMO agent about 1.1 s |
-| Tests | 957 passing (`make check`) |
+Measured numbers (dataset, graph, Bright Data runs, reachability, tests) are kept in one place: [SUBMISSION.md](SUBMISSION.md), read from the running app.
 
 | 1. Goal | 2. Who to meet, and why |
 |---|---|
@@ -147,28 +144,56 @@ Fort Mason Center, San Francisco, October 28 and 29. Fictional traveller from Ne
 ## Quickstart
 
 ```bash
-make up        # FalkorDB in Docker on 127.0.0.1:6379, Browser on :3000
+git clone https://github.com/spicyx9/PatchConferenceHack.git && cd PatchConferenceHack
+make up        # FalkorDB 6.0.3 in Docker on 127.0.0.1:6379, Browser v2.6.2 on :3000 (the one bundled in 6.0.3 fails on every query)
 make install   # Python deps with uv
 make demo      # API + UI on http://127.0.0.1:8000, demo data loaded into FalkorDB
 ```
 
-No `.env` is needed. Port: if 6379 is already taken by a local Redis, run `FALKORDB_PORT=6380 make up` and `FALKORDB_PORT=6380 make demo` (or put `FALKORDB_PORT=6380` in `.env`); `make demo` stops with "port 6379 is a plain Redis, set FALKORDB_PORT to the FalkorDB port" when it finds a Redis without the FalkorDB module.
+No `.env` is needed for the demo. Ports:
+- If 6379 is already taken by a local Redis, run `FALKORDB_PORT=6380 make up` and `FALKORDB_PORT=6380 make demo` (or put `FALKORDB_PORT=6380` in `.env`). When `make demo` finds a Redis without the FalkorDB module, it stops with "port 6379 is a plain Redis, set FALKORDB_PORT to the FalkorDB port".
+- If 8000 is taken, run `make demo DEMO_PORT=8001`. `make demo` checks this before loading anything.
 
-`uv run python scripts/run_demo.py --mode live` collects from the public sources instead of the snapshot. Copy `.env.example` to `.env` and add `BRIGHTDATA_API_KEY` to enable the Bright Data connectors.
+By default `make demo` makes no Bright Data call at startup: travel comes from labelled fixtures and LinkedIn from cached probe files. `make demo DEMO_ARGS="--travel live"` adds the live stays and flights searches. With a key, these took 2 to 3 min on 2026-10-24, because each Bright Data source is capped at 120 s.
+
+`uv run python scripts/run_demo.py --mode live` collects from the public sources instead of the snapshot. Copy `.env.example` to `.env` and set `BRIGHTDATA_API_KEY` (plus `BRIGHTDATA_UNLOCKER_ZONE` and `BRIGHTDATA_SERP_ZONE`) to enable the Bright Data connectors.
 
 ## Tracks
 
 - **FalkorDB**: the graph of record, written only through `GraphStore` MERGE methods, queried for explainable goal to person paths, conflicts, replanning impact and meeting memory.
-- **Bright Data**: SERP discovery, Web Unlocker, Google Flights, Booking and LinkedIn datasets are implemented behind one client (`conferge/core/brightdata.py`); without a key they report `missing_credentials` instead of inventing data.
-- **Qodo**: planned as the PR review assistant for the 12 workstream PRs; no Qodo review has run on this repository yet.
+- **Bright Data**: one client (`conferge/core/brightdata.py`) behind every connector; without a key they report `missing_credentials` instead of inventing data. Records received on 2026-10-24: Booking and Airbnb datasets (21 stays), Web Unlocker (34 Google Flights itineraries from one page), LinkedIn dataset (15 profiles, 6 of them found by SERP), Crunchbase and Google Maps datasets. Implemented, no record received yet: Google Flights dataset (snapshots still `running` after 396 s), Google Hotels dataset (0 records, provider `no_peers` at 18:12 UTC), SERP event discovery, Facebook Events.
+- **Qodo**: installed on the repository as the GitHub app `qodo-code-review[bot]`; it posted a PR summary on pull requests 6 and 7 and its full review on pull request 6 failed on Qodo's side. No Qodo finding has been acted on yet.
 
 ## Honesty: live vs fixture today
 
-- **Live and working without keys**: official GitHub Universe catalog (RainFocus), Luma, Partiful, Eventbrite, conference-party aggregators, ground travel (BART fares, OSRM routes), and the FalkorDB graph itself.
-- **Implemented, waiting for a Bright Data key**: SERP discovery, flights, hotels, LinkedIn enrichment. Today they return `missing_credentials` and the demo shows labelled fixtures for flights and stays.
-- **The demo runs on a snapshot** of the live public collection (captured 2026-10-24), labelled `fixture` in every API response and in the UI badge, so it works offline on stage.
-- **Simulations are labelled**: the sold-out change in the demo is a simulation, never presented as an observed update.
-- **No LLM in the loop yet**: goal parsing and ranking are deterministic; no price, attendance or guest list is ever invented.
+Checked against the code on main (2026-10-24) and the wiring audit of 2026-10-24 (read-only audit, not yet merged).
+
+- **Live and working without keys**: official GitHub Universe catalog (RainFocus), Luma, Partiful, Eventbrite and conference-party aggregators (`run_demo.py --mode live`), and the FalkorDB graph itself.
+- **The demo runs on a snapshot** of that public collection captured on 2026-10-24, labelled `fixture` in every API response and in the UI badge, so it works offline on stage.
+- **Collected through Bright Data on 2026-10-24 and served from `data/cache/`** (labelled `cached`, with the collection time on every card): 21 stays (Booking and Airbnb datasets), 34 Google Flights itineraries (Web Unlocker, one page, the round-trip total shown on the page, return slice not collected), 15 LinkedIn profiles, Crunchbase funding rows.
+- **Implemented, no record received yet**: Google Flights dataset, Google Hotels dataset, SERP event discovery, Facebook Events. Without `BRIGHTDATA_API_KEY` the client reports "Bright Data key missing", `GET /brightdata` answers `data_source: unknown` with a warning, lodging providers report `missing_credentials`, and flights and stays fall back to fixtures labelled as such.
+- **The traveller profile is a fixture even in live mode**: New York, October 27 to 30, budget $2,500 come from `fixtures/api.json`; the budget block carries `source_mode: fixture` in `GET /travel` and a FIXTURE badge in the UI.
+- **People are the speakers of the official catalog**: LinkedIn profiles and Crunchbase funding are read from the Bright Data cache at startup, never fetched at query time.
+- **Ground travel is not in the demo**: BART, OSRM and walking connectors exist with a probe (`make probe-travel`) but the demo API does not call them; the map draws straight lines in visit order and says so.
+- **A travel proposal books nothing**: the button is "Note" and the API returns `books: false`.
+- **Simulations are labelled**: the sold-out change is a simulation; every later response carries a warning until Reset.
+- **No LLM in the loop**: goal parsing is rule based (`conferge/agents/planner/goals.py`), the anti-FOMO agent uses templates, ranking is deterministic; no price, attendance or guest list is ever invented. A public speaker is never presented as a confirmed side-event attendee.
+
+## Measured numbers
+
+| Measure | Value (measured 2026-10-24 14:13 PDT) | Read from |
+|---|---|---|
+| FalkorDB graph | 684 nodes, 2,214 edges: Person 215, Event 194, Company 141, Venue 58, Topic 54, Opportunity 10, Lodging 6, Goal 3, Conference 1, FlightOffer 1, User 1 | `count()` queries on `conferge_demo` after `make predemo` (`GET /api/v1/graph` serves a capped sample: 332 nodes, 400 edges) |
+| Events in the demo | 194: RainFocus official catalog 161, Luma 12, Eventbrite 8, conferenceparties/github26 7, Partiful 6 (partial: Partiful not exhausted, `page_cap`) | `GET /api/v1/events`, `GET /api/v1/pipeline` |
+| Stays | 21 Bright Data dataset records (Booking 15, Airbnb 6), 6 shown; Google Hotels dataset 0 (`no_peers`) | `GET /api/v1/pipeline`, `GET /api/v1/stays` (`cached`) |
+| Flights | 34 Google Flights itineraries from 1 Bright Data Web Unlocker request, 1 shown | `GET /api/v1/pipeline`, `GET /api/v1/flights` (`cached`) |
+| Bright Data requests and records | 38 requests, 79 records. Datasets 10 / 38 (Booking 1 / 15, Airbnb 1 / 6, Google Hotels 1 / 0, LinkedIn 6 / 15, Crunchbase 1 / 2); Web Unlocker 1 / 34 (Google Flights); SERP 27 / 7 (LinkedIn URL search 17 / 5, Crunchbase URL search 10 / 2). No USD cost shown: no captured Bright Data response carried one. 0 requests made by the running demo (all from cache); Google Maps not merged | `GET /api/v1/brightdata`, `GET /api/v1/cost` |
+| LinkedIn | 10 of the 50 people cards carry a Bright Data LinkedIn profile (9 in the first 10); 15 `Person` nodes with `provider brightdata:linkedin` in the graph, 6 of their URLs found by SERP | `GET /api/v1/people?limit=50`, FalkorDB |
+| Crunchbase | funding on 27 of the 50 people cards, from 2 companies (GitHub, Swamp Club); read from the cache by the API, not written to the graph | `GET /api/v1/people?limit=50` |
+| People and plan | 50 people ranked from FalkorDB traversals; top 3 Ryan Hecht 56, Camila Maia 47, Nick Liffen 40; 32 items on the agenda | `GET /api/v1/people`, `GET /api/v1/plan` |
+| Reachability (block matrix run 2026-10-24 19:01 UTC, 21 sites) | 10 without Bright Data, 12 with Web Unlocker alone, 14 with Bright Data; 18 projected once KYC is approved (Kayak, Hotels.com, Expedia, Marriott) | `GET /api/v1/pipeline` `reachability` |
+| Tests | `make check`: 1,355 passed, 27 skipped (main `b12c425`) | local run |
+| Live collection totals (probes, not the demo snapshot) | Luma 1,092 raw rows (194 in Oct 27-30); Partiful Explore 85 unique events (11 in the window, `page_cap`, not exhaustive); RainFocus 210 records (156 sessions, 54 exhibitors) | `probes/luma.md`, `probes/partiful.md`, `probes/official.md` |
 
 ## Team
 

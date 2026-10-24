@@ -18,6 +18,9 @@ from zoneinfo import ZoneInfo
 from conferge.agents.planner.goals import goal_warnings  # noqa: F401 - re-exported for app.py
 from conferge.agents.planner.goals import parse_goals as planner_parse_goals
 from conferge.api.data import DemoData
+from conferge.api.provenance import source_of
+from conferge.flights.round_trip_total import display as rt_display
+from conferge.flights.round_trip_total import is_round_trip, trip_price
 from conferge.core.schemas import Event, Goal, Opportunity, Person, SourceEvidence
 
 FALLBACK = "api-fallback"
@@ -181,11 +184,16 @@ def build_plan(
     attended: set[str] | None = None,
     scores: dict[str, float] | None = None,
 ) -> dict[str, Any]:
-    """Greedy reverse plan: per day keep the best non-overlapping events.
+    """Greedy reverse plan: per day keep the best events that fit together.
 
-    Overlapping candidates become anti-FOMO conflicts with a verdict and the
-    people the user misses by choosing the winner.
+    Same feasibility rules as the anti-FOMO optimizer (conferge/agents/antifomo): an event
+    needs an end time, and two kept events must not overlap once the travel time between
+    them (antifomo.travel.travel_minutes) is added. Score order is unchanged. Rejected
+    candidates become anti-FOMO conflicts with a verdict and the people the user misses.
     """
+    from conferge.agents.antifomo.models import Constraints
+    from conferge.agents.antifomo.travel import compatible, site_name, travel_minutes
+
     skipped = skipped or set()
     attended = attended or set()
     # Graph-derived scores when given (API graph mode); Python scores only as degraded fallback.
@@ -197,7 +205,7 @@ def build_plan(
     available = [
         e for e in data.events
         if e.start_at and e.status not in {"cancelled", "sold_out"} and e.id not in skipped
-        and in_trip(data, e) and e.id not in off_hours
+        and in_trip(data, e) and e.id not in off_hours and e.end_at
     ]
     excluded = [
         {"event_id": e.id, "title": e.title, "reason": e.status if e.status in {"cancelled", "sold_out"} else "skipped"}
@@ -213,7 +221,14 @@ def build_plan(
         for e in data.events
         if e.id in off_hours and e.status not in {"cancelled", "sold_out"} and e.id not in skipped
         and in_trip(data, e)
+    ] + [
+        {"event_id": e.id, "title": e.title, "reason": "no_end_time",
+         "detail": "no end time in the source: cannot check overlap or travel, not scheduled"}
+        for e in data.events
+        if e.start_at and not e.end_at and e.status not in {"cancelled", "sold_out"}
+        and e.id not in skipped and in_trip(data, e) and e.id not in off_hours
     ]
+    constraints = Constraints(timezone=tz, conference_site=site_name(data.conference.venue_name))
     unscheduled = [{"event_id": e.id, "title": e.title} for e in data.events if not e.start_at]
     days: dict[str, list[Event]] = {}
     for event in available:
@@ -225,7 +240,7 @@ def build_plan(
         candidates = sorted(days[day], key=lambda e: (-(scores.get(e.id, 0) + (1000 if e.id in attended else 0)), e.id))
         chosen: list[Event] = []
         for event in candidates:
-            clash = next((c for c in chosen if _overlaps(c, event)), None)
+            clash = next((c for c in chosen if not compatible(c, event, constraints)), None)
             if clash is None:
                 chosen.append(event)
                 continue
@@ -245,6 +260,12 @@ def build_plan(
                 "computed_by": FALLBACK,
             })
         chosen.sort(key=lambda e: e.start_at)  # type: ignore[arg-type, return-value]
+        # Travel from the previous kept event, as the feasibility check computed it; the
+        # conservative default (two distinct sites without coordinates) is labelled "default".
+        travel: dict[str, dict[str, Any]] = {}
+        for prev, cur in zip(chosen, chosen[1:], strict=False):
+            minutes, basis = travel_minutes(prev, cur, constraints)
+            travel[cur.id] = {"minutes": minutes, "basis": "default" if basis == "unknown_default" else basis}
         plan_days.append({
             "day": day,
             "items": [
@@ -261,6 +282,7 @@ def build_plan(
                         for pid in _event_people(data, e) if pid in opp_by_person
                     ],
                     "source_mode": _mode_of(e.evidence),
+                    "travel_from_previous": travel.get(e.id),
                 }
                 for e in chosen
             ],
@@ -426,7 +448,9 @@ def stays_view(data: DemoData) -> list[dict[str, Any]]:
     conf = data.conference
     out = []
     for stay in data.stays:
-        item = stay.model_dump(mode="json")
+        from conferge.api.travel_cards import view
+
+        item = view(stay)
         distance = stay.distance_to_venue_m
         computed = False
         if distance is None and stay.venue and stay.venue.latitude is not None and conf.latitude is not None:
@@ -435,8 +459,16 @@ def stays_view(data: DemoData) -> list[dict[str, Any]]:
         item["distance_to_venue_m"] = distance
         item["distance_is_straight_line_estimate"] = computed
         item["source_mode"] = _mode_of(stay.evidence)
+        item["source"] = source_of(stay.evidence)
         out.append(item)
     return out
+
+
+# Display threshold for "opportunities" in the ROI panel: a parameter, returned with the count.
+OPPORTUNITY_THRESHOLD = 30
+
+# The budget is the demo persona's configuration (fixtures/api.json user), never typed by the user.
+BUDGET_SOURCE = "demo persona assumption (fixtures/api.json), not entered by you"
 
 
 def travel_view(
@@ -455,7 +487,11 @@ def travel_view(
                 "departure_at": first.departure_at.isoformat() if first.departure_at else None,
                 "arrival_at": last.arrival_at.isoformat() if last.arrival_at else None,
                 "carrier": first.marketing_carrier, "price_status": flight.price_status,
+                "total_price": flight.total_price, "currency": flight.currency,
+                "price_label": rt_display(flight).get("price_label"),
+                "return_slice_collected": flight.return_slice_collected,
                 "source_mode": _mode_of(flight.evidence),
+                "source": source_of(flight.evidence),
             })
     stays = stays_view(data)
     if stays:
@@ -463,6 +499,7 @@ def travel_view(
             "kind": "stay", "stay_id": stays[0]["id"], "name": stays[0]["name"],
             "check_in": stays[0]["check_in"], "check_out": stays[0]["check_out"],
             "price_status": stays[0]["price_status"], "source_mode": stays[0]["source_mode"],
+            "source": stays[0]["source"],
         })
     proposals = []
     arrival_day = user["depart_date"]
@@ -479,17 +516,28 @@ def travel_view(
             ),
             "reason": f"event score {first['score']} on your arrival day",
             "accepted": pid in accepted,
+            "books": False,
             "computed_by": FALLBACK,
         })
     budget = Decimal(str(user["budget_usd"]))
-    flight_total = _sum_known([f.total_price for f in _trip_flights(data.flights)])
-    stay_total = _sum_known([s.total_price for s in data.stays[:1]])
+    trip = _trip_flights(data.flights)
+    flight_total = _sum_known([trip_price(f) for f in trip])
+    # The stay counted is the one the itinerary shows (first listed); there is no stay choice yet.
+    stay = data.stays[0] if data.stays else None
+    stay_total = _sum_known([stay.total_price] if stay else [])
     return {
         "itinerary": legs,
         "proposals": proposals,
         "budget": {
             "budget_usd": str(budget),
+            "budget_source": BUDGET_SOURCE,
+            "source_mode": user.get("source_mode", "fixture"),
             "flights_usd": flight_total, "lodging_usd": stay_total,
+            "flights_price_status": [f.price_status for f in trip],
+            "lodging_price_status": stay.price_status if stay else None,
+            "lodging_stay": {"id": stay.id, "name": stay.name} if stay else None,
+            "spend_basis": ("flights of the itinerary + the stay it shows "
+                            f"({stay.name if stay else 'none'}, first listed, not chosen by you)"),
             "remaining_usd": (
                 str(budget - Decimal(flight_total) - Decimal(stay_total))
                 if flight_total is not None and stay_total is not None else None
@@ -501,7 +549,7 @@ def travel_view(
 
 def _trip_flights(flights: list[Any]) -> list[Any]:
     """The offers one trip pays for: a round trip, or the first outbound + first return one-way."""
-    if not flights or flights[0].trip_type != "one_way":
+    if not flights or is_round_trip(flights[0]):
         return flights[:1]
     landed = flights[0].slices[0].segments[-1].destination_iata
     back = next((f for f in flights[1:] if f.trip_type == "one_way"
@@ -513,6 +561,34 @@ def _sum_known(values: list[Any]) -> str | None:
     if not values or any(v is None for v in values):
         return None
     return str(sum(Decimal(str(v)) for v in values))
+
+
+CORE_DOMAINS = ("conference", "events", "people", "companies")
+TRAVEL_DOMAINS = ("stays", "flights")
+_MODE_LABEL = {"fixture": "Sample data", "live": "Live data", "cached": "Cached data",
+               "mixed": "Mixed sources", "unknown": "Sources need verification"}
+_TRAVEL_LABEL = {"fixture": "sample travel", "live": "live travel", "cached": "cached travel",
+                 "mixed": "mixed travel"}
+
+
+def _single_mode(modes: set[str]) -> str:
+    return modes.pop() if len(modes) == 1 else ("mixed" if modes else "unknown")
+
+
+def source_badge(domains: dict[str, Any]) -> dict[str, Any]:
+    """The provenance badge: the conference data's mode, with travel named apart when it differs.
+
+    Events, people and the conference are what the demo is judged on; stays and flights can be
+    live through Bright Data while the rest is the October 24 snapshot. "Mixed sources" would
+    hide that, so the badge reads "Sample data, live travel" instead and keeps the core mode's
+    colour. "Mixed sources" is kept for core domains that really disagree with each other.
+    """
+    core = _single_mode({domains[d].source_mode for d in CORE_DOMAINS if d in domains})
+    travel = _single_mode({domains[d].source_mode for d in TRAVEL_DOMAINS if d in domains})
+    label = _MODE_LABEL[core]
+    if travel != "unknown" and travel != core and core != "unknown":
+        label += f", {_TRAVEL_LABEL[travel]}"
+    return {"mode": core, "core_mode": core, "travel_mode": travel, "label": label}
 
 
 def travel_map(data: DemoData, plan: dict[str, Any]) -> dict[str, Any]:
@@ -559,26 +635,72 @@ def roi_view(
     return {
         "spend_usd": spend,
         "spend_note": None if spend is not None else "unknown until flight and lodging prices are collected",
+        "spend_basis": travel["budget"]["spend_basis"],
+        "spend_price_status": {"flights": travel["budget"]["flights_price_status"],
+                               "lodging": travel["budget"]["lodging_price_status"]},
         "meetings": len(met),
         "qualified_contacts": len(qualified),
-        "opportunities": sum(1 for o in opportunities if o.score >= 30),
+        "opportunities": sum(1 for o in opportunities if o.score >= OPPORTUNITY_THRESHOLD),
+        "opportunity_threshold": OPPORTUNITY_THRESHOLD,
         "budget_usd": travel["budget"]["budget_usd"],
+        "budget_source": travel["budget"]["budget_source"],
     }
 
 
-_SKIP_CATEGORY = {"outside_hours": "hors plage horaire", "other_timezone": "autre fuseau, en presentiel",
-                  "time_conflict": "conflit horaire", "travel": "trajet trop long", "low_score": "score faible"}
+_SKIP_CATEGORY = {"outside_hours": "outside hours", "other_timezone": "other time zone, in person",
+                  "time_conflict": "time conflict", "travel": "travel too long", "low_score": "low score"}
+
+
+def _served_block(event: Event | None, decision: dict[str, Any], data: DemoData,
+                  plan_items: dict[str, dict[str, Any]], kept: dict[str, dict[str, Any]],
+                  ) -> dict[str, Any] | None:
+    """The plan event a rejected event loses to, taken from the served plan, never from the agent.
+
+    The agent's ``blocking_event_id`` counts only when the served plan keeps it; otherwise the
+    served plan's overlapping event, then its closest same-day event (a travel clash). Returns
+    ``{"event_id", "title", "utility", "names"}`` or None when the plan keeps nothing nearby.
+    """
+    def _item(event_id: str) -> dict[str, Any] | None:
+        item = plan_items.get(event_id)
+        if item is None:
+            return None
+        agent_item = kept.get(event_id)
+        names = [p["name"] for p in item.get("people", []) if p.get("name")]
+        if agent_item:
+            names = [p.name for pid in agent_item.get("targets_confirmed", [])
+                     if (p := data.person(pid))] or names
+        return {"event_id": event_id, "title": item["title"],
+                "utility": agent_item["utility"] if agent_item else None, "names": names}
+
+    hinted = decision.get("blocking_event_id") or ""
+    if hinted in plan_items:
+        return _item(hinted)
+    if event is None or event.start_at is None:
+        return None
+    candidates = [data.event(eid) for eid in plan_items]
+    same_day = [c for c in candidates if c and c.start_at and c.start_at.date() == event.start_at.date()]
+    overlapping = [c for c in same_day if _overlaps(event, c)]
+    pool = overlapping or same_day
+    if not pool:
+        return None
+    nearest = min(pool, key=lambda c: abs((c.start_at - event.start_at).total_seconds()))  # type: ignore[operator]
+    return _item(nearest.id)
 
 
 def antifomo_skips(decisions: list[dict[str, Any]], data: DemoData, limit: int = 4,
-                   planned: set[str] | None = None) -> list[dict[str, Any]]:
+                   planned: set[str] | None = None,
+                   plan_items: dict[str, dict[str, Any]] | None = None) -> list[dict[str, Any]]:
     """The anti-FOMO agent's most tempting rejections, with a category and what skipping gains.
 
     One per category first (outside hours, time conflict, travel, low score), then by utility,
     so the demo shows the different reasons instead of variations of the same one. Events kept
-    by the displayed plan (``planned``) are left out so the two views never contradict.
+    by the displayed plan (``planned``) are left out so the two views never contradict, and the
+    event a skip "gains" (``plan_items``, the served plan's items by event id) is always one the
+    displayed plan keeps. Without ``plan_items`` the agent's own plan items stand in.
     """
     kept = {d["event_id"]: d for d in decisions if d.get("type") == "plan_item"}
+    if plan_items is None:
+        plan_items = {eid: {"title": d["title"], "people": []} for eid, d in kept.items()}
     out = []
     tz = data.conference.timezone
     for event in data.events:
@@ -598,16 +720,16 @@ def antifomo_skips(decisions: list[dict[str, Any]], data: DemoData, limit: int =
             continue
         if (planned and r["event_id"] in planned) or r["event_id"] in seen:
             continue
-        event, block_item = data.event(r["event_id"]), kept.get(r.get("blocking_event_id") or "")
+        event = data.event(r["event_id"])
+        block_item = _served_block(event, r, data, plan_items, kept) if r["code"] == "conflict" else None
         block = data.event(block_item["event_id"]) if block_item else None
         utility = r.get("utility") or 0.0
-        if r["code"] == "conflict" and event and block:
+        if r["code"] == "conflict" and event and block_item and block:
             category = "time_conflict" if _overlaps(event, block) else "travel"
-            names = [p.name for pid in block_item.get("targets_confirmed", [])
-                     if (p := data.person(pid))]
+            names = block_item["names"]
             kept_u = block_item["utility"]
             gain = (f"you keep '{block_item['title']}' (+{kept_u - utility:.0f} utility)"
-                    if kept_u >= utility else
+                    if kept_u is not None and kept_u >= utility else
                     f"the day's best combination keeps '{block_item['title']}'")
             if names:
                 gain += f", where you meet {', '.join(names[:2])}"

@@ -9,6 +9,9 @@ slice is labelled fixture and the report says so.
 from __future__ import annotations
 
 import asyncio
+import time
+from collections.abc import Iterator
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Literal
@@ -19,10 +22,44 @@ from conferge.integration import checks
 from conferge.integration.assemble import Assembly, assemble
 from conferge.integration.components import ComponentStatus, inventory
 from conferge.integration.memgraph import MemoryGraph
-from conferge.integration.sources import SourceSlice, fixture_slices, live_slices
+from conferge.integration.sources import (
+    SourceSlice,
+    fixture_slices,
+    live_slices,
+    overall_report,
+    status_display,
+)
 from conferge.integration.stays_flights import collect_stays_flights
 
 Outcome = Literal["pass", "warn", "fail", "skip"]
+STEPS = ("collect", "assemble", "plan", "ingest", "rank")
+
+
+@dataclass
+class Timings:
+    """Wall time per pipeline step, in seconds: collect (sources + travel), assemble, plan
+    (agents), ingest (GraphStore writes). ``rank`` is FalkorDB ranking, measured by the API
+    at request time."""
+
+    steps: dict[str, float] = field(default_factory=dict)
+
+    @contextmanager
+    def step(self, name: str) -> Iterator[None]:
+        started = time.perf_counter()
+        try:
+            yield
+        finally:
+            self.steps[name] = round(self.steps.get(name, 0.0) + time.perf_counter() - started, 3)
+
+    def as_dict(self, slices: list[SourceSlice]) -> dict[str, Any]:
+        """``{"steps": [...], "sources": [...]}`` for /api/v1/pipeline; a step that did not run
+        in this process is absent, never zero."""
+        return {
+            "steps": [{"step": n, "seconds": self.steps[n]} for n in STEPS if n in self.steps]
+            + [{"step": n, "seconds": v} for n, v in self.steps.items() if n not in STEPS],
+            "sources": [{"source": s.name, "attempted": s.attempted, "status": s.status,
+                         "records": s.count, "seconds": s.duration_s} for s in slices],
+        }
 
 
 @dataclass
@@ -44,6 +81,7 @@ class E2EReport:
     slices: list[SourceSlice] = field(default_factory=list)
     mismatches: list[str] = field(default_factory=list)
     data_mode: str = "fixture"
+    timings: Timings = field(default_factory=Timings)
 
     @property
     def passed(self) -> bool:
@@ -362,6 +400,15 @@ def _stage_demo_backup(report: E2EReport) -> None:
     _stage_api(report, backup, "fixture", name="demo-backup:api-fixture", backup=True)
 
 
+def record_collection(demo: Any, slices: list[SourceSlice], timings: Timings,
+                      started_at: datetime | None = None) -> None:
+    """Attach the per-source/per-step durations and the overall sources RunReport to the
+    dataset the API serves (shown by /api/v1/pipeline)."""
+    demo.timings = timings.as_dict(slices)
+    demo.sources_report = {**overall_report(slices, started_at).model_dump(mode="json"),
+                           "display": status_display(slices)}
+
+
 def run_e2e_sync(*args: Any, **kwargs: Any) -> E2EReport:
     return asyncio.run(run_e2e(*args, **kwargs))
 
@@ -372,15 +419,21 @@ async def run_e2e(mode: Literal["fixture", "live"] = "fixture", *,
     from conferge.api.logic import parse_goals
 
     report = E2EReport(mode=mode, started_at=datetime.now(timezone.utc))
+    t = report.timings
     _stage_inventory(report)
-    _stage_sources(report, await _collect(mode, fallback_fixture, timeout, sources))
-    travel = await collect_stays_flights(timeout) if mode == "live" else None
-    assembly = assemble(_usable(report.slices), travel)
+    with t.step("collect"):
+        _stage_sources(report, await _collect(mode, fallback_fixture, timeout, sources))
+        travel = await collect_stays_flights(timeout) if mode == "live" else None
+    with t.step("assemble"):
+        assembly = assemble(_usable(report.slices), travel)
     report.data_mode = assembly.data_mode
     _stage_checks(report, assembly)
     goals = parse_goals(assembly.demo.demo_goal_text)
-    opps = await _stage_planning(report, assembly, goals)
-    _stage_graph(report, assembly, goals, opps)
+    with t.step("plan"):
+        opps = await _stage_planning(report, assembly, goals)
+    with t.step("ingest"):
+        _stage_graph(report, assembly, goals, opps)
+    record_collection(assembly.demo, report.slices, t, report.started_at)
     _stage_travel(report)
     _stage_api(report, assembly.demo, assembly.data_mode)
     if include_backup:
@@ -389,4 +442,4 @@ async def run_e2e(mode: Literal["fixture", "live"] = "fixture", *,
     return report
 
 
-__all__ = ["E2EReport", "StageResult", "run_e2e", "run_e2e_sync"]
+__all__ = ["E2EReport", "StageResult", "Timings", "record_collection", "run_e2e", "run_e2e_sync"]

@@ -1388,6 +1388,7 @@
         "price_scope": "total_all_passengers",
         "price_status": "sandbox",
         "raw_price_text": "$512.40 (simulated)",
+        "return_slice_collected": null,
         "slices": [
           {
             "duration_minutes": 385,
@@ -1456,6 +1457,7 @@
         "price_scope": "total_all_passengers",
         "price_status": "sandbox",
         "raw_price_text": "$468.90 (simulated)",
+        "return_slice_collected": null,
         "slices": [
           {
             "duration_minutes": 380,
@@ -1524,6 +1526,7 @@
         "price_scope": "total_all_passengers",
         "price_status": "sandbox",
         "raw_price_text": "$401.15 (simulated)",
+        "return_slice_collected": null,
         "slices": [
           {
             "duration_minutes": 390,
@@ -1596,6 +1599,7 @@
       "description": "Meet seed investors active in developer tools",
       "id": "goal-seed-investors",
       "priority": 0.45,
+      "stated_at": null,
       "tags": [
         "fundraising"
       ],
@@ -1612,6 +1616,7 @@
       "description": "Meet founders building AI agents",
       "id": "goal-agent-founders",
       "priority": 0.35,
+      "stated_at": null,
       "tags": [
         "peers"
       ],
@@ -1628,6 +1633,7 @@
       "description": "Meet Copilot product managers",
       "id": "goal-copilot-pms",
       "priority": 0.2,
+      "stated_at": null,
       "tags": [
         "distribution"
       ],

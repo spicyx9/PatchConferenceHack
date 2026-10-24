@@ -42,9 +42,6 @@ WINDOW = (date(2026, 10, 27), date(2026, 10, 30))
 AGGREGATOR_TARGETS = [
     ("conferenceparties", "github26", "GitHub Universe 2026 (anchor)"),
     ("conferenceparties", "reinvent2026", "AWS re:Invent 2026 (parser breadth)"),
-    ("raidandev", "reinvent-2026", "AWS re:Invent 2026"),
-    ("raidandev", "reinvent2026", "legacy slug from spec (expected schema_changed)"),
-    ("reinventradar", "reinventradar", "AWS re:Invent 2026 schedule"),
 ]
 _TRIM_KEYS = {"debug_info", "urgency_signals", "locations", "dedup", "image_id", "saves"}
 

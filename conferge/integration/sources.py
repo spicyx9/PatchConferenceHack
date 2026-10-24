@@ -8,6 +8,12 @@ Two explicit paths, never mixed silently:
   ``failed`` slice with zero items and the error text. It is **not** replaced by
   the fixture here; the caller decides, and the replacement stays labelled.
 
+Sources are isolated from each other: live runners go through
+``asyncio.gather(return_exceptions=True)``, so one adapter raising becomes one
+``failed`` slice with a sanitized message while the others complete.
+``overall_report`` turns the slices into one RunReport (``degraded`` when some
+failed). Each slice carries its own ``duration_s``.
+
 Side-event sources (Luma, Partiful, Eventbrite) are normalized with
 ``conference_id=None``: proximity in time and place is not evidence of a
 relation to the anchor conference, and the graph would otherwise draw a
@@ -17,6 +23,8 @@ relation to the anchor conference, and the graph would otherwise draw a
 from __future__ import annotations
 
 import asyncio
+import re
+import time
 from collections.abc import Awaitable, Callable
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
@@ -55,16 +63,85 @@ class SourceSlice:
     errors: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     collected_at: datetime | None = None
+    duration_s: float | None = None
+    """Wall time of this source's collection (loader or live runner), seconds."""
 
     @property
     def count(self) -> int:
         return len(self.events) + len(self.people) + len(self.companies)
 
 
+_SECRET = re.compile(r"(?i)\b(bearer|token|api[_-]?key|key|password|secret|authorization|cookie)"
+                     r"(\s*[=:]\s*|\s+)[^\s&,;'\"]+")
+
+
+def sanitize(message: str, limit: int = 200) -> str:
+    """Error text safe to show: no URL query strings, no credential values, one line, capped."""
+    text = re.sub(r"(https?://[^\s?#'\"]+)[?#][^\s'\"]*", r"\1?…", message)
+    text = _SECRET.sub(lambda m: f"{m.group(1)}=<redacted>", text)
+    text = " ".join(text.split())
+    return text if len(text) <= limit else text[: limit - 1] + "…"
+
+
+def describe(exc: BaseException, timeout: float | None = None) -> str:
+    """Sanitized one-line reason for a source that raised."""
+    if isinstance(exc, (TimeoutError, asyncio.TimeoutError)) and timeout is not None:
+        return f"timeout after {timeout:.0f}s"
+    if isinstance(exc, ImportError):
+        return sanitize(f"not importable: {exc}")
+    return sanitize(f"{type(exc).__name__}: {exc}")
+
+
 def _failed(name: str, window: str, attempted: str, error: str) -> SourceSlice:
+    """Failed slice with its own failed RunReport, so the pipeline panel shows a row for it."""
     mode = "fixture" if attempted == "fixture" else "live"
-    return SourceSlice(name, window, attempted, mode, "failed", errors=[error[:300]],
-                       collected_at=datetime.now(timezone.utc))
+    now = datetime.now(timezone.utc)
+    reason = sanitize(error, 300)
+    report = RunReport(provider=name, started_at=now, finished_at=now, status="failed",
+                       termination="error", source_mode=mode, fetched_count=0, unique_count=0,
+                       errors=[reason])
+    return SourceSlice(name, window, attempted, mode, "failed", reports=[report], errors=[reason],
+                       collected_at=now)
+
+
+def _kept(s: SourceSlice) -> str:
+    parts = [(len(s.events), "events"), (len(s.people), "people"), (len(s.companies), "companies")]
+    return ", ".join(f"{n} {label}" for n, label in parts if n) or "0 records"
+
+
+def status_display(slices: list[SourceSlice]) -> dict[str, str]:
+    """Screen wording for the overall status. ``failed``: a source raised or returned nothing;
+    ``partial``: a source is not exhausted (records kept); ``ok`` otherwise. The API's
+    ``degraded`` is never shown alone: the reason says which source and what was kept."""
+    failed = [s for s in slices if s.status == "failed"]
+    partial = [s for s in slices if s.status == "degraded"]
+    if failed:
+        reason = "; ".join(f"{s.name.capitalize()} failed ({s.errors[0] if s.errors else 'no records'})"
+                           for s in failed)
+        return {"label": "failed", "reason": reason}
+    if partial:
+        reason = "; ".join(f"{s.name.capitalize()} not exhausted, {_kept(s)} kept" for s in partial)
+        return {"label": "partial", "reason": reason}
+    return {"label": "ok", "reason": f"all {len(slices)} sources exhausted"}
+
+
+def overall_report(slices: list[SourceSlice], started_at: datetime | None = None) -> RunReport:
+    """One RunReport for the whole collection: ok, degraded when some sources failed, failed
+    when none produced records."""
+    now = datetime.now(timezone.utc)
+    failed = [s for s in slices if s.status == "failed"]
+    usable = [s for s in slices if s.count]
+    status: RunStatus = ("failed" if not usable else
+                         "degraded" if failed or any(s.status == "degraded" for s in slices) else "ok")
+    modes = {s.source_mode for s in usable}
+    return RunReport(
+        provider="sources", started_at=min(started_at or now, now), finished_at=now,
+        status=status, termination="exhausted" if status == "ok" else "error",
+        source_mode="live" if "live" in modes else ("cached" if "cached" in modes else "fixture"),
+        fetched_count=len(slices), unique_count=len(usable),
+        errors=[f"{s.name}: {e}" for s in failed for e in s.errors],
+        warnings=[f"{len(failed)} of {len(slices)} sources failed; the others are kept"] if failed else [],
+    )
 
 
 def _from_envelope(name: str, window: str, attempted: str,
@@ -122,8 +199,22 @@ def _fixture_eventbrite() -> SourceSlice:
 def _fixture_aggregators() -> SourceSlice:
     from conferge.events.aggregators import load_fixture
     from conferge.events.aggregators.normalize import normalize_records
+    from conferge.events.aggregators.source import DEFAULT_TARGETS
 
     result = load_fixture(explicit_opt_in=True)
+    # Same pages as the live run for the anchor (conferenceparties/github26). The fixture
+    # also holds another conference's page (reinvent2026, parser breadth): linking those
+    # rows to GitHub Universe would be an invented relation.
+    slugs = {t["slug"] for t in DEFAULT_TARGETS[CONFERENCE_ID]}
+    kept = [r for r in result.items if r.source_id.split(":", 1)[0] in slugs]
+    dropped = sorted({r.source_id.split(":", 1)[0] for r in result.items} - slugs)
+    if len(kept) != len(result.items):
+        report = result.run_report.model_copy(update={
+            "unique_count": len({r.source_id for r in kept}),
+            "warnings": [*result.run_report.warnings,
+                         f"{len(result.items) - len(kept)} records from other conference pages "
+                         f"({', '.join(dropped)}) not linked to {CONFERENCE_ID}"]})
+        result = result.model_copy(update={"items": kept, "run_report": report})
     events, errors = normalize_records(result.items, conference_id=CONFERENCE_ID,
                                        timezone_name="America/Los_Angeles",
                                        city="San Francisco")
@@ -179,12 +270,13 @@ def fixture_slices(names: list[str] | None = None) -> list[SourceSlice]:
     for name, (window, loader) in FIXTURE_LOADERS.items():
         if names is not None and name not in names:
             continue
+        started = time.perf_counter()
         try:
-            out.append(loader())
-        except ImportError as exc:
-            out.append(_failed(name, window, "fixture", f"not importable: {exc}"))
+            got = loader()
         except Exception as exc:  # noqa: BLE001 - one broken window must not stop the run
-            out.append(_failed(name, window, "fixture", f"{type(exc).__name__}: {exc}"))
+            got = _failed(name, window, "fixture", describe(exc))
+        got.duration_s = round(time.perf_counter() - started, 3)
+        out.append(got)
     return out
 
 
@@ -278,22 +370,28 @@ LIVE_RUNNERS: dict[str, tuple[str, Callable[[], Awaitable[SourceSlice]]]] = {
 }
 
 
-async def _guard(name: str, window: str, runner: Callable[[], Awaitable[SourceSlice]],
-                 timeout: float) -> SourceSlice:
-    try:
-        return await asyncio.wait_for(runner(), timeout)
-    except TimeoutError:
-        return _failed(name, window, "live", f"timeout after {timeout:.0f}s")
-    except ImportError as exc:
-        return _failed(name, window, "live", f"not importable: {exc}")
-    except Exception as exc:  # noqa: BLE001 - visible failure, never a silent fixture
-        return _failed(name, window, "live", f"{type(exc).__name__}: {exc}")
-
-
 async def live_slices(
     names: list[str] | None = None, *, timeout: float = 90.0,
     runners: dict[str, tuple[str, Callable[[], Awaitable[SourceSlice]]]] | None = None,
 ) -> list[SourceSlice]:
+    """Every chosen runner concurrently; an exception or timeout is that source's failed slice."""
     table = runners if runners is not None else LIVE_RUNNERS
     chosen = [(n, w, r) for n, (w, r) in table.items() if names is None or n in names]
-    return list(await asyncio.gather(*(_guard(n, w, r, timeout) for n, w, r in chosen)))
+    durations: dict[str, float] = {}
+
+    async def timed(name: str, runner: Callable[[], Awaitable[SourceSlice]]) -> SourceSlice:
+        started = time.perf_counter()
+        try:
+            return await asyncio.wait_for(runner(), timeout)
+        finally:
+            durations[name] = round(time.perf_counter() - started, 3)
+
+    results = await asyncio.gather(*(timed(n, r) for n, _, r in chosen), return_exceptions=True)
+    out: list[SourceSlice] = []
+    for (name, window, _), res in zip(chosen, results, strict=True):
+        got = res if isinstance(res, SourceSlice) else _failed(
+            name, window, "live", describe(res, timeout) if isinstance(res, BaseException)
+            else f"runner returned {type(res).__name__}, not a SourceSlice")
+        got.duration_s = durations.get(name)
+        out.append(got)
+    return out

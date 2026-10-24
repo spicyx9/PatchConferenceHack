@@ -47,6 +47,14 @@ class DemoData:
     flights: list[FlightOffer]
     scenarios: list[dict[str, Any]]
     domains: dict[str, DomainSlice]
+    pipeline: list[dict[str, Any]] = field(default_factory=list)
+    """Data pipeline rows (integration.pipeline_view), from the real RunReports of this run."""
+    linkedin: dict[str, dict[str, Any]] = field(default_factory=dict)
+    """person_id -> LinkedIn evidence (integration.people_linkedin.cards) shown on /people cards."""
+    timings: dict[str, Any] = field(default_factory=dict)
+    """Per-step and per-source durations of the run that built this dataset (pipeline.Timings)."""
+    sources_report: dict[str, Any] | None = None
+    """Overall sources RunReport (integration.sources.overall_report): degraded when some failed."""
 
     def event(self, event_id: str) -> Event | None:
         return next((e for e in self.events if e.id == event_id), None)
@@ -76,7 +84,7 @@ def load_fixture(path: Path | str = FIXTURE_PATH) -> DemoData:
     }
     return DemoData(
         conference=Conference.model_validate(raw["conference"]),
-        user=dict(raw["user"]),
+        user={**raw["user"], "source_mode": "fixture"},
         demo_goal_text=raw["demo_goal_text"],
         events=[Event.model_validate(e) for e in raw["events"]],
         people=[Person.model_validate(p) for p in raw["people"]],

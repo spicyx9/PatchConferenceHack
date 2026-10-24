@@ -11,6 +11,7 @@ import copy
 import os
 import platform
 import subprocess
+import time
 from datetime import datetime, timezone
 from importlib import metadata
 from pathlib import Path
@@ -24,6 +25,10 @@ from pydantic import BaseModel, Field
 
 from conferge.api import logic, providers
 from conferge.api.data import DemoData, load_fixture
+from conferge.api.provenance import source_of
+from conferge.extras.router import router as calendar_router
+from conferge.extras.travel_search import router as travel_search_router
+from conferge.flights.round_trip_total import display as rt_display
 from conferge.core.schemas import AgentContext, Goal, Opportunity
 
 STATIC_DIR = Path(__file__).resolve().parents[2] / "static"
@@ -65,6 +70,38 @@ class DemoState:
         self.providers = found
         self.graph_probe = graph_probe
         self.reset()
+        self.restore_memory()
+
+    def restore_memory(self) -> int:
+        """Meetings already recorded in FalkorDB survive an API restart (they live in the graph).
+
+        Reads the user's MET Meeting nodes (person, note, time); nothing is written. Returns how
+        many were restored; 0 without a graph. ``POST /reset`` deletes them on purpose.
+        """
+        store = self.store()
+        if store is None:
+            return 0
+        try:
+            from conferge.graph.queries import run_read
+
+            rows = run_read(store, "MATCH (m:Meeting {user_id: $user_id, kind: 'MET'})-[:MET]->(p:Person) "
+                                   "RETURN p.id, m.note, m.at ORDER BY m.at", {"user_id": USER_ID})
+        except Exception:  # noqa: BLE001 - no graph memory: the process starts empty, as before
+            return 0
+        for row in rows:
+            if not isinstance(row, (list, tuple)) or len(row) != 3:
+                continue  # not a Meeting row: nothing to restore
+            person_id, note, at = row
+            if not isinstance(person_id, str) or self.data.person(person_id) is None:
+                continue
+            self.met[person_id] = note or ""
+            if at:
+                try:
+                    self.met_at[person_id] = datetime.fromisoformat(str(at))
+                except ValueError:
+                    pass
+        self.invalidate()
+        return len(self.met)
 
     def reset(self) -> None:
         self.data = copy.deepcopy(self.pristine)
@@ -81,6 +118,7 @@ class DemoState:
         self.agent_opportunities: list[Opportunity] | None = None
         self.agent_warnings: list[str] = []
         self.rank_mode: str | None = None  # "graph" or DEGRADED_NO_GRAPH, set by _ranking()
+        self.rank_seconds: float | None = None  # wall time of the last uncached ranking
         self.rank_warnings: list[str] = []
         self._rank_cache: tuple[list[Opportunity], dict[str, float]] | None = None
         self._synced_goals: tuple[str, ...] | None = None
@@ -102,7 +140,7 @@ class DemoState:
             from conferge.graph import ranking
             from conferge.graph.ingest import GraphIngestor
 
-            ids = tuple(g.id for g in self.goals)
+            ids = tuple((g.id, g.stated_at) for g in self.goals)
             if self._synced_goals != ids:  # goals live in the graph, written through GraphStore
                 GraphIngestor(store, default_mode="live").ingest_goals(USER_ID, self.goals)
                 self._synced_goals = ids
@@ -117,6 +155,13 @@ class DemoState:
     def _ranking(self) -> tuple[list[Opportunity], dict[str, float]]:
         if self._rank_cache is not None:
             return self._rank_cache
+        started = time.perf_counter()
+        try:
+            return self._compute_ranking()
+        finally:
+            self.rank_seconds = round(time.perf_counter() - started, 3)
+
+    def _compute_ranking(self) -> tuple[list[Opportunity], dict[str, float]]:
         graph = self._graph_ranking()
         if graph is not None:
             self.rank_mode = "graph"
@@ -252,6 +297,7 @@ def create_app(
                        "collected_at": s.collected_at.isoformat(), "warnings": s.warnings}
                 for name, s in state.data.domains.items()
             },
+            "badge": logic.source_badge(state.data.domains),
             "providers": [vars(s) for s in state.providers.statuses],
         })
 
@@ -303,6 +349,8 @@ def create_app(
         if req.conference_id and req.conference_id != state.data.conference.id:
             raise HTTPException(404, f"unknown conference_id {req.conference_id!r}")
         goals = logic.parse_goals(req.text)  # never empty: unknown role -> tagged defaults + warning
+        stated = datetime.now(timezone.utc)
+        goals = [g.model_copy(update={"stated_at": stated}) for g in goals]
         state.goal_text, state.goals = req.text, goals
         state.agent_mode, state.agent_opportunities, state.agent_warnings = None, None, []
         state.invalidate()
@@ -335,6 +383,67 @@ def create_app(
     def plan() -> dict[str, Any]:
         return _envelope(state, ["events", "people"], _plan_payload(), extra_warnings=_plan_warnings())
 
+    @api.post("/pipeline/refresh")
+    async def pipeline_refresh() -> dict[str, Any]:
+        """Data pipeline button: 2 real Bright Data calls (Web Unlocker flights, SERP LinkedIn)."""
+        from conferge.integration.live_refresh import refresh
+
+        from conferge.integration.live_refresh import cached_profiles
+
+        # A top-5 speaker, preferring one whose LinkedIn URL is already cached (verifiable).
+        known = cached_profiles()
+        candidates = []
+        for opp in state.opportunities()[:5]:
+            person = next((state.data.person(p) for p in opp.person_ids if state.data.person(p)), None)
+            if person is not None:
+                company = state.data.company(person.company_id)
+                candidates.append((person.name, company.name if company else None))
+        speaker = next((c for c in candidates if c[0].casefold() in known),
+                       next((c for c in candidates if c[1]), candidates[0] if candidates else None))
+        result = await refresh(state.data, speaker)
+        return _envelope(state, ["flights"], {"refresh": result},
+                         extra_warnings=result["errors"])
+
+    @api.get("/pipeline")
+    def pipeline_view() -> dict[str, Any]:
+        """How every source of this demo was collected, from the RunReports of the run."""
+        from conferge.core import brightdata as bd
+        from conferge.integration.pipeline_view import HEADLINE, reachability, totals
+
+        rows = state.data.pipeline
+        timings = {"steps": list(state.data.timings.get("steps", [])),
+                   "sources": list(state.data.timings.get("sources", []))}
+        if state.rank_seconds is not None:
+            timings["steps"].append({"step": "rank", "seconds": state.rank_seconds,
+                                     "note": f"last {state.rank_mode} ranking, measured at request time"})
+        from conferge.core.cost import snapshot as live_snapshot
+        from conferge.integration import brightdata_usage
+
+        requests = {
+            "at_collection_time": [
+                {k: p[k] for k in ("product", "api", "requests", "records", "collected_first",
+                                    "collected_last")}
+                for p in brightdata_usage.cached_products()],
+            "since_start": live_snapshot()["by_api"],
+            "note": "at collection time: requests recorded when the cached records were collected; "
+                    "since start: calls made by this process (0 until Refresh)",
+        }
+        return _envelope(state, [], {
+            "headline": HEADLINE, "rows": rows, "totals": totals(rows), "requests": requests,
+            "brightdata_calls": bd.calls(), "reachability": reachability(),
+            "timings": timings, "sources_report": state.data.sources_report,
+            "note": None if rows else "no collection run in this process (dataset served as loaded)",
+        }, mode_override="live" if any(r["kind"] != "fallback" for r in rows) else "fixture")
+
+    @api.get("/cost")
+    def cost() -> dict[str, Any]:
+        """Bright Data requests and records of this process; no USD figure (none ever read)."""
+        from conferge.core import cost as bd_cost
+
+        snap = bd_cost.snapshot()
+        return _envelope(state, [], snap, mode_override="live" if snap["requests"] else "unknown",
+                         extra_warnings=[bd_cost.COST_NOTE])
+
     @api.get("/brightdata")
     def brightdata_usage() -> dict[str, Any]:
         """What Bright Data actually returned in this process, per API; config state, never the key."""
@@ -346,8 +455,38 @@ def create_app(
         # "live" only when at least one Bright Data API can actually be called from this
         # process; without a key nothing here is live, so the label says "unknown".
         notes = [] if any(ready.values()) else ["Bright Data not configured: no API ready in this process"]
+        from conferge.integration import brightdata_usage
+
+        # Requests and records per product, with the records' own collected_at (never a
+        # run report's finished_at, which can be the demo start time).
+        summary = brightdata_usage.summary()
+        cached: dict[str, Any] = {"datasets": 0, "web_unlocker": 0, "serp": 0, "collected_at": {}}
+        api_key = {"dataset": "datasets", "unlocker": "web_unlocker", "serp": "serp"}
+        for p in summary["products"]:
+            if p["source"] == "cached" and p["api"] in api_key:
+                cached[api_key[p["api"]]] += p["records"]
+                if p["collected_first"]:
+                    cached["collected_at"][p["product"]] = [p["collected_first"], p["collected_last"]]
+        cached["total"] = cached["datasets"] + cached["web_unlocker"] + cached["serp"]
+        from conferge.core.cost import snapshot as live_snapshot
+
+        live = live_snapshot()
+        key_missing = client.not_ready("datasets") == "Bright Data key missing; set BRIGHTDATA_API_KEY"
+        cache_rows = [p for p in summary["products"] if p["source"].startswith("cached")]
+        firsts = [p["collected_first"] for p in cache_rows if p["collected_first"]]
+        lasts = [p["collected_last"] for p in cache_rows if p["collected_last"]]
         return _envelope(state, [], {
+            **summary,
             "usage": bd.usage(),
+            "cached": cached,
+            # Live counter of this process only; the cache is a separate line, never added in.
+            "live": {"requests": live["requests"], "records": live["records"],
+                     "key_missing": key_missing,
+                     "label": "key missing" if key_missing else None},
+            "cache_summary": {"records": sum(p["records"] for p in cache_rows),
+                              "requests_at_collection_time": sum(p["requests"] for p in cache_rows),
+                              "collected_first": min(firsts, default=None),
+                              "collected_last": max(lasts, default=None)},
             "ready": ready,
             "not_ready_reason": {api: client.not_ready(api) for api in apis},
         }, extra_warnings=notes, mode_override="live" if any(ready.values()) else "unknown")
@@ -397,15 +536,17 @@ def create_app(
         # The plan comes from the graph (written by the planner), not from this process.
         notes = [f"{result.agent}: {e}" for e in result.errors]
         store, plan_version, skips_written = state.store(), None, None
+        served = state.plan()  # the plan the UI shows: every "gain" below names one of its events
+        plan_items = {i["event_id"]: i for d in served["days"] for i in d["items"]}
         if store is not None:
             from conferge.agents.antifomo.graph_state import planned_from_graph, publish_skips
 
-            _publish_plan(state.plan())  # make sure the planner's current plan is in the graph
+            _publish_plan(served)  # make sure the planner's current plan is in the graph
             planned, plan_version = planned_from_graph(store, USER_ID)
         else:
-            planned = {i["event_id"] for d in state.plan()["days"] for i in d["items"]}
+            planned = set(plan_items)
             notes.append("FalkorDB not reachable: anti-FOMO read the plan from the API process")
-        skips = logic.antifomo_skips(result.decisions, state.data, planned=planned)
+        skips = logic.antifomo_skips(result.decisions, state.data, planned=planned, plan_items=plan_items)
         if store is not None:
             skips_written = publish_skips(store, USER_ID, skips)
         return _envelope(state, ["events", "people"], {
@@ -414,9 +555,32 @@ def create_app(
             "plan_version": plan_version, "skips_graph": skips_written,
         }, extra_warnings=notes)
 
+    def _company_card(company: Any, funding: dict[str, Any]) -> dict[str, Any] | None:
+        """Company of a /people card, plus Crunchbase funding from the public cache when known."""
+        if company is None:
+            return None
+        from conferge.people import crunchbase
+
+        card = company.model_dump(mode="json")
+        view = crunchbase.company_view(funding.get(company.id))
+        if view:
+            card["funding"], card["last_round"] = view["funding"], view["last_round"]
+            card["evidence"] = [*card.get("evidence", []), view["evidence"]]
+        return card
+
+    def _why(opp: Opportunity) -> dict[str, Any]:
+        """Edge rationales and evidence ids of the graph path behind this suggestion."""
+        edges = [e for e in opp.path if "rationale" in e and "evidence_ids" in e]
+        ids = list(dict.fromkeys(i for e in edges for i in e["evidence_ids"]))
+        return {"edges": edges, "evidence_ids": ids,
+                "source": "falkordb" if edges else None}
+
     @api.get("/people")
     def people(limit: int = Query(10, ge=1, le=100)) -> dict[str, Any]:
+        from conferge.people import crunchbase
+
         opps = state.opportunities()[:limit]
+        funding = crunchbase.load_public_cache(crunchbase.PUBLIC_CACHE)  # read-only, may be {}
         cards = []
         for opp in opps:
             person = state.data.person(opp.person_ids[0]) if opp.person_ids else None
@@ -424,11 +588,14 @@ def create_app(
             cards.append({
                 "opportunity": opp.model_dump(mode="json"),
                 "person": person.model_dump(mode="json") if person else None,
-                "company": company.model_dump(mode="json") if company else None,
+                "company": _company_card(company, funding),
                 "met": bool(person and person.id in state.met),
                 "met_note": state.met.get(person.id) if person else None,
+                "linkedin": state.data.linkedin.get(person.id) if person else None,
+                "why": _why(opp),
             })
-        return _envelope(state, ["people", "companies"], {"items": cards, "count": len(cards)},
+        return _envelope(state, ["people", "companies"], {"items": cards, "count": len(cards),
+                                                               "total": len(state.opportunities())},
                          extra_warnings=_plan_warnings())
 
     def _events_view(event_type: str | None, day: str | None, min_score: float | None) -> list[dict[str, Any]]:
@@ -475,8 +642,23 @@ def create_app(
         return _envelope(state, ["stays"], {"items": items, "count": len(items)})
 
     @api.get("/flights")
-    def flights() -> dict[str, Any]:
-        items = [f.model_dump(mode="json") for f in state.data.flights]
+    def flights(alternatives: bool = True) -> dict[str, Any]:
+        """The kept itinerary first, then every other cached itinerary (alternatives=false: kept only)."""
+        offers = list(state.data.flights)
+        domain = state.data.domains.get("flights")
+        if alternatives and domain and domain.source_mode == "cached":
+            from conferge.integration import travel_cache
+
+            cached = travel_cache.load(flight_alternatives=True)
+            if cached and "flights" in cached:
+                kept = {o.id for o in offers}
+                offers += [o for o in cached["flights"].items if o.id not in kept]
+        from conferge.api.travel_cards import view
+
+        kept_ids = {o.id for o in state.data.flights}
+        # kept: the itinerary of the trip (in the graph); the others are cached alternatives.
+        items = [{**view(f), **rt_display(f), "source": source_of(f.evidence),
+                  "kept": f.id in kept_ids} for f in offers]
         return _envelope(state, ["flights"], {"items": items, "count": len(items)})
 
     @api.get("/travel")
@@ -549,6 +731,7 @@ def create_app(
                     "evidence_source": e["props"].get("source"),
                     "confidence": e["props"].get("confidence"),
                     "observed_at": e["props"].get("observed_at"),
+                    "rationale": e.get("rationale"), "evidence_ids": e.get("evidence_ids") or [],
                 }})
         modes = {s["node"]["source_mode"] for s in steps if "node" in s}
         cypher = graph_queries.literal_cypher(
@@ -557,6 +740,22 @@ def create_app(
         return {"steps": steps, "explanation": path_to_text(path), "signature": signature,
                 "cypher": cypher, "browser_url": providers.browser_url(cypher) if cypher else None,
                 "mode": modes.pop() if len(modes) == 1 else "mixed"}
+
+    @api.get("/graph/why/{person_id}")
+    def graph_why(person_id: str, user: str = USER_ID) -> dict[str, Any]:
+        """Deterministic why: edge rationales of the FalkorDB paths, each citing [ev:<id>]."""
+        if state.data.person(person_id) is None:
+            raise HTTPException(404, f"unknown person_id {person_id!r}")
+        store = state.store()
+        if store is None:
+            raise HTTPException(503, "FalkorDB not reachable: the why answer is read from the graph")
+        from conferge.graph.why import why_person
+
+        why = why_person(store, user, person_id)
+        notes = ["answer built from edge rationales in FalkorDB (rule-based, no LLM)"]
+        if why["answer"] is None:
+            notes.append("no goal-to-person path in the graph for this person")
+        return _envelope(state, ["people", "events"], why, extra_warnings=notes)
 
     @api.get("/graph/path")
     def graph_path(person: str, user: str = "demo-user") -> dict[str, Any]:
@@ -629,10 +828,13 @@ def create_app(
         if found.id not in state.met:
             raise HTTPException(409, f"{person!r} not met yet: record the meeting first")
         opp = next((o for o in state.opportunities() if found.id in o.person_ids), None)
-        event = next((e for e in (state.data.event(i) for i in found.event_ids) if e is not None), None)
+        person_events = [e for e in (state.data.event(i) for i in found.event_ids) if e is not None]
+        # Where they met is known only if the user attended one of the person's events.
+        met_event = next((e for e in person_events if e.id in state.attended), None)
         draft = draft_followup(
             found, conference=state.data.conference, goal=best_goal(found, state.goals),
-            event=event, company=state.data.company(found.company_id),
+            event=met_event, person_event=person_events[0] if person_events else None,
+            company=state.data.company(found.company_id),
             note=state.met.get(found.id) or None,
             path_text=opp.rationale if opp else None, met_at=state.met_at.get(found.id),
         )
@@ -784,6 +986,8 @@ def create_app(
     from conferge.api.connections import router as connections_router
 
     app.include_router(connections_router(state))
+    app.include_router(calendar_router)
+    app.include_router(travel_search_router)
 
     if STATIC_DIR.is_dir():
         app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")

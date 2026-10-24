@@ -38,13 +38,15 @@ def drafts_for_context(ctx: AgentContext, met_at: datetime | None = None) -> lis
         person = people.get(pid)
         if person is None:
             continue
-        event = next((events[e] for e in person.event_ids if e in events), None)
+        person_events = [events[e] for e in person.event_ids if e in events]
+        attended = {str(i) for i in ctx.constraints.get("attended_event_ids", []) or []}
         out.append(
             draft_followup(
                 person,
                 conference=ctx.conference,
                 goal=best_goal(person, ctx.goals),
-                event=event,
+                event=next((e for e in person_events if e.id in attended), None),
+                person_event=person_events[0] if person_events else None,
                 note=notes.get(pid),
                 met_at=met_at,
             )

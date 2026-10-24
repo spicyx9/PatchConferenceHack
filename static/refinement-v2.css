@@ -1,0 +1,423 @@
+.illustrated-avatar {
+  display: inline-block;
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  border-radius: 18px;
+  background-image: url("/static/images/people-neutral-v3.jpg");
+  background-size: 400% 200%;
+  background-repeat: no-repeat;
+  background-color: #ede8e2;
+}
+.illustrated-avatar.avatar-small {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+}
+.illustrated-avatar.avatar-large {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+#tab-people .page-heading {
+  padding: 34px 0 28px;
+  margin-bottom: 12px;
+}
+#tab-people .page-heading .eyebrow {
+  margin-bottom: 15px;
+}
+#tab-people .page-heading p {
+  margin-top: 12px;
+}
+.people-toolbar {
+  margin-bottom: 26px;
+}
+#people-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+.people-card {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  border: 1px solid #e4e4e4;
+  background: #fff;
+  border-radius: 16px;
+  transition:
+    border-color 0.18s,
+    box-shadow 0.18s;
+}
+.people-card:hover {
+  border-color: #cfc9c4;
+  box-shadow: 0 8px 28px #1b171307;
+}
+.people-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 21px;
+}
+.people-match {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 132px;
+  border-radius: 6px;
+  background: #f1efeb;
+  color: #61594d;
+  font-size: 10px;
+  line-height: 1.5;
+  padding: 5px 8px;
+}
+.people-name {
+  font-size: 21px;
+  font-weight: 630;
+  letter-spacing: -0.6px;
+  line-height: 1.2;
+  margin: 0 0 10px;
+}
+.people-position {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #626262;
+  min-height: 39px;
+  margin: 0 0 3px;
+}
+.people-company {
+  font-size: 13px;
+  font-weight: 550;
+  margin: 0 0 22px;
+  min-height: 20px;
+}
+.people-session {
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  padding: 16px 0;
+  margin-bottom: 5px;
+}
+.people-session-label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #737373;
+  margin-bottom: 7px;
+}
+.people-session-title {
+  padding: 0;
+  background: none;
+  font-size: 13px;
+  font-weight: 550;
+  line-height: 1.5;
+  text-align: left;
+  min-height: 0;
+  border-radius: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.people-session-title:hover {
+  background: none;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.people-session-date {
+  display: block;
+  font-size: 11px;
+  color: #696969;
+  line-height: 1.5;
+  margin: 8px 0 0;
+}
+.people-context {
+  margin-top: auto;
+  padding-top: 8px;
+  font-size: 12px;
+}
+.people-context summary {
+  padding: 9px 0;
+  min-height: 36px;
+  color: #666;
+  font-size: 11px;
+}
+.people-context p,
+.people-context li {
+  font-size: 12px;
+  line-height: 1.65;
+}
+.people-context ul {
+  padding-left: 17px;
+}
+.people-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 16px;
+}
+.people-actions .primary {
+  min-height: 39px;
+  font-size: 12px;
+  padding: 9px 13px;
+  border-radius: 8px;
+}
+.people-met {
+  padding: 8px;
+  min-height: 39px;
+  font-size: 12px;
+  color: #626262;
+  background: transparent;
+}
+.people-met:hover {
+  background: #f3f3f3;
+}
+.people-met-status {
+  font-size: 11px;
+  color: #626262;
+}
+.people-card .followup {
+  font-size: 12px;
+}
+.people-card .followup:empty {
+  display: none;
+}
+.people-card.is-met {
+  border-color: #d8dfe9;
+}
+#tab-story .overview-stats {
+  display: none;
+}
+#tab-story .sources-link {
+  font-size: 11px;
+  color: #707070;
+  margin-bottom: 0;
+}
+#tab-story .goal-context {
+  border: 0;
+  padding-bottom: 0;
+  margin-bottom: 10px;
+}
+#tab-story .people-preview {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+#tab-story .person-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  padding: 20px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #e6e6e6;
+}
+#tab-story .person-preview .illustrated-avatar {
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  margin-bottom: 16px;
+}
+#tab-story .person-preview .person-name {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-bottom: 5px;
+}
+#tab-story .person-preview .person-role {
+  font-size: 12px;
+  line-height: 1.5;
+  margin-bottom: 17px;
+  color: #696969;
+}
+#tab-story .person-preview .text-button {
+  font-size: 11px;
+  padding: 0;
+  margin-top: auto;
+  min-height: 32px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.discover-alternatives {
+  border-top: 1px solid #dedede;
+  border-bottom: 1px solid #dedede;
+  margin: 28px 0 45px;
+}
+.discover-alternatives > summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 66px;
+  padding: 15px 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+.discover-alternatives > summary::after {
+  content: "+";
+  font-size: 20px;
+  font-weight: 400;
+  color: #737373;
+}
+.discover-alternatives[open] > summary::after {
+  content: "−";
+}
+#alternatives-count {
+  margin-left: auto;
+  margin-right: 16px;
+  color: #6b6b6b;
+  font-size: 12px;
+}
+.quiet-alternative {
+  padding: 18px 0;
+  border-top: 1px solid #e6e6e6;
+}
+.quiet-alternative strong {
+  font-size: 14px;
+  font-weight: 500;
+  display: block;
+}
+.quiet-alternative span {
+  font-size: 12px;
+  display: block;
+  color: #686868;
+  margin-top: 5px;
+}
+.quiet-alternative details {
+  margin-top: 8px;
+}
+.quiet-alternative summary,
+.quiet-alternative p {
+  font-size: 12px;
+  color: #626262;
+}
+#tab-dashboard .progress-tools {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  padding: 20px;
+}
+#tab-dashboard #step-roi {
+  margin-top: 25px;
+}
+@media (max-width: 1000px) {
+  #people-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  #people-cards {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .people-card {
+    padding: 23px;
+  }
+  .people-card-top .illustrated-avatar {
+    width: 80px;
+    height: 80px;
+  }
+  .people-position {
+    min-height: 0;
+  }
+  .people-company {
+    margin-bottom: 20px;
+  }
+  .people-name {
+    font-size: 24px;
+  }
+  .people-actions .primary {
+    min-height: 43px;
+    font-size: 13px;
+  }
+  .people-met {
+    min-height: 43px;
+  }
+  #tab-story .people-preview {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  #tab-story .person-preview {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+    column-gap: 13px;
+    padding: 15px;
+  }
+  #tab-story .person-preview .illustrated-avatar {
+    width: 48px;
+    height: 48px;
+    margin: 0;
+    grid-row: 1 / 3;
+    border-radius: 12px;
+  }
+  #tab-story .person-preview .person-name {
+    font-size: 14px;
+  }
+  #tab-story .person-preview .person-role {
+    margin: 0;
+    font-size: 11px;
+  }
+  #tab-story .person-preview .text-button {
+    grid-column: 3;
+    grid-row: 1 / 3;
+    font-size: 10px;
+    margin: 0;
+    text-decoration: none;
+  }
+  #tab-dashboard .progress-tools {
+    grid-template-columns: 1fr;
+    padding: 0;
+  }
+  .discover-alternatives {
+    margin-top: 22px;
+  }
+}
+.event-artwork.artwork-atmosphere {
+  background-image: url("/static/images/session-atmospheres-v2.jpg");
+  background-size: 300% 200%;
+  background-repeat: no-repeat;
+  background-color: #e7e4df;
+}
+#tab-travel .trip-overview {
+  background: #fff;
+}
+#tab-travel .page-heading {
+  padding-top: 26px;
+  margin-bottom: 16px;
+}
+#tab-travel .page-heading .eyebrow {
+  display: none;
+}
+#tab-graph .page-heading .eyebrow {
+  display: none;
+}
+#tab-graph .page-heading {
+  padding-top: 28px;
+  margin-bottom: 20px;
+}
+@media (max-width: 760px) {
+  .connection-profile {
+    grid-template-columns: 96px minmax(0, 1fr);
+  }
+  .connection-portrait {
+    min-height: 0;
+    background: transparent;
+    align-items: flex-start;
+    padding: 24px 0 0 18px;
+  }
+  .connection-portrait .illustrated-avatar {
+    width: 78px;
+    height: 78px;
+    border-radius: 15px;
+  }
+  .connection-profile-copy {
+    padding: 24px 18px;
+  }
+}
