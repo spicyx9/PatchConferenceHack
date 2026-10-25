@@ -30,6 +30,94 @@ def records(document: Any, relative: str) -> list[dict[str, Any]]:
     return value
 
 
+def access_metrics(matrix: Any) -> dict[str, int]:
+    """Recompute reachability from site-level attempts, never aggregate counts."""
+    if not isinstance(matrix, dict) or not isinstance(matrix.get("sites"), list):
+        raise ValueError("data/block_matrix.json: expected a sites array")
+    sites = matrix["sites"]
+    if not sites:
+        raise ValueError("data/block_matrix.json: sites array is empty")
+
+    required = (
+        "plain_default_ua",
+        "plain_browser_ua",
+        "brightdata_unlocker",
+        "brightdata_dataset",
+    )
+    allowed_classes = {"ok", "blocked", "error", "not_run", "pending", "shell_js"}
+    direct = unlocker = dataset = bright_data = any_path = 0
+    names: set[str] = set()
+
+    for index, site in enumerate(sites):
+        if not isinstance(site, dict):
+            raise ValueError(f"data/block_matrix.json: site {index} is not an object")
+        name = site.get("site")
+        if not isinstance(name, str) or not name.strip():
+            raise ValueError(f"data/block_matrix.json: site {index} has no valid name")
+        if name in names:
+            raise ValueError(f"data/block_matrix.json: duplicate site name: {name}")
+        names.add(name)
+        attempts = site.get("attempts")
+        if not isinstance(attempts, dict):
+            raise ValueError(f"data/block_matrix.json: {name} has no attempts object")
+
+        for attempt_name in required:
+            attempt = attempts.get(attempt_name)
+            if not isinstance(attempt, dict):
+                raise ValueError(
+                    f"data/block_matrix.json: {name} missing {attempt_name} attempt"
+                )
+            attempt_class = attempt.get("class")
+            if attempt_class not in allowed_classes:
+                raise ValueError(
+                    f"data/block_matrix.json: {name}.{attempt_name} has invalid class "
+                    f"{attempt_class!r}"
+                )
+
+        direct_ok = any(attempts[key]["class"] == "ok" for key in required[:2])
+        unlocker_ok = attempts["brightdata_unlocker"]["class"] == "ok"
+        dataset_attempt = attempts["brightdata_dataset"]
+        dataset_ok = dataset_attempt["class"] == "ok"
+        if dataset_ok:
+            record_count = dataset_attempt.get("records")
+            if not isinstance(record_count, int) or isinstance(record_count, bool) or record_count <= 0:
+                raise ValueError(
+                    f"data/block_matrix.json: {name} dataset is ok without positive records"
+                )
+        bright_data_ok = unlocker_ok or dataset_ok
+        direct += direct_ok
+        unlocker += unlocker_ok
+        dataset += dataset_ok
+        bright_data += bright_data_ok
+        any_path += direct_ok or bright_data_ok
+
+    computed = {
+        "access_sites": len(sites),
+        "access_direct": direct,
+        "access_unlocker": unlocker,
+        "access_dataset": dataset,
+        "access_bright_data": bright_data,
+        "access_any_path": any_path,
+    }
+    reported = matrix.get("counts")
+    if not isinstance(reported, dict):
+        raise ValueError("data/block_matrix.json: expected a counts object")
+    reported_keys = {
+        "access_sites": "n",
+        "access_direct": "reachable_without_brightdata",
+        "access_unlocker": "reachable_with_unlocker_only",
+        "access_bright_data": "reachable_with_brightdata",
+        "access_any_path": "reachable_any_path",
+    }
+    for metric, key in reported_keys.items():
+        if reported.get(key) != computed[metric]:
+            raise ValueError(
+                f"data/block_matrix.json: stored {key}={reported.get(key)!r} "
+                f"disagrees with recomputed {computed[metric]}"
+            )
+    return computed
+
+
 def verify() -> dict[str, Any]:
     flights = records(load("data/cache/flights.json"), "data/cache/flights.json")
     stays = records(load("data/cache/stays.json"), "data/cache/stays.json")
@@ -41,14 +129,10 @@ def verify() -> dict[str, Any]:
     stay_sites = Counter(item.get("provenance", {}).get("site") for item in stays)
     profiles = linkedin.get("profiles") if isinstance(linkedin, dict) else None
     companies = crunchbase.get("companies") if isinstance(crunchbase, dict) else None
-    sites = matrix.get("sites") if isinstance(matrix, dict) else None
-    counts = matrix.get("counts") if isinstance(matrix, dict) else None
     if not isinstance(profiles, list):
         raise ValueError("data/cache/linkedin_public.json: expected profiles array")
     if not isinstance(companies, list):
         raise ValueError("data/cache/crunchbase_public.json: expected companies array")
-    if not isinstance(sites, list) or not isinstance(counts, dict):
-        raise ValueError("data/block_matrix.json: expected sites array and counts object")
 
     actual = {
         "flights": len(flights),
@@ -58,11 +142,7 @@ def verify() -> dict[str, Any]:
         "airbnb": stay_sites["airbnb"],
         "linkedin_profiles": len(profiles),
         "crunchbase_companies": len(companies),
-        "access_sites": len(sites),
-        "access_direct": counts.get("reachable_without_brightdata"),
-        "access_bright_data": counts.get("reachable_with_brightdata"),
-        "access_unlocker": counts.get("reachable_with_unlocker_only"),
-        "access_any_path": counts.get("reachable_any_path"),
+        **access_metrics(matrix),
     }
     expected = {
         "flights": 34,
@@ -82,7 +162,11 @@ def verify() -> dict[str, Any]:
         key: {"expected": value, "actual": actual[key], "pass": actual[key] == value}
         for key, value in expected.items()
     }
-    return {"pass": all(item["pass"] for item in checks.values()), "checks": checks}
+    return {
+        "pass": all(item["pass"] for item in checks.values()),
+        "metrics": actual,
+        "checks": checks,
+    }
 
 
 def main() -> int:

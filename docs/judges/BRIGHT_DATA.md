@@ -28,7 +28,7 @@ Dynamic travel pages, anti-bot responses, and search-mediated identity resolutio
 
 ## Direct access versus Bright Data
 
-The committed access experiment covers **21 sites**: **10** succeeded directly, **14** through Bright Data, **12** through Web Unlocker alone, and **16** through any attempted path. These values come directly from [`data/block_matrix.json`](../../data/block_matrix.json).
+The committed access experiment covers **21 sites**: **10** succeeded directly, **14** through Bright Data, **12** through Web Unlocker alone, and **16** through any attempted path. The verification script recalculates these figures from every site's two direct user-agent attempts, Web Unlocker attempt, and Dataset attempt in [`data/block_matrix.json`](../../data/block_matrix.json); it does not trust the file's aggregate counters.
 
 The often-cited “8 of 16 direct versus 14 of 16 Bright Data” subset is intentionally not used: the evidence file does not define which five endpoints belong to that scope, so it cannot be reproduced honestly.
 

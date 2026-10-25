@@ -1,6 +1,6 @@
 # Verify the results
 
-All offline checks read committed evidence and require no API key or network access.
+All offline checks read committed evidence and require no API key or network access. Access metrics are recalculated from all 21 site-level attempt records—the union of two direct user-agent attempts, Web Unlocker, and Dataset outcomes—and then cross-checked against the stored summary.
 
 ```bash
 uv run python scripts/verify_judge_evidence.py --check
